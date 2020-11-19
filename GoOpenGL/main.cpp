@@ -9,6 +9,8 @@
 //#include <GLUT/glut.h>
 #include <GLFW/glfw3.h>
 
+#include <cmath>
+
 namespace Debug
 {
     GLenum glCheckErrorsLogging(const char *file, int line)
@@ -100,20 +102,27 @@ namespace SRender
     #version 330 core
     layout (location = 0) in vec3 aPos;
 
+    out vec4 vertexColor;
+
     void main()
     {
-        gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+        gl_Position = vec4(aPos, 1.0);
+        vertexColor = vec4(0.0, 1.0, 0.0, 1.0);
     }
     )";
 
     const char *solidColorOrangeFs =
     R"(
     #version 330 core
+
     out vec4 FragColor;
+    in vec4 vertexColor;
+    uniform vec4 someColor;
 
     void main()
     {
-        FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+        FragColor = vertexColor;
+        FragColor = someColor;
     }
     )";
 
@@ -349,6 +358,13 @@ namespace SRender
 
     void InitRender()
     {
+        // Log maximal number of vertex attributes available
+
+        int nrAttributes;
+        glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+        std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << "\n";
+
+        // Specify clear value for color buffer: color to fill color buffer with after call to "glClear(GL_COLOR_BUFFER_BIT)".
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
         // Setup shader: create, compile and link vertex and fragment shaders.
@@ -395,12 +411,17 @@ namespace SRender
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        float timeValue = glfwGetTime();
+        float greenValue = (std::sin(timeValue) / 2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderOrange, "someColor");
         glUseProgram(shaderOrange);
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(smallTriangleVao1);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(smallTriangle1) / 3);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glUseProgram(shaderRed);
         glBindVertexArray(smallTriangleVao2);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(smallTriangle2) / 3);

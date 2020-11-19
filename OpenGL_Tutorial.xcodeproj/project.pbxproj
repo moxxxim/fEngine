@@ -170,20 +170,28 @@
 		C3A9ECBB2564509100FD225B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"HEADER_SEARCH_PATHS[arch=*]" = (
-					Include,
-					Source,
-				);
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				HEADER_SEARCH_PATHS = Include;
+				LIBRARY_SEARCH_PATHS = "";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = Source;
+				SYSTEM_HEADER_SEARCH_PATHS = Source;
+				USER_HEADER_SEARCH_PATHS = Source;
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = Source;
 			};
 			name = Debug;
 		};
 		C3A9ECBC2564509100FD225B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"HEADER_SEARCH_PATHS[arch=*]" = (
-					Include,
-					Source,
-				);
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				HEADER_SEARCH_PATHS = Include;
+				LIBRARY_SEARCH_PATHS = "";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = Source;
+				SYSTEM_HEADER_SEARCH_PATHS = Source;
+				USER_HEADER_SEARCH_PATHS = Source;
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = Source;
 			};
 			name = Release;
 		};
