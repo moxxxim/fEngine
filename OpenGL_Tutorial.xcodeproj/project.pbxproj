@@ -13,6 +13,7 @@
 		C3A9ECD3256580C500FD225B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3A9ECD2256580C500FD225B /* Cocoa.framework */; };
 		C3A9ECD5256580EB00FD225B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3A9ECD4256580EB00FD225B /* IOKit.framework */; };
 		C3A9ECD7256580F200FD225B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3A9ECD6256580F200FD225B /* CoreVideo.framework */; };
+		C3A9ECDC2565B4C200FD225B /* FEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C3A9ECDA2565B4C200FD225B /* FEngine.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,6 +36,8 @@
 		C3A9ECD2256580C500FD225B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		C3A9ECD4256580EB00FD225B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		C3A9ECD6256580F200FD225B /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		C3A9ECDA2565B4C200FD225B /* FEngine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEngine.cpp; sourceTree = "<group>"; };
+		C3A9ECDB2565B4C200FD225B /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +59,7 @@
 		C3A9ECB62564509100FD225B = {
 			isa = PBXGroup;
 			children = (
+				C3A9ECD92565B3BA00FD225B /* Source */,
 				C3A9ECC3256452F200FD225B /* GoOpenGL */,
 				C3A9ECC2256452F200FD225B /* Products */,
 				C3A9ECCC2564552700FD225B /* Frameworks */,
@@ -88,6 +92,15 @@
 				C3A9ECCD2564552700FD225B /* libglfw3.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C3A9ECD92565B3BA00FD225B /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				C3A9ECDA2565B4C200FD225B /* FEngine.cpp */,
+				C3A9ECDB2565B4C200FD225B /* FEngine.h */,
+			);
+			path = Source;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -146,6 +159,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3A9ECDC2565B4C200FD225B /* FEngine.cpp in Sources */,
 				C3A9ECC5256452F200FD225B /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -157,8 +171,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				"HEADER_SEARCH_PATHS[arch=*]" = (
-					Sources,
 					Include,
+					Source,
 				);
 			};
 			name = Debug;
@@ -168,7 +182,7 @@
 			buildSettings = {
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					Include,
-					Sources,
+					Source,
 				);
 			};
 			name = Release;
