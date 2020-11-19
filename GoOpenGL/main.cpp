@@ -9,6 +9,33 @@
 //#include <GLUT/glut.h>
 #include <GLFW/glfw3.h>
 
+namespace Debug
+{
+    GLenum glCheckErrorsLogging(const char *file, int line)
+    {
+        GLenum errorCode;
+        while ((errorCode = glGetError()) != GL_NO_ERROR)
+        {
+            std::string error;
+            switch (errorCode)
+            {
+                case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+                case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+                case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+                case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+                case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+                case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+                case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+            }
+
+            std::cout << "[OpenGL Error]: "<< error << " | " << file << " (" << line << ")" << std::endl;
+        }
+        return errorCode;
+    }
+}
+
+#define glCheckErrorsLogging() Debug::glCheckErrorsLogging(__FILE__, __LINE__)
+
 namespace SMain
 {
     bool TryInitGlfw()
@@ -68,6 +95,39 @@ namespace SMain
 
 namespace SRender
 {
+    const char *diffuseShaderVs =
+    R"(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+
+    void main()
+    {
+        gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    }
+    )";
+
+    const char *solidColorOrangeFs =
+    R"(
+    #version 330 core
+    out vec4 FragColor;
+
+    void main()
+    {
+        FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    }
+    )";
+
+    const char *solidColorRedFs =
+    R"(
+    #version 330 core
+    out vec4 FragColor;
+
+    void main()
+    {
+        FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    }
+    )";
+
     const float triangle[]
     {
         -0.5f, -0.5f, 0.0f,
@@ -75,7 +135,7 @@ namespace SRender
         0.0f,  0.5f, 0.0f
     };
 
-    float rectangle[] = {
+    const float rectangle[] = {
         // first triangle
          0.5f,  0.5f, 0.0f,  // top right
          0.5f, -0.5f, 0.0f,  // bottom right
@@ -86,23 +146,64 @@ namespace SRender
         -0.5f,  0.5f, 0.0f   // top left
     };
 
-    GLuint shader;
-    GLuint shapeVao;
+    const float twoTriangles[]
+    {
+        // Left triangle
+        -0.5f, -0.5f, 0.0f,
+        0.f, -0.5f, 0.0f,
+        -0.25f, 0.f, 0.0f,
 
-    GLuint CreateVertexShader()
+        // Right triangle
+        0.f, 0.f, 0.0f,
+        0.5f, 0.f, 0.0f,
+        0.25f, 0.5f, 0.0f,
+    };
+
+    const unsigned int twoTrianglesIndices[]
+    {
+        0, 1, 2,
+        3, 4, 5
+    };
+
+    const float smallTriangle1[]
+    {
+        -0.5f, -0.5f, 0.0f,
+        0.f, -0.5f, 0.0f,
+        -0.25f, 0.f, 0.0f,
+    };
+
+    const float smallTriangle2[]
+    {
+        0.f, 0.f, 0.0f,
+        0.5f, 0.f, 0.0f,
+        0.25f, 0.5f, 0.0f,
+    };
+
+    const float rectangleVertices[]
+    {
+         0.5f,  0.5f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left
+    };
+
+    const unsigned int rectangleIndices[]
+    {  // note that we start from 0!
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
+    };
+
+    GLuint shaderOrange;
+    GLuint shaderRed;
+    GLuint shapeVao;
+    GLuint shapeEbo;
+
+    GLuint smallTriangleVao1;
+    GLuint smallTriangleVao2;
+
+    GLuint CreateVertexShader(const char *sourceCode)
     {
         // Shader code.
-
-        static const char *diffuseShaderVs =
-        R"(
-        #version 330 core
-        layout (location = 0) in vec3 aPos;
-
-        void main()
-        {
-            gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-        }
-        )";
 
         // Create shader object.
 
@@ -111,7 +212,7 @@ namespace SRender
         {
             // Set code for shader object and compile.
 
-            glShaderSource(vertexShader, 1, &diffuseShaderVs, nullptr);
+            glShaderSource(vertexShader, 1, &sourceCode, nullptr);
             glCompileShader(vertexShader);
 
             // Check shader compilation.
@@ -130,19 +231,8 @@ namespace SRender
         return vertexShader;
     }
 
-    GLuint CreateFragmentShader()
+    GLuint CreateFragmentShader(const char *sourceCode)
     {
-        const char *diffuseShaderFs =
-        R"(
-        #version 330 core
-        out vec4 FragColor;
-
-        void main()
-        {
-            FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-        }
-        )";
-
         // Create shader object.
 
         GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -150,7 +240,7 @@ namespace SRender
         {
             // Set code for shader object and compile.
 
-            glShaderSource(fragmentShader, 1, &diffuseShaderFs, nullptr);
+            glShaderSource(fragmentShader, 1, &sourceCode, nullptr);
             glCompileShader(fragmentShader);
 
             // Check shader compilation.
@@ -169,15 +259,15 @@ namespace SRender
         return fragmentShader;
     }
 
-    GLuint CreateShader()
+    GLuint CreateShader(const char *sourceVs, const char *sourceFs)
     {
-        GLuint vertexShader = CreateVertexShader();
+        GLuint vertexShader = CreateVertexShader(sourceVs);
         if(vertexShader == 0)
         {
             return 0;
         }
 
-        GLuint fragmentShader = CreateFragmentShader();
+        GLuint fragmentShader = CreateFragmentShader(sourceFs);
         if(fragmentShader == 0)
         {
             return 0;
@@ -243,11 +333,18 @@ namespace SRender
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-        glBindVertexArray(0);
-
         return vao;
+    }
+
+    GLuint CreateEbo(const unsigned int* indices, unsigned int indicesCount)
+    {
+        GLuint ebo;
+        glGenBuffers(1, &ebo);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
+        return ebo;
     }
 
     void InitRender()
@@ -255,20 +352,58 @@ namespace SRender
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
         // Setup shader: create, compile and link vertex and fragment shaders.
-        shader = CreateShader();
-        shapeVao = CreateVao(rectangle, 6);
+        shaderOrange = CreateShader(diffuseShaderVs, solidColorOrangeFs);
+        shaderRed = CreateShader(diffuseShaderVs, solidColorRedFs);
+        shapeVao = CreateVao(twoTriangles, 6);
+        smallTriangleVao1 = CreateVao(smallTriangle1, 3);
+        smallTriangleVao2 = CreateVao(smallTriangle2, 3);
 
-        // uncomment this call to draw in wireframe polygons.
+        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+        //glBindVertexArray(0);
+
+        shapeEbo = CreateEbo(twoTrianglesIndices, 6);
+
+        glBindVertexArray(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        // Draw in wireframe polygons.
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
-    void Render(GLuint vao, int verticesCount)
+    void RenderVao(GLuint vao, int verticesCount)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shader);
+        glUseProgram(shaderOrange);
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+    }
+
+    void RenderEbo(GLuint ebo, GLuint vao, int indicesCount)
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shaderOrange);
+        glBindVertexArray(vao);
+        // It's unneccessory if the EBO was bound while VAO was bound (and not unbound until VAO is unbound).
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+    }
+
+    void RenderTwoSmallTriangles()
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glUseProgram(shaderOrange);
+        glBindVertexArray(smallTriangleVao1);
+        glDrawArrays(GL_TRIANGLES, 0, sizeof(smallTriangle1) / 3);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glUseProgram(shaderRed);
+        glBindVertexArray(smallTriangleVao2);
+        glDrawArrays(GL_TRIANGLES, 0, sizeof(smallTriangle2) / 3);
     }
 }
 
@@ -283,7 +418,9 @@ int main(int argc, const char * argv[])
         while(!glfwWindowShouldClose(window))
         {
             SMain::ProcessWindowEscapeInput(*window);
-            SRender::Render(SRender::shapeVao, 6);
+            //SRender::RenderVao(SRender::shapeVao, 6);
+            //SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6);
+            SRender::RenderTwoSmallTriangles();
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
