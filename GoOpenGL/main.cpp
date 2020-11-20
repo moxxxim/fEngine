@@ -97,32 +97,68 @@ namespace SMain
 
 namespace SRender
 {
-    const char *diffuseShaderVs =
+    const char *dumbShaderVs =
     R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
 
-    out vec4 vertexColor;
-
     void main()
     {
         gl_Position = vec4(aPos, 1.0);
-        vertexColor = vec4(0.0, 1.0, 0.0, 1.0);
     }
     )";
 
-    const char *solidColorOrangeFs =
+    const char *vertexColorShaderVs =
+    R"(
+    #version 330 core
+
+    layout (location = 0) in vec3 aPosition;
+    layout (location = 1) in vec3 aColor;
+
+    out vec3 vertexColor;
+
+    void main()
+    {
+        gl_Position = vec4(aPosition, 1.0);
+        vertexColor = aColor;
+    }
+    )";
+
+    const char *vertexColorShaderFs =
+    R"(
+    #version 330 core
+
+    in vec3 vertexColor;
+    out vec4 FragColor;
+
+    void main()
+    {
+        FragColor = vec4(vertexColor, 1.0);
+    }
+    )";
+
+    const char *solidColorBlueFs =
     R"(
     #version 330 core
 
     out vec4 FragColor;
-    in vec4 vertexColor;
-    uniform vec4 someColor;
 
     void main()
     {
-        FragColor = vertexColor;
-        FragColor = someColor;
+        FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+    }
+    )";
+
+    const char *uniformColorFs =
+    R"(
+    #version 330 core
+
+    out vec4 FragColor;
+    uniform vec4 uColor
+
+    void main()
+    {
+        FragColor = uColor;
     }
     )";
 
@@ -142,6 +178,13 @@ namespace SRender
         -0.5f, -0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
         0.0f,  0.5f, 0.0f
+    };
+
+    const float triangleWithColors[]
+    {
+        -0.5f, -0.5f, 0.0f,     1.0, 0.0, 0.0,  // Red vertex
+        0.5f, -0.5f, 0.0f,      0.0, 1.0, 0.0,  // Green vertex
+        0.0f,  0.5f, 0.0f,      0.0, 0.0, 1.0,  // Blue vertex
     };
 
     const float rectangle[] = {
@@ -206,6 +249,7 @@ namespace SRender
     GLuint shaderRed;
     GLuint shapeVao;
     GLuint shapeEbo;
+    GLuint shaderVertexColor;
 
     GLuint smallTriangleVao1;
     GLuint smallTriangleVao2;
@@ -306,7 +350,7 @@ namespace SRender
         return shaderProgram;
     }
 
-    GLuint CreateVao(const float* triangles, int verticesCount)
+    GLuint CreateVao(const float* triangles, int verticesCount, int stride)
     {
         // Generate and bind vertex array object.
         GLuint vao;
@@ -322,7 +366,7 @@ namespace SRender
         // Bind buffer object.
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, 3 * verticesCount * sizeof(float), triangles, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 3 * stride, triangles, GL_STATIC_DRAW);
 
         // Setup vertex alignment in vertex buffer.
 
@@ -334,10 +378,51 @@ namespace SRender
          5 - offset between consecutive vertex attributes. Can be 0 in our case (indicates that attributes tightly packed).
          6 - offset of the first argument in array.
          */
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 
         // Enable vertex attribute in location 0.
         glEnableVertexAttribArray(0);
+
+        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        return vao;
+    }
+
+    GLuint CreateVaoWithColor(const float* triangles, int verticesCount, int stride)
+    {
+        // Generate and bind vertex array object.
+        GLuint vao;
+        glGenVertexArrays(1, &vao);
+
+        // Generate vertex buffer object.
+        GLuint vbo;
+        glGenBuffers(1, &vbo);
+
+        // Vind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+        glBindVertexArray(vao);
+
+        // Bind buffer object.
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, 3 * stride, triangles, GL_STATIC_DRAW);
+
+        // Setup vertex alignment in vertex buffer.
+
+        /*
+         1 - position of vertex attribute in shader: in our case this is position with location 0.
+         2 - number of components in vertex attribute: in our case this is 3 (Vector3 dimension).
+         3 - data type of each component in array.
+         4 - whether data should be normalized (clamed to range [-1, 1], or [0, 1]). WTF????
+         5 - offset between consecutive vertex attributes. Can be 0 in our case (indicates that attributes tightly packed).
+         6 - offset of the first argument in array.
+         */
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(0));
+        // Enable vertex attribute in location 0.
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(stride/2));
+        glEnableVertexAttribArray(1);
 
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -368,11 +453,12 @@ namespace SRender
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
         // Setup shader: create, compile and link vertex and fragment shaders.
-        shaderOrange = CreateShader(diffuseShaderVs, solidColorOrangeFs);
-        shaderRed = CreateShader(diffuseShaderVs, solidColorRedFs);
-        shapeVao = CreateVao(twoTriangles, 6);
-        smallTriangleVao1 = CreateVao(smallTriangle1, 3);
-        smallTriangleVao2 = CreateVao(smallTriangle2, 3);
+        shaderOrange = CreateShader(dumbShaderVs, solidColorBlueFs);
+        shaderRed = CreateShader(dumbShaderVs, solidColorRedFs);
+        shaderVertexColor = CreateShader(vertexColorShaderVs, vertexColorShaderFs);
+        shapeVao = CreateVaoWithColor(triangleWithColors, 3, sizeof(triangleWithColors) / 3);
+        smallTriangleVao1 = CreateVao(smallTriangle1, 3, sizeof(smallTriangle1) / 3);
+        smallTriangleVao2 = CreateVao(smallTriangle2, 3, sizeof(smallTriangle2) / 3);
 
         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
         // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
@@ -387,11 +473,11 @@ namespace SRender
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
-    void RenderVao(GLuint vao, int verticesCount)
+    void RenderVao(GLuint vao, int verticesCount, GLuint shader)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderOrange);
+        glUseProgram(shader);
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, verticesCount);
     }
@@ -412,14 +498,13 @@ namespace SRender
         glClear(GL_COLOR_BUFFER_BIT);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        float timeValue = glfwGetTime();
-        float greenValue = (std::sin(timeValue) / 2.0f) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderOrange, "someColor");
+//        float timeValue = glfwGetTime();
+//        float greenValue = (std::sin(timeValue) / 2.0f) + 0.5f;
+//        int vertexColorLocation = glGetUniformLocation(shaderOrange, "someColor");
         glUseProgram(shaderOrange);
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(smallTriangleVao1);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(smallTriangle1) / 3);
-
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glUseProgram(shaderRed);
@@ -439,9 +524,9 @@ int main(int argc, const char * argv[])
         while(!glfwWindowShouldClose(window))
         {
             SMain::ProcessWindowEscapeInput(*window);
-            //SRender::RenderVao(SRender::shapeVao, 6);
+            SRender::RenderVao(SRender::shapeVao, 3, SRender::shaderVertexColor);
             //SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6);
-            SRender::RenderTwoSmallTriangles();
+            //SRender::RenderTwoSmallTriangles();
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
