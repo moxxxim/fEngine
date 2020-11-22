@@ -4,6 +4,13 @@ cmake_minimum_required(VERSION 3.0)
 set(PROJECT_NAME "OpenGL_Tutorial")
 project(${PROJECT_NAME})
 
+message(${PROJECT_SOURCE_DIR})
+message(${PROJECT_BINARY_DIR})
+# do not allow build in source directory
+IF(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
+    message(FATAL_ERROR "Specify different directory for binaries: not allowed to build into source directory.")
+ENDIF()
+
 # ---------------- Define utility functions for build process -----------------
 
 # define function to generate gropus/filters in IDE corresponding to the folders structure in file system
