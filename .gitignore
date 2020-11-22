@@ -108,7 +108,7 @@ Temporary Items
 # Compiled Static libraries
 *.lai
 *.la
-*.a
+# *.a  Allow static libraries
 *.lib
 
 # Executables
