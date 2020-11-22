@@ -5,11 +5,9 @@
 
 namespace fengine
 {
-
-class Object
-{
-
-public:
+    class Object
+    {
+    public:
 
 	virtual ~Object() {};
 	inline obj_id GetId() const;

@@ -132,3 +132,5 @@ target_link_libraries(OpenGLWindow
 
 # ---------------- Make project groups -----------------
 assign_source_group(${MY_PROJECT_SOURCES_FILES})
+
+# TODO: m.alekseev make resources folder visible in project.

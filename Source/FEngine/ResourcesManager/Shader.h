@@ -1,58 +1,71 @@
 #pragma once
 
-#include "../../../Utilities/utilities.h"
+//#include <FEngine/App/Object.h>
+#include <FEngine/ResourcesManager/CachedShader.h>
 
-#include "../Utilities/utilities.h"
-#include "../App/Object.h"
-#include "../Utils/StringMap.h"
-#include "CachedShader.h"
+#include <map>
+#include <string>
 
 namespace fengine
 {
+    enum class ShaderStates : int;
 
-enum class ShaderStates : int;
+    class Shader final // : public Object
+    {
+    public:
+        enum class eType : uint8_t
+        {
+            Vertex = 0,
+            Fragment = 1,
+        };
 
-class Shader final : public Object
+        Shader(const CachedShader& cachedShader);
+        ~Shader();
+
+        void Load();
+        void Unload();
+        void StartUse() const;
+        void StopUse() const;
+        //void Destroy() override;
+
+        const std::map<std::string, int32_t> &GetAttributes() const;
+        const std::map<std::string, int32_t> &GetUniforms() const;
+
+        bool TryGetAttributeLocation(const char *name, uint32_t& location) const;
+        bool TryGetUniformLocation(const char *name, uint32_t& location) const;
+        bool HasUniform(const char *name) const;
+
+        bool SetUniformBool(const char *name, bool value);
+        bool SetUniformInt(const char *name, int32_t value);
+        bool SetUniformFloat(const char *name, float value);
+        bool SetUniformFloatArray(const char *name, const float *value, int size);
+
+    private:
+        void EnableState() const;
+        void DisableStates() const;
+        void FetchActiveAttributes();
+        void FetchActiveUniforms();
+
+        static const int32_t k_undefinedShaderParamLocation = -1;
+
+        uint32_t m_program = 0;
+        std::map<std::string, int32_t> m_attributes;
+        std::map<std::string, int32_t> m_uniforms;
+        CachedShader m_cachedInfo;
+    };
+
+    std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath);
+}
+
+namespace fengine
 {
+    inline const std::map<std::string, int32_t> &Shader::GetAttributes() const
+    {
+        return m_attributes;
+    }
 
-public:
-
-	Shader(const CachedShader& cachedShader);
-	~Shader();
-
-	void StartUse() const;
-	void StopUse() const;
-	void Destroy() override;
-
-	const StringMap<int> * GetAttributes() const;
-	const StringMap<int> * GetUniforms() const;
-	bool TryGetAttribute(const char *name, int& location) const;
-	bool HasUniform(const char *name) const;
-	bool SetUniformInt(const char *name, int value);
-	bool SetUniformFloat(const char *name, float value);
-	bool SetUniformFloatArray(const char *name, const float *value, int size);
-	bool SetUniformVector3(const char *name, const Vector3& value);
-	bool SetUniformVector3Array(const char *name, const Vector3 *value, int size);
-	bool SetUniformVector4(const char *name, const Vector4& value);
-	bool SetUniformVector4Array(const char *name, const Vector4 *value, int size);
-	bool SetUniformMatrix4(const char *name, const Matrix& value);
-
-private:
-
-	void EnableState() const;
-	void DisableStates() const;
-	void FetchActiveAttributes();
-	void FetchActiveUniforms();
-
-	unsigned int m_program = 0;
-	unsigned int m_vertexShader = 0;
-	unsigned int m_fragmentShader = 0;
-	StringMap<int> m_attributes;
-	StringMap<int> m_uniforms;
-	CachedShader m_cachedInfo;
-
-	static const int k_undefinedShaderParamLocation = -1;
-
-};
-
+    inline const std::map<std::string, int32_t> &Shader::GetUniforms() const
+    {
+        return m_uniforms;
+    }
 }

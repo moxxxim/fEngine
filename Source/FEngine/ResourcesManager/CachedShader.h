@@ -3,27 +3,22 @@
 #include <FEngine/ResourcesManager/CachedResource.h>
 #include <FEngine/ResourcesManager/ShaderStates.h>
 
+#include <string>
+
 namespace fengine
 {
     class CachedShader : public CachedResource
     {
     public:
         CachedShader() = default;
-        CachedShader(const CachedShader& other);
-        CachedShader(CachedShader&& other);
-        inline ~CachedShader();
+        CachedShader(const CachedShader& other) = default;
+        CachedShader(CachedShader&& other) = default;
 
-        CachedShader& operator = (const CachedShader& other);
-        CachedShader& operator = (CachedShader&& other);
+        CachedShader& operator = (const CachedShader& other) = default;
+        CachedShader& operator = (CachedShader&& other) = default;
 
         ShaderStates States = ShaderStates::None;
-        char *Fs = nullptr;
-        char *Vs = nullptr;
+        std::string Fs;
+        std::string Vs;
     };
-
-    inline CachedShader::~CachedShader()
-    {
-        delete[] Fs;
-        delete[] Vs;
-    }
 }

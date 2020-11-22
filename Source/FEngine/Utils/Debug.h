@@ -1,12 +1,14 @@
 #pragma once
 
+#include <string>
+
 namespace fengine
 {
     class Debug final
     {
     public:
-        static void LogMessage(const char *message);
-        static void LogWarning(const char *message);
-        static void LogError(const char *message);
+        static void LogMessage(const std::string &message);
+        static void LogWarning(const std::string &message);
+        static void LogError(const std::string &message);
     };
 }

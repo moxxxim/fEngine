@@ -3,38 +3,16 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
+#include <FEngine/ResourcesManager/Shader.h>
 
 #include <cmath>
 
-namespace Debug
-{
-    GLenum glCheckErrorsLogging(const char *file, int line)
-    {
-        GLenum errorCode;
-        while ((errorCode = glGetError()) != GL_NO_ERROR)
-        {
-            std::string error;
-            switch (errorCode)
-            {
-                case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
-                case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
-                case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
-                case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
-                case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
-                case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
-                case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
-            }
-
-            std::cout << "[OpenGL Error]: "<< error << " | " << file << " (" << line << ")" << std::endl;
-        }
-        return errorCode;
-    }
-}
-
-#define glCheckErrorsLogging() Debug::glCheckErrorsLogging(__FILE__, __LINE__)
-
 namespace SMain
 {
+    std::string BaseResourcesDir = "../../../Resources/";
+    std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
+    std::string BaseTempShadersDir = BaseShadersDir + "Temp/";
+
     bool TryInitGlfw()
     {
         int initResult = glfwInit();
@@ -88,85 +66,23 @@ namespace SMain
             glfwSetWindowShouldClose(&window, true);
         }
     }
+
+    std::unique_ptr<fengine::Shader> LoadTempShader(const std::string& vsFileName, const std::string& fsFileName)
+    {
+        std::string vsFilePath = BaseTempShadersDir + vsFileName;
+        std::string fsFilePath = BaseTempShadersDir + fsFileName;
+        return fengine::LoadShader(vsFilePath, fsFilePath);
+    }
 }
 
 namespace SRender
 {
-    const char *dumbShaderVs =
-    R"(
-    #version 330 core
-    layout (location = 0) in vec3 aPos;
-
-    void main()
-    {
-        gl_Position = vec4(aPos, 1.0);
-    }
-    )";
-
-    const char *vertexColorShaderVs =
-    R"(
-    #version 330 core
-
-    layout (location = 0) in vec3 aPosition;
-    layout (location = 1) in vec3 aColor;
-
-    out vec3 vertexColor;
-
-    void main()
-    {
-        gl_Position = vec4(aPosition, 1.0);
-        vertexColor = aColor;
-    }
-    )";
-
-    const char *vertexColorShaderFs =
-    R"(
-    #version 330 core
-
-    in vec3 vertexColor;
-    out vec4 FragColor;
-
-    void main()
-    {
-        FragColor = vec4(vertexColor, 1.0);
-    }
-    )";
-
-    const char *solidColorBlueFs =
-    R"(
-    #version 330 core
-
-    out vec4 FragColor;
-
-    void main()
-    {
-        FragColor = vec4(0.0, 0.0, 1.0, 1.0);
-    }
-    )";
-
-    const char *uniformColorFs =
-    R"(
-    #version 330 core
-
-    out vec4 FragColor;
-    uniform vec4 uColor
-
-    void main()
-    {
-        FragColor = uColor;
-    }
-    )";
-
-    const char *solidColorRedFs =
-    R"(
-    #version 330 core
-    out vec4 FragColor;
-
-    void main()
-    {
-        FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    }
-    )";
+    const char *vertexColorVsName = "TriangleVertexColorVs.vs";
+    const char *vertexColorFsName = "TriangleVertexColorFs.fs";
+    const char *vertexColorUpsideDownVsName = "TriangleVertexColorUpsideDownVs.vs";
+    const char *vertexColorWithOffsetVsName = "TriangleVertexColorWithOffsetVs.vs";
+    const char *vertexColorFromPositionVsName = "TriangleVertexColorFromPositionVs.vs";
+    const char *vertexColorFromPositionFsName = "TriangleVertexColorFromPositionFs.fs";
 
     const float triangle[]
     {
@@ -177,8 +93,8 @@ namespace SRender
 
     const float triangleWithColors[]
     {
-        -0.5f, -0.5f, 0.0f,     1.0, 0.0, 0.0,  // Red vertex
-        0.5f, -0.5f, 0.0f,      0.0, 1.0, 0.0,  // Green vertex
+        0.5f, -0.5f, 0.0f,     1.0, 0.0, 0.0,  // Red vertex
+        -0.5f, -0.5f, 0.0f,      0.0, 1.0, 0.0,  // Green vertex
         0.0f,  0.5f, 0.0f,      0.0, 0.0, 1.0,  // Blue vertex
     };
 
@@ -240,110 +156,15 @@ namespace SRender
         1, 2, 3    // second triangle
     };
 
-    GLuint shaderOrange;
-    GLuint shaderRed;
     GLuint shapeVao;
     GLuint shapeEbo;
-    GLuint shaderVertexColor;
+    std::unique_ptr<fengine::Shader> vertexColorShader;
+    std::unique_ptr<fengine::Shader> vertexColorUpsideDownShader;
+    std::unique_ptr<fengine::Shader> vertexColorWithOffsetShader;
+    std::unique_ptr<fengine::Shader> vertexColorFromPositionShader;
 
     GLuint smallTriangleVao1;
     GLuint smallTriangleVao2;
-
-    GLuint CreateVertexShader(const char *sourceCode)
-    {
-        // Shader code.
-
-        // Create shader object.
-
-        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        if(vertexShader != 0)
-        {
-            // Set code for shader object and compile.
-
-            glShaderSource(vertexShader, 1, &sourceCode, nullptr);
-            glCompileShader(vertexShader);
-
-            // Check shader compilation.
-            GLint success;
-            glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-            if(!success)
-            {
-                constexpr int logSize = 512;
-                char errorLog[logSize];
-                glGetShaderInfoLog(vertexShader, logSize, nullptr, errorLog);
-                std::cout << "[Render] Failed to compile vertex shader: " << errorLog;
-                glDeleteShader(vertexShader);
-            }
-        }
-
-        return vertexShader;
-    }
-
-    GLuint CreateFragmentShader(const char *sourceCode)
-    {
-        // Create shader object.
-
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        if(fragmentShader != 0)
-        {
-            // Set code for shader object and compile.
-
-            glShaderSource(fragmentShader, 1, &sourceCode, nullptr);
-            glCompileShader(fragmentShader);
-
-            // Check shader compilation.
-            GLint success;
-            glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-            if(!success)
-            {
-                constexpr int logSize = 512;
-                char errorLog[logSize];
-                glGetShaderInfoLog(fragmentShader, logSize, nullptr, errorLog);
-                std::cout << "[Render] Failed to compile fragment shader: " << errorLog;
-                glDeleteShader(fragmentShader);
-            }
-        }
-
-        return fragmentShader;
-    }
-
-    GLuint CreateShader(const char *sourceVs, const char *sourceFs)
-    {
-        GLuint vertexShader = CreateVertexShader(sourceVs);
-        if(vertexShader == 0)
-        {
-            return 0;
-        }
-
-        GLuint fragmentShader = CreateFragmentShader(sourceFs);
-        if(fragmentShader == 0)
-        {
-            return 0;
-        }
-
-        GLuint shaderProgram = glCreateProgram();
-        if(shaderProgram != 0)
-        {
-            glAttachShader(shaderProgram, vertexShader);
-            glAttachShader(shaderProgram, fragmentShader);
-            glLinkProgram(shaderProgram);
-
-            GLint success;
-            glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-            if(!success)
-            {
-                constexpr int logSize = 512;
-                char errorLog[logSize];
-                glGetProgramInfoLog(shaderProgram, logSize, nullptr, errorLog);
-                std::cout << "[Render] Failed to create shader program: " << errorLog;
-                glDeleteProgram(shaderProgram);
-            }
-        }
-
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-        return shaderProgram;
-    }
 
     GLuint CreateVao(const float* triangles, int verticesCount, int stride)
     {
@@ -436,6 +257,20 @@ namespace SRender
         return ebo;
     }
 
+    void LoadShaders()
+    {
+        vertexColorShader = SMain::LoadTempShader(SRender::vertexColorVsName, SRender::vertexColorFsName);
+        vertexColorUpsideDownShader = SMain::LoadTempShader(
+                                                            SRender::vertexColorUpsideDownVsName,
+                                                            SRender::vertexColorFsName);
+        vertexColorWithOffsetShader = SMain::LoadTempShader(
+                                                            SRender::vertexColorWithOffsetVsName,
+                                                            SRender::vertexColorFsName);
+        vertexColorFromPositionShader = SMain::LoadTempShader(
+                                                              SRender::vertexColorFromPositionVsName,
+                                                              SRender::vertexColorFromPositionFsName);
+    }
+
     void InitRender()
     {
         // Log maximal number of vertex attributes available
@@ -447,10 +282,7 @@ namespace SRender
         // Specify clear value for color buffer: color to fill color buffer with after call to "glClear(GL_COLOR_BUFFER_BIT)".
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-        // Setup shader: create, compile and link vertex and fragment shaders.
-        shaderOrange = CreateShader(dumbShaderVs, solidColorBlueFs);
-        shaderRed = CreateShader(dumbShaderVs, solidColorRedFs);
-        shaderVertexColor = CreateShader(vertexColorShaderVs, vertexColorShaderFs);
+        LoadShaders();
         shapeVao = CreateVaoWithColor(triangleWithColors, 3, sizeof(triangleWithColors) / 3);
         smallTriangleVao1 = CreateVao(smallTriangle1, 3, sizeof(smallTriangle1) / 3);
         smallTriangleVao2 = CreateVao(smallTriangle2, 3, sizeof(smallTriangle2) / 3);
@@ -468,41 +300,38 @@ namespace SRender
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
-    void RenderVao(GLuint vao, int verticesCount, GLuint shader)
+    void RenderVao(GLuint vao, int verticesCount, fengine::Shader& shader)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shader);
+        shader.StartUse();
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+        shader.StopUse();
     }
 
-    void RenderEbo(GLuint ebo, GLuint vao, int indicesCount)
+    void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, fengine::Shader& shader)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderOrange);
+        shader.StartUse();
         glBindVertexArray(vao);
         // It's unneccessory if the EBO was bound while VAO was bound (and not unbound until VAO is unbound).
         //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
     }
 
-    void RenderTwoSmallTriangles()
+    void RenderTwoSmallTriangles(fengine::Shader& firstShader, fengine::Shader& secondShader)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//        float timeValue = glfwGetTime();
-//        float greenValue = (std::sin(timeValue) / 2.0f) + 0.5f;
-//        int vertexColorLocation = glGetUniformLocation(shaderOrange, "someColor");
-        glUseProgram(shaderOrange);
-        //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        firstShader.StartUse();
         glBindVertexArray(smallTriangleVao1);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(smallTriangle1) / 3);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glUseProgram(shaderRed);
+        secondShader.StartUse();
         glBindVertexArray(smallTriangleVao2);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(smallTriangle2) / 3);
     }
@@ -519,9 +348,11 @@ int main(int argc, const char * argv[])
         while(!glfwWindowShouldClose(window))
         {
             SMain::ProcessWindowEscapeInput(*window);
-            SRender::RenderVao(SRender::shapeVao, 3, SRender::shaderVertexColor);
-            //SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6);
-            //SRender::RenderTwoSmallTriangles();
+
+//            float timeValue = glfwGetTime();
+//            float offsetValue = std::sin(timeValue) / 2.0f;
+//            SRender::vertexColorWithOffsetShader->SetUniformFloat("uOffset", offsetValue);
+            SRender::RenderVao(SRender::shapeVao, 3, *SRender::vertexColorFromPositionShader);
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
