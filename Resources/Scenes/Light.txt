@@ -1,0 +1,86 @@
+Settings
+Fog
+FogStart 8
+FogRange 10
+FogDensity 0.3
+FogColor [0.3, 0.0, 0.2]
+
+Skybox
+Id 200 [ l_MaterialId 1000000300 l_MeshId 1000000021 ]
+
+AmbientLight
+Color [1.0, 1.0, 1.0, 1.0]
+
+GameObjectsCount 9
+
+Id 40
+Position [0, 4, -5]
+Rotation [-0.4, 3.14159, 0.0]
+Scale [1.0, 1.0, 1.0]
+ComponentsCount 2
+Component Camera Id 1 [ f_AspectRatio 1.777778 f_FovY 1 f_NearClipDistance 1 f_FarClipDistance 61 ]
+Component CameraController Id 2 [ f_MoveSpeed 6 f_RotateSpeed 3 ]
+
+Id 10
+Position [0.0, 0, 0.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [1, 1, 1]
+ComponentsCount 1
+Component SceneLoader Id 11 []
+
+Id 3
+Position [4.0, -1.0, 4.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [0.02, 0.02, 0.02]
+ComponentsCount 2
+Component MeshRenderer Id 4 [ l_MaterialId 1000000003 l_MeshId 1000000001 ]
+Component GameObjectRotation Id 5 [ f_FullTurnDuration 8.0 ]
+
+Id 101
+Position [0, 0, 0]
+Rotation [0, 0, 0.0]
+Scale [1.0, 1.0, 1.0]
+ComponentsCount 1
+Component Light Id 1010 [ l_Type 0 f_ColorR 1.0 f_ColorG 1.0 f_ColorB 1.0 f_ColorA 1.0 f_Intensity 2.0 f_Range 0.0 ]
+
+Id 102
+Position [0.0, 0.0, 3.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [1, 1, 1]
+ComponentsCount 1
+Component Light Id 1011 [ l_Type 1 f_ColorR 1.0 f_ColorG 0.0 f_ColorB 0.0 f_ColorA 1.0 f_Intensity 30.0 f_Range 3 ]
+
+Id 103
+Position [0.0, 0.0, 4.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [1, 1, 1]
+ComponentsCount 1
+Component Light Id 1012 [ l_Type 1 f_ColorR 0.0 f_ColorG 0.0 f_ColorB 1.0 f_ColorA 1.0 f_Intensity 40.0 f_Range 3 ]
+
+Id 104
+Position [-4.0, -1.0, 4.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [0.02, 0.02, 0.02]
+ComponentsCount 2
+Component MeshRenderer Id 1013 [ l_MaterialId 1000000303 l_MeshId 1000000001 ]
+Component GameObjectRotation Id 1014 [ f_FullTurnDuration 200 ]
+
+Id 105
+Position [0.0, -2.0, 5.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [6, 1, 6]
+ComponentsCount 1
+Component MeshRenderer Id 1015 [ l_MaterialId 1000000304 l_MeshId 1010000001 ]
+
+Id 106
+Position [0.0, 0.0, 0.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [1, 1, 1]
+ComponentsCount 1
+Component PostEffectsSwitcher Id 1016 
+[
+l_BlackNWhiteId 1000010000
+l_BlurId 1000010001
+l_BloomId 1000010006
+l_DepthOfFieldId 1000010007
+]

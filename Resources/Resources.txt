@@ -1,0 +1,397 @@
+Textures Count 13
+
+Id 1000000000
+Location "../Resources/Textures/Bus.tga"
+Wrapping 0
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1000000006
+Location "../Resources/Textures/Dirt.tga"
+Wrapping 0
+TextureType 0
+MinFilter 2
+MagFilter 1
+MipMaps 1
+
+Id 1000000007
+Location "../Resources/Textures/Grass.tga"
+Wrapping 0
+TextureType 0
+MinFilter 2
+MagFilter 1
+MipMaps 1
+
+Id 1000000008
+Location "../Resources/Textures/Rock.tga"
+Wrapping 0
+TextureType 0
+MinFilter 2
+MagFilter 1
+MipMaps 1
+
+Id 1000000009
+Location "../Resources/Textures/Terrain_blend_map.tga"
+Wrapping 0
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1000000020
+Location "../Resources/Textures/envMap.tga"
+Wrapping 0
+TextureType 1
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1000000022
+Location "../Resources/Textures/Radar.tga"
+Wrapping 0
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1100000000
+Location "../Resources/Textures/Fire.tga"
+Wrapping 1
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1100000001
+Location "../Resources/Textures/fire_mask.tga"
+Wrapping 1
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1100000002
+Location "../Resources/Textures/DisplacementMap.tga"
+Wrapping 0
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1100000003
+Location "../Resources/Textures/NormalMap.tga"
+Wrapping 0
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1100000004
+Location "../Resources/Textures/SolidBlue.tga"
+Wrapping 0
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Id 1100000005
+Location "../Resources/Textures/WaterNormal.tga"
+Wrapping 0
+TextureType 0
+MinFilter 5
+MagFilter 1
+MipMaps 1
+
+Meshes Count 6
+
+Id 1000000001
+Location "../Resources/Models/Bus.nfg"
+
+Id 1000000010
+Location "../Resources/Models/Terrain.nfg"
+
+Id 1000000021
+Location "../Resources/Models/UnitCube.nfg"
+
+Id 1000000023
+Location "../Resources/Models/Radar.nfg"
+
+Id 1010000000
+Location "../Resources/Models/Fire.nfg"
+
+Id 1010000001
+Location "../Resources/Models/Water.nfg"
+
+Shaders Count 13
+
+Id 1000000002
+VsLocation "../Resources/Shaders/DiffuseColorVS.vs"
+FsLocation "../Resources/Shaders/DiffuseColorFS.fs"
+ShaderStates 2 4 8
+
+Id 1000000004
+VsLocation "../Resources/Shaders/TexturesBlend3ShaderVS.vs"
+FsLocation "../Resources/Shaders/TexturesBlend3ShaderFS.fs"
+ShaderStates 2 4 8
+
+Id 1000000200
+VsLocation "../Resources/Shaders/CubeMapShaderVS.vs"
+FsLocation "../Resources/Shaders/CubeMapShaderFS.fs"
+ShaderStates 1 4
+
+Id 1000000201
+VsLocation "../Resources/Shaders/SpecularCubeMapShaderVS.vs"
+FsLocation "../Resources/Shaders/SpecularCubeMapShaderFS.fs"
+ShaderStates 2 4 8
+
+Id 1001000000
+VsLocation "../Resources/Shaders/FireShaderVS.vs"
+FsLocation "../Resources/Shaders/FireShaderFS.fs"
+ShaderStates 2 4 8
+
+Id 1001000001
+VsLocation "../Resources/Shaders/DiffuseNormalVS.vs"
+FsLocation "../Resources/Shaders/DiffuseNormalFS.fs"
+ShaderStates 2 4 8
+
+Id 1001000002
+VsLocation "../Resources/Shaders/WaterVS.vs"
+FsLocation "../Resources/Shaders/WaterFS.fs"
+ShaderStates 2 4 8
+
+Id 1001000003
+VsLocation "../Resources/Shaders/PostEffectVS.vs"
+FsLocation "../Resources/Shaders/PostEffectBlackAndWhiteFS.fs"
+ShaderStates 0
+
+Id 1001000004
+VsLocation "../Resources/Shaders/PostEffectVS.vs"
+FsLocation "../Resources/Shaders/PostEffectBlurFS.fs"
+ShaderStates 0
+
+Id 1001000005
+VsLocation "../Resources/Shaders/PostEffectVS.vs"
+FsLocation "../Resources/Shaders/PostEffectBloomStartFS.fs"
+ShaderStates 0
+
+Id 1001000006
+VsLocation "../Resources/Shaders/PostEffectVS.vs"
+FsLocation "../Resources/Shaders/PostEffectDepthOfFieldStartFS.fs"
+ShaderStates 0
+
+Id 1001000007
+VsLocation "../Resources/Shaders/PostEffectVS.vs"
+FsLocation "../Resources/Shaders/PostEffectDepthOfFieldFinishFS.fs"
+ShaderStates 0
+
+Id 1001000008
+VsLocation "../Resources/Shaders/PostEffectVS.vs"
+FsLocation "../Resources/Shaders/PostEffectBloomFinishFS.fs"
+ShaderStates 0
+
+Materials Count 13
+
+Id 1000000003
+Shader 1000000002
+Textures 1 
+[
+u_textureMain 1000000000
+]
+Floats 0 []
+Vec4 0 []
+
+Id 1000000005
+Shader 1000000004
+Textures 4
+[
+u_texDirt 1000000006
+u_texGrass 1000000007
+u_texRock 1000000008
+u_texBlend 1000000009
+]
+Floats 1
+[
+u_tiling 6.0
+]
+Vec4 0 []
+
+Id 1000000300
+Shader 1000000200
+Textures 1
+[
+u_cubeMap 1000000020
+]
+Floats 0 []
+Vec4 0 []
+
+Id 1000000301
+Shader 1000000201
+Textures 2
+[
+u_textureMain 1000000022
+u_reflectionMap 1000000020
+]
+Floats 1
+[
+u_specularity 0.6
+]
+Vec4 0 []
+
+Id 1000000302
+Shader 1001000000
+Textures 3
+[
+u_textureMain 1100000000
+u_displacementMap 1100000002
+u_fireMask 1100000001
+]
+Floats 1
+[
+u_maxDisplacement 0.3
+]
+Vec4 0 []
+
+Id 1000000303
+Shader 1001000001
+Textures 2
+[
+u_textureMain 1000000000
+u_normalMap 1100000003
+]
+Floats 0 [ ]
+Vec4 0 []
+
+Id 1000000304
+Shader 1001000002
+Textures 4
+[
+u_waterBottom 1000000008
+u_normalMap 1100000005
+u_displacementMap 1100000002
+u_reflectionMap 1000000020
+]
+Floats 5
+[ 
+u_depthAdjustDisplacement 0.02
+u_flowSpeed 0.2
+u_transparencyFactor 5.0
+u_depthAdjust 0.2
+u_surfaceMaxDisplacement 0.2
+]
+Vec4 1
+[
+u_waterColor [0.1, 0.6, 1.0, 1.0]
+]
+
+Id 1000100000
+Shader 1001000003
+Textures 0 []
+Floats 1
+[
+u_brightness 3.0
+]
+Vec4 0 []
+
+Id 1000100001
+Shader 1001000004
+Textures 0 []
+Floats 0 []
+Vec4 0
+[
+]
+
+Id 1000100002
+Shader 1001000005
+Textures 0 []
+Floats 1
+[
+u_limit 0.2
+]
+Vec4 0 []
+
+Id 1000100003
+Shader 1001000006
+Textures 0 []
+Floats 4
+[
+u_near 1.0
+u_far 61.0
+u_fade 8.0
+u_clarity 12.0
+]
+Vec4 0
+[
+]
+
+Id 1000100004
+Shader 1001000007
+Textures 0 []
+Floats 4
+[
+u_near 1.0
+u_far 61.0
+u_fade 8.0
+u_clarity 12.0
+]
+Vec4 1
+[
+u_step [0.01, 0.01, 0.002, 0.001]
+]
+
+Id 1000100005
+Shader 1001000008
+Textures 0 []
+Floats 0 []
+Vec4 0 []
+
+PostEffects 8
+
+Id 1000010000
+Type 0
+Material 1000100000
+PassBehaviour 0
+Sequence 0 [ ]
+
+Id 1000010001
+Type 0
+Material 1000100001
+PassBehaviour 1000001000
+Sequence 0 [ ]
+
+Id 1000010002
+Type 0
+Material 1000100002
+PassBehaviour 0
+Sequence 0 [ ]
+
+Id 1000010003
+Type 0
+Material 1000100005
+PassBehaviour 0
+Sequence 0 []
+
+Id 1000010004
+Type 0
+Material 1000100003
+PassBehaviour 1000001001
+Sequence 0 [ ]
+
+Id 1000010005
+Type 0
+Material 1000100004
+PassBehaviour 1000001002
+Sequence 0 [ ]
+
+Id 1000010006
+Type 1
+Material 0
+PassBehaviour 0
+Sequence 3 [ 1000010002 1000010001 1000010003 ]
+
+Id 1000010007
+Type 1
+Material 0
+PassBehaviour 0
+Sequence 2 [ 1000010004 1000010005 ]

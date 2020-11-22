@@ -1,0 +1,64 @@
+Settings
+Fog
+FogStart 5
+FogRange 10
+FogDensity 0.5
+FogColor [0.0, 1.0, 0.5]
+
+Skybox
+Id 200 [ l_MaterialId 1000000300 l_MeshId 1000000021 ]
+
+AmbientLight
+Color [1.0, 1.0, 1.0, 1.0]
+
+GameObjectsCount 6
+
+Id 40
+Position [-1, 4, -5]
+Rotation [-0.4, 3, 0.0]
+Scale [1.0, 1.0, 1.0]
+ComponentsCount 2
+Component Camera Id 1 [ f_AspectRatio 1.777778 f_FovY 1 f_NearClipDistance 0.1 f_FarClipDistance 100 ]
+Component CameraController Id 2 [ f_MoveSpeed 6 f_RotateSpeed 6 ]
+
+Id 3
+Position [0.0, -1.0, 4.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [0.1, 0.1, 0.1]
+ComponentsCount 1
+Component MeshRenderer Id 4 [ l_MaterialId 1000000005 l_MeshId 1000000010 ]
+
+Id 6
+Position [0.0, -1.0, 4.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [0.02, 0.02, 0.02]
+ComponentsCount 2
+Component MeshRenderer Id 7 [ l_MaterialId 1000000003 l_MeshId 1000000001 ]
+Component GameObjectRotation Id 8 [ f_FullTurnDuration 8.0 ]
+
+Id 10
+Position [0.0, 0, 0.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [1, 1, 1]
+ComponentsCount 1
+Component SceneLoader Id 11 []
+
+Id 100
+Position [-4.0, -1.0, 1.0]
+Rotation [0.0, 3.14, 0.0]
+Scale [0.2, 0.2, 0.2]
+ComponentsCount 1
+Component MeshRenderer Id 1000 [ l_MaterialId 1000000302 l_MeshId 1010000000 ]
+
+Id 106
+Position [0.0, 0.0, 0.0]
+Rotation [0.0, 0.0, 0.0]
+Scale [1, 1, 1]
+ComponentsCount 1
+Component PostEffectsSwitcher Id 1016 
+[
+l_BlackNWhiteId 1000010000
+l_BlurId 1000010001
+l_BloomId 1000010006
+l_DepthOfFieldId 1000010007
+]
