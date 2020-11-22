@@ -116,3 +116,5 @@ Temporary Items
 *.out
 *.app
 
+## cmake ignores
+_cmake_build/

@@ -1,12 +1,7 @@
 #include <iostream>
 
-// Define to remove "deprecation" messages about OpenGL
-#define GL_SILENCE_DEPRECATION
-
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
-//#include <OpenGL/glu.h>
-//#include <GLUT/glut.h>
 #include <GLFW/glfw3.h>
 
 #include <cmath>
