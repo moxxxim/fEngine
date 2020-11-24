@@ -8,12 +8,7 @@ namespace fengine
     {
     public:
         CachedResource() = default;
-        CachedResource(const CachedResource& other) = default;
-        CachedResource(CachedResource&& other) = default;
         virtual ~CachedResource() = default;
-
-        CachedResource& operator = (const CachedResource& other) = default;
-        CachedResource& operator = (CachedResource&& other) = default;
 
         obj_id Id = 0;
     };

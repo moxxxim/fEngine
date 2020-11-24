@@ -7,9 +7,9 @@ project(${PROJECT_NAME})
 message(${PROJECT_SOURCE_DIR})
 message(${PROJECT_BINARY_DIR})
 # do not allow build in source directory
-IF(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
+if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
     message(FATAL_ERROR "Specify different directory for binaries: not allowed to build into source directory.")
-ENDIF()
+endif()
 
 # ---------------- Define utility functions for build process -----------------
 
@@ -66,10 +66,10 @@ set(THIRDPARTY_LIBS)
 set(THIRDPARTY_LIBS_DIRS)
 
 # serach for Mac-specific libraries
-IF(APPLE)
+if(APPLE)
     file(GLOB_RECURSE THIRDPARTY_LIBS REGEX "*.a")
     list(FILTER THIRDPARTY_LIBS INCLUDE REGEX ".*Thirdparty.*Libs.*")
-ENDIF(APPLE)
+endif(APPLE)
 
 # evaluate thirdparty libs' directories
 foreach(lib_path IN ITEMS ${THIRDPARTY_LIBS})
@@ -90,7 +90,7 @@ log_delimeters()
 # ---------------- Collect platform-specifil libraries -----------------
 # collect Mac-specific libraries
 set(PLATFORM_SPECIFIC_LIBS)
-IF(APPLE)
+if(APPLE)
     find_library(MAC_COCOA_LIB Cocoa REQUIRED)
     find_library(MAC_IO_KIT_LIB IOKit REQUIRED)
     find_library(MAC_CORE_VIDEO_LIB CoreVideo REQUIRED)
@@ -101,7 +101,7 @@ IF(APPLE)
                     ${MAC_IO_KIT_LIB}
                     ${MAC_CORE_VIDEO_LIB}
                     ${MAC_OPEN_GL_LIB})
-ENDIF(APPLE)
+endif(APPLE)
 
 list(JOIN PLATFORM_SPECIFIC_LIBS "\n" PLATFORM_SPECIFIC_LIBS_SEPARATED)
 log_message_framed("Platform-specific libraries:\n${PLATFORM_SPECIFIC_LIBS_SEPARATED}")
@@ -118,10 +118,10 @@ log_message_framed("Source code files for project '${PROJECT_NAME}':\n\n${MY_SOU
 add_executable(OpenGLWindow)
 target_sources(OpenGLWindow PUBLIC ${MY_PROJECT_SOURCES_FILES})
 
-IF(APPLE)
+if(APPLE)
     # disable warnings aboug OpenGL deprecation of Mac
     target_compile_definitions(OpenGLWindow PRIVATE "GL_SILENCE_DEPRECATION")
-ENDIF(APPLE)
+endif(APPLE)
 
 # add the binary tree to the search path for include files
 # can include files only using brackets(<>), but not with with quotes(""). Why?
