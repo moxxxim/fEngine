@@ -8,6 +8,7 @@
 #include <Classes/TextureLoader.h>
 
 #include <cmath>
+#include <sstream>
 
 GLenum glCheckError_(const char *file, int line)
 {
@@ -84,11 +85,31 @@ namespace SMain
         return window;
     }
 
-    void ProcessWindowEscapeInput(GLFWwindow &window)
+    float mixValue = 0.f;
+
+    void UpdateMixValue(bool increase)
+    {
+        float delta = increase ? 0.005 : -0.005;
+        mixValue += delta;
+
+        std::stringstream ss;
+        ss << "Mix value: " << mixValue;
+        fengine::Debug::LogError(ss.str());
+    }
+
+    void ProcessWindowInput(GLFWwindow &window)
     {
         if(glfwGetKey(&window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             glfwSetWindowShouldClose(&window, true);
+        }
+        else if(glfwGetKey(&window, GLFW_KEY_UP) == GLFW_PRESS)
+        {
+            UpdateMixValue(true);
+        }
+        else if(glfwGetKey(&window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        {
+            UpdateMixValue(false);
         }
     }
 
@@ -119,9 +140,10 @@ namespace SMain
             }
         }
 
-        void Load(const std::string& textureName)
+        void Load(const std::string& textureName, bool flip)
         {
             std::string texturePath = SMain::BaseTexturesDir + textureName;
+            stbi_set_flip_vertically_on_load(flip);
             stbi_uc *textureData = stbi_load(texturePath.c_str(), &width, &height, &chanelsCount, 0);
             data = static_cast<unsigned char*>(textureData);
         }
@@ -146,12 +168,14 @@ namespace SRender
 
     const char *vertexColorTextureVsName = "TriangleVertexColorTextureVs.vs";
     const char *vertexColorTextureFsName = "TriangleVertexColorTextureFs.fs";
-
+    const char *twoTexturesVsName = "TriangleTexture2Vs.vs";
+    const char *twoTexturesFsName = "TriangleTexture2Fs.fs";
 
     // Textures.
 
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *brickWallJpg = "brik_wall.jpg";
+    const char *awesomeFacePng = "awesomeface.png";
 
     // Geometry.
 
@@ -172,8 +196,8 @@ namespace SRender
     const float rectTexturedCoords[] =
     {
         // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,    1.0f, 1.0f,   // top right
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
     };
@@ -247,18 +271,22 @@ namespace SRender
 
     GLuint shapeVao;
     GLuint shapeEbo;
-    GLuint textureObj;
+    GLuint textureObj1;
+    GLuint textureObj2;
+    GLuint textureObj3;
     std::unique_ptr<fengine::Shader> vertexColorShader;
     std::unique_ptr<fengine::Shader> vertexColorUpsideDownShader;
     std::unique_ptr<fengine::Shader> vertexColorWithOffsetShader;
     std::unique_ptr<fengine::Shader> vertexColorFromPositionShader;
     std::unique_ptr<fengine::Shader> vertexColorTextureShader;
+    std::unique_ptr<fengine::Shader> twoTextureShader;
 
     GLuint smallTriangleVao1;
     GLuint smallTriangleVao2;
 
     SMain::TextureData woodenContainerTexture;
     SMain::TextureData brickWallTexture;
+    SMain::TextureData awesomeFaceTexture;
 
     GLuint CreateVao(const float* triangles, int verticesCount, int stride)
     {
@@ -418,15 +446,17 @@ namespace SRender
         vertexColorTextureShader = SMain::LoadTempShader(
                                                          SRender::vertexColorTextureVsName,
                                                          SRender::vertexColorTextureFsName);
+        twoTextureShader = SMain::LoadTempShader(SRender::twoTexturesVsName, SRender::twoTexturesFsName);
     }
 
     void LoadTextures()
     {
-        woodenContainerTexture.Load(woodenContainerJpg);
-        brickWallTexture.Load(brickWallJpg);
+        woodenContainerTexture.Load(woodenContainerJpg, false);
+        brickWallTexture.Load(brickWallJpg, false);
+        awesomeFaceTexture.Load(awesomeFacePng, true);
     }
 
-    GLuint InitTextureObj(const SMain::TextureData& textureData)
+    GLuint InitTextureObj(const SMain::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
     {
         if(textureData.data != nullptr)
         {
@@ -440,11 +470,11 @@ namespace SRender
                          textureData.width,
                          textureData.height,
                          0,
-                         GL_RGB,
+                         (withAlpha ? GL_RGBA : GL_RGB),
                          GL_UNSIGNED_BYTE,
                          textureData.data);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -473,7 +503,9 @@ namespace SRender
 
         LoadShaders();
         LoadTextures();
-        textureObj = InitTextureObj(woodenContainerTexture);
+        textureObj1 = InitTextureObj(woodenContainerTexture, GL_REPEAT, GL_REPEAT, false);
+        textureObj2 = InitTextureObj(brickWallTexture, GL_REPEAT, GL_REPEAT, false);
+        textureObj3 = InitTextureObj(awesomeFaceTexture, GL_REPEAT, GL_REPEAT, true);
         shapeVao = CreateVaoWithColorAndTexture(rectTexturedCoords, 4, sizeof(rectTexturedCoords) / 4);
         smallTriangleVao1 = CreateVao(smallTriangle1, 3, sizeof(smallTriangle1) / 3);
         smallTriangleVao2 = CreateVao(smallTriangle2, 3, sizeof(smallTriangle2) / 3);
@@ -506,9 +538,15 @@ namespace SRender
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.StartUse();
-        glBindTexture(GL_TEXTURE_2D, textureObj);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureObj1);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, textureObj3);
+
         glBindVertexArray(vao);
 
+        SRender::twoTextureShader->SetUniformFloat("mixValue", SMain::mixValue);
         // It's unneccessory if the EBO was bound while VAO was bound (and not unbound until VAO is unbound).
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
@@ -525,15 +563,21 @@ int main(int argc, const char * argv[])
         glCheckError();
 
         fengine::Debug::LogMessage("Start loop.");
+
+        SRender::twoTextureShader->StartUse();
+        SRender::twoTextureShader->SetUniformInt("uTex1", 0);
+        SRender::twoTextureShader->SetUniformInt("uTex2", 1);
+        SRender::twoTextureShader->StopUse();
+
         while(!glfwWindowShouldClose(window))
         {
-            SMain::ProcessWindowEscapeInput(*window);
+            SMain::ProcessWindowInput(*window);
 
 //            float timeValue = glfwGetTime();
 //            float offsetValue = std::sin(timeValue) / 2.0f;
 //            SRender::vertexColorWithOffsetShader->SetUniformFloat("uOffset", offsetValue);
             //SRender::RenderVao(SRender::shapeVao, 4, *SRender::vertexColorTextureShader);
-            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::vertexColorTextureShader);
+            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::twoTextureShader);
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
