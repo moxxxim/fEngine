@@ -1,3 +1,4 @@
+0. Add compiler option to require return value definition.
 1. File system;
 2. GUID generation;
 3. Math lib: Vector2, Vector3, Vector4, Matrix3, Matrix4, Quaternion; Radians <-> Degrees. Left-handed <-> Right-handed

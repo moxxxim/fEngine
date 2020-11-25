@@ -130,7 +130,7 @@ namespace fengine
     //        manager->DestroyResource(GetId());
     //    }
 
-    bool Shader::TryGetAttributeLocation(const char *name, uint32_t& location) const
+    bool Shader::TryGetAttributeLocation(const std::string& name, uint32_t& location) const
     {
         if(auto it = m_attributes.find(name); it != m_attributes.end())
         {
@@ -141,7 +141,7 @@ namespace fengine
         return false;
     }
 
-    bool Shader::TryGetUniformLocation(const char *name, uint32_t& location) const
+    bool Shader::TryGetUniformLocation(const std::string& name, uint32_t& location) const
     {
         if(auto it = m_uniforms.find(name); it != m_uniforms.end())
         {
@@ -152,18 +152,18 @@ namespace fengine
         return false;
     }
 
-    bool Shader::HasUniform(const char *name) const
+    bool Shader::HasUniform(const std::string& name) const
     {
         auto it = m_uniforms.find(name);
         return it != m_uniforms.end();
     }
 
-    bool Shader::SetUniformBool(const char *name, bool value)
+    bool Shader::SetUniformBool(const std::string& name, bool value)
     {
         SetUniformInt(name, static_cast<int32_t>(value));
     }
 
-    bool Shader::SetUniformInt(const char *name, int32_t value)
+    bool Shader::SetUniformInt(const std::string& name, int32_t value)
     {
         if(auto it = m_uniforms.find(name); it != m_uniforms.end())
         {
@@ -174,7 +174,7 @@ namespace fengine
         return false;
     }
 
-    bool Shader::SetUniformFloat(const char *name, float value)
+    bool Shader::SetUniformFloat(const std::string& name, float value)
     {
         uint32_t location = k_undefinedShaderParamLocation;
         if(TryGetUniformLocation(name, location))
@@ -186,7 +186,7 @@ namespace fengine
         return false;
     }
 
-    bool Shader::SetUniformFloatArray(const char *name, const float *value, int size)
+    bool Shader::SetUniformFloatArray(const std::string& name, const float *value, int size)
     {
         uint32_t location = k_undefinedShaderParamLocation;
         if(TryGetUniformLocation(name, location))
@@ -196,6 +196,15 @@ namespace fengine
         }
 
         return false;
+    }
+
+    bool Shader::SetUniformMatrix4(const std::string& name, const glm::mat4& matrix)
+    {
+        uint32_t location = k_undefinedShaderParamLocation;
+        if(TryGetUniformLocation(name, location))
+        {
+            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+        }
     }
 
     void Shader::EnableState() const

@@ -170,7 +170,7 @@ namespace SRender
     const char *vertexColorTextureFsName = "TriangleVertexColorTextureFs.fs";
     const char *twoTexturesVsName = "TriangleTexture2Vs.vs";
     const char *twoTexturesFsName = "TriangleTexture2Fs.fs";
-
+    const char *twoTexturesWithTransformVsName = "TriangleTexture2WithTransformVs.vs";
     // Textures.
 
     const char *woodenContainerJpg = "wood_container.jpg";
@@ -280,6 +280,7 @@ namespace SRender
     std::unique_ptr<fengine::Shader> vertexColorFromPositionShader;
     std::unique_ptr<fengine::Shader> vertexColorTextureShader;
     std::unique_ptr<fengine::Shader> twoTextureShader;
+    std::unique_ptr<fengine::Shader> twoTextureWithTransformShader;
 
     GLuint smallTriangleVao1;
     GLuint smallTriangleVao2;
@@ -447,6 +448,9 @@ namespace SRender
                                                          SRender::vertexColorTextureVsName,
                                                          SRender::vertexColorTextureFsName);
         twoTextureShader = SMain::LoadTempShader(SRender::twoTexturesVsName, SRender::twoTexturesFsName);
+        twoTextureWithTransformShader = SMain::LoadTempShader(
+                                                              SRender::twoTexturesWithTransformVsName,
+                                                              SRender::twoTexturesFsName);
     }
 
     void LoadTextures()
@@ -533,6 +537,18 @@ namespace SRender
         shader.StopUse();
     }
 
+    glm::mat4 CalculateTransform()
+    {
+        float time = static_cast<float>(glfwGetTime());
+        float xPos = sin(time) * (2.f / 3);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(xPos, 0.0f, 0.0f));
+        trans = glm::rotate(trans, time , glm::vec3(0.0f, 0.0f, 1.0f));
+
+        return trans;
+    }
+
     void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, fengine::Shader& shader)
     {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -546,7 +562,9 @@ namespace SRender
 
         glBindVertexArray(vao);
 
-        SRender::twoTextureShader->SetUniformFloat("mixValue", SMain::mixValue);
+        glm::mat4 transform = CalculateTransform();
+        shader.SetUniformMatrix4("uTransform", transform);
+        shader.SetUniformFloat("mixValue", SMain::mixValue);
         // It's unneccessory if the EBO was bound while VAO was bound (and not unbound until VAO is unbound).
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
@@ -569,6 +587,11 @@ int main(int argc, const char * argv[])
         SRender::twoTextureShader->SetUniformInt("uTex2", 1);
         SRender::twoTextureShader->StopUse();
 
+        SRender::twoTextureWithTransformShader->StartUse();
+        SRender::twoTextureWithTransformShader->SetUniformInt("uTex1", 0);
+        SRender::twoTextureWithTransformShader->SetUniformInt("uTex2", 1);
+        SRender::twoTextureWithTransformShader->StopUse();
+
         while(!glfwWindowShouldClose(window))
         {
             SMain::ProcessWindowInput(*window);
@@ -577,7 +600,7 @@ int main(int argc, const char * argv[])
 //            float offsetValue = std::sin(timeValue) / 2.0f;
 //            SRender::vertexColorWithOffsetShader->SetUniformFloat("uOffset", offsetValue);
             //SRender::RenderVao(SRender::shapeVao, 4, *SRender::vertexColorTextureShader);
-            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::twoTextureShader);
+            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::twoTextureWithTransformShader);
             glfwSwapBuffers(window);
             glfwPollEvents();
         }

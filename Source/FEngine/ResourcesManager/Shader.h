@@ -5,6 +5,9 @@
 
 #include <map>
 #include <string>
+#include <Glm/glm.hpp>
+#include <Glm/gtc/matrix_transform.hpp>
+#include <Glm/gtc/type_ptr.hpp>
 
 namespace fengine
 {
@@ -31,14 +34,15 @@ namespace fengine
         const std::map<std::string, int32_t> &GetAttributes() const;
         const std::map<std::string, int32_t> &GetUniforms() const;
 
-        bool TryGetAttributeLocation(const char *name, uint32_t& location) const;
-        bool TryGetUniformLocation(const char *name, uint32_t& location) const;
-        bool HasUniform(const char *name) const;
+        bool TryGetAttributeLocation(const std::string& name, uint32_t& location) const;
+        bool TryGetUniformLocation(const std::string& name, uint32_t& location) const;
+        bool HasUniform(const std::string& name) const;
 
-        bool SetUniformBool(const char *name, bool value);
-        bool SetUniformInt(const char *name, int32_t value);
-        bool SetUniformFloat(const char *name, float value);
-        bool SetUniformFloatArray(const char *name, const float *value, int size);
+        bool SetUniformBool(const std::string& name, bool value);
+        bool SetUniformInt(const std::string& name, int32_t value);
+        bool SetUniformFloat(const std::string& name, float value);
+        bool SetUniformFloatArray(const std::string& name, const float *value, int size);
+        bool SetUniformMatrix4(const std::string& name, const glm::mat4& matrix);
 
     private:
         void EnableState() const;
