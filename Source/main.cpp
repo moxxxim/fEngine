@@ -39,13 +39,18 @@ namespace SMain
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
     std::string BaseTempShadersDir = BaseShadersDir + "Temp/";
-    uint32_t Width = 800;
-    uint32_t Height = 600;
+    constexpr uint32_t Width = 800;
+    constexpr uint32_t Height = 600;
+    float lastX = Width / 2.f;
+    float lastY = Height / 2.f;
+    float Zoom = 45;
 
     float deltaTime = 0.0f;    // Time between current frame and last frame
     float lastFrame = 0.0f;
     float mixValue = 0.f;
-    const float cameraSpeed = 2.5f;
+    const float cameraSpeed = 3.f;
+    float camPitch = 0.f;
+    float camYaw = -90.f;
     glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f,  3.0f);
     glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f,  0.0f);
@@ -78,9 +83,52 @@ namespace SMain
 
     void MouseCallback(GLFWwindow* window, double x, double y)
     {
-//        cameraFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-//        cameraFront.y = sin(glm::radians(pitch));
-//        cameraFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        static bool firstMouse = true;
+        if (firstMouse) // initially set to true
+        {
+            lastX = x;
+            lastY = y;
+            firstMouse = false;
+        }
+
+        float xoffset = x - lastX;
+        float yoffset = lastY - y; // reversed since y-coordinates range from bottom to top
+        lastX = x;
+        lastY = y;
+
+        const float sensitivity = 0.1f;
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
+
+        camYaw += xoffset;
+        camPitch += yoffset;
+
+        if(camPitch > 89.0f)
+        {
+          camPitch =  89.0f;
+        }
+        if(camPitch < -89.0f)
+        {
+          camPitch = -89.0f;
+        }
+
+        cameraFront.x = cos(glm::radians(camYaw)) * cos(glm::radians(camPitch));
+        cameraFront.y = sin(glm::radians(camPitch));
+        cameraFront.z = sin(glm::radians(camYaw)) * cos(glm::radians(camPitch));
+        cameraFront = glm::normalize(cameraFront);
+    }
+
+    void ScrollCallback(GLFWwindow* window, double x, double y)
+    {
+        Zoom -= static_cast<float>(y);
+        if (Zoom < 1.0f)
+        {
+            Zoom = 1.0f;
+        }
+        if (Zoom > 45.0f)
+        {
+            Zoom = 45.0f;
+        }
     }
 
     void UpdateMixValue(bool increase)
@@ -95,6 +143,8 @@ namespace SMain
 
     void ProcessWindowInput(GLFWwindow &window)
     {
+        float speedMultiplier = (glfwGetKey(&window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? 2 : 1;
+
         if(glfwGetKey(&window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             glfwSetWindowShouldClose(&window, true);
@@ -109,19 +159,19 @@ namespace SMain
         }
         else if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            cameraPos += cameraSpeed * deltaTime * cameraFront;
+            cameraPos += cameraSpeed * deltaTime * cameraFront * speedMultiplier;
         }
         if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            cameraPos -= cameraSpeed * deltaTime * cameraFront;
+            cameraPos -= cameraSpeed * deltaTime * cameraFront * speedMultiplier;
         }
         if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime * speedMultiplier;
         }
         if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
         {
-            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime * speedMultiplier;
         }
     }
 
@@ -142,6 +192,7 @@ namespace SMain
             glfwMakeContextCurrent(window);
             glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
             glfwSetCursorPosCallback(window, MouseCallback);
+            glfwSetScrollCallback(window, ScrollCallback);
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             glViewport(0, 0, width, height);
         }
@@ -454,11 +505,6 @@ namespace SRender
 
     void InitializeTransforms()
     {
-        camProjectionMatrix = glm::perspective(
-                                        glm::radians(45.0f),
-                                        static_cast<float>(SMain::Width)/SMain::Height,
-                                        0.1f,
-                                        100.0f);
         camOrthoMatrix = glm::ortho(
                                     0.0f,
                                     static_cast<float>(SMain::Width),
@@ -469,9 +515,9 @@ namespace SRender
 
         modelTransformMatrix = glm::mat4(1.0f);
         modelTransformMatrix = glm::rotate(modelTransformMatrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        SMain::cameraFront.x = cos(glm::radians(-90.f)) * cos(glm::radians(0.f));
-        SMain::cameraFront.y = sin(glm::radians(0.f));
-        SMain::cameraFront.z = sin(glm::radians(-90.f)) * cos(glm::radians(0.f));
+        SMain::cameraFront.x = cos(glm::radians(SMain::camYaw)) * cos(glm::radians(SMain::camPitch));
+        SMain::cameraFront.y = sin(glm::radians(SMain::camPitch));
+        SMain::cameraFront.z = sin(glm::radians(SMain::camYaw)) * cos(glm::radians(SMain::camPitch));
     }
 
     GLuint InitTextureObj(const SMain::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
@@ -611,6 +657,12 @@ int main(int argc, const char * argv[])
             SMain::deltaTime = currentFrame - SMain::lastFrame;
             SMain::lastFrame = currentFrame;
             SMain::ProcessWindowInput(*window);
+
+            SRender::camProjectionMatrix = glm::perspective(
+                                            glm::radians(SMain::Zoom),
+                                            static_cast<float>(SMain::Width)/SMain::Height,
+                                            0.1f,
+                                            100.0f);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::modelViewProjShader);
