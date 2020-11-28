@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <sstream>
+#include <array>
 
 GLenum glCheckError_(const char *file, int line)
 {
@@ -181,7 +182,8 @@ namespace SRender
         -0.5f,  0.5f, 0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // top left front
     };
 
-    float cube[] = {
+    float cube[] =
+    {
             // position       // color         // uv
         -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
          0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
@@ -224,6 +226,19 @@ namespace SRender
          0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f
+    };
+
+    std::array<glm::vec3, 10> cubePositions = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
     const unsigned int rectIndices[]
@@ -520,18 +535,21 @@ namespace SRender
 
         glBindVertexArray(vao);
 
-        glm::mat4 transform = CalculateTransform();
-        modelTransformMatrix = glm::rotate(
-                                           modelTransformMatrix,
-                                           glm::radians(1.0f),
-                                           glm::vec3(0.5f, 1.0f, 0.0f));
-        shader.SetUniformMatrix4("uModelMat", SRender::modelTransformMatrix);
-        shader.SetUniformMatrix4("uViewMat", SRender::viewMatrix);
-        shader.SetUniformMatrix4("uProjMat", SRender::camProjectionMatrix);
-        shader.SetUniformFloat("mixValue", SMain::mixValue);
-        // It's unneccessory if the EBO was bound while VAO was bound (and not unbound until VAO is unbound).
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        for(size_t i = 0; i < cubePositions.size(); ++i)
+        {
+            glm::mat4 transform = glm::mat4(1.0f);
+            transform = glm::translate(transform, cubePositions[i]);
+            float angle = ((i % 3) == 0) ? glm::radians(static_cast<float>(20 * glfwGetTime())) : glm::radians(20.f * i);
+            transform = glm::rotate(transform, angle, glm::vec3(0.5f, 1.0f, 0.0f));
+
+            shader.SetUniformMatrix4("uModelMat", transform);
+            shader.SetUniformMatrix4("uViewMat", SRender::viewMatrix);
+            shader.SetUniformMatrix4("uProjMat", SRender::camProjectionMatrix);
+            shader.SetUniformFloat("mixValue", SMain::mixValue);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
     }
 }
 
