@@ -38,6 +38,9 @@ namespace SMain
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
     std::string BaseTempShadersDir = BaseShadersDir + "Temp/";
+    uint32_t Width = 800;
+    uint32_t Height = 600;
+
 
     bool TryInitGlfw()
     {
@@ -159,18 +162,8 @@ namespace SRender
 {
     // Shaders.
 
-    const char *vertexColorVsName = "TriangleVertexColorVs.vs";
-    const char *vertexColorFsName = "TriangleVertexColorFs.fs";
-    const char *vertexColorUpsideDownVsName = "TriangleVertexColorUpsideDownVs.vs";
-    const char *vertexColorWithOffsetVsName = "TriangleVertexColorWithOffsetVs.vs";
-    const char *vertexColorFromPositionVsName = "TriangleVertexColorFromPositionVs.vs";
-    const char *vertexColorFromPositionFsName = "TriangleVertexColorFromPositionFs.fs";
-
-    const char *vertexColorTextureVsName = "TriangleVertexColorTextureVs.vs";
-    const char *vertexColorTextureFsName = "TriangleVertexColorTextureFs.fs";
-    const char *twoTexturesVsName = "TriangleTexture2Vs.vs";
     const char *twoTexturesFsName = "TriangleTexture2Fs.fs";
-    const char *twoTexturesWithTransformVsName = "TriangleTexture2WithTransformVs.vs";
+    const char *ModelViewProjVsName = "ModelViewProjVs.vs";
     // Textures.
 
     const char *woodenContainerJpg = "wood_container.jpg";
@@ -179,86 +172,58 @@ namespace SRender
 
     // Geometry.
 
-    const float triangle[]
-    {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
-    };
-
-    const float triangleTextureCoordinates[]
-    {
-        0.0f, 0.0f,  // lower-left corner of texture
-        1.0f, 0.0f,  // lower-right corner of texture
-        0.5f, 1.0f  // top-center of texture
-    };
-
     const float rectTexturedCoords[] =
     {
         // positions          // colors           // texture coords
-        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,    1.0f, 1.0f,   // top right
-        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
+        0.5f,  0.5f, 0.5f,   1.0f, 0.0f, 0.0f,    1.0f, 1.0f,   // top right front
+        0.5f, -0.5f, 0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right front
+        -0.5f, -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left front
+        -0.5f,  0.5f, 0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // top left front
     };
 
-    const float triangleWithColors[]
-    {
-        0.5f, -0.5f, 0.0f,     1.0, 0.0, 0.0,  // Red vertex
-        -0.5f, -0.5f, 0.0f,      0.0, 1.0, 0.0,  // Green vertex
-        0.0f,  0.5f, 0.0f,      0.0, 0.0, 1.0,  // Blue vertex
-    };
+    float cube[] = {
+            // position       // color         // uv
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
 
-    const float rectangle[] = {
-        // first triangle
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f,  0.5f, 0.0f,  // top left
-        // second triangle
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left
-    };
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
 
-    const float twoTriangles[]
-    {
-        // Left triangle
-        -0.5f, -0.5f, 0.0f,
-        0.f, -0.5f, 0.0f,
-        -0.25f, 0.f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
 
-        // Right triangle
-        0.f, 0.f, 0.0f,
-        0.5f, 0.f, 0.0f,
-        0.25f, 0.5f, 0.0f,
-    };
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
 
-    const unsigned int twoTrianglesIndices[]
-    {
-        0, 1, 2,
-        3, 4, 5
-    };
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
-    const float smallTriangle1[]
-    {
-        -0.5f, -0.5f, 0.0f,
-        0.f, -0.5f, 0.0f,
-        -0.25f, 0.f, 0.0f,
-    };
-
-    const float smallTriangle2[]
-    {
-        0.f, 0.f, 0.0f,
-        0.5f, 0.f, 0.0f,
-        0.25f, 0.5f, 0.0f,
-    };
-
-    const float rectangleVertices[]
-    {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left
+        -0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f
     };
 
     const unsigned int rectIndices[]
@@ -274,13 +239,13 @@ namespace SRender
     GLuint textureObj1;
     GLuint textureObj2;
     GLuint textureObj3;
-    std::unique_ptr<fengine::Shader> vertexColorShader;
-    std::unique_ptr<fengine::Shader> vertexColorUpsideDownShader;
-    std::unique_ptr<fengine::Shader> vertexColorWithOffsetShader;
-    std::unique_ptr<fengine::Shader> vertexColorFromPositionShader;
-    std::unique_ptr<fengine::Shader> vertexColorTextureShader;
-    std::unique_ptr<fengine::Shader> twoTextureShader;
-    std::unique_ptr<fengine::Shader> twoTextureWithTransformShader;
+    std::unique_ptr<fengine::Shader> modelViewProjShader;
+
+    glm::mat4 modelTransformMatrix;
+    glm::mat4 camProjectionMatrix;
+    glm::mat4 camOrthoMatrix;
+    glm::mat4 camTransformMatrix;
+    glm::mat4 viewMatrix;
 
     GLuint smallTriangleVao1;
     GLuint smallTriangleVao2;
@@ -433,24 +398,7 @@ namespace SRender
 
     void LoadShaders()
     {
-        vertexColorShader = SMain::LoadTempShader(SRender::vertexColorVsName, SRender::vertexColorFsName);
-        vertexColorUpsideDownShader = SMain::LoadTempShader(
-                                                            SRender::vertexColorUpsideDownVsName,
-                                                            SRender::vertexColorFsName);
-        vertexColorWithOffsetShader = SMain::LoadTempShader(
-                                                            SRender::vertexColorWithOffsetVsName,
-                                                            SRender::vertexColorFsName);
-        vertexColorFromPositionShader = SMain::LoadTempShader(
-                                                              SRender::vertexColorFromPositionVsName,
-                                                              SRender::vertexColorFromPositionFsName);
-
-        vertexColorTextureShader = SMain::LoadTempShader(
-                                                         SRender::vertexColorTextureVsName,
-                                                         SRender::vertexColorTextureFsName);
-        twoTextureShader = SMain::LoadTempShader(SRender::twoTexturesVsName, SRender::twoTexturesFsName);
-        twoTextureWithTransformShader = SMain::LoadTempShader(
-                                                              SRender::twoTexturesWithTransformVsName,
-                                                              SRender::twoTexturesFsName);
+        modelViewProjShader = SMain::LoadTempShader(SRender::ModelViewProjVsName, SRender::twoTexturesFsName);
     }
 
     void LoadTextures()
@@ -458,6 +406,28 @@ namespace SRender
         woodenContainerTexture.Load(woodenContainerJpg, false);
         brickWallTexture.Load(brickWallJpg, false);
         awesomeFaceTexture.Load(awesomeFacePng, true);
+    }
+
+    void InitializeTransforms()
+   {
+        camProjectionMatrix = glm::perspective(
+                                        glm::radians(45.0f),
+                                        static_cast<float>(SMain::Width)/SMain::Height,
+                                        0.1f,
+                                        100.0f);
+        camOrthoMatrix = glm::ortho(
+                                    0.0f,
+                                    static_cast<float>(SMain::Width),
+                                    0.0f,
+                                    static_cast<float>(SMain::Height),
+                                    0.1f,
+                                    100.0f);
+
+        modelTransformMatrix = glm::mat4(1.0f);
+        modelTransformMatrix = glm::rotate(modelTransformMatrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+        viewMatrix = glm::mat4(1.0f);
+        viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0f));
     }
 
     GLuint InitTextureObj(const SMain::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
@@ -505,14 +475,13 @@ namespace SRender
         // Specify clear value for color buffer: color to fill color buffer with after call to "glClear(GL_COLOR_BUFFER_BIT)".
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
+        InitializeTransforms();
         LoadShaders();
         LoadTextures();
         textureObj1 = InitTextureObj(woodenContainerTexture, GL_REPEAT, GL_REPEAT, false);
         textureObj2 = InitTextureObj(brickWallTexture, GL_REPEAT, GL_REPEAT, false);
         textureObj3 = InitTextureObj(awesomeFaceTexture, GL_REPEAT, GL_REPEAT, true);
-        shapeVao = CreateVaoWithColorAndTexture(rectTexturedCoords, 4, sizeof(rectTexturedCoords) / 4);
-        smallTriangleVao1 = CreateVao(smallTriangle1, 3, sizeof(smallTriangle1) / 3);
-        smallTriangleVao2 = CreateVao(smallTriangle2, 3, sizeof(smallTriangle2) / 3);
+        shapeVao = CreateVaoWithColorAndTexture(cube, 36, sizeof(cube) / 36);
 
         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
         // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
@@ -525,16 +494,7 @@ namespace SRender
 
         // Draw in wireframe polygons.
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-
-    void RenderVao(GLuint vao, int verticesCount, fengine::Shader& shader)
-    {
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        shader.StartUse();
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, verticesCount);
-        shader.StopUse();
+        glEnable(GL_DEPTH_TEST);
     }
 
     glm::mat4 CalculateTransform()
@@ -551,8 +511,6 @@ namespace SRender
 
     void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, fengine::Shader& shader)
     {
-        glClear(GL_COLOR_BUFFER_BIT);
-
         shader.StartUse();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureObj1);
@@ -563,11 +521,17 @@ namespace SRender
         glBindVertexArray(vao);
 
         glm::mat4 transform = CalculateTransform();
-        shader.SetUniformMatrix4("uTransform", transform);
+        modelTransformMatrix = glm::rotate(
+                                           modelTransformMatrix,
+                                           glm::radians(1.0f),
+                                           glm::vec3(0.5f, 1.0f, 0.0f));
+        shader.SetUniformMatrix4("uModelMat", SRender::modelTransformMatrix);
+        shader.SetUniformMatrix4("uViewMat", SRender::viewMatrix);
+        shader.SetUniformMatrix4("uProjMat", SRender::camProjectionMatrix);
         shader.SetUniformFloat("mixValue", SMain::mixValue);
         // It's unneccessory if the EBO was bound while VAO was bound (and not unbound until VAO is unbound).
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 }
 
@@ -582,25 +546,22 @@ int main(int argc, const char * argv[])
 
         fengine::Debug::LogMessage("Start loop.");
 
-        SRender::twoTextureShader->StartUse();
-        SRender::twoTextureShader->SetUniformInt("uTex1", 0);
-        SRender::twoTextureShader->SetUniformInt("uTex2", 1);
-        SRender::twoTextureShader->StopUse();
+        SRender::modelViewProjShader->StartUse();
+        SRender::modelViewProjShader->SetUniformInt("uTex1", 0);
+        SRender::modelViewProjShader->SetUniformInt("uTex2", 1);
+        SRender::modelViewProjShader->StopUse();
 
-        SRender::twoTextureWithTransformShader->StartUse();
-        SRender::twoTextureWithTransformShader->SetUniformInt("uTex1", 0);
-        SRender::twoTextureWithTransformShader->SetUniformInt("uTex2", 1);
-        SRender::twoTextureWithTransformShader->StopUse();
+        SRender::modelViewProjShader->StartUse();
+        SRender::modelViewProjShader->SetUniformInt("uTex1", 0);
+        SRender::modelViewProjShader->SetUniformInt("uTex2", 1);
+        SRender::modelViewProjShader->StopUse();
 
         while(!glfwWindowShouldClose(window))
         {
             SMain::ProcessWindowInput(*window);
 
-//            float timeValue = glfwGetTime();
-//            float offsetValue = std::sin(timeValue) / 2.0f;
-//            SRender::vertexColorWithOffsetShader->SetUniformFloat("uOffset", offsetValue);
-            //SRender::RenderVao(SRender::shapeVao, 4, *SRender::vertexColorTextureShader);
-            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::twoTextureWithTransformShader);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::modelViewProjShader);
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
