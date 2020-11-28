@@ -42,6 +42,13 @@ namespace SMain
     uint32_t Width = 800;
     uint32_t Height = 600;
 
+    float deltaTime = 0.0f;    // Time between current frame and last frame
+    float lastFrame = 0.0f;
+    float mixValue = 0.f;
+    const float cameraSpeed = 2.5f;
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f,  3.0f);
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f,  0.0f);
 
     bool TryInitGlfw()
     {
@@ -69,27 +76,12 @@ namespace SMain
         glViewport(0, 0, width, height);
     }
 
-    GLFWwindow* CreateWindow()
+    void MouseCallback(GLFWwindow* window, double x, double y)
     {
-        constexpr int width = 800;
-        constexpr int height = 600;
-        GLFWwindow* window = glfwCreateWindow(width, height, "Sweet OpenGL Window", nullptr, nullptr);
-        if (window != nullptr)
-        {
-            glfwMakeContextCurrent(window);
-            glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-            glViewport(0, 0, width, height);
-        }
-        else
-        {
-            std::cout << "Failed to create GLFW window" << std::endl;
-            glfwTerminate();
-        }
-
-        return window;
+//        cameraFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+//        cameraFront.y = sin(glm::radians(pitch));
+//        cameraFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     }
-
-    float mixValue = 0.f;
 
     void UpdateMixValue(bool increase)
     {
@@ -115,6 +107,22 @@ namespace SMain
         {
             UpdateMixValue(false);
         }
+        else if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
+        {
+            cameraPos += cameraSpeed * deltaTime * cameraFront;
+        }
+        if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
+        {
+            cameraPos -= cameraSpeed * deltaTime * cameraFront;
+        }
+        if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
+        {
+            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+        }
+        if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
+        {
+            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+        }
     }
 
     std::unique_ptr<fengine::Shader> LoadTempShader(const std::string& vsFileName, const std::string& fsFileName)
@@ -122,6 +130,28 @@ namespace SMain
         std::string vsFilePath = BaseTempShadersDir + vsFileName;
         std::string fsFilePath = BaseTempShadersDir + fsFileName;
         return fengine::LoadShader(vsFilePath, fsFilePath);
+    }
+
+    GLFWwindow* CreateWindow()
+    {
+        constexpr int width = 800;
+        constexpr int height = 600;
+        GLFWwindow* window = glfwCreateWindow(width, height, "Sweet OpenGL Window", nullptr, nullptr);
+        if (window != nullptr)
+        {
+            glfwMakeContextCurrent(window);
+            glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+            glfwSetCursorPosCallback(window, MouseCallback);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glViewport(0, 0, width, height);
+        }
+        else
+        {
+            std::cout << "Failed to create GLFW window" << std::endl;
+            glfwTerminate();
+        }
+
+        return window;
     }
 
     class TextureData final
@@ -439,6 +469,9 @@ namespace SRender
 
         modelTransformMatrix = glm::mat4(1.0f);
         modelTransformMatrix = glm::rotate(modelTransformMatrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        SMain::cameraFront.x = cos(glm::radians(-90.f)) * cos(glm::radians(0.f));
+        SMain::cameraFront.y = sin(glm::radians(0.f));
+        SMain::cameraFront.z = sin(glm::radians(-90.f)) * cos(glm::radians(0.f));
     }
 
     GLuint InitTextureObj(const SMain::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
@@ -533,13 +566,7 @@ namespace SRender
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        const float radius = 10.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
-        glm::vec3 camPos = glm::vec3(camZ, 0.f, camX);
-        glm::vec3 camLookTarget = glm::vec3(0.f, 0.f, 0.f);
-        glm::vec3 camUp = glm::vec3(0.f, 1.f, 0.f);
-        viewMatrix = glm::lookAt(camPos, camLookTarget, camUp);
+        SRender::viewMatrix = glm::lookAt(SMain::cameraPos, SMain::cameraPos + SMain::cameraFront, SMain::cameraUp);
 
         for(size_t i = 0; i < cubePositions.size(); ++i)
         {
@@ -580,12 +607,27 @@ int main(int argc, const char * argv[])
 
         while(!glfwWindowShouldClose(window))
         {
+            float currentFrame = glfwGetTime();
+            SMain::deltaTime = currentFrame - SMain::lastFrame;
+            SMain::lastFrame = currentFrame;
             SMain::ProcessWindowInput(*window);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::modelViewProjShader);
             glfwSwapBuffers(window);
             glfwPollEvents();
+
+#ifdef __APPLE__
+            static bool macMoved = false;
+
+            if(!macMoved)
+            {
+                int x, y;
+                glfwGetWindowPos(window, &x, &y);
+                glfwSetWindowPos(window, ++x, y);
+                macMoved = true;
+            }
+#endif
         }
 
         glfwTerminate();
