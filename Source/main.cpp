@@ -259,7 +259,6 @@ namespace SRender
     glm::mat4 modelTransformMatrix;
     glm::mat4 camProjectionMatrix;
     glm::mat4 camOrthoMatrix;
-    glm::mat4 camTransformMatrix;
     glm::mat4 viewMatrix;
 
     GLuint smallTriangleVao1;
@@ -424,7 +423,7 @@ namespace SRender
     }
 
     void InitializeTransforms()
-   {
+    {
         camProjectionMatrix = glm::perspective(
                                         glm::radians(45.0f),
                                         static_cast<float>(SMain::Width)/SMain::Height,
@@ -440,9 +439,6 @@ namespace SRender
 
         modelTransformMatrix = glm::mat4(1.0f);
         modelTransformMatrix = glm::rotate(modelTransformMatrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-        viewMatrix = glm::mat4(1.0f);
-        viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0f));
     }
 
     GLuint InitTextureObj(const SMain::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
@@ -536,6 +532,14 @@ namespace SRender
         glBindVertexArray(vao);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+        const float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        glm::vec3 camPos = glm::vec3(camZ, 0.f, camX);
+        glm::vec3 camLookTarget = glm::vec3(0.f, 0.f, 0.f);
+        glm::vec3 camUp = glm::vec3(0.f, 1.f, 0.f);
+        viewMatrix = glm::lookAt(camPos, camLookTarget, camUp);
 
         for(size_t i = 0; i < cubePositions.size(); ++i)
         {
