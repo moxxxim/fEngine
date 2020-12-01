@@ -3,3 +3,9 @@
 2. GUID generation;
 3. Math lib: Vector2, Vector3, Vector4, Matrix3, Matrix4, Quaternion; Radians <-> Degrees. Left-handed <-> Right-handed
 4. Euler <-> Matrix <-> Quaternion;
+5. Reflection
+6. Serialization
+7. Different Graphics API: DirectX, OpenGL, Vulkan, Metal.
+8. Common shading language: GLSL, HLSL, metal.
+9. Constexpr Vector3. Functions from Unity.
+10. clamp optimized.
