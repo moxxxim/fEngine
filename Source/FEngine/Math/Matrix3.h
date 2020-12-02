@@ -16,6 +16,9 @@ namespace fengine
         Matrix3(const Matrix3&) = default;
         Matrix3(Matrix3&&) = default;
 
+        Matrix3& operator = (const Matrix3& other) = default;
+        Matrix3& operator = (Matrix3&& other) = default;
+
         friend Matrix3 operator * (const Matrix3& a, const Matrix3& b);
         friend Matrix3 operator * (const Vector3& a, const Matrix3& b);
         friend Matrix3 operator * (float a, const Matrix3& m);

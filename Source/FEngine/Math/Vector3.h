@@ -26,6 +26,9 @@ namespace fengine
         void Normalize();
 
         Vector3 operator-() const;
+        Vector3& operator = (const Vector3& other) = default;
+        Vector3& operator = (Vector3&& other) = default;
+
         friend bool operator == (const Vector3& a, const Vector3& b);
         friend bool operator != (const Vector3& a, const Vector3& b);
         friend Vector3 operator * (const Vector3& v, float a);

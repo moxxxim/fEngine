@@ -30,11 +30,11 @@ namespace fengine
 
 namespace fengine
 {
-    Vector4::Vector4(float aX, float aY, float aZ, float aW)
+    inline Vector4::Vector4(float aX, float aY, float aZ, float aW)
         : data {aX, aY, aZ, aW}
     { }
 
-    Vector4::Vector4(const Vector3& aXyz, float aW)
+    inline Vector4::Vector4(const Vector3& aXyz, float aW)
         : data {aXyz.x, aXyz.y, aXyz.z, aW}
     { }
 }

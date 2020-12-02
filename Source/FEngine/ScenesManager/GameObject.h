@@ -21,7 +21,7 @@
 //    public:
 //        bool IsEnabled() const;
 //        void SetEnabled(bool isEnabled);
-//	    Transform * GetTransform();
+//	      Transform * GetTransform();
 //        Renderer * GetRenderer() const;
 //        Camera * GetCamera() const;
 //
