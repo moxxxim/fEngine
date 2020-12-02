@@ -16,8 +16,8 @@ namespace fengine
 
         Vector3() = default;
         Vector3(float aX, float aY, float aZ);
-        Vector3(const Vector3 &other) = default;
-        Vector3(Vector3 &&other) = default;
+        Vector3(const Vector3&) = default;
+        Vector3(Vector3&&) = default;
 
         float Length() const;
         float LengthSqr() const;
@@ -34,11 +34,11 @@ namespace fengine
         friend Vector3 operator + (const Vector3& a, const Vector3& b);
         friend Vector3 operator - (const Vector3& a, const Vector3& b);
 
-        const static Vector3 Zero;
-        const static Vector3 One;
-        const static Vector3 OneX;
-        const static Vector3 OneY;
-        const static Vector3 OneZ;
+        static const Vector3 Zero;
+        static const Vector3 One;
+        static const Vector3 OneX;
+        static const Vector3 OneY;
+        static const Vector3 OneZ;
 
         union
         {
