@@ -23,6 +23,7 @@ namespace fengine
         float LengthSqr() const;
         Vector3 ProjectOn(const Vector3& on) const;
         Vector3 ToNormalized() const;
+        Vector3 Reflect() const;
         void Normalize();
 
         Vector3 operator-() const;
@@ -79,10 +80,15 @@ namespace fengine
 
     inline Vector3 Vector3::ToNormalized() const
     {
-        Vector3 me = *this;
-        me.Normalize();
+        Vector3 normalized = *this;
+        normalized.Normalize();
 
-        return me;
+        return normalized;
+    }
+
+    inline Vector3 Vector3::Reflect() const
+    {
+        throw "'Vector3::Reflect()' not implemented yet.";
     }
 
     inline void Vector3::Normalize()

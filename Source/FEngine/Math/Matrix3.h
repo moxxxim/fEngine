@@ -16,6 +16,14 @@ namespace fengine
         Matrix3(const Matrix3&) = default;
         Matrix3(Matrix3&&) = default;
 
+        bool HasInverse() const;
+        float Determinant() const;
+        float Trace() const;
+        bool TryInvert(Matrix3& inverted) const;
+        Matrix3 Transposed() const;
+
+        void Transpose();
+
         Matrix3& operator = (const Matrix3& other) = default;
         Matrix3& operator = (Matrix3&& other) = default;
 
@@ -46,4 +54,52 @@ namespace fengine
         };
     };
 }
+
+namespace fengine
+{
+    inline bool Matrix3::HasInverse() const
+    {
+        float determinant = Determinant();
+        float epsilon = std::numeric_limits<float>::epsilon();
+        return !((epsilon < determinant) && (determinant < epsilon));
+    }
+
+    inline float Matrix3::Determinant() const
+    {
+        return m00 * (m11 * m22 - m21 * m12) - m01 * (m10 * m22 - m20 * m12) + m02 * (m10 * m21 - m20 * m11);
+    }
+
+    inline float Matrix3::Trace() const
+    {
+        return m00 + m11 + m22;
+    }
+
+    inline bool Matrix3::TryInvert(Matrix3& inverted) const
+    {
+        float det = Determinant();
+        float epsilon = std::numeric_limits<float>::epsilon();
+        if((epsilon < det) && (det < epsilon))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    inline Matrix3 Matrix3::Transposed() const
+    {
+        Matrix3 inverted = *this;
+        inverted.Transpose();
+
+        return inverted;
+    }
+
+    inline void Matrix3::Transpose()
+    {
+        std::swap(m01, m10);
+        std::swap(m02, m20);
+        std::swap(m12, m21);
+    }
+}
+
 #endif

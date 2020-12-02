@@ -14,7 +14,9 @@ namespace fengine
         Matrix4 MakeRotation(const Matrix3& rotation);
         Matrix4 MakeTranslation(const Vector3& translation);
         Matrix4 MakeTransformation(const Vector3& scale, const Matrix3& rotation, const Vector3& translation);
+        Matrix4 MakePerspectiveProjection(float fov, float aspect, float near, float far);
     }
 }
 
 #endif
+ 

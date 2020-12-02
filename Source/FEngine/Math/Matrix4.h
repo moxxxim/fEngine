@@ -12,6 +12,14 @@ namespace fengine
         Matrix4(const Matrix4&) = default;
         Matrix4(Matrix4&&) = default;
 
+        bool HasInverse() const;
+        float Determinant() const;
+        float Trace() const;
+        bool TryInvert(Matrix4& inverted) const;
+        Matrix4 Transposed() const;
+
+        void Transpose();
+
         friend Matrix4 operator * (const Matrix4& a, const Matrix4& b);
         friend Vector4 operator * (const Vector4& a, const Matrix4& b);
 
@@ -49,6 +57,80 @@ namespace fengine
 
 namespace fengine
 {
+    inline bool Matrix4::HasInverse() const
+    {
+        float determinant = Determinant();
+        float epsilon = std::numeric_limits<float>::epsilon();
+        return !((epsilon < determinant) && (determinant < epsilon));
+    }
+
+    inline float Matrix4::Determinant() const
+    {
+        return (m00 * m11 - m10 * m01) * (m22 * m33 - m32 * m23)
+        - (m00 * m21 - m20 * m01) * (m12 * m33 - m32 * m13)
+        + (m00 * m31 - m30 * m01) * (m12 * m23 - m22 * m13)
+        + (m10 * m21 - m20 * m11) * (m02 * m33 - m32 * m03)
+        - (m10 * m31 - m30 * m11) * (m02 * m23 - m22 * m03)
+        + (m20 * m31 - m30 * m21) * (m02 * m13 - m12 * m03);
+    }
+
+    inline float Matrix4::Trace() const
+    {
+        return m00 + m11 + m22 + m33;
+    }
+
+    inline bool Matrix4::TryInvert(Matrix4& inv) const
+    {
+        const float epsilon = std::numeric_limits<float>::epsilon();
+        float d = Determinant();
+        if((epsilon < d) && (d < epsilon))
+        {
+            return false;
+        }
+
+        d = 1.f / d;
+
+        inv.m00 = d * (m11 * (m22 * m33 - m32 * m23) + m32 * (m32 * m13 - m12 * m33) + m31 * (m12 * m23 - m22 * m13));
+        inv.m10 = d * (m12 * (m20 * m33 - m30 * m23) + m22 * (m30 * m13 - m10 * m33) + m32 * (m10 * m23 - m20 * m13));
+        inv.m20 = d * (m13 * (m20 * m31 - m30 * m21) + m23 * (m30 * m11 - m10 * m31) + m33 * (m10 * m21 - m20 * m11));
+        inv.m30 = d * (m10 * (m31 * m22 - m21 * m32) + m20 * (m11 * m32 - m31 * m12) + m30 * (m21 * m12 - m11 * m22));
+
+        inv.m01 = d * (m21 * (m02 * m33 - m32 * m03) + m31 * (m22 * m03 - m02 * m23) + m01 * (m32 * m23 - m22 * m33));
+        inv.m11 = d * (m22 * (m00 * m33 - m30 * m03) + m32 * (m20 * m03 - m00 * m23) + m02 * (m30 * m23 - m20 * m33));
+        inv.m21 = d * (m23 * (m00 * m31 - m30 * m01) + m33 * (m20 * m01 - m00 * m21) + m03 * (m30 * m21 - m20 * m31));
+        inv.m31 = d * (m20 * (m31 * m02 - m01 * m32) + m30 * (m01 * m22 - m21 * m02) + m00 * (m21 * m32 - m31 * m22));
+
+        inv.m02 = d * (m31 * (m02 * m13 - m12 * m03) + m01 * (m12 * m33 - m32 * m13) + m11 * (m32 * m03 - m02 * m33));
+        inv.m12 = d * (m32 * (m00 * m13 - m10 * m03) + m02 * (m10 * m33 - m30 * m13) + m12 * (m30 * m03 - m00 * m33));
+        inv.m22 = d * (m33 * (m00 * m11 - m10 * m01) + m03 * (m10 * m31 - m30 * m11) + m13 * (m30 * m01 - m00 * m31));
+        inv.m32 = d * (m30 * (m11 * m02 - m01 * m12) + m00 * (m31 * m12 - m11 * m32) + m10 * (m01 * m32 - m31 * m02));
+
+        inv.m03 = d * (m01 * (m22 * m13 - m12 * m23) + m11 * (m02 * m23 - m22 * m03) + m21 * (m12 * m03 - m02 * m13));
+        inv.m13 = d * (m02 * (m20 * m13 - m10 * m23) + m12 * (m00 * m23 - m20 * m03) + m22 * (m10 * m03 - m00 * m13));
+        inv.m23 = d * (m03 * (m20 * m11 - m10 * m21) + m13 * (m00 * m21 - m20 * m01) + m23 * (m10 * m01 - m00 * m11));
+        inv.m33 = d * (m00 * (m11 * m22 - m21 * m12) + m10 * (m21 * m02 - m01 * m22) + m20 * (m01 * m12 - m11 * m02));
+
+        return true;
+    }
+
+    inline Matrix4 Matrix4::Transposed() const
+    {
+        Matrix4 transposed = *this;
+        transposed.Transpose();
+
+        return transposed;
+    }
+
+    inline void Matrix4::Transpose()
+    {
+        std::swap(m01, m10);
+        std::swap(m02, m20);
+        std::swap(m03, m30);
+        std::swap(m12, m21);
+        std::swap(m13, m31);
+        std::swap(m23, m32);
+    }
+
     inline Matrix4 operator * (const Matrix4& a, const Matrix4& b)
     {
         Matrix4 result;

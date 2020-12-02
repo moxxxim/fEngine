@@ -53,5 +53,20 @@ namespace fengine
 
             return scaleMat * rotateMat * translateMat;
         }
+
+        Matrix4 MakePerspectiveProjection(float fov, float aspect, float near, float far)
+        {
+            Matrix4 projection;
+
+            float fovHalfTan = std::tan(fov / 2);
+
+            projection.m00 = (1 / aspect * fovHalfTan);
+            projection.m11 = 1 / fovHalfTan;
+            projection.m22 = - (far + near) / (far - near);
+            projection.m23 = -1;
+            projection.m32 = -2 * far * near / (far - near);
+
+            return projection;
+        }
     }
 }
