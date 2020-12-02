@@ -10,3 +10,5 @@
 9. Constexpr Vector3. Functions from Unity.
 10. clamp optimized.
 11. Vector4, Matrix4 functionality (Unity)
+12. Add unit tests.
+13. math utils.

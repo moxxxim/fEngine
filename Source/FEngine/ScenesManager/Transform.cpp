@@ -6,8 +6,8 @@ namespace fengine
 {
     Transform::Transform()
         : rotation { Matrix3::Identity }
-        , position{ Vector3::Zero }
-        , scale{ Vector3::One }
+        , position { Vector3::Zero }
+        , scale { Vector3::One }
     { }
 
     Vector3 Transform::GetRotationEuler() const
@@ -17,31 +17,41 @@ namespace fengine
 
     void Transform::SetRotationEuler(float x, float y, float z)
     {
-        throw "'Transform::SetRotationEuler()' not implemented yet.";
+        rotation = mat3::MakeRotation(x, y, z);
     }
 
-    void Transform::SetRotationEuler(const Vector3& angles)
+    void Transform::SetRotationEuler(const Vector3& euler)
     {
-        throw "'Transform::SetRotationEuler()' not implemented yet.";
+        rotation = mat3::MakeRotation(euler);
     }
 
     Vector3 Transform::GetForward() const
     {
-        throw "'Transform::GetForward()' not implemented yet.";
+        return -Vector3::OneZ * mat3::MakeScale(scale) * rotation;
     }
 
     Vector3 Transform::GetUp() const
     {
-        throw "'Transform::GetUp()' not implemented yet.";
+        return Vector3::OneY * mat3::MakeScale(scale) * rotation;
     }
 
     Vector3 Transform::GetRight() const
     {
-        throw "'Transform::GetRight()' not implemented yet.";
+        return Vector3::OneX * mat3::MakeScale(scale) * rotation;
     }
 
     Matrix4 Transform::GetGlobalMatrix() const
     {
-        return matutils::MakeTransformation(scale, rotation, position);
+        return mat4::MakeTransformation(scale, rotation, position);
+    }
+
+    void Transform::Rotate(const Vector3& euler)
+    {
+        rotation *= mat3::MakeRotation(euler);
+    }
+
+    void Transform::Rotate(float x, float y, float z)
+    {
+        rotation *= mat3::MakeRotation(x, y, z);
     }
 }

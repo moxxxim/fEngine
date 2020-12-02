@@ -26,9 +26,12 @@ namespace fengine
         Vector3 Reflect() const;
         void Normalize();
 
-        Vector3 operator-() const;
         Vector3& operator = (const Vector3& other) = default;
         Vector3& operator = (Vector3&& other) = default;
+        Vector3 operator - () const;
+        Vector3& operator += (const Vector3& other);
+        Vector3& operator -= (const Vector3& other);
+        Vector3& operator *= (float value);
 
         friend bool operator == (const Vector3& a, const Vector3& b);
         friend bool operator != (const Vector3& a, const Vector3& b);
@@ -123,9 +126,36 @@ namespace fengine
         return ((1 - t) * a) + (t * b);
     }
 
-    inline Vector3 Vector3::operator-() const
+    inline Vector3 Vector3::operator - () const
     {
         return Vector3{-x, -y, -z};
+    }
+
+    inline Vector3& Vector3::operator += (const Vector3& other)
+    {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+
+        return *this;
+    }
+
+    inline Vector3& Vector3::operator -= (const Vector3& other)
+    {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+
+        return *this;
+    }
+
+    inline Vector3& Vector3::operator *= (float value)
+    {
+        x *= value;
+        y *= value;
+        z *= value;
+
+        return *this;
     }
 
     inline bool operator == (const Vector3& a, const Vector3& b)

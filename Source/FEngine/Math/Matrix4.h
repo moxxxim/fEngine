@@ -20,6 +20,9 @@ namespace fengine
 
         void Transpose();
 
+        Matrix4& operator = (const Matrix4& other) = default;
+        Matrix4& operator = (Matrix4&& other) = default;
+
         friend Matrix4 operator * (const Matrix4& a, const Matrix4& b);
         friend Vector4 operator * (const Vector4& a, const Matrix4& b);
 
@@ -29,6 +32,7 @@ namespace fengine
         union
         {
             float data[16];
+            Vector4 rows[4];
             struct
             {
                 float m00;

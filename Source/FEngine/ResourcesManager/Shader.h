@@ -2,12 +2,10 @@
 
 //#include <FEngine/App/Object.h>
 #include <FEngine/ResourcesManager/CachedShader.h>
+#include <FEngine/Math/Matrix4.h>
 
 #include <map>
 #include <string>
-#include <Glm/glm.hpp>
-#include <Glm/gtc/matrix_transform.hpp>
-#include <Glm/gtc/type_ptr.hpp>
 
 namespace fengine
 {
@@ -42,7 +40,7 @@ namespace fengine
         bool SetUniformInt(const std::string& name, int32_t value);
         bool SetUniformFloat(const std::string& name, float value);
         bool SetUniformFloatArray(const std::string& name, const float *value, int size);
-        bool SetUniformMatrix4(const std::string& name, const glm::mat4& matrix);
+        bool SetUniformMatrix4(const std::string& name, const Matrix4& matrix);
 
     private:
         void EnableState() const;

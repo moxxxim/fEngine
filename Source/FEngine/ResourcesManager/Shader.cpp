@@ -198,12 +198,12 @@ namespace fengine
         return false;
     }
 
-    bool Shader::SetUniformMatrix4(const std::string& name, const glm::mat4& matrix)
+    bool Shader::SetUniformMatrix4(const std::string& name, const Matrix4& matrix)
     {
         uint32_t location = k_undefinedShaderParamLocation;
         if(TryGetUniformLocation(name, location))
         {
-            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+            glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data);
         }
     }
 

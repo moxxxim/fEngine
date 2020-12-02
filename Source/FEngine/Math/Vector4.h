@@ -14,6 +14,9 @@ namespace fengine
         Vector4(const Vector4&) = default;
         Vector4(Vector4&&) = default;
 
+        Vector4& operator = (const Vector4& other) = default;
+        Vector4& operator = (Vector4&& other) = default;
+
         union
         {
             float data[4];

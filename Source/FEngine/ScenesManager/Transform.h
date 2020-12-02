@@ -19,7 +19,7 @@ namespace fengine
         const Matrix3& GetRotation() const;
         void SetRotation(const Matrix3& aRotation);
         Vector3 GetRotationEuler() const;
-        void SetRotationEuler(const Vector3& angles);
+        void SetRotationEuler(const Vector3& euler);
         void SetRotationEuler(float x, float y, float z);
 
         const Vector3& GetScale() const;
@@ -31,6 +31,11 @@ namespace fengine
         Vector3 GetUp() const;
         Vector3 GetRight() const;
         Matrix4 GetGlobalMatrix() const;
+
+        void Move(const Vector3& translation);
+        void Move(float x, float y, float z);
+        void Rotate(const Vector3& euler);
+        void Rotate(float x, float y, float z);
 
     private:
         Matrix3 rotation;
@@ -90,5 +95,17 @@ namespace fengine
         scale.x = uniformScale;
         scale.y = uniformScale;
         scale.z = uniformScale;
+    }
+
+    inline void Transform::Move(const Vector3& translation)
+    {
+        position += translation;
+    }
+
+    inline void Transform::Move(float x, float y, float z)
+    {
+        position.x += x;
+        position.y += y;
+        position.z += z;
     }
 }

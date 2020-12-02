@@ -9,7 +9,7 @@ namespace fengine
 
     Matrix4 Camera::GetProjectionMatrix() const
     {
-        return matutils::MakePerspectiveProjection(fovY, aspectRatio, near, far);
+        return mat4::MakePerspectiveProjection(fovY, aspectRatio, near, far);
     }
 
     Matrix4 Camera::GetViewProjectionMatrix() const
