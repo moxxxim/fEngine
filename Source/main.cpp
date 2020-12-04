@@ -4,8 +4,13 @@
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
 #include <FEngine/ResourcesManager/Shader.h>
+#include <FEngine/ScenesManager/Transform.h>
+#include <FEngine/ScenesManager/Camera.h>
 #include <FEngine/Utils/Debug.h>
 #include <Classes/TextureLoader.h>
+#include <FEngine/Math/Matrix4.h>
+#include <FEngine/Math/MatrixUtils.h>
+#include <FEngine/Math/Vector3.h>
 
 #include <cmath>
 #include <sstream>
@@ -50,10 +55,11 @@ namespace SMain
     float mixValue = 0.f;
     const float cameraSpeed = 3.f;
     float camPitch = 0.f;
-    float camYaw = -90.f;
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f,  3.0f);
-    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f,  0.0f);
+    float camYaw = 0.f;
+
+    fengine::Transform camTransform;
+    fengine::Camera cam;
+    fengine::Matrix4 camViewMatrix;
 
     bool TryInitGlfw()
     {
@@ -105,17 +111,14 @@ namespace SMain
 
         if(camPitch > 89.0f)
         {
-          camPitch =  89.0f;
+            camPitch =  89.0f;
         }
         if(camPitch < -89.0f)
         {
-          camPitch = -89.0f;
+            camPitch = -89.0f;
         }
 
-        cameraFront.x = cos(glm::radians(camYaw)) * cos(glm::radians(camPitch));
-        cameraFront.y = sin(glm::radians(camPitch));
-        cameraFront.z = sin(glm::radians(camYaw)) * cos(glm::radians(camPitch));
-        cameraFront = glm::normalize(cameraFront);
+        camTransform.Rotate(camPitch, camYaw, 0);
     }
 
     void ScrollCallback(GLFWwindow* window, double x, double y)
@@ -159,19 +162,23 @@ namespace SMain
         }
         else if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            cameraPos += cameraSpeed * deltaTime * cameraFront * speedMultiplier;
+            fengine::Vector3 forward = camTransform.GetForward();
+            camTransform.Move(cameraSpeed * deltaTime * speedMultiplier * forward);
         }
         if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            cameraPos -= cameraSpeed * deltaTime * cameraFront * speedMultiplier;
+            fengine::Vector3 forward = camTransform.GetForward();
+            camTransform.Move(-cameraSpeed * deltaTime * speedMultiplier * forward);
         }
         if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime * speedMultiplier;
+            fengine::Vector3 right = camTransform.GetRight();
+            camTransform.Move(-cameraSpeed * deltaTime * speedMultiplier * right);
         }
         if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
         {
-            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime * speedMultiplier;
+            fengine::Vector3 right = camTransform.GetRight();
+            camTransform.Move(cameraSpeed * deltaTime * speedMultiplier * right);
         }
     }
 
@@ -309,17 +316,17 @@ namespace SRender
         -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f
     };
 
-    std::array<glm::vec3, 10> cubePositions = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
+    std::array<fengine::Vector3, 10> cubePositions = {
+        fengine::Vector3( 0.0f,  0.0f,  0.0f),
+        fengine::Vector3( 2.0f,  5.0f, -15.0f),
+        fengine::Vector3(-1.5f, -2.2f, -2.5f),
+        fengine::Vector3(-3.8f, -2.0f, -12.3f),
+        fengine::Vector3( 2.4f, -0.4f, -3.5f),
+        fengine::Vector3(-1.7f,  3.0f, -7.5f),
+        fengine::Vector3( 1.3f, -2.0f, -2.5f),
+        fengine::Vector3( 1.5f,  2.0f, -2.5f),
+        fengine::Vector3( 1.5f,  0.2f, -1.5f),
+        fengine::Vector3(-1.3f,  1.0f, -1.5f)
     };
 
     const unsigned int rectIndices[]
@@ -336,11 +343,6 @@ namespace SRender
     GLuint textureObj2;
     GLuint textureObj3;
     std::unique_ptr<fengine::Shader> modelViewProjShader;
-
-    glm::mat4 modelTransformMatrix;
-    glm::mat4 camProjectionMatrix;
-    glm::mat4 camOrthoMatrix;
-    glm::mat4 viewMatrix;
 
     GLuint smallTriangleVao1;
     GLuint smallTriangleVao2;
@@ -505,19 +507,16 @@ namespace SRender
 
     void InitializeTransforms()
     {
-        camOrthoMatrix = glm::ortho(
-                                    0.0f,
-                                    static_cast<float>(SMain::Width),
-                                    0.0f,
-                                    static_cast<float>(SMain::Height),
-                                    0.1f,
-                                    100.0f);
+        SMain::camTransform.SetPosition(0.f, 0.f, 3.f);
+        SMain::camTransform.SetRotationEuler(SMain::camPitch, SMain::camYaw, 0.f);
 
-        modelTransformMatrix = glm::mat4(1.0f);
-        modelTransformMatrix = glm::rotate(modelTransformMatrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        SMain::cameraFront.x = cos(glm::radians(SMain::camYaw)) * cos(glm::radians(SMain::camPitch));
-        SMain::cameraFront.y = sin(glm::radians(SMain::camPitch));
-        SMain::cameraFront.z = sin(glm::radians(SMain::camYaw)) * cos(glm::radians(SMain::camPitch));
+        fengine::Matrix4 globalCamTransform = SMain::camTransform.GetGlobalMatrix();
+        globalCamTransform.TryInvert(SMain::camViewMatrix);
+
+        SMain::cam.SetFovY(SMain::Zoom);
+        SMain::cam.SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
+        SMain::cam.SetNearClipPlane(0.1f);
+        SMain::cam.SetFarClipPlane(100.f);
     }
 
     GLuint InitTextureObj(const SMain::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
@@ -587,16 +586,27 @@ namespace SRender
         glEnable(GL_DEPTH_TEST);
     }
 
-    glm::mat4 CalculateTransform()
+    void UpdateCamera()
     {
+        fengine::Matrix4 globalCamTransform = SMain::camTransform.GetGlobalMatrix();
+        globalCamTransform.TryInvert(SMain::camViewMatrix);
+
+        SMain::cam.SetFovY(SMain::Zoom);
+        SMain::cam.SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
+        SMain::cam.SetNearClipPlane(0.1f);
+        SMain::cam.SetFarClipPlane(100.f);
+    }
+
+    fengine::Transform UpdateTransform(int32_t i)
+    {
+        fengine::Transform transform;
+        transform.SetPosition(cubePositions[i]);
         float time = static_cast<float>(glfwGetTime());
-        float xPos = sin(time) * (2.f / 3);
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(xPos, 0.0f, 0.0f));
-        trans = glm::rotate(trans, time , glm::vec3(0.0f, 0.0f, 1.0f));
+        float angle = ((i % 3) == 0) ? 20.f * time : (20.f * i);
+        transform.SetRotationEuler(angle, 0.f, 0.f);
 
-        return trans;
+        return transform;
     }
 
     void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, fengine::Shader& shader)
@@ -609,21 +619,17 @@ namespace SRender
         glBindTexture(GL_TEXTURE_2D, textureObj3);
 
         glBindVertexArray(vao);
-
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        SRender::viewMatrix = glm::lookAt(SMain::cameraPos, SMain::cameraPos + SMain::cameraFront, SMain::cameraUp);
-
-        for(size_t i = 0; i < cubePositions.size(); ++i)
+        for(size_t i = 0; i < SRender::cubePositions.size(); ++i)
         {
-            glm::mat4 transform = glm::mat4(1.0f);
-            transform = glm::translate(transform, cubePositions[i]);
-            float angle = ((i % 3) == 0) ? glm::radians(static_cast<float>(20 * glfwGetTime())) : glm::radians(20.f * i);
-            transform = glm::rotate(transform, angle, glm::vec3(0.5f, 1.0f, 0.0f));
+            fengine::Transform modelTransform = UpdateTransform(i);
+            fengine::Matrix4 modelTransformMatrix = modelTransform.GetGlobalMatrix();
+            fengine::Matrix4 camProjectionMatrix = SMain::cam.GetProjectionMatrix();
 
-            shader.SetUniformMatrix4("uModelMat", transform);
-            shader.SetUniformMatrix4("uViewMat", SRender::viewMatrix);
-            shader.SetUniformMatrix4("uProjMat", SRender::camProjectionMatrix);
+            shader.SetUniformMatrix4("uModelMat", modelTransformMatrix);
+            shader.SetUniformMatrix4("uViewMat", SMain::camViewMatrix);
+            shader.SetUniformMatrix4("uProjMat", camProjectionMatrix);
             shader.SetUniformFloat("mixValue", SMain::mixValue);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
@@ -658,11 +664,7 @@ int main(int argc, const char * argv[])
             SMain::lastFrame = currentFrame;
             SMain::ProcessWindowInput(*window);
 
-            SRender::camProjectionMatrix = glm::perspective(
-                                            glm::radians(SMain::Zoom),
-                                            static_cast<float>(SMain::Width)/SMain::Height,
-                                            0.1f,
-                                            100.0f);
+            SRender::UpdateCamera();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::modelViewProjShader);
@@ -680,6 +682,7 @@ int main(int argc, const char * argv[])
                 macMoved = true;
             }
 #endif
+            glCheckError();
         }
 
         glfwTerminate();
