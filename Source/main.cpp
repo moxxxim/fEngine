@@ -118,7 +118,8 @@ namespace SMain
             camPitch = -89.0f;
         }
 
-        camTransform.SetEuler(camPitch, camYaw, 0.f);
+        camTransform.SetRotation(fengine::mat3::MakeRotationY(camYaw), fengine::eSpace::World);
+        camTransform.SetRotation(fengine::mat3::MakeRotationX(camPitch), fengine::eSpace::Self);
     }
 
     void ScrollCallback(GLFWwindow* window, double x, double y)
