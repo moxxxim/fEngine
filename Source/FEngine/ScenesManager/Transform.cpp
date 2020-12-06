@@ -10,19 +10,24 @@ namespace fengine
         , scale { Vector3::One }
     { }
 
-    Vector3 Transform::GetEuler() const
+    void Transform::SetRotation(const Matrix3& aRotation, eSpace space /*= eSpace::World*/)
+    {
+        rotation = (space == eSpace::World) ? aRotation : aRotation * rotation;
+    }
+
+    Vector3 Transform::GetEuler(eSpace space /*= eSpace::World*/) const
     {
         throw "'Transform::GetRotationEuler()' not implemented yet.";
     }
 
-void Transform::SetEuler(float x, float y, float z, eSpace space /*= eSpace::World*/)
+    void Transform::SetEuler(float x, float y, float z, eSpace space /*= eSpace::World*/)
     {
-        rotation = mat3::MakeRotation(x, y, z);
+        rotation = (space == eSpace::World) ? mat3::MakeRotation(x, y, z) : mat3::MakeRotation(x, y, z) * rotation;
     }
 
     void Transform::SetEuler(const Vector3& euler, eSpace space /*= eSpace::World*/)
     {
-        rotation = mat3::MakeRotation(euler);
+        SetEuler(euler.x, euler.y, euler.z, space);
     }
 
     Vector3 Transform::GetForward() const

@@ -17,9 +17,9 @@ namespace fengine
         void SetPosition(const Vector3& aPosition, eSpace space = eSpace::World);
         void SetPosition(float x, float y, float z, eSpace space = eSpace::World);
 
-        const Matrix3& GetRotation() const;
+        const Matrix3& GetRotation(eSpace space = eSpace::World) const;
         void SetRotation(const Matrix3& aRotation, eSpace space = eSpace::World);
-        Vector3 GetEuler() const;
+        Vector3 GetEuler(eSpace space = eSpace::World) const;
         void SetEuler(const Vector3& euler, eSpace space = eSpace::World);
         void SetEuler(float x, float y, float z, eSpace space = eSpace::World);
 
@@ -64,14 +64,9 @@ namespace fengine
         position.z = z;
     }
 
-    inline const Matrix3& Transform::GetRotation() const
+    inline const Matrix3& Transform::GetRotation(eSpace space /*= eSpace::World*/) const
     {
         return rotation;
-    }
-
-    inline void Transform::SetRotation(const Matrix3& aRotation, eSpace space /*= eSpace::World*/)
-    {
-        rotation = aRotation;
     }
 
     inline const Vector3& Transform::GetScale() const
