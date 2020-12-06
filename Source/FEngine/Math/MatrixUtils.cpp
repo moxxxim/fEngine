@@ -83,6 +83,19 @@ namespace fengine
 
             return projection;
         }
+
+        Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far)
+        {
+            Matrix4 projection = Matrix4::Zero;
+
+            projection.m00 = 1 / static_cast<float>(width);
+            projection.m11 = 1 / static_cast<float>(height);
+            projection.m22 = -2 / (far - near);
+            projection.m33 = 1;
+            projection.m32 = - (far + near) / (far - near);
+
+            return projection;
+        }
     }
 
     namespace mat3
