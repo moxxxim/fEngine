@@ -3,6 +3,7 @@
 #include <FEngine/Math/Matrix3.h>
 #include <FEngine/Math/Matrix4.h>
 #include <FEngine/Math/Vector3.h>
+#include <FEngine/ScenesManager/Space.h>
 
 namespace fengine
 {
@@ -13,14 +14,14 @@ namespace fengine
         ~Transform() = default;
 
         const Vector3& GetPosition() const;
-        void SetPosition(const Vector3& aPosition);
-        void SetPosition(float x, float y, float z);
+        void SetPosition(const Vector3& aPosition, eSpace space = eSpace::World);
+        void SetPosition(float x, float y, float z, eSpace space = eSpace::World);
 
         const Matrix3& GetRotation() const;
-        void SetRotation(const Matrix3& aRotation);
-        Vector3 GetRotationEuler() const;
-        void SetRotationEuler(const Vector3& euler);
-        void SetRotationEuler(float x, float y, float z);
+        void SetRotation(const Matrix3& aRotation, eSpace space = eSpace::World);
+        Vector3 GetEuler() const;
+        void SetEuler(const Vector3& euler, eSpace space = eSpace::World);
+        void SetEuler(float x, float y, float z, eSpace space = eSpace::World);
 
         const Vector3& GetScale() const;
         void SetScale(const Vector3& aScale);
@@ -51,12 +52,12 @@ namespace fengine
         return position;
     }
 
-    inline void Transform::SetPosition(const Vector3& aPosition)
+    inline void Transform::SetPosition(const Vector3& aPosition, eSpace space /*= eSpace::World*/)
     {
         position = aPosition;
     }
 
-    inline void Transform::SetPosition(float x, float y, float z)
+    inline void Transform::SetPosition(float x, float y, float z, eSpace space /*= eSpace::World*/)
     {
         position.x = x;
         position.y = y;
@@ -68,7 +69,7 @@ namespace fengine
         return rotation;
     }
 
-    inline void Transform::SetRotation(const Matrix3& aRotation)
+    inline void Transform::SetRotation(const Matrix3& aRotation, eSpace space /*= eSpace::World*/)
     {
         rotation = aRotation;
     }

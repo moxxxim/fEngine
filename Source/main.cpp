@@ -118,7 +118,7 @@ namespace SMain
             camPitch = -89.0f;
         }
 
-        camTransform.Rotate(camPitch, camYaw, 0);
+        camTransform.SetEuler(camPitch, camYaw, 0.f);
     }
 
     void ScrollCallback(GLFWwindow* window, double x, double y)
@@ -508,7 +508,7 @@ namespace SRender
     void InitializeTransforms()
     {
         SMain::camTransform.SetPosition(0.f, 0.f, 3.f);
-        SMain::camTransform.SetRotationEuler(SMain::camPitch, SMain::camYaw, 0.f);
+        SMain::camTransform.SetEuler(SMain::camPitch, SMain::camYaw, 0.f);
 
         fengine::Matrix4 globalCamTransform = SMain::camTransform.GetGlobalMatrix();
         globalCamTransform.TryInvert(SMain::camViewMatrix);
@@ -604,7 +604,7 @@ namespace SRender
         float time = static_cast<float>(glfwGetTime());
 
         float angle = ((i % 3) == 0) ? 20.f * time : (20.f * i);
-        transform.SetRotationEuler(angle, 0.f, 0.f);
+        transform.SetEuler(0.f, 0.f, angle);
 
         return transform;
     }
