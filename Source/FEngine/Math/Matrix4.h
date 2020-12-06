@@ -2,6 +2,7 @@
 #define Matrix4_hpp
 
 #include <FEngine/Math/Vector4.h>
+#include <cstdint>
 
 namespace fengine
 {
@@ -22,6 +23,9 @@ namespace fengine
 
         Matrix4& operator = (const Matrix4& other) = default;
         Matrix4& operator = (Matrix4&& other) = default;
+        Matrix4& operator *= (const Matrix4& other);
+        float operator () (uint8_t i, uint8_t j) const;
+        float& operator () (uint8_t i, uint8_t j);
 
         friend Matrix4 operator * (const Matrix4& a, const Matrix4& b);
         friend Vector4 operator * (const Vector4& a, const Matrix4& b);
@@ -32,6 +36,7 @@ namespace fengine
         union
         {
             float data[16];
+            float mat[4][4];
             Vector4 rows[4];
             struct
             {
@@ -133,6 +138,22 @@ namespace fengine
         std::swap(m12, m21);
         std::swap(m13, m31);
         std::swap(m23, m32);
+    }
+
+    inline Matrix4& Matrix4::operator *= (const Matrix4& other)
+    {
+        *this = *this * other;
+        return *this;
+    }
+
+    inline float Matrix4::operator () (uint8_t i, uint8_t j) const
+    {
+        return mat[i][j];
+    }
+
+    inline float& Matrix4::operator () (uint8_t i, uint8_t j)
+    {
+        return mat[i][j];
     }
 
     inline Matrix4 operator * (const Matrix4& a, const Matrix4& b)

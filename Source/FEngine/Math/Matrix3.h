@@ -2,6 +2,7 @@
 #define Matrix3_hpp
 
 #include <FEngine/Math/Vector3.h>
+#include <cstdint>
 
 namespace fengine
 {
@@ -28,6 +29,8 @@ namespace fengine
         Matrix3& operator = (const Matrix3& other) = default;
         Matrix3& operator = (Matrix3&& other) = default;
         Matrix3& operator *= (const Matrix3& other);
+        float operator()(uint8_t i, uint8_t j) const;
+        float& operator()(uint8_t i, uint8_t j);
 
         friend Matrix3 operator * (const Matrix3& a, const Matrix3& b);
         friend Vector3 operator * (const Vector3& a, const Matrix3& b);
@@ -41,6 +44,7 @@ namespace fengine
         union
         {
             float data[9];
+            float mat[3][3];
             Vector3 rows[3];
             struct
             {
@@ -148,6 +152,16 @@ namespace fengine
     {
         *this = *this * other;
         return *this;
+    }
+
+    inline float Matrix3::operator()(uint8_t i, uint8_t j) const
+    {
+        return mat[j][j];
+    }
+
+    inline float& Matrix3::operator()(uint8_t i, uint8_t j)
+    {
+        return mat[j][j];
     }
 
     inline Matrix3 operator * (const Matrix3& a, const Matrix3& b)

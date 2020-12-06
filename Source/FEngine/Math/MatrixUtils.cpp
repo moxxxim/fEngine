@@ -118,7 +118,6 @@ namespace fengine
 
             rotation.m00 = rotationCos;
             rotation.m02 = rotationSin;
-            rotation.m11 = 1.f;
             rotation.m20 = -rotationSin;
             rotation.m22 = rotationCos;
 
@@ -137,7 +136,6 @@ namespace fengine
             rotation.m01 = rotationSin;
             rotation.m10 = -rotationSin;
             rotation.m11 = rotationCos;
-            rotation.m22 = 1.f;
 
             return rotation;
         }
