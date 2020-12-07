@@ -3,11 +3,12 @@
 #include <FEngine/Math/Matrix3.h>
 #include <FEngine/Math/Matrix4.h>
 #include <FEngine/Math/Vector3.h>
+#include <FEngine/ScenesManager/Component.h>
 #include <FEngine/ScenesManager/Space.h>
 
 namespace fengine
 {
-    class Transform final
+    class Transform final : public Component
     {
     public:
         Transform();
