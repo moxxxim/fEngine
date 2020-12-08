@@ -1,5 +1,4 @@
-#ifndef Vector3_hpp
-#define Vector3_hpp
+#pragma once
 
 #include <cmath>
 #include <cstring>
@@ -193,5 +192,3 @@ namespace feng
         return a + (-b);
     }
 }
-
-#endif

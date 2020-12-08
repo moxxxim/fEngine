@@ -45,6 +45,7 @@ namespace SMain
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
     std::string BaseTempShadersDir = BaseShadersDir + "Temp/";
+
     constexpr uint32_t Width = 800;
     constexpr uint32_t Height = 600;
     float lastX = Width / 2.f;
@@ -139,10 +140,6 @@ namespace SMain
     {
         float delta = increase ? 0.005 : -0.005;
         mixValue += delta;
-
-        std::stringstream ss;
-        ss << "Mix value: " << mixValue;
-        feng::Debug::LogError(ss.str());
     }
 
     void ProcessWindowInput(GLFWwindow &window)
@@ -254,26 +251,10 @@ namespace SMain
 
 namespace SRender
 {
-    // Shaders.
-
     const char *twoTexturesFsName = "TriangleTexture2Fs.fs";
     const char *ModelViewProjVsName = "ModelViewProjVs.vs";
-    // Textures.
-
     const char *woodenContainerJpg = "wood_container.jpg";
-    const char *brickWallJpg = "brik_wall.jpg";
     const char *awesomeFacePng = "awesomeface.png";
-
-    // Geometry.
-
-    const float rectTexturedCoords[] =
-    {
-        // positions          // colors           // texture coords
-        0.5f,  0.5f, 0.5f,   1.0f, 0.0f, 0.0f,    1.0f, 1.0f,   // top right front
-        0.5f, -0.5f, 0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right front
-        -0.5f, -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left front
-        -0.5f,  0.5f, 0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // top left front
-    };
 
     float cube[] =
     {
@@ -335,7 +316,7 @@ namespace SRender
     };
 
     const unsigned int rectIndices[]
-    {  // note that we start from 0!
+    {
         0, 1, 3,   // first triangle
         1, 2, 3    // second triangle
     };
@@ -345,96 +326,11 @@ namespace SRender
     GLuint shapeVao;
     GLuint shapeEbo;
     GLuint textureObj1;
-    GLuint textureObj2;
     GLuint textureObj3;
     std::unique_ptr<feng::Shader> modelViewProjShader;
 
-    GLuint smallTriangleVao1;
-    GLuint smallTriangleVao2;
-
     SMain::TextureData woodenContainerTexture;
-    SMain::TextureData brickWallTexture;
     SMain::TextureData awesomeFaceTexture;
-
-    GLuint CreateVao(const float* triangles, int verticesCount, int stride)
-    {
-        // Generate and bind vertex array object.
-        GLuint vao;
-        glGenVertexArrays(1, &vao);
-
-        // Generate vertex buffer object.
-        GLuint vbo;
-        glGenBuffers(1, &vbo);
-
-        // Vind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        glBindVertexArray(vao);
-
-        // Bind buffer object.
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, 3 * stride, triangles, GL_STATIC_DRAW);
-
-        // Setup vertex alignment in vertex buffer.
-
-        /*
-         1 - position of vertex attribute in shader: in our case this is position with location 0.
-         2 - number of components in vertex attribute: in our case this is 3 (Vector3 dimension).
-         3 - data type of each component in array.
-         4 - whether data should be normalized (clamed to range [-1, 1], or [0, 1]). WTF????
-         5 - offset between consecutive vertex attributes. Can be 0 in our case (indicates that attributes tightly packed).
-         6 - offset of the first argument in array.
-         */
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-
-        // Enable vertex attribute in location 0.
-        glEnableVertexAttribArray(0);
-
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        return vao;
-    }
-
-    GLuint CreateVaoWithColor(const float* vertices, int verticesCount, int stride)
-    {
-        // Generate and bind vertex array object.
-        GLuint vao;
-        glGenVertexArrays(1, &vao);
-
-        // Generate vertex buffer object.
-        GLuint vbo;
-        glGenBuffers(1, &vbo);
-
-        // Vind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        glBindVertexArray(vao);
-
-        // Bind buffer object.
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, verticesCount * stride, vertices, GL_STATIC_DRAW);
-
-        // Setup vertex alignment in vertex buffer.
-
-        /*
-         1 - position of vertex attribute in shader: in our case this is position with location 0.
-         2 - number of components in vertex attribute: in our case this is 3 (Vector3 dimension).
-         3 - data type of each component in array.
-         4 - whether data should be normalized (clamed to range [-1, 1], or [0, 1]). WTF????
-         5 - offset between consecutive vertex attributes. Can be 0 in our case (indicates that attributes tightly packed).
-         6 - offset of the first argument in array.
-         */
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(0));
-        // Enable vertex attribute in location 0.
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(stride/2));
-        glEnableVertexAttribArray(1);
-
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        return vao;
-    }
 
     GLuint CreateVaoWithColorAndTexture(const float* vertices, int verticesCount, int stride)
     {
@@ -506,7 +402,6 @@ namespace SRender
     void LoadTextures()
     {
         woodenContainerTexture.Load(woodenContainerJpg, false);
-        brickWallTexture.Load(brickWallJpg, false);
         awesomeFaceTexture.Load(awesomeFacePng, true);
     }
 
@@ -573,7 +468,6 @@ namespace SRender
         LoadShaders();
         LoadTextures();
         textureObj1 = InitTextureObj(woodenContainerTexture, GL_REPEAT, GL_REPEAT, false);
-        textureObj2 = InitTextureObj(brickWallTexture, GL_REPEAT, GL_REPEAT, false);
         textureObj3 = InitTextureObj(awesomeFaceTexture, GL_REPEAT, GL_REPEAT, true);
         shapeVao = CreateVaoWithColorAndTexture(cube, 36, sizeof(cube) / 36);
 
@@ -646,14 +540,9 @@ int main(int argc, const char * argv[])
         GLFWwindow *window = SMain::CreateWindow();
 
         SRender::InitRender();
+
         glCheckError();
-
         feng::Debug::LogMessage("Start loop.");
-
-        SRender::modelViewProjShader->StartUse();
-        SRender::modelViewProjShader->SetUniformInt("uTex1", 0);
-        SRender::modelViewProjShader->SetUniformInt("uTex2", 1);
-        SRender::modelViewProjShader->StopUse();
 
         SRender::modelViewProjShader->StartUse();
         SRender::modelViewProjShader->SetUniformInt("uTex1", 0);
