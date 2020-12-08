@@ -1,11 +1,34 @@
 #include <FEngine/ScenesManager/Camera.h>
 
 #include <FEngine/Math/MatrixUtils.h>
+#include <FEngine/ScenesManager/Entity.h>
+#include <FEngine/ScenesManager/Transform.h>
 
 namespace fengine
 {
-    Camera::Camera()
-    { }
+    void Camera::SetFovY(float fov)
+    {
+        // TODO: m.alekseev Validate.
+        fovY = fov;
+    }
+
+    void Camera::SetAspectRatio(float aAspectRatio)
+    {
+        // TODO: m.alekseev Validate.
+        aspectRatio = aAspectRatio;
+    }
+
+    void Camera::SetNearClipPlane(float aNear)
+    {
+        // TODO: m.alekseev Validate.
+        near = aNear;
+    }
+
+    void Camera::SetFarClipPlane(float aFar)
+    {
+        // TODO: m.alekseev Validate.
+        far = aFar;
+    }
 
     Matrix4 Camera::GetProjectionMatrix() const
     {
@@ -22,7 +45,15 @@ namespace fengine
 
     Matrix4 Camera::GetViewMatrix() const
     {
-        // inverse of cam transform
-        throw "'Camera::GetViewMatrix()' is not implemented yet";
+        const Entity *myEntity = GetEntity();
+        const Transform *myTransform = myEntity->GetComponent<Transform>();
+        const Matrix4 myTransformMatrix = myTransform->GetGlobalMatrix();
+        const Vector3 myScale = myTransform->GetScale();
+
+        Matrix4 transformInverted;
+        myTransformMatrix.TryInvert(transformInverted);
+
+        // TODO: m.alekseev Ignore scale.
+        return transformInverted;
     }
 }

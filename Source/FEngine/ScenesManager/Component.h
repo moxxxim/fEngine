@@ -9,12 +9,12 @@ namespace fengine
     {
         friend Entity;
     public:
+        virtual ~Component() = default;
         const Entity* GetEntity() const;
         Entity* GetEntity();
 
     protected:
         Component() = default;
-        virtual ~Component() = default;
 
         void SetOwner(Entity *owner);
 

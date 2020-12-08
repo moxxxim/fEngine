@@ -1,32 +1,46 @@
 #pragma once
 
 #include <FEngine/Math/Matrix4.h>
+#include <FEngine/ScenesManager/Component.h>
 
 namespace fengine
 {
-    class Camera final
+    class Camera final : public Component
     {
     public:
-        Camera();
+        Camera() = default;
 
         float GetFovY() const;
 	    void SetFovY(float fov);
+
 	    float GetAspectRatio() const;
 	    void SetAspectRatio(float aspectRatio);
+
 	    float GetNearClipPlane() const;
         void SetNearClipPlane(float aNear);
+
 	    float GetFarClipPlane() const;
 	    void SetFarClipPlane(float aFar);
+        
         Matrix4 GetProjectionMatrix() const;
         Matrix4 GetViewProjectionMatrix() const;
 
-private:
+    private:
+        static constexpr float MinFovY = 0.1f;
+        static constexpr float MinAspectRatio = 0.1f;
+        static constexpr float MinNear = 0.01f;
+
+        static constexpr float DefaultFovY = 45.f;
+        static constexpr float DefaultAspectRatio = 1.0f;
+        static constexpr float DefaultNear = 0.1f;
+        static constexpr float DefaultFar = 100.f;
+
         Matrix4 GetViewMatrix() const;
 
-        float aspectRatio = 1.0f;
-        float fovY = 90.0f;
-        float near = 0.1f;
-        float far = 90.0f;
+        float aspectRatio = DefaultAspectRatio;;
+        float fovY = DefaultFovY;
+        float near = DefaultNear;
+        float far = DefaultFar;
     };
 
     inline float Camera::GetFovY() const
@@ -34,19 +48,9 @@ private:
         return fovY;
     }
 
-    inline void Camera::SetFovY(float fov)
-    {
-        fovY = fov;
-    }
-
     inline float Camera::GetAspectRatio() const
     {
         return aspectRatio;
-    }
-
-    inline void Camera::SetAspectRatio(float aAspectRatio)
-    {
-        aspectRatio = aAspectRatio;
     }
 
     inline float Camera::GetNearClipPlane() const
@@ -54,18 +58,8 @@ private:
         return near;
     }
 
-    inline void Camera::SetNearClipPlane(float aNear)
-    {
-        near = aNear;
-    }
-
     inline float Camera::GetFarClipPlane() const
     {
         return far;
-    }
-
-    inline void Camera::SetFarClipPlane(float aFar)
-    {
-        far = aFar;
     }
 }

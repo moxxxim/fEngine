@@ -4,8 +4,9 @@
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
 #include <FEngine/ResourcesManager/Shader.h>
-#include <FEngine/ScenesManager/Transform.h>
 #include <FEngine/ScenesManager/Camera.h>
+#include <FEngine/ScenesManager/Entity.h>
+#include <FEngine/ScenesManager/Transform.h>
 #include <FEngine/Utils/Debug.h>
 #include <Classes/TextureLoader.h>
 #include <FEngine/Math/Matrix4.h>
@@ -57,9 +58,7 @@ namespace SMain
     float camPitch = 0.f;
     float camYaw = 0.f;
 
-    fengine::Transform camTransform;
-    fengine::Camera cam;
-    fengine::Matrix4 camViewMatrix;
+    std::unique_ptr<fengine::Entity> camEntity;
 
     bool TryInitGlfw()
     {
@@ -118,8 +117,9 @@ namespace SMain
             camPitch = -89.0f;
         }
 
-        camTransform.SetRotation(fengine::mat3::MakeRotationY(camYaw), fengine::eSpace::World);
-        camTransform.SetRotation(fengine::mat3::MakeRotationX(camPitch), fengine::eSpace::Self);
+        fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
+        camTransform->SetRotation(fengine::mat3::MakeRotationY(camYaw), fengine::eSpace::World);
+        camTransform->SetRotation(fengine::mat3::MakeRotationX(camPitch), fengine::eSpace::Self);
     }
 
     void ScrollCallback(GLFWwindow* window, double x, double y)
@@ -163,23 +163,27 @@ namespace SMain
         }
         else if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            fengine::Vector3 forward = camTransform.GetForward();
-            camTransform.Move(cameraSpeed * deltaTime * speedMultiplier * forward);
+            fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
+            fengine::Vector3 forward = camTransform->GetForward();
+            camTransform->Move(cameraSpeed * deltaTime * speedMultiplier * forward);
         }
         if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            fengine::Vector3 forward = camTransform.GetForward();
-            camTransform.Move(-cameraSpeed * deltaTime * speedMultiplier * forward);
+            fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
+            fengine::Vector3 forward = camTransform->GetForward();
+            camTransform->Move(-cameraSpeed * deltaTime * speedMultiplier * forward);
         }
         if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            fengine::Vector3 right = camTransform.GetRight();
-            camTransform.Move(-cameraSpeed * deltaTime * speedMultiplier * right);
+            fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
+            fengine::Vector3 right = camTransform->GetRight();
+            camTransform->Move(-cameraSpeed * deltaTime * speedMultiplier * right);
         }
         if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
         {
-            fengine::Vector3 right = camTransform.GetRight();
-            camTransform.Move(cameraSpeed * deltaTime * speedMultiplier * right);
+            fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
+            fengine::Vector3 right = camTransform->GetRight();
+            camTransform->Move(cameraSpeed * deltaTime * speedMultiplier * right);
         }
     }
 
@@ -508,16 +512,16 @@ namespace SRender
 
     void InitializeTransforms()
     {
-        SMain::camTransform.SetPosition(0.f, 0.f, 3.f);
-        SMain::camTransform.SetEuler(SMain::camPitch, SMain::camYaw, 0.f);
+        SMain::camEntity = std::make_unique<fengine::Entity>("Camera");
+        fengine::Camera &camera = SMain::camEntity->AddComponent<fengine::Camera>();
+        fengine::Transform *camTransform = SMain::camEntity->GetComponent<fengine::Transform>();
+        camTransform->SetPosition(0.f, 0.f, 3.f);
+        camTransform->SetEuler(SMain::camPitch, SMain::camYaw, 0.f);
 
-        fengine::Matrix4 globalCamTransform = SMain::camTransform.GetGlobalMatrix();
-        globalCamTransform.TryInvert(SMain::camViewMatrix);
-
-        SMain::cam.SetFovY(SMain::Zoom);
-        SMain::cam.SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
-        SMain::cam.SetNearClipPlane(0.1f);
-        SMain::cam.SetFarClipPlane(100.f);
+        camera.SetFovY(SMain::Zoom);
+        camera.SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
+        camera.SetNearClipPlane(0.1f);
+        camera.SetFarClipPlane(100.f);
     }
 
     GLuint InitTextureObj(const SMain::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
@@ -589,13 +593,12 @@ namespace SRender
 
     void UpdateCamera()
     {
-        fengine::Matrix4 globalCamTransform = SMain::camTransform.GetGlobalMatrix();
-        globalCamTransform.TryInvert(SMain::camViewMatrix);
+        fengine::Camera *camera = SMain::camEntity->GetComponent<fengine::Camera>();
 
-        SMain::cam.SetFovY(SMain::Zoom);
-        SMain::cam.SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
-        SMain::cam.SetNearClipPlane(0.1f);
-        SMain::cam.SetFarClipPlane(100.f);
+        camera->SetFovY(SMain::Zoom);
+        camera->SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
+        camera->SetNearClipPlane(0.1f);
+        camera->SetFarClipPlane(100.f);
     }
 
     fengine::Transform UpdateTransform(int32_t i)
@@ -626,11 +629,10 @@ namespace SRender
         {
             fengine::Transform modelTransform = UpdateTransform(i);
             fengine::Matrix4 modelTransformMatrix = modelTransform.GetGlobalMatrix();
-            fengine::Matrix4 camProjectionMatrix = SMain::cam.GetProjectionMatrix();
+            fengine::Camera *camera = SMain::camEntity->GetComponent<fengine::Camera>();
 
             shader.SetUniformMatrix4("uModelMat", modelTransformMatrix);
-            shader.SetUniformMatrix4("uViewMat", SMain::camViewMatrix);
-            shader.SetUniformMatrix4("uProjMat", camProjectionMatrix);
+            shader.SetUniformMatrix4("uViewProjMat", camera->GetViewProjectionMatrix());
             shader.SetUniformFloat("mixValue", SMain::mixValue);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }

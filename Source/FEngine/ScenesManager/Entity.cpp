@@ -1,32 +1,20 @@
 #include <FEngine/ScenesManager/Entity.h>
 
+#include <FEngine/ScenesManager/Transform.h>
+
 namespace fengine
 {
-    Entity::~Entity()
+    Entity::Entity(const std::string& aName)
+        : name {aName}
     {
-
+        std::ignore = AddComponent<Transform>();
     }
 
-    void Entity::AddComponent(Component *component)
+    Entity::Entity(std::string&& aName)
+        : name {std::move(aName)}
     {
+        std::ignore = AddComponent<Transform>();
     }
 
-    void Entity::RemoveComponent(Component *component)
-    {
-    }
-
-    void Entity::Update(float deltaTime)
-    {
-
-    }
-
-    void Entity::DeleteComponents()
-    {
-        for(Component* component: components)
-        {
-            delete component;
-        }
-
-        components.clear();
-    }
+    Entity::~Entity() = default;
 }
