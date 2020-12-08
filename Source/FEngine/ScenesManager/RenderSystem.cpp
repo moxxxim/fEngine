@@ -4,30 +4,30 @@
 //#include "Renderer.h"
 //#include "RenderPostProcessing.h"
 //
-//fengine::RenderSystem::RenderSystem() :
+//feng::RenderSystem::RenderSystem() :
 //	m_renderProperties(this),
-//	m_postProcessing(fengine::RenderPostProcessing::GetInstance())
+//	m_postProcessing(feng::RenderPostProcessing::GetInstance())
 //{
 //	m_frameBuffer = m_buffersPool.GetBuffer(true);
 //}
 //
-//fengine::RenderSystem::~RenderSystem()
+//feng::RenderSystem::~RenderSystem()
 //{
 //	m_buffersPool.PutBuffer(m_frameBuffer);
 //	m_frameBuffer = FrameBuffer(0, 0, 0);
 //}
 //
-//void fengine::RenderSystem::SetCamera(fengine::Camera *camera)
+//void feng::RenderSystem::SetCamera(feng::Camera *camera)
 //{
 //	m_camera = camera;
 //}
 //
-//void fengine::RenderSystem::SetSkybox(fengine::Renderer *skyboxRenderer)
+//void feng::RenderSystem::SetSkybox(feng::Renderer *skyboxRenderer)
 //{
 //	m_skybox = skyboxRenderer;
 //}
 //
-//void fengine::RenderSystem::AddRenderer(fengine::Renderer *renderer)
+//void feng::RenderSystem::AddRenderer(feng::Renderer *renderer)
 //{
 //	if (!m_renderers.Contains(renderer))
 //	{
@@ -35,7 +35,7 @@
 //	}
 //}
 //
-//void fengine::RenderSystem::AddLight(fengine::Light *light)
+//void feng::RenderSystem::AddLight(feng::Light *light)
 //{
 //	if (!m_lights.Contains(light))
 //	{
@@ -43,7 +43,7 @@
 //	}
 //}
 //
-//void fengine::RenderSystem::RemoveSkybox(fengine::Renderer *skyboxRenderer)
+//void feng::RenderSystem::RemoveSkybox(feng::Renderer *skyboxRenderer)
 //{
 //	if (m_skybox == skyboxRenderer)
 //	{
@@ -51,7 +51,7 @@
 //	}
 //}
 //
-//void fengine::RenderSystem::RemoveCamera(fengine::Camera *camera)
+//void feng::RenderSystem::RemoveCamera(feng::Camera *camera)
 //{
 //	if (m_camera == camera)
 //	{
@@ -59,17 +59,17 @@
 //	}
 //}
 //
-//void fengine::RenderSystem::RemoveRenderer(fengine::Renderer *renderer)
+//void feng::RenderSystem::RemoveRenderer(feng::Renderer *renderer)
 //{
 //	m_renderers.Remove(renderer);
 //}
 //
-//void fengine::RenderSystem::RemoveLight(fengine::Light *light)
+//void feng::RenderSystem::RemoveLight(feng::Light *light)
 //{
 //	m_lights.Remove(light);
 //}
 //
-//void fengine::RenderSystem::Reset()
+//void feng::RenderSystem::Reset()
 //{
 //	m_renderers.Clear();
 //	m_lights.Clear();
@@ -77,7 +77,7 @@
 //	m_camera = nullptr;
 //}
 //
-//void fengine::RenderSystem::Draw(ESContext *esContext)
+//void feng::RenderSystem::Draw(ESContext *esContext)
 //{
 //	SetupDraw();
 //	DrawRenderers(esContext);
@@ -86,7 +86,7 @@
 //	eglSwapBuffers(esContext->eglDisplay, esContext->eglSurface);
 //}
 //
-//void fengine::RenderSystem::SetupDraw()
+//void feng::RenderSystem::SetupDraw()
 //{
 //	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //	m_renderProperties.Update();
@@ -97,7 +97,7 @@
 //	}
 //}
 //
-//void fengine::RenderSystem::DrawRenderers(ESContext *esContext)
+//void feng::RenderSystem::DrawRenderers(ESContext *esContext)
 //{
 //	if (m_skybox)
 //	{
@@ -120,7 +120,7 @@
 //	}
 //}
 //
-//void fengine::RenderSystem::ApplyPostProcessing()
+//void feng::RenderSystem::ApplyPostProcessing()
 //{
 //	if (m_frameBuffer.Frame)
 //	{
@@ -129,7 +129,7 @@
 //	}
 //}
 //
-//void fengine::RenderSystem::BindFrameBuffer()
+//void feng::RenderSystem::BindFrameBuffer()
 //{
 //	if (!m_frameBuffer.Frame)
 //	{

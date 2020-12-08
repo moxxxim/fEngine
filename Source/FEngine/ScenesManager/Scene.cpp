@@ -5,13 +5,13 @@
 //#include "MeshRenderer.h"
 //#include "../ResourcesManager/ResourcesManager.h"
 //
-//fengine::Scene::Scene(RenderSystem *renderSystem) :
+//feng::Scene::Scene(RenderSystem *renderSystem) :
 //	m_renderSystem(renderSystem),
 //	m_settings(new SceneSettings(this))
 //{
 //}
 //
-//fengine::Scene::~Scene()
+//feng::Scene::~Scene()
 //{
 //	if (m_skybox)
 //	{
@@ -37,21 +37,21 @@
 //	delete[] m_settings;
 //}
 //
-//fengine::GameObject * fengine::Scene::CreateGameObject()
+//feng::GameObject * feng::Scene::CreateGameObject()
 //{
-//	fengine::GameObject *go = new GameObject(this, m_renderSystem);
+//	feng::GameObject *go = new GameObject(this, m_renderSystem);
 //	AddGameObject(go);
 //
 //	return go;
 //}
 //
-//void fengine::Scene::DestroyGameObject(GameObject *go)
+//void feng::Scene::DestroyGameObject(GameObject *go)
 //{
 //	RemoveGameObject(go);
 //	delete go;
 //}
 //
-//fengine::GameObject * fengine::Scene::GetGameObject(obj_id id) const
+//feng::GameObject * feng::Scene::GetGameObject(obj_id id) const
 //{
 //	if (m_gameObjects.GetSize() > 0)
 //	{
@@ -70,7 +70,7 @@
 //	return nullptr;
 //}
 //
-//void fengine::Scene::Update(float deltaTime)
+//void feng::Scene::Update(float deltaTime)
 //{
 //	if (m_gameObjects.GetSize() > 0)
 //	{
@@ -87,7 +87,7 @@
 //	}
 //}
 //
-//void fengine::Scene::AddGameObject(fengine::GameObject *go)
+//void feng::Scene::AddGameObject(feng::GameObject *go)
 //{
 //	Renderer *renderer = go->GetRenderer();
 //	if (renderer)
@@ -98,7 +98,7 @@
 //	m_gameObjects.Add(go);
 //}
 //
-//void fengine::Scene::RemoveGameObject(fengine::GameObject *go)
+//void feng::Scene::RemoveGameObject(feng::GameObject *go)
 //{
 //	Renderer *renderer = go->GetRenderer();
 //	if (renderer)
@@ -109,7 +109,7 @@
 //	m_gameObjects.Remove(go);
 //}
 //
-//void fengine::Scene::SetSkybox(Renderer *skybox)
+//void feng::Scene::SetSkybox(Renderer *skybox)
 //{
 //	if (m_skybox != skybox)
 //	{
@@ -118,7 +118,7 @@
 //	}
 //}
 //
-//void fengine::Scene::RemoveSkybox()
+//void feng::Scene::RemoveSkybox()
 //{
 //	if (m_skybox)
 //	{

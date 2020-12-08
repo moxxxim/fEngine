@@ -4,7 +4,7 @@
 //#include "Material.h"
 //#include "CachedMaterial.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //    class ResourceManagerTextures;
 //    class ResourceManagerShaders;

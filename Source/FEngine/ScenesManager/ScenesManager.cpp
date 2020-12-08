@@ -9,13 +9,13 @@
 //#include "RenderSystem.h"
 //#include "SceneSerializer.h"
 //
-//fengine::ScenesManager *fengine::ScenesManager::m_scenesManager = nullptr;
+//feng::ScenesManager *feng::ScenesManager::m_scenesManager = nullptr;
 //
-//fengine::ScenesManager * fengine::ScenesManager::GetInstance()
+//feng::ScenesManager * feng::ScenesManager::GetInstance()
 //{
 //	if (!m_scenesManager)
 //	{
-//		fengine::RegisterSerializableObjects();
+//		feng::RegisterSerializableObjects();
 //		m_scenesManager = new ScenesManager();
 //		const char *initialScene = AppSettings::GetInitialSceneLocation();
 //		m_scenesManager->CreateCurrentScene(initialScene);
@@ -24,26 +24,26 @@
 //	return m_scenesManager;
 //}
 //
-//fengine::ScenesManager::ScenesManager() :
+//feng::ScenesManager::ScenesManager() :
 //	m_renderSystem(new RenderSystem()),
 //	m_time(Time::GetInstance())
 //{
 //}
 //
-//fengine::ScenesManager::~ScenesManager()
+//feng::ScenesManager::~ScenesManager()
 //{
 //	delete m_currentScene;
 //	delete m_renderSystem;
 //}
 //
-//void fengine::ScenesManager::Load(const char *sceneName)
+//void feng::ScenesManager::Load(const char *sceneName)
 //{
 //	m_isLoadingScene = true;
 //	m_cachedScene = new char[strlen(sceneName) + 1];
 //	strcpy(m_cachedScene, sceneName);
 //}
 //
-//void fengine::ScenesManager::Update(float deltaTime)
+//void feng::ScenesManager::Update(float deltaTime)
 //{
 //	UpdateTime(deltaTime);
 //
@@ -57,18 +57,18 @@
 //	}
 //}
 //
-//void fengine::ScenesManager::Draw(ESContext *esContext)
+//void feng::ScenesManager::Draw(ESContext *esContext)
 //{
 //	m_renderSystem->Draw(esContext);
 //}
 //
-//void fengine::ScenesManager::CreateCurrentScene(const char *sceneFile)
+//void feng::ScenesManager::CreateCurrentScene(const char *sceneFile)
 //{
 //	m_currentScene = new Scene(m_renderSystem);
 //	DeserializeScene(m_currentScene, sceneFile);
 //}
 //
-//void fengine::ScenesManager::DeserializeScene(Scene *scene, const char *sceneFile) const
+//void feng::ScenesManager::DeserializeScene(Scene *scene, const char *sceneFile) const
 //{
 //	SceneSerializer serializer;
 //	if (serializer.Deserialize(scene, sceneFile))
@@ -78,18 +78,18 @@
 //			sceneFile
 //		};
 //
-//		fengine::Debug::LogError(message, 2);
+//		feng::Debug::LogError(message, 2);
 //	}
 //}
 //
-//void fengine::ScenesManager::UpdateTime(float deltaTime)
+//void feng::ScenesManager::UpdateTime(float deltaTime)
 //{
 //	m_time->m_time += deltaTime;
 //	m_time->m_sceneTime += deltaTime;
 //	m_time->m_deltaTime = deltaTime;
 //}
 //
-//void fengine::ScenesManager::DestroyCurrentScene()
+//void feng::ScenesManager::DestroyCurrentScene()
 //{
 //	delete m_currentScene;
 //	m_currentScene = nullptr;
@@ -99,13 +99,13 @@
 //	GuidGenerator::ResetNextSceneObjectId();
 //}
 //
-//void fengine::ScenesManager::PurgeResources()
+//void feng::ScenesManager::PurgeResources()
 //{
 //	ResourcesManager *manager = ResourcesManager::GetInstance();
 //	manager->Purge();
 //}
 //
-//void fengine::ScenesManager::LoadCachedScene()
+//void feng::ScenesManager::LoadCachedScene()
 //{
 //	DestroyCurrentScene();
 //	PurgeResources();

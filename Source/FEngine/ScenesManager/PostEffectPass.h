@@ -5,7 +5,7 @@
 //#include <map>
 //#include <vector>
 //
-//namespace fengine
+//namespace feng
 //{
 //    class Material;
 //    class Shader;

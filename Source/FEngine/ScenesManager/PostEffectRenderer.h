@@ -3,7 +3,7 @@
 //#include "../ResourcesManager/ShaderParameters.h"
 //#include "../Utils/StringMap.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class Material;

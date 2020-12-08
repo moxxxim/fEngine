@@ -2,7 +2,7 @@
 //#include "ResourcesManager.h"
 //#include "CachedTexture.h"
 //
-//fengine::Texture::Texture(const CachedTexture& texture, char *data, int width, int height, int bpp) :
+//feng::Texture::Texture(const CachedTexture& texture, char *data, int width, int height, int bpp) :
 //	Object(ObjectType::Resource),
 //	m_textureInfo(texture),
 //	m_data(data),
@@ -12,7 +12,7 @@
 //{
 //}
 //
-//fengine::Texture::~Texture()
+//feng::Texture::~Texture()
 //{
 //	delete[] m_data;
 //	delete[] m_cubeMap_Pos_X;
@@ -23,13 +23,13 @@
 //	delete[] m_cubeMap_Neg_Z;
 //}
 //
-//void fengine::Texture::Destroy()
+//void feng::Texture::Destroy()
 //{
 //	ResourcesManager *manager = ResourcesManager::GetInstance();
 //	manager->DestroyResource(GetId());
 //}
 //
-//const char * fengine::Texture::GetCubeMapFace(fengine::CubeMapFace face) const
+//const char * feng::Texture::GetCubeMapFace(feng::CubeMapFace face) const
 //{
 //	int faceWidth = m_width / 4;
 //	int faceHeight = m_height / 3;
@@ -37,7 +37,7 @@
 //
 //	switch (face)
 //	{
-//		case fengine::CubeMapFace::XPos:
+//		case feng::CubeMapFace::XPos:
 //			if (!m_cubeMap_Pos_X)
 //			{
 //				m_cubeMap_Pos_X = CreateCubeMapFace(m_width * bytesPerPixel * faceHeight + 2 * faceWidth * bytesPerPixel, faceWidth, faceHeight);
@@ -45,7 +45,7 @@
 //
 //			return m_cubeMap_Pos_X;
 //
-//		case fengine::CubeMapFace::XNeg:
+//		case feng::CubeMapFace::XNeg:
 //			if (!m_cubeMap_Neg_X)
 //			{
 //				m_cubeMap_Neg_X = CreateCubeMapFace(m_width * bytesPerPixel * faceHeight, faceWidth, faceHeight);
@@ -53,7 +53,7 @@
 //
 //			return m_cubeMap_Neg_X;
 //
-//		case fengine::CubeMapFace::YPos:
+//		case feng::CubeMapFace::YPos:
 //			if (!m_cubeMap_Pos_Y)
 //			{
 //				m_cubeMap_Pos_Y = CreateCubeMapFace(faceWidth * bytesPerPixel, faceWidth, faceHeight);
@@ -61,7 +61,7 @@
 //
 //			return m_cubeMap_Pos_Y;
 //
-//		case fengine::CubeMapFace::YNeg:
+//		case feng::CubeMapFace::YNeg:
 //			if (!m_cubeMap_Neg_Y)
 //			{
 //				m_cubeMap_Neg_Y = CreateCubeMapFace(2 * m_width * bytesPerPixel * faceHeight + faceWidth * bytesPerPixel, faceWidth, faceHeight);
@@ -69,7 +69,7 @@
 //
 //			return m_cubeMap_Neg_Y;
 //
-//		case fengine::CubeMapFace::ZPos:
+//		case feng::CubeMapFace::ZPos:
 //			if (!m_cubeMap_Pos_Z)
 //			{
 //				m_cubeMap_Pos_Z = CreateCubeMapFace(m_width * bytesPerPixel * faceHeight + faceWidth * bytesPerPixel, faceWidth, faceHeight);
@@ -77,7 +77,7 @@
 //
 //			return m_cubeMap_Pos_Z;
 //
-//		case fengine::CubeMapFace::ZNeg:
+//		case feng::CubeMapFace::ZNeg:
 //			if (!m_cubeMap_Neg_Z)
 //			{
 //				m_cubeMap_Neg_Z = CreateCubeMapFace(m_width * bytesPerPixel * faceHeight + 3 * faceWidth * bytesPerPixel, faceWidth, faceHeight);
@@ -90,7 +90,7 @@
 //	}
 //}
 //
-//char * fengine::Texture::CreateCubeMapFace(unsigned start, unsigned width, unsigned height) const
+//char * feng::Texture::CreateCubeMapFace(unsigned start, unsigned width, unsigned height) const
 //{
 //	unsigned int size = width * height * m_bitsPerPixel / 8;
 //	char *face = new char[size];

@@ -3,7 +3,7 @@
 
 #include <FEngine/Math/Vector3.h>
 
-namespace fengine
+namespace feng
 {
     class Vector4 final
     {
@@ -31,7 +31,7 @@ namespace fengine
     };
 }
 
-namespace fengine
+namespace feng
 {
     inline Vector4::Vector4(float aX, float aY, float aZ, float aW)
         : data {aX, aY, aZ, aW}

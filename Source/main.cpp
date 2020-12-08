@@ -58,7 +58,7 @@ namespace SMain
     float camPitch = 0.f;
     float camYaw = 0.f;
 
-    std::unique_ptr<fengine::Entity> camEntity;
+    std::unique_ptr<feng::Entity> camEntity;
 
     bool TryInitGlfw()
     {
@@ -117,9 +117,9 @@ namespace SMain
             camPitch = -89.0f;
         }
 
-        fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
-        camTransform->SetRotation(fengine::mat3::MakeRotationY(camYaw), fengine::eSpace::World);
-        camTransform->SetRotation(fengine::mat3::MakeRotationX(camPitch), fengine::eSpace::Self);
+        feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
+        camTransform->SetRotation(feng::mat3::MakeRotationY(camYaw), feng::eSpace::World);
+        camTransform->SetRotation(feng::mat3::MakeRotationX(camPitch), feng::eSpace::Self);
     }
 
     void ScrollCallback(GLFWwindow* window, double x, double y)
@@ -142,7 +142,7 @@ namespace SMain
 
         std::stringstream ss;
         ss << "Mix value: " << mixValue;
-        fengine::Debug::LogError(ss.str());
+        feng::Debug::LogError(ss.str());
     }
 
     void ProcessWindowInput(GLFWwindow &window)
@@ -163,35 +163,35 @@ namespace SMain
         }
         else if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
-            fengine::Vector3 forward = camTransform->GetForward();
+            feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 forward = camTransform->GetForward();
             camTransform->Move(cameraSpeed * deltaTime * speedMultiplier * forward);
         }
         if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
-            fengine::Vector3 forward = camTransform->GetForward();
+            feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 forward = camTransform->GetForward();
             camTransform->Move(-cameraSpeed * deltaTime * speedMultiplier * forward);
         }
         if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
-            fengine::Vector3 right = camTransform->GetRight();
+            feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 right = camTransform->GetRight();
             camTransform->Move(-cameraSpeed * deltaTime * speedMultiplier * right);
         }
         if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
         {
-            fengine::Transform *camTransform = camEntity->GetComponent<fengine::Transform>();
-            fengine::Vector3 right = camTransform->GetRight();
+            feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 right = camTransform->GetRight();
             camTransform->Move(cameraSpeed * deltaTime * speedMultiplier * right);
         }
     }
 
-    std::unique_ptr<fengine::Shader> LoadTempShader(const std::string& vsFileName, const std::string& fsFileName)
+    std::unique_ptr<feng::Shader> LoadTempShader(const std::string& vsFileName, const std::string& fsFileName)
     {
         std::string vsFilePath = BaseTempShadersDir + vsFileName;
         std::string fsFilePath = BaseTempShadersDir + fsFileName;
-        return fengine::LoadShader(vsFilePath, fsFilePath);
+        return feng::LoadShader(vsFilePath, fsFilePath);
     }
 
     GLFWwindow* CreateWindow()
@@ -321,17 +321,17 @@ namespace SRender
         -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f
     };
 
-    std::array<fengine::Vector3, 10> cubePositions = {
-        fengine::Vector3( 0.0f,  0.0f,  0.0f),
-        fengine::Vector3( 2.0f,  5.0f, -15.0f),
-        fengine::Vector3(-1.5f, -2.2f, -2.5f),
-        fengine::Vector3(-3.8f, -2.0f, -12.3f),
-        fengine::Vector3( 2.4f, -0.4f, -3.5f),
-        fengine::Vector3(-1.7f,  3.0f, -7.5f),
-        fengine::Vector3( 1.3f, -2.0f, -2.5f),
-        fengine::Vector3( 1.5f,  2.0f, -2.5f),
-        fengine::Vector3( 1.5f,  0.2f, -1.5f),
-        fengine::Vector3(-1.3f,  1.0f, -1.5f)
+    std::array<feng::Vector3, 10> cubePositions = {
+        feng::Vector3( 0.0f,  0.0f,  0.0f),
+        feng::Vector3( 2.0f,  5.0f, -15.0f),
+        feng::Vector3(-1.5f, -2.2f, -2.5f),
+        feng::Vector3(-3.8f, -2.0f, -12.3f),
+        feng::Vector3( 2.4f, -0.4f, -3.5f),
+        feng::Vector3(-1.7f,  3.0f, -7.5f),
+        feng::Vector3( 1.3f, -2.0f, -2.5f),
+        feng::Vector3( 1.5f,  2.0f, -2.5f),
+        feng::Vector3( 1.5f,  0.2f, -1.5f),
+        feng::Vector3(-1.3f,  1.0f, -1.5f)
     };
 
     const unsigned int rectIndices[]
@@ -347,7 +347,7 @@ namespace SRender
     GLuint textureObj1;
     GLuint textureObj2;
     GLuint textureObj3;
-    std::unique_ptr<fengine::Shader> modelViewProjShader;
+    std::unique_ptr<feng::Shader> modelViewProjShader;
 
     GLuint smallTriangleVao1;
     GLuint smallTriangleVao2;
@@ -512,9 +512,9 @@ namespace SRender
 
     void InitializeTransforms()
     {
-        SMain::camEntity = std::make_unique<fengine::Entity>("Camera");
-        fengine::Camera &camera = SMain::camEntity->AddComponent<fengine::Camera>();
-        fengine::Transform *camTransform = SMain::camEntity->GetComponent<fengine::Transform>();
+        SMain::camEntity = std::make_unique<feng::Entity>("Camera");
+        feng::Camera &camera = SMain::camEntity->AddComponent<feng::Camera>();
+        feng::Transform *camTransform = SMain::camEntity->GetComponent<feng::Transform>();
         camTransform->SetPosition(0.f, 0.f, 3.f);
         camTransform->SetEuler(SMain::camPitch, SMain::camYaw, 0.f);
 
@@ -552,14 +552,14 @@ namespace SRender
         }
         else
         {
-            fengine::Debug::LogError("No texture object created.");
+            feng::Debug::LogError("No texture object created.");
             return 0;
         }
     }
 
     void InitRender()
     {
-        fengine::Debug::LogMessage("Initialize render.");
+        feng::Debug::LogMessage("Initialize render.");
         // Log maximal number of vertex attributes available
 
         int nrAttributes;
@@ -593,7 +593,7 @@ namespace SRender
 
     void UpdateCamera()
     {
-        fengine::Camera *camera = SMain::camEntity->GetComponent<fengine::Camera>();
+        feng::Camera *camera = SMain::camEntity->GetComponent<feng::Camera>();
 
         camera->SetFovY(SMain::Zoom);
         camera->SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
@@ -601,9 +601,9 @@ namespace SRender
         camera->SetFarClipPlane(100.f);
     }
 
-    fengine::Transform UpdateTransform(int32_t i)
+    feng::Transform UpdateTransform(int32_t i)
     {
-        fengine::Transform transform;
+        feng::Transform transform;
         transform.SetPosition(cubePositions[i]);
         float time = static_cast<float>(glfwGetTime());
 
@@ -613,7 +613,7 @@ namespace SRender
         return transform;
     }
 
-    void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, fengine::Shader& shader)
+    void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, feng::Shader& shader)
     {
         shader.StartUse();
         glActiveTexture(GL_TEXTURE0);
@@ -627,9 +627,9 @@ namespace SRender
 
         for(size_t i = 0; i < SRender::cubePositions.size(); ++i)
         {
-            fengine::Transform modelTransform = UpdateTransform(i);
-            fengine::Matrix4 modelTransformMatrix = modelTransform.GetGlobalMatrix();
-            fengine::Camera *camera = SMain::camEntity->GetComponent<fengine::Camera>();
+            feng::Transform modelTransform = UpdateTransform(i);
+            feng::Matrix4 modelTransformMatrix = modelTransform.GetGlobalMatrix();
+            feng::Camera *camera = SMain::camEntity->GetComponent<feng::Camera>();
 
             shader.SetUniformMatrix4("uModelMat", modelTransformMatrix);
             shader.SetUniformMatrix4("uViewProjMat", camera->GetViewProjectionMatrix());
@@ -648,7 +648,7 @@ int main(int argc, const char * argv[])
         SRender::InitRender();
         glCheckError();
 
-        fengine::Debug::LogMessage("Start loop.");
+        feng::Debug::LogMessage("Start loop.");
 
         SRender::modelViewProjShader->StartUse();
         SRender::modelViewProjShader->SetUniformInt("uTex1", 0);

@@ -2,7 +2,7 @@
 //
 //#include <FEngine/ScenesManager/FrameBuffersPool.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    CompositePostEffect::CompositePostEffect(PostEffect **effects, unsigned effectsCount, FrameBuffersPool *buffersPool) :
 //        m_effects(effects),

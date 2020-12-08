@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fengine
+namespace feng
 {
 
 enum class TextureWarapMode : int

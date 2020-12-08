@@ -1,6 +1,6 @@
 #pragma once
 
-//class SceneLoader final : public fengine::GameObjectScript
+//class SceneLoader final : public feng::GameObjectScript
 //{
 //public:
 //	SceneLoader() = default;
@@ -13,8 +13,8 @@
 //	void LoadScene(int index);
 //	const char * GetSceneName(int index);
 //
-//	fengine::Input *m_input = nullptr;
-//	fengine::ScenesManager *m_scenesManager = nullptr;
+//	feng::Input *m_input = nullptr;
+//	feng::ScenesManager *m_scenesManager = nullptr;
 //
 //	static bool m_wasKeyPressed;
 //	static int s_sceneIndex;

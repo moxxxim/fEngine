@@ -3,7 +3,7 @@
 //#include <FEngine/Utils/Debug.h>
 //#include <FEngine/ResourcesManager/ShaderParameters.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    VertexAttributeInfo::VertexAttributeInfo(const char *attributeName)
 //    {

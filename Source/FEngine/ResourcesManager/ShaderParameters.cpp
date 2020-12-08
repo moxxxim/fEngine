@@ -2,48 +2,48 @@
 #include "ShaderParameters.h"
 #include "../Utils/Debug.h"
 
-char const **fengine::ShaderParameters::s_attibutes = nullptr;
-char const **fengine::ShaderParameters::s_uniforms = nullptr;
+char const **feng::ShaderParameters::s_attibutes = nullptr;
+char const **feng::ShaderParameters::s_uniforms = nullptr;
 
 // Common engine uniforms.
 
-const char *fengine::ShaderParameters::k_uniformViewProjMatrix = "u_matT";
-const char *fengine::ShaderParameters::k_uniformModelGlobalMatrix = "u_matGlobal";
-const char *fengine::ShaderParameters::k_uniformTime = "u_time";
-const char *fengine::ShaderParameters::k_uniformCamPos = "u_camPos";
-const char *fengine::ShaderParameters::k_uniformScreenColorOriginal = "u_screenColorOriginal";
-const char *fengine::ShaderParameters::k_uniformScreenDepthOriginal = "u_screenDepthOriginal";
-const char *fengine::ShaderParameters::k_uniformScreenColorProcessed = "u_screenColorProcessed";
+const char *feng::ShaderParameters::k_uniformViewProjMatrix = "u_matT";
+const char *feng::ShaderParameters::k_uniformModelGlobalMatrix = "u_matGlobal";
+const char *feng::ShaderParameters::k_uniformTime = "u_time";
+const char *feng::ShaderParameters::k_uniformCamPos = "u_camPos";
+const char *feng::ShaderParameters::k_uniformScreenColorOriginal = "u_screenColorOriginal";
+const char *feng::ShaderParameters::k_uniformScreenDepthOriginal = "u_screenDepthOriginal";
+const char *feng::ShaderParameters::k_uniformScreenColorProcessed = "u_screenColorProcessed";
 
 // Fog uniforms.
 
-const char *fengine::ShaderParameters::k_uniformFogStart = "u_fogStart";
-const char *fengine::ShaderParameters::k_uniformFogRange = "u_fogRange";
-const char *fengine::ShaderParameters::k_uniformFogDensity = "u_fogDensity";
-const char *fengine::ShaderParameters::k_uniformFogColor = "u_fogColor";
+const char *feng::ShaderParameters::k_uniformFogStart = "u_fogStart";
+const char *feng::ShaderParameters::k_uniformFogRange = "u_fogRange";
+const char *feng::ShaderParameters::k_uniformFogDensity = "u_fogDensity";
+const char *feng::ShaderParameters::k_uniformFogColor = "u_fogColor";
 
 // Light uniforms.
 
-const char *fengine::ShaderParameters::k_uniformDirectLightCount = "u_directLightCount";
-const char *fengine::ShaderParameters::k_uniformDirectLightDirections = "u_directLightDirection[0]";
-const char *fengine::ShaderParameters::k_uniformDirectLightColors = "u_directLightColor[0]";
-const char *fengine::ShaderParameters::k_uniformDirectLightIntensities = "u_directLightIntensity[0]";
-const char *fengine::ShaderParameters::k_uniformPointLightCount = "u_pointLightCount";
-const char *fengine::ShaderParameters::k_uniformPointLightPositions = "u_pointLightPos[0]";
-const char *fengine::ShaderParameters::k_uniformPointLightRanges = "u_pointLightRange[0]";
-const char *fengine::ShaderParameters::k_uniformPointLightColors = "u_pointLightColor[0]";
-const char *fengine::ShaderParameters::k_uniformPointLightIntensities = "u_pointLightIntensity[0]";
-const char *fengine::ShaderParameters::k_uniformAmbientLightColor= "u_ambientLightColor";
+const char *feng::ShaderParameters::k_uniformDirectLightCount = "u_directLightCount";
+const char *feng::ShaderParameters::k_uniformDirectLightDirections = "u_directLightDirection[0]";
+const char *feng::ShaderParameters::k_uniformDirectLightColors = "u_directLightColor[0]";
+const char *feng::ShaderParameters::k_uniformDirectLightIntensities = "u_directLightIntensity[0]";
+const char *feng::ShaderParameters::k_uniformPointLightCount = "u_pointLightCount";
+const char *feng::ShaderParameters::k_uniformPointLightPositions = "u_pointLightPos[0]";
+const char *feng::ShaderParameters::k_uniformPointLightRanges = "u_pointLightRange[0]";
+const char *feng::ShaderParameters::k_uniformPointLightColors = "u_pointLightColor[0]";
+const char *feng::ShaderParameters::k_uniformPointLightIntensities = "u_pointLightIntensity[0]";
+const char *feng::ShaderParameters::k_uniformAmbientLightColor= "u_ambientLightColor";
 
 // Vertex attributes.
 
-const char *fengine::ShaderParameters::k_attributeVertexPositionL = "a_posL";
-const char *fengine::ShaderParameters::k_attributeVertexUv = "a_uv";
-const char *fengine::ShaderParameters::k_attributeVertexNorm = "a_norm";
-const char *fengine::ShaderParameters::k_attributeVertexBinorm = "a_binorm";
-const char *fengine::ShaderParameters::k_attributeVertexTangent = "a_tan";
+const char *feng::ShaderParameters::k_attributeVertexPositionL = "a_posL";
+const char *feng::ShaderParameters::k_attributeVertexUv = "a_uv";
+const char *feng::ShaderParameters::k_attributeVertexNorm = "a_norm";
+const char *feng::ShaderParameters::k_attributeVertexBinorm = "a_binorm";
+const char *feng::ShaderParameters::k_attributeVertexTangent = "a_tan";
 
-bool fengine::ShaderParameters::IsParameterReserved(const char *parameter)
+bool feng::ShaderParameters::IsParameterReserved(const char *parameter)
 {
 	const char **reservedAttributes = GetReservedAttributes();
 	for (unsigned int i = 0; i < ReservedAttributesCount; ++i)
@@ -68,141 +68,141 @@ bool fengine::ShaderParameters::IsParameterReserved(const char *parameter)
 	return false;
 }
 
-fengine::ShaderParameters::ReservedAttribute fengine::ShaderParameters::GetReservedAttribute(const char *attributeName)
+feng::ShaderParameters::ReservedAttribute feng::ShaderParameters::GetReservedAttribute(const char *attributeName)
 {
 	if (!strcmp(attributeName, k_attributeVertexPositionL))
 	{
-		return fengine::ShaderParameters::ReservedAttribute::VertexPositionL;
+		return feng::ShaderParameters::ReservedAttribute::VertexPositionL;
 	}
 	else if (!strcmp(attributeName, k_attributeVertexUv))
 	{
-		return fengine::ShaderParameters::ReservedAttribute::VertexUV;
+		return feng::ShaderParameters::ReservedAttribute::VertexUV;
 	}
 	else if (!strcmp(attributeName, k_attributeVertexNorm))
 	{
-		return fengine::ShaderParameters::ReservedAttribute::VertexNorm;
+		return feng::ShaderParameters::ReservedAttribute::VertexNorm;
 	}
 	else if (!strcmp(attributeName, k_attributeVertexBinorm))
 	{
-		return fengine::ShaderParameters::ReservedAttribute::VertexBinorm;
+		return feng::ShaderParameters::ReservedAttribute::VertexBinorm;
 	}
 	else if (!strcmp(attributeName, k_attributeVertexTangent))
 	{
-		return fengine::ShaderParameters::ReservedAttribute::VertexTangent;
+		return feng::ShaderParameters::ReservedAttribute::VertexTangent;
 	}
 
-	fengine::Debug::LogWarning("Wrong attribute name specified.");
-	return (fengine::ShaderParameters::ReservedAttribute) (-1);
+	feng::Debug::LogWarning("Wrong attribute name specified.");
+	return (feng::ShaderParameters::ReservedAttribute) (-1);
 }
 
-fengine::ShaderParameters::ReservedUniform fengine::ShaderParameters::GetReservedUniform(const char * uniformName)
+feng::ShaderParameters::ReservedUniform feng::ShaderParameters::GetReservedUniform(const char * uniformName)
 {
 	if (!strcmp(uniformName, k_uniformViewProjMatrix))
 	{
-		return fengine::ShaderParameters::ReservedUniform::ViewProjMatrix;
+		return feng::ShaderParameters::ReservedUniform::ViewProjMatrix;
 	}
 	else if (!strcmp(uniformName, k_uniformModelGlobalMatrix))
 	{
-		return fengine::ShaderParameters::ReservedUniform::ModelGlobalMatrix;
+		return feng::ShaderParameters::ReservedUniform::ModelGlobalMatrix;
 	}
 	else if (!strcmp(uniformName, k_uniformViewProjMatrix))
 	{
-		return fengine::ShaderParameters::ReservedUniform::Time;
+		return feng::ShaderParameters::ReservedUniform::Time;
 	}
 	else if (!strcmp(uniformName, k_uniformCamPos))
 	{
-		return fengine::ShaderParameters::ReservedUniform::CamPos;
+		return feng::ShaderParameters::ReservedUniform::CamPos;
 	}
 	else if (!strcmp(uniformName, k_uniformFogColor))
 	{
-		return fengine::ShaderParameters::ReservedUniform::FogColor;
+		return feng::ShaderParameters::ReservedUniform::FogColor;
 	}
 	else if (!strcmp(uniformName, k_uniformFogStart))
 	{
-		return fengine::ShaderParameters::ReservedUniform::FogStart;
+		return feng::ShaderParameters::ReservedUniform::FogStart;
 	}
 	else if (!strcmp(uniformName, k_uniformFogRange))
 	{
-		return fengine::ShaderParameters::ReservedUniform::FogRange;
+		return feng::ShaderParameters::ReservedUniform::FogRange;
 	}
 	else if (!strcmp(uniformName, k_uniformFogDensity))
 	{
-		return fengine::ShaderParameters::ReservedUniform::FogDensity;
+		return feng::ShaderParameters::ReservedUniform::FogDensity;
 	}
 	else if (!strcmp(uniformName, k_uniformDirectLightCount))
 	{
-		return fengine::ShaderParameters::ReservedUniform::DirectLightCount;
+		return feng::ShaderParameters::ReservedUniform::DirectLightCount;
 	}
 	else if (!strcmp(uniformName, k_uniformDirectLightDirections))
 	{
-		return fengine::ShaderParameters::ReservedUniform::DirectLightDirection;
+		return feng::ShaderParameters::ReservedUniform::DirectLightDirection;
 	}
 	else if (!strcmp(uniformName, k_uniformDirectLightColors))
 	{
-		return fengine::ShaderParameters::ReservedUniform::DirectLightColor;
+		return feng::ShaderParameters::ReservedUniform::DirectLightColor;
 	}
 	else if (!strcmp(uniformName, k_uniformDirectLightIntensities))
 	{
-		return fengine::ShaderParameters::ReservedUniform::DirectLightIntensity;
+		return feng::ShaderParameters::ReservedUniform::DirectLightIntensity;
 	}
 	else if (!strcmp(uniformName, k_uniformPointLightCount))
 	{
-		return fengine::ShaderParameters::ReservedUniform::PointLightCount;
+		return feng::ShaderParameters::ReservedUniform::PointLightCount;
 	}
 	else if (!strcmp(uniformName, k_uniformPointLightPositions))
 	{
-		return fengine::ShaderParameters::ReservedUniform::PointLightPosition;
+		return feng::ShaderParameters::ReservedUniform::PointLightPosition;
 	}
 	else if (!strcmp(uniformName, k_uniformPointLightRanges))
 	{
-		return fengine::ShaderParameters::ReservedUniform::PointLightRange;
+		return feng::ShaderParameters::ReservedUniform::PointLightRange;
 	}
 	else if (!strcmp(uniformName, k_uniformPointLightColors))
 	{
-		return fengine::ShaderParameters::ReservedUniform::PointLightColor;
+		return feng::ShaderParameters::ReservedUniform::PointLightColor;
 	}
 	else if (!strcmp(uniformName, k_uniformPointLightIntensities))
 	{
-		return fengine::ShaderParameters::ReservedUniform::PointLightIntensity;
+		return feng::ShaderParameters::ReservedUniform::PointLightIntensity;
 	}
 	else if (!strcmp(uniformName, k_uniformAmbientLightColor))
 	{
-		return fengine::ShaderParameters::ReservedUniform::AmbientLightColor;
+		return feng::ShaderParameters::ReservedUniform::AmbientLightColor;
 	}
 	else if (!strcmp(uniformName, k_uniformScreenColorOriginal))
 	{
-		return fengine::ShaderParameters::ReservedUniform::ScreenColorOriginal;
+		return feng::ShaderParameters::ReservedUniform::ScreenColorOriginal;
 	}
 	else if (!strcmp(uniformName, k_uniformScreenDepthOriginal))
 	{
-		return fengine::ShaderParameters::ReservedUniform::ScreenDepthOriginal;
+		return feng::ShaderParameters::ReservedUniform::ScreenDepthOriginal;
 	}
 	else if (!strcmp(uniformName, k_uniformScreenColorProcessed))
 	{
-		return fengine::ShaderParameters::ReservedUniform::ScreenColorProcessed;
+		return feng::ShaderParameters::ReservedUniform::ScreenColorProcessed;
 	}
 
-	fengine::Debug::LogWarning("Wrong attribute name specified.");
-	return (fengine::ShaderParameters::ReservedUniform) (-1);
+	feng::Debug::LogWarning("Wrong attribute name specified.");
+	return (feng::ShaderParameters::ReservedUniform) (-1);
 }
 
-const char * fengine::ShaderParameters::GetReservedAttributeName(fengine::ShaderParameters::ReservedAttribute attribute)
+const char * feng::ShaderParameters::GetReservedAttributeName(feng::ShaderParameters::ReservedAttribute attribute)
 {
 	switch (attribute)
 	{
-		case fengine::ShaderParameters::ReservedAttribute::VertexPositionL:
+		case feng::ShaderParameters::ReservedAttribute::VertexPositionL:
 			return k_attributeVertexPositionL;
 
-		case fengine::ShaderParameters::ReservedAttribute::VertexUV:
+		case feng::ShaderParameters::ReservedAttribute::VertexUV:
 			return k_attributeVertexUv;
 
-		case fengine::ShaderParameters::ReservedAttribute::VertexNorm:
+		case feng::ShaderParameters::ReservedAttribute::VertexNorm:
 			return k_attributeVertexNorm;
 
-		case fengine::ShaderParameters::ReservedAttribute::VertexBinorm:
+		case feng::ShaderParameters::ReservedAttribute::VertexBinorm:
 			return k_attributeVertexBinorm;
 
-		case fengine::ShaderParameters::ReservedAttribute::VertexTangent:
+		case feng::ShaderParameters::ReservedAttribute::VertexTangent:
 			return k_attributeVertexTangent;
 
 		default:
@@ -210,71 +210,71 @@ const char * fengine::ShaderParameters::GetReservedAttributeName(fengine::Shader
 	}
 }
 
-const char * fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform uniform)
+const char * feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform uniform)
 {
 	switch (uniform)
 	{
-		case fengine::ShaderParameters::ReservedUniform::ViewProjMatrix:
+		case feng::ShaderParameters::ReservedUniform::ViewProjMatrix:
 			return k_uniformViewProjMatrix;
 
-		case fengine::ShaderParameters::ReservedUniform::ModelGlobalMatrix:
+		case feng::ShaderParameters::ReservedUniform::ModelGlobalMatrix:
 			return k_uniformModelGlobalMatrix;
 
-		case fengine::ShaderParameters::ReservedUniform::Time:
+		case feng::ShaderParameters::ReservedUniform::Time:
 			return k_uniformTime;
 
-		case fengine::ShaderParameters::ReservedUniform::CamPos:
+		case feng::ShaderParameters::ReservedUniform::CamPos:
 			return k_uniformCamPos;
 
-		case fengine::ShaderParameters::ReservedUniform::FogColor:
+		case feng::ShaderParameters::ReservedUniform::FogColor:
 			return k_uniformFogColor;
 
-		case fengine::ShaderParameters::ReservedUniform::FogStart:
+		case feng::ShaderParameters::ReservedUniform::FogStart:
 			return k_uniformFogStart;
 
-		case fengine::ShaderParameters::ReservedUniform::FogRange:
+		case feng::ShaderParameters::ReservedUniform::FogRange:
 			return k_uniformFogRange;
 
-		case fengine::ShaderParameters::ReservedUniform::FogDensity:
+		case feng::ShaderParameters::ReservedUniform::FogDensity:
 			return k_uniformFogDensity;
 
-		case fengine::ShaderParameters::ReservedUniform::DirectLightCount:
+		case feng::ShaderParameters::ReservedUniform::DirectLightCount:
 			return k_uniformDirectLightCount;
 
-		case fengine::ShaderParameters::ReservedUniform::DirectLightDirection:
+		case feng::ShaderParameters::ReservedUniform::DirectLightDirection:
 			return k_uniformDirectLightDirections;
 
-		case fengine::ShaderParameters::ReservedUniform::DirectLightColor:
+		case feng::ShaderParameters::ReservedUniform::DirectLightColor:
 			return k_uniformDirectLightColors;
 
-		case fengine::ShaderParameters::ReservedUniform::DirectLightIntensity:
+		case feng::ShaderParameters::ReservedUniform::DirectLightIntensity:
 			return k_uniformDirectLightIntensities;
 
-		case fengine::ShaderParameters::ReservedUniform::PointLightCount:
+		case feng::ShaderParameters::ReservedUniform::PointLightCount:
 			return k_uniformPointLightCount;
 
-		case fengine::ShaderParameters::ReservedUniform::PointLightPosition:
+		case feng::ShaderParameters::ReservedUniform::PointLightPosition:
 			return k_uniformPointLightPositions;
 
-		case fengine::ShaderParameters::ReservedUniform::PointLightRange:
+		case feng::ShaderParameters::ReservedUniform::PointLightRange:
 			return k_uniformPointLightRanges;
 
-		case fengine::ShaderParameters::ReservedUniform::PointLightColor:
+		case feng::ShaderParameters::ReservedUniform::PointLightColor:
 			return k_uniformPointLightColors;
 
-		case fengine::ShaderParameters::ReservedUniform::PointLightIntensity:
+		case feng::ShaderParameters::ReservedUniform::PointLightIntensity:
 			return k_uniformPointLightIntensities;
 
-		case fengine::ShaderParameters::ReservedUniform::AmbientLightColor:
+		case feng::ShaderParameters::ReservedUniform::AmbientLightColor:
 			return k_uniformAmbientLightColor;
 
-		case fengine::ShaderParameters::ReservedUniform::ScreenColorOriginal:
+		case feng::ShaderParameters::ReservedUniform::ScreenColorOriginal:
 			return k_uniformScreenColorOriginal;
 
-		case fengine::ShaderParameters::ReservedUniform::ScreenDepthOriginal:
+		case feng::ShaderParameters::ReservedUniform::ScreenDepthOriginal:
 			return k_uniformScreenDepthOriginal;
 
-		case fengine::ShaderParameters::ReservedUniform::ScreenColorProcessed:
+		case feng::ShaderParameters::ReservedUniform::ScreenColorProcessed:
 			return k_uniformScreenColorProcessed;
 
 		default:
@@ -282,11 +282,11 @@ const char * fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderPa
 	}
 }
 
-const char ** fengine::ShaderParameters::GetReservedAttributes()
+const char ** feng::ShaderParameters::GetReservedAttributes()
 {
 	if (!s_attibutes)
 	{
-		fengine::ShaderParameters::s_attibutes = new const char*[ReservedAttributesCount];
+		feng::ShaderParameters::s_attibutes = new const char*[ReservedAttributesCount];
 		s_attibutes[0] = k_attributeVertexPositionL;
 		s_attibutes[1] = k_attributeVertexUv;
 		s_attibutes[2] = k_attributeVertexNorm;
@@ -297,11 +297,11 @@ const char ** fengine::ShaderParameters::GetReservedAttributes()
 	return s_attibutes;
 }
 
-const char ** fengine::ShaderParameters::GetReservedUniforms()
+const char ** feng::ShaderParameters::GetReservedUniforms()
 {
 	if (!s_uniforms)
 	{
-		fengine::ShaderParameters::s_uniforms = new const char*[ReservedUniformsCount];
+		feng::ShaderParameters::s_uniforms = new const char*[ReservedUniformsCount];
 		s_uniforms[0] = k_uniformViewProjMatrix;
 		s_uniforms[1] = k_uniformTime;
 		s_uniforms[2] = k_uniformCamPos;

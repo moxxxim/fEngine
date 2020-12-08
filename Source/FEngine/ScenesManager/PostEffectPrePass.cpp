@@ -2,7 +2,7 @@
 //
 //#include <FEngine/ScenesManager/FrameBuffersPool.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    PostEffectPrePass::PostEffectPrePass(FrameBuffersPool *buffersPool) :
 //        m_buffersPool(buffersPool)

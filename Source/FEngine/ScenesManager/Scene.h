@@ -4,7 +4,7 @@
 //#include "SceneSettings.h"
 //#include "../App/Globals.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class GameObject;
@@ -56,7 +56,7 @@
 //	return m_settings;
 //}
 //
-//inline inline LinkedListIterator<GameObject> fengine::Scene::GetGameObjectsIterator() const
+//inline inline LinkedListIterator<GameObject> feng::Scene::GetGameObjectsIterator() const
 //{
 //	return m_gameObjects.GetIterator();
 //}

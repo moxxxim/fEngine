@@ -4,7 +4,7 @@
 //#include <FEngine/ResourcesManager/CachedShader.h>
 //#include <FEngine/ResourcesManager/Shader.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    class ResourceManagerShaders final: public ResourceManager<Shader, CachedShader>
 //    {

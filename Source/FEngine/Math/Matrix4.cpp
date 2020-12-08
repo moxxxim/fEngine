@@ -1,6 +1,6 @@
 #include <FEngine/Math/Matrix4.h>
 
-namespace fengine
+namespace feng
 {
     const Matrix4 Matrix4::Zero
     {

@@ -5,38 +5,38 @@
 //#include "../ResourcesManager/Vertex.h"
 //#include "../Utils/VertexAttributeInfo.h"
 //
-//fengine::RenderPostProcessing * fengine::RenderPostProcessing::GetInstance()
+//feng::RenderPostProcessing * feng::RenderPostProcessing::GetInstance()
 //{
 //	static RenderPostProcessing *instance = new RenderPostProcessing();
 //
 //	return instance;
 //}
 //
-//fengine::RenderPostProcessing::~RenderPostProcessing()
+//feng::RenderPostProcessing::~RenderPostProcessing()
 //{
 //	glDeleteBuffers(1, &m_vbo);
 //	glDeleteBuffers(1, &m_ibo);
 //}
 //
-//bool fengine::RenderPostProcessing::HasPostEffects()
+//bool feng::RenderPostProcessing::HasPostEffects()
 //{
 //	return !m_effectsSequence.IsEmpty();
 //}
 //
-//void fengine::RenderPostProcessing::SetPostEffect(PostEffectDefinition *postEffect)
+//void feng::RenderPostProcessing::SetPostEffect(PostEffectDefinition *postEffect)
 //{
 //	m_effectsSequence.Clear();
 //	PostEffect *effect = CreatePostEffect(postEffect);
 //	m_effectsSequence.Add(effect);
 //}
 //
-//void fengine::RenderPostProcessing::AddPostEffect(PostEffectDefinition *postEffect)
+//void feng::RenderPostProcessing::AddPostEffect(PostEffectDefinition *postEffect)
 //{
 //	PostEffect *effect = CreatePostEffect(postEffect);
 //	m_effectsSequence.Add(effect);
 //}
 //
-//void fengine::RenderPostProcessing::RemoveEffects()
+//void feng::RenderPostProcessing::RemoveEffects()
 //{
 //	unsigned effectsCount = m_effectsSequence.GetSize();
 //	for (unsigned i = 0; i < effectsCount; ++i)
@@ -47,14 +47,14 @@
 //	m_effectsSequence.Clear();
 //}
 //
-//void fengine::RenderPostProcessing::ApplyPostEffects(const FrameBuffer& screenBuffer)
+//void feng::RenderPostProcessing::ApplyPostEffects(const FrameBuffer& screenBuffer)
 //{
 //	BindQuadBuffer();
 //	ApplyPostEffectsSequence(screenBuffer);
 //	UnbindQuadBuffer();
 //}
 //
-//void fengine::RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer)
+//void feng::RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer)
 //{
 //	unsigned effectsCount = m_effectsSequence.GetSize();
 //	FrameBuffer intermediateBuffer = effectsCount > 1 ? m_buffersPool.GetBuffer(false) : FrameBuffer(0, 0, 0);
@@ -77,7 +77,7 @@
 //	}
 //}
 //
-//void fengine::RenderPostProcessing::BindQuadBuffer()
+//void feng::RenderPostProcessing::BindQuadBuffer()
 //{
 //	if (!m_vbo)
 //	{
@@ -88,13 +88,13 @@
 //	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 //}
 //
-//void fengine::RenderPostProcessing::UnbindQuadBuffer()
+//void feng::RenderPostProcessing::UnbindQuadBuffer()
 //{
 //	glBindBuffer(GL_ARRAY_BUFFER, 0);
 //	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 //}
 //
-//void fengine::RenderPostProcessing::CreateQuadBuffer()
+//void feng::RenderPostProcessing::CreateQuadBuffer()
 //{
 //	Vertex vertices[4];
 //	vertices[0].Position = Vector3(-1.0, -1.0, 0.0);
@@ -122,7 +122,7 @@
 //	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 //}
 //
-//fengine::PostEffect * fengine::RenderPostProcessing::CreatePostEffect(PostEffectDefinition *postEffect)
+//feng::PostEffect * feng::RenderPostProcessing::CreatePostEffect(PostEffectDefinition *postEffect)
 //{
 //	PostEffectType type = postEffect->GetType();
 //	if (type == PostEffectType::Material)

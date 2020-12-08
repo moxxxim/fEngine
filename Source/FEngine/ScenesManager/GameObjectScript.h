@@ -2,7 +2,7 @@
 //
 //#include "GameObjectComponent.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //    class GameObjectScript : public GameObjectComponent
 //    {

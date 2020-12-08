@@ -3,7 +3,7 @@
 #include <FEngine/App/Object.h>
 #include <map>
 
-namespace fengine
+namespace feng
 {
     class Texture;
     class Shader;
@@ -50,7 +50,7 @@ namespace fengine
     {
     }
 
-    inline fengine::Shader * Material::GetShader() const
+    inline feng::Shader * Material::GetShader() const
     {
         return m_shader;
     }

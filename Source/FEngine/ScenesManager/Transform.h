@@ -6,7 +6,7 @@
 #include <FEngine/ScenesManager/Component.h>
 #include <FEngine/ScenesManager/Space.h>
 
-namespace fengine
+namespace feng
 {
     class Transform final : public Component
     {
@@ -46,7 +46,7 @@ namespace fengine
     };
 }
 
-namespace fengine
+namespace feng
 {
     inline const Vector3& Transform::GetPosition() const
     {

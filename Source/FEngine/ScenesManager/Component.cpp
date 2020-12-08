@@ -2,6 +2,6 @@
 
 #include <FEngine/ScenesManager/Entity.h>
 
-namespace fengine
+namespace feng
 {
 }

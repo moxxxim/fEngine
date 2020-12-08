@@ -11,7 +11,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace fengine
+namespace feng
 {
     namespace SShader
     {
@@ -228,17 +228,17 @@ namespace fengine
 
     void Shader::DisableStates() const
     {
-        if ((int)m_cachedInfo.States & (int)fengine::ShaderStates::Culling)
+        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::Culling)
         {
             glDisable(GL_CULL_FACE);
         }
 
-        if ((int)m_cachedInfo.States & (int)fengine::ShaderStates::AlphaTest)
+        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::AlphaTest)
         {
             glDisable(GL_BLEND);
         }
 
-        if ((int)m_cachedInfo.States & (int)fengine::ShaderStates::DepthTest)
+        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::DepthTest)
         {
             glDisable(GL_DEPTH_TEST);
         }

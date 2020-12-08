@@ -4,7 +4,7 @@
 //#include <FEngine/ResourcesManager/ResourceManagerMaterials.h>
 //#include <FEngine/ResourcesManager/PostEffectsSerializer.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    ResourceManagerPostEffects::ResourceManagerPostEffects(CachedPostEffectDefinition *cachedPostEffects,
 //        unsigned cachedResourcesCount,

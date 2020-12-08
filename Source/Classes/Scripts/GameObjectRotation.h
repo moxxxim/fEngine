@@ -2,7 +2,7 @@
 //
 //#include <FEngine/ScenesManager/GameObjectScript.h>
 //
-//class GameObjectRotation final : public fengine::GameObjectScript
+//class GameObjectRotation final : public feng::GameObjectScript
 //{
 //public:
 //	GameObjectRotation() = default;
@@ -11,11 +11,11 @@
 //	void Start() override;
 //	void Update(float deltaTime) override;
 //
-//	void Serialize(fengine::SerializationNode& node) const override;
-//	void Deserialize(const fengine::SerializationNode& node) override;
+//	void Serialize(feng::SerializationNode& node) const override;
+//	void Deserialize(const feng::SerializationNode& node) override;
 //
 //private:
 //	float m_fullTurnDuration = 8;
 //	float m_oneTurnTimePassed = 0;
-//	fengine::Transform *m_transform = nullptr;
+//	feng::Transform *m_transform = nullptr;
 //};

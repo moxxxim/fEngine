@@ -2,7 +2,7 @@
 
 #include <FEngine/App/GuidGenerator.h>
 
-namespace fengine
+namespace feng
 {
 //    ResourceManagerMeshes::ResourceManagerMeshes(CachedMesh *cachedMeshes, unsigned cachedMeshedCount) :
 //        ResourceManager<Mesh, CachedMesh>(cachedMeshes, cachedMeshedCount)
@@ -11,7 +11,7 @@ namespace fengine
 //
 //    Mesh * ResourceManagerMeshes::Instantiate(CachedMesh cachedMesh)
 //    {
-//        fengine::GuidGenerator::SetNextResourceId(cachedMesh.Id);
+//        feng::GuidGenerator::SetNextResourceId(cachedMesh.Id);
 //        MeshLoaderNFG nfgLoader(cachedMesh.Location);
 //        return nfgLoader.Load();
 //    }

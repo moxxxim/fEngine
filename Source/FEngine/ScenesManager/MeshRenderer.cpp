@@ -9,19 +9,19 @@
 //#include "../Utils/VertexAttributeInfo.h"
 //#include "ScenesManager.h"
 //
-//fengine::MeshRenderer::MeshRenderer()
+//feng::MeshRenderer::MeshRenderer()
 //{
 //	m_resources = ResourcesManager::GetInstance();
 //}
 //
-//fengine::MeshRenderer::~MeshRenderer()
+//feng::MeshRenderer::~MeshRenderer()
 //{
 //	glDeleteBuffers(1, &m_vbo);
 //	glDeleteBuffers(1, &m_ibo);
 //	ClearTexturesBuffers();
 //}
 //
-//void fengine::MeshRenderer::SetMaterial(Material *material)
+//void feng::MeshRenderer::SetMaterial(Material *material)
 //{
 //	if (material)
 //	{
@@ -33,7 +33,7 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::SetMesh(Mesh *mesh)
+//void feng::MeshRenderer::SetMesh(Mesh *mesh)
 //{
 //	if (mesh)
 //	{
@@ -53,20 +53,20 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::Serialize(fengine::SerializationNode& node) const
+//void feng::MeshRenderer::Serialize(feng::SerializationNode& node) const
 //{
 //	node.SetName("MeshRenderer");
 //	node.SetFloat("MaterialId", m_material ? m_material->GetId() : -1);
 //	node.SetFloat("MeshId", m_mesh ? m_mesh->GetId() : -1);
 //}
 //
-//void fengine::MeshRenderer::Deserialize(const fengine::SerializationNode& node)
+//void feng::MeshRenderer::Deserialize(const feng::SerializationNode& node)
 //{
 //	DeserializeMesh(node);
 //	DeserializeMaterial(node);
 //}
 //
-//void fengine::MeshRenderer::Draw(const RenderProperties *renderProperties)
+//void feng::MeshRenderer::Draw(const RenderProperties *renderProperties)
 //{
 //	if (IsValidState())
 //	{
@@ -82,12 +82,12 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::StartDraw()
+//void feng::MeshRenderer::StartDraw()
 //{
 //	m_shader->StartUse();
 //}
 //
-//void fengine::MeshRenderer::SetupDrawVertices()
+//void feng::MeshRenderer::SetupDrawVertices()
 //{
 //	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 //	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
@@ -102,7 +102,7 @@
 //		GLint attributeLocation = 0;
 //		if (m_shader->TryGetAttribute(namedAttribute.Key, attributeLocation))
 //		{
-//			fengine::VertexAttributeInfo info(namedAttribute.Key);
+//			feng::VertexAttributeInfo info(namedAttribute.Key);
 //
 //			glEnableVertexAttribArray(attributeLocation);
 //			glVertexAttribPointer(attributeLocation, info.Size, info.Type, info.IsNormalized, sizeof(Vertex), info.Pointer);
@@ -112,23 +112,23 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::SetupLight(const RenderProperties *renderProperties)
+//void feng::MeshRenderer::SetupLight(const RenderProperties *renderProperties)
 //{
-//	const char *ambientLightColorUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::AmbientLightColor);
+//	const char *ambientLightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::AmbientLightColor);
 //	m_shader->SetUniformVector4(ambientLightColorUniform, renderProperties->GetAmbientLightColor());
 //
 //	int directLightsCount = renderProperties->GetDirectLightsCount();
 //	if (directLightsCount > 0)
 //	{
-//		const char *lightsCountUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::DirectLightCount);
+//		const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightCount);
 //		m_shader->SetUniformInt(lightsCountUniform, directLightsCount);
-//		const char *lightDirectionsUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::DirectLightDirection);
+//		const char *lightDirectionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightDirection);
 //		const Vector3 *directions = renderProperties->GetDirectLightDirections();
 //		m_shader->SetUniformVector3Array(lightDirectionsUniform, directions, directLightsCount);
-//		const char *lightColorUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::DirectLightColor);
+//		const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightColor);
 //		const Vector4 *colors = renderProperties->GetDirectLightColors();
 //		m_shader->SetUniformVector4Array(lightColorUniform, colors, directLightsCount);
-//		const char *lightsIntensityUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::DirectLightIntensity);
+//		const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightIntensity);
 //		const float *intensities = renderProperties->GetDirectLightIntensities();
 //		m_shader->SetUniformFloatArray(lightsIntensityUniform, intensities, directLightsCount);
 //	}
@@ -136,37 +136,37 @@
 //	int pointLightsCount = renderProperties->GetPointLightsCount();
 //	if (pointLightsCount > 0)
 //	{
-//		const char *lightsCountUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::PointLightCount);
+//		const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightCount);
 //		m_shader->SetUniformInt(lightsCountUniform, pointLightsCount);
-//		const char *lightPositionsUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::PointLightPosition);
+//		const char *lightPositionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightPosition);
 //		m_shader->SetUniformVector3Array(lightPositionsUniform, renderProperties->GetPointLightPositions(), pointLightsCount);
-//		const char *lightsRangeUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::PointLightRange);
+//		const char *lightsRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightRange);
 //		m_shader->SetUniformFloatArray(lightsRangeUniform, renderProperties->GetPointLightRanges(), pointLightsCount);
-//		const char *lightColorUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::PointLightColor);
+//		const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightColor);
 //		m_shader->SetUniformVector4Array(lightColorUniform, renderProperties->GetPointLightColors(), pointLightsCount);
-//		const char *lightsIntensityUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::PointLightIntensity);
+//		const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightIntensity);
 //		m_shader->SetUniformFloatArray(lightsIntensityUniform, renderProperties->GetPointLightIntensities(), pointLightsCount);
 //	}
 //}
 //
-//void fengine::MeshRenderer::SetupFog(const RenderProperties *renderProperties)
+//void feng::MeshRenderer::SetupFog(const RenderProperties *renderProperties)
 //{
-//	const fengine::Camera *cam = renderProperties->GetCamera();
-//	const fengine::Fog& fog = renderProperties->GetFog();
+//	const feng::Camera *cam = renderProperties->GetCamera();
+//	const feng::Fog& fog = renderProperties->GetFog();
 //
-//	const char *fogStartUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::FogStart);
+//	const char *fogStartUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogStart);
 //	m_shader->SetUniformFloat(fogStartUniform, fog.GetStart());
-//	const char *fogRangeUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::FogRange);
+//	const char *fogRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogRange);
 //	m_shader->SetUniformFloat(fogRangeUniform, fog.GetRange());
-//	const char *fogDensityUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::FogDensity);
+//	const char *fogDensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogDensity);
 //	m_shader->SetUniformFloat(fogDensityUniform, fog.GetDensity());
-//	const char *fogColorUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::FogColor);
+//	const char *fogColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogColor);
 //	m_shader->SetUniformVector3(fogColorUniform, fog.GetColor());
 //}
 //
-//void fengine::MeshRenderer::SetViewProjectionMatrix(const Camera *cam)
+//void feng::MeshRenderer::SetViewProjectionMatrix(const Camera *cam)
 //{
-//	const char *viewProjectionMatrixUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::ViewProjMatrix);
+//	const char *viewProjectionMatrixUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::ViewProjMatrix);
 //	Transform *transform = GetTransform();
 //
 //	if (cam->GetGameObject() == GetGameObject())
@@ -187,21 +187,21 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::SetupReservedUniforms(const Camera *cam)
+//void feng::MeshRenderer::SetupReservedUniforms(const Camera *cam)
 //{
 //	Time *time = Time::GetInstance();
 //	Transform *camTransform = cam->GetTransform();
 //	Transform *myTransform = GetTransform();
 //
-//	const char *modelTransformMatrix = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::ModelGlobalMatrix);
+//	const char *modelTransformMatrix = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::ModelGlobalMatrix);
 //	m_shader->SetUniformMatrix4(modelTransformMatrix, myTransform->GetTransformMatrix());
-//	const char *camPosUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::CamPos);
+//	const char *camPosUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::CamPos);
 //	m_shader->SetUniformVector3(camPosUniform, camTransform->GetPosition());
-//	const char *timeUniform = fengine::ShaderParameters::GetReservedUniformName(fengine::ShaderParameters::ReservedUniform::Time);
+//	const char *timeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::Time);
 //	m_shader->SetUniformFloat(timeUniform, time->GetSceneTime());
 //}
 //
-//void fengine::MeshRenderer::SetCustomDrawUniforms()
+//void feng::MeshRenderer::SetCustomDrawUniforms()
 //{
 //	const StringMap<int> *uniforms = m_shader->GetUniforms();
 //	auto iterator = uniforms->GetIterator();
@@ -233,12 +233,12 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::DrawElements()
+//void feng::MeshRenderer::DrawElements()
 //{
 //	glDrawElements(GL_TRIANGLES, m_indicesCount, GL_UNSIGNED_INT, 0);
 //}
 //
-//void fengine::MeshRenderer::FinishDraw()
+//void feng::MeshRenderer::FinishDraw()
 //{
 //	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 //	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -246,48 +246,48 @@
 //	m_shader->StopUse();
 //}
 //
-//void fengine::MeshRenderer::ActivateTexture(const char *name, int unit)
+//void feng::MeshRenderer::ActivateTexture(const char *name, int unit)
 //{
 //	const Texture *texture = m_material->GetTexture(name);
-//	GLuint target = texture->GetType() == fengine::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
+//	GLuint target = texture->GetType() == feng::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
 //	glActiveTexture(GL_TEXTURE0 + unit);
 //	glBindTexture(target, m_textureBuffers[name]);
 //	m_shader->SetUniformInt(name, unit);
 //}
 //
-//void fengine::MeshRenderer::DeserializeMesh(const fengine::SerializationNode& node)
+//void feng::MeshRenderer::DeserializeMesh(const feng::SerializationNode& node)
 //{
 //	long meshId;
 //	node.TryGetLong("MeshId", meshId);
 //
-//	fengine::Mesh *mesh = m_resources->GetMesh(meshId);
+//	feng::Mesh *mesh = m_resources->GetMesh(meshId);
 //	if (mesh)
 //	{
 //		SetMesh(mesh);
 //	}
 //	else
 //	{
-//		fengine::Debug::LogError("Couldn't find mesh.");
+//		feng::Debug::LogError("Couldn't find mesh.");
 //	}
 //}
 //
-//void fengine::MeshRenderer::DeserializeMaterial(const fengine::SerializationNode& node)
+//void feng::MeshRenderer::DeserializeMaterial(const feng::SerializationNode& node)
 //{
 //	long materialId;
 //	node.TryGetLong("MaterialId", materialId);
 //
-//	fengine::Material *material = m_resources->GetMaterial(materialId);
+//	feng::Material *material = m_resources->GetMaterial(materialId);
 //	if (material)
 //	{
 //		SetMaterial(material);
 //	}
 //	else
 //	{
-//		fengine::Debug::LogError("Couldn't find material.\n");
+//		feng::Debug::LogError("Couldn't find material.\n");
 //	}
 //}
 //
-//void fengine::MeshRenderer::SetupMeshBuffers(const fengine::Mesh *mesh)
+//void feng::MeshRenderer::SetupMeshBuffers(const feng::Mesh *mesh)
 //{
 //	if (mesh)
 //	{
@@ -316,7 +316,7 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::SetupTexturesBuffers()
+//void feng::MeshRenderer::SetupTexturesBuffers()
 //{
 //	const StringMap<int> *uniforms = m_shader->GetUniforms();
 //	auto iterator = uniforms->GetIterator();
@@ -326,7 +326,7 @@
 //		KeyValuePair<const char*, int> namedUniform = iterator.GetCurrent();
 //		if (m_material->HasTexture(namedUniform.Key))
 //		{
-//			const fengine::Texture *texture = m_material->GetTexture(namedUniform.Key);
+//			const feng::Texture *texture = m_material->GetTexture(namedUniform.Key);
 //			SetupTextureBuffer(texture, namedUniform.Key);
 //		}
 //
@@ -334,26 +334,26 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::SetupTextureBuffer(const fengine::Texture *texture, const char *name)
+//void feng::MeshRenderer::SetupTextureBuffer(const feng::Texture *texture, const char *name)
 //{
 //	if (texture)
 //	{
-//		fengine::TextureType textureType = texture->GetType();
-//		GLuint target = textureType == fengine::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
+//		feng::TextureType textureType = texture->GetType();
+//		GLuint target = textureType == feng::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
 //
 //		unsigned int tbo;
 //		glGenTextures(1, &tbo);
 //		glBindTexture(target, tbo);
 //
-//		GLint wrapMode = fengine::GetTextureWrapMode(texture);
-//		GLint minFilter = fengine::GetTextureMinFilter(texture);
-//		GLint magFilter = fengine::GetTextureMagFilter(texture);
+//		GLint wrapMode = feng::GetTextureWrapMode(texture);
+//		GLint minFilter = feng::GetTextureMinFilter(texture);
+//		GLint magFilter = feng::GetTextureMagFilter(texture);
 //		glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapMode);
 //		glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapMode);
 //		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
 //		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
 //
-//		if (textureType == fengine::TextureType::Texture2D)
+//		if (textureType == feng::TextureType::Texture2D)
 //		{
 //			GenerateTexture2D(texture);
 //		}
@@ -376,33 +376,33 @@
 //	}
 //}
 //
-//void fengine::MeshRenderer::GenerateTexture2D(const fengine::Texture *texture)
+//void feng::MeshRenderer::GenerateTexture2D(const feng::Texture *texture)
 //{
-//	const GLint format = fengine::GetTextureFormat(texture);
+//	const GLint format = feng::GetTextureFormat(texture);
 //	int width = texture->GetWidth();
 //	int height = texture->GetHeight();
 //	const char *data = texture->GetData();
 //	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 //}
 //
-//void fengine::MeshRenderer::GenerateTextureCube(const fengine::Texture *texture)
+//void feng::MeshRenderer::GenerateTextureCube(const feng::Texture *texture)
 //{
-//	const GLint format = fengine::GetTextureFormat(texture);
+//	const GLint format = feng::GetTextureFormat(texture);
 //	int faceWidth = texture->GetWidth() / 4;
 //	int faceHeight = texture->GetHeight() / 3;
 //	for (int i = 0; i < 6; ++i)
 //	{
-//		const char *data = texture->GetCubeMapFace((fengine::CubeMapFace)i);
+//		const char *data = texture->GetCubeMapFace((feng::CubeMapFace)i);
 //		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, data);
 //	}
 //}
 //
-//void fengine::MeshRenderer::ClearTexturesBuffers()
+//void feng::MeshRenderer::ClearTexturesBuffers()
 //{
 //	auto iterator = m_textureBuffers.GetIterator();
 //	while (iterator.HasCurrent())
 //	{
-//		fengine::KeyValuePair<const char*, unsigned>& buffer = iterator.GetCurrent();
+//		feng::KeyValuePair<const char*, unsigned>& buffer = iterator.GetCurrent();
 //		glDeleteTextures(1, &buffer.Value);
 //		iterator.MoveNext();
 //	}

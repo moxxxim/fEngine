@@ -8,43 +8,43 @@
 //#include "ResourceManagerMaterials.h"
 //#include "ResourceManagerPostEffects.h"
 //
-//const char *fengine::ResourcesSerializer::k_resources = "../Resources/Resources.txt";
-//const char *fengine::ResourcesSerializer::k_texturesTag = "Textures ";
-//const char *fengine::ResourcesSerializer::k_meshesTag = "Meshes ";
-//const char *fengine::ResourcesSerializer::k_shadersTag = "Shaders ";
-//const char *fengine::ResourcesSerializer::k_materialsTag = "Materials ";
-//const char *fengine::ResourcesSerializer::k_postEffectsTag = "PostEffects ";
-//const char *fengine::ResourcesSerializer::k_countTag = "Count ";
-//const char *fengine::ResourcesSerializer::k_idTag = "Id ";
-//const char *fengine::ResourcesSerializer::k_locationTag = "Location ";
-//const char *fengine::ResourcesSerializer::k_textureTypeTag = "TextureType ";
-//const char *fengine::ResourcesSerializer::k_textureWrappingTag = "Wrapping ";
-//const char *fengine::ResourcesSerializer::k_textureMinFilterTag = "MinFilter ";
-//const char *fengine::ResourcesSerializer::k_textureMagFilterTag = "MagFilter ";
-//const char *fengine::ResourcesSerializer::k_textureMipMapsTag = "MipMaps ";
-//const char *fengine::ResourcesSerializer::k_shaderVsTag = "VsLocation ";
-//const char *fengine::ResourcesSerializer::k_shaderFsTag = "FsLocation ";
-//const char *fengine::ResourcesSerializer::k_shaderStatesTag = "ShaderStates ";
-//const char *fengine::ResourcesSerializer::k_shaderAttributesTag = "Attributes";
-//const char *fengine::ResourcesSerializer::k_shaderUniformsTag = "Uniforms";
-//const char *fengine::ResourcesSerializer::k_materialShaderTag = "Shader";
-//const char *fengine::ResourcesSerializer::k_materialTexturesTag = "Textures";
-//const char *fengine::ResourcesSerializer::k_materialFloatsTag = "Floats";
-//const char *fengine::ResourcesSerializer::k_materialVec4Tag = "Vec4";
-//const char *fengine::ResourcesSerializer::k_postEffectTypeTag = "Type";
-//const char *fengine::ResourcesSerializer::k_postEffectMaterialTag = "Material";
-//const char *fengine::ResourcesSerializer::k_postEffectPassBehaviourTag = "PassBehaviour";
-//const char *fengine::ResourcesSerializer::k_postEffectSequenceTag = "Sequence";
+//const char *feng::ResourcesSerializer::k_resources = "../Resources/Resources.txt";
+//const char *feng::ResourcesSerializer::k_texturesTag = "Textures ";
+//const char *feng::ResourcesSerializer::k_meshesTag = "Meshes ";
+//const char *feng::ResourcesSerializer::k_shadersTag = "Shaders ";
+//const char *feng::ResourcesSerializer::k_materialsTag = "Materials ";
+//const char *feng::ResourcesSerializer::k_postEffectsTag = "PostEffects ";
+//const char *feng::ResourcesSerializer::k_countTag = "Count ";
+//const char *feng::ResourcesSerializer::k_idTag = "Id ";
+//const char *feng::ResourcesSerializer::k_locationTag = "Location ";
+//const char *feng::ResourcesSerializer::k_textureTypeTag = "TextureType ";
+//const char *feng::ResourcesSerializer::k_textureWrappingTag = "Wrapping ";
+//const char *feng::ResourcesSerializer::k_textureMinFilterTag = "MinFilter ";
+//const char *feng::ResourcesSerializer::k_textureMagFilterTag = "MagFilter ";
+//const char *feng::ResourcesSerializer::k_textureMipMapsTag = "MipMaps ";
+//const char *feng::ResourcesSerializer::k_shaderVsTag = "VsLocation ";
+//const char *feng::ResourcesSerializer::k_shaderFsTag = "FsLocation ";
+//const char *feng::ResourcesSerializer::k_shaderStatesTag = "ShaderStates ";
+//const char *feng::ResourcesSerializer::k_shaderAttributesTag = "Attributes";
+//const char *feng::ResourcesSerializer::k_shaderUniformsTag = "Uniforms";
+//const char *feng::ResourcesSerializer::k_materialShaderTag = "Shader";
+//const char *feng::ResourcesSerializer::k_materialTexturesTag = "Textures";
+//const char *feng::ResourcesSerializer::k_materialFloatsTag = "Floats";
+//const char *feng::ResourcesSerializer::k_materialVec4Tag = "Vec4";
+//const char *feng::ResourcesSerializer::k_postEffectTypeTag = "Type";
+//const char *feng::ResourcesSerializer::k_postEffectMaterialTag = "Material";
+//const char *feng::ResourcesSerializer::k_postEffectPassBehaviourTag = "PassBehaviour";
+//const char *feng::ResourcesSerializer::k_postEffectSequenceTag = "Sequence";
 //
-//fengine::ResourcesSerializer::ResourcesSerializer()
+//feng::ResourcesSerializer::ResourcesSerializer()
 //{
 //}
 //
-//void fengine::ResourcesSerializer::Serialize(const ResourcesManager& resourcesManager)
+//void feng::ResourcesSerializer::Serialize(const ResourcesManager& resourcesManager)
 //{
 //}
 //
-//int fengine::ResourcesSerializer::Deserialize(ResourcesManager& resourcesManager)
+//int feng::ResourcesSerializer::Deserialize(ResourcesManager& resourcesManager)
 //{
 //	FILE *file = fopen(k_resources, "r");
 //
@@ -73,7 +73,7 @@
 //	return 1;
 //}
 //
-//fengine::ResourceManagerTextures * fengine::ResourcesSerializer::ReadTextures(FILE *file)
+//feng::ResourceManagerTextures * feng::ResourcesSerializer::ReadTextures(FILE *file)
 //{
 //	unsigned int resourcesCount;
 //	fscanf_s(file, k_countTag);
@@ -92,7 +92,7 @@
 //	return new ResourceManagerTextures(resources, resourcesCount);
 //}
 //
-//fengine::ResourceManagerMeshes * fengine::ResourcesSerializer::ReadMeshes(FILE *file)
+//feng::ResourceManagerMeshes * feng::ResourcesSerializer::ReadMeshes(FILE *file)
 //{
 //	unsigned int resourcesCount;
 //	fscanf_s(file, k_countTag);
@@ -111,7 +111,7 @@
 //	return new ResourceManagerMeshes(resources, resourcesCount);
 //}
 //
-//fengine::ResourceManagerShaders * fengine::ResourcesSerializer::ReadShaders(FILE *file)
+//feng::ResourceManagerShaders * feng::ResourcesSerializer::ReadShaders(FILE *file)
 //{
 //	unsigned int resourcesCount;
 //	fscanf_s(file, k_countTag);
@@ -130,10 +130,10 @@
 //	return new ResourceManagerShaders(resources, resourcesCount);
 //}
 //
-//fengine::ResourceManagerMaterials * fengine::ResourcesSerializer::ReadMaterials(
+//feng::ResourceManagerMaterials * feng::ResourcesSerializer::ReadMaterials(
 //	FILE *file,
-//	fengine::ResourceManagerTextures *texturesManager,
-//	fengine::ResourceManagerShaders *shadersManager)
+//	feng::ResourceManagerTextures *texturesManager,
+//	feng::ResourceManagerShaders *shadersManager)
 //{
 //	unsigned int resourcesCount;
 //	fscanf_s(file, k_countTag);
@@ -151,9 +151,9 @@
 //	return new ResourceManagerMaterials(resources, resourcesCount, texturesManager, shadersManager);
 //}
 //
-//fengine::ResourceManagerPostEffects * fengine::ResourcesSerializer::ReadPostEffects(
+//feng::ResourceManagerPostEffects * feng::ResourcesSerializer::ReadPostEffects(
 //	FILE *file,
-//	fengine::ResourceManagerMaterials *materialsManager)
+//	feng::ResourceManagerMaterials *materialsManager)
 //{
 //	unsigned int resourcesCount;
 //	fscanf_s(file, k_countTag);
@@ -171,7 +171,7 @@
 //	return new ResourceManagerPostEffects(resources, resourcesCount, materialsManager);
 //}
 //
-//void fengine::ResourcesSerializer::ReadTexture(FILE *file, CachedTexture *texture)
+//void feng::ResourcesSerializer::ReadTexture(FILE *file, CachedTexture *texture)
 //{
 //	// Read Id.
 //
@@ -223,7 +223,7 @@
 //	texture->GenerateMipMaps = generateMipMaps;
 //}
 //
-//void fengine::ResourcesSerializer::ReadMesh(FILE *file, CachedMesh *mesh)
+//void feng::ResourcesSerializer::ReadMesh(FILE *file, CachedMesh *mesh)
 //{
 //	fscanf_s(file, k_idTag);
 //	fscanf_s(file, "%lu ", &mesh->Id);
@@ -236,7 +236,7 @@
 //	strcpy(mesh->Location, location);
 //}
 //
-//void fengine::ResourcesSerializer::ReadShader(FILE *file, CachedShader *shader)
+//void feng::ResourcesSerializer::ReadShader(FILE *file, CachedShader *shader)
 //{
 //	fscanf_s(file, k_idTag);
 //	fscanf_s(file, "%lu ", &shader->Id);
@@ -257,7 +257,7 @@
 //	ReadShaderStates(file, shader);
 //}
 //
-//void fengine::ResourcesSerializer::ReadShaderStates(FILE *file, CachedShader *shader)
+//void feng::ResourcesSerializer::ReadShaderStates(FILE *file, CachedShader *shader)
 //{
 //	int statesCount;
 //	fscanf_s(file, k_shaderStatesTag);
@@ -271,7 +271,7 @@
 //	}
 //}
 //
-//void fengine::ResourcesSerializer::ReadMaterial(FILE *file, CachedMaterial *material)
+//void feng::ResourcesSerializer::ReadMaterial(FILE *file, CachedMaterial *material)
 //{
 //	fscanf_s(file, k_idTag);
 //	fscanf_s(file, "%lu ", &material->Id);
@@ -284,7 +284,7 @@
 //	ReadMaterialVec4(file, material);
 //}
 //
-//void fengine::ResourcesSerializer::ReadPostEffect(FILE *file, CachedPostEffectDefinition *postEffect)
+//void feng::ResourcesSerializer::ReadPostEffect(FILE *file, CachedPostEffectDefinition *postEffect)
 //{
 //	fscanf_s(file, k_idTag);
 //	fscanf_s(file, "%lu ", &postEffect->Id);
@@ -292,7 +292,7 @@
 //	int type;
 //	fscanf_s(file, k_postEffectTypeTag);
 //	fscanf_s(file, "%lu ", &type);
-//	postEffect->Type = (fengine::PostEffectType)type;
+//	postEffect->Type = (feng::PostEffectType)type;
 //
 //	fscanf_s(file, k_postEffectMaterialTag);
 //	fscanf_s(file, "%lu ", &postEffect->MaterialId);
@@ -318,13 +318,13 @@
 //	fscanf_s(file, "] ");
 //}
 //
-//void fengine::ResourcesSerializer::ReadMaterialTextures(FILE *file, CachedMaterial *material)
+//void feng::ResourcesSerializer::ReadMaterialTextures(FILE *file, CachedMaterial *material)
 //{
 //	unsigned int texturesCount;
 //	fscanf_s(file, k_materialTexturesTag);
 //	fscanf_s(file, "%u ", &texturesCount);
 //
-//	fengine::StringMap<obj_id> textures(texturesCount);
+//	feng::StringMap<obj_id> textures(texturesCount);
 //	fscanf_s(file, "[ ");
 //	for (int i = 0; i < texturesCount; ++i)
 //	{
@@ -339,13 +339,13 @@
 //	fscanf_s(file, "] ");
 //}
 //
-//void fengine::ResourcesSerializer::ReadMaterialFloats(FILE *file, CachedMaterial *material)
+//void feng::ResourcesSerializer::ReadMaterialFloats(FILE *file, CachedMaterial *material)
 //{
 //	unsigned int floatsCount;
 //	fscanf_s(file, k_materialFloatsTag);
 //	fscanf_s(file, "%u ", &floatsCount);
 //
-//	fengine::StringMap<float> floats(floatsCount);
+//	feng::StringMap<float> floats(floatsCount);
 //	fscanf_s(file, "[ ");
 //	for (int i = 0; i < floatsCount; ++i)
 //	{
@@ -360,13 +360,13 @@
 //	fscanf_s(file, "] ");
 //}
 //
-//void fengine::ResourcesSerializer::ReadMaterialVec4(FILE *file, CachedMaterial *material)
+//void feng::ResourcesSerializer::ReadMaterialVec4(FILE *file, CachedMaterial *material)
 //{
 //	unsigned int vectors4Count;
 //	fscanf_s(file, k_materialVec4Tag);
 //	fscanf_s(file, "%u ", &vectors4Count);
 //
-//	fengine::StringMap<Vector4> vec4Values(vectors4Count);
+//	feng::StringMap<Vector4> vec4Values(vectors4Count);
 //	fscanf_s(file, "[ ");
 //	for (int i = 0; i < vectors4Count; ++i)
 //	{
@@ -381,7 +381,7 @@
 //	fscanf_s(file, "] ");
 //}
 //
-//void fengine::ResourcesSerializer::TrimPathQuotes(char *path)
+//void feng::ResourcesSerializer::TrimPathQuotes(char *path)
 //{
 //	int strLength = strlen(path);
 //	int i = 1;
@@ -393,7 +393,7 @@
 //	path[i - 1] = '\0';
 //}
 //
-//void fengine::ResourcesSerializer::ReadVector4(FILE *file, Vector4& vec)
+//void feng::ResourcesSerializer::ReadVector4(FILE *file, Vector4& vec)
 //{
 //	const char *const format = "[%f, %f, %f, %f] ";
 //	fscanf_s(file, format, &vec.x, &vec.y, &vec.z, &vec.w);

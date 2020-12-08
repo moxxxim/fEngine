@@ -1,7 +1,7 @@
 //#include <FEngine/ResourcesManager/CachedPostEffectDefinition.h>
 //#include <utility>
 //
-//namespace fengine
+//namespace feng
 //{
 //    CachedPostEffectDefinition::CachedPostEffectDefinition(const CachedPostEffectDefinition& other):
 //        CachedResource(other),

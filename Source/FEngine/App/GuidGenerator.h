@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 
-namespace fengine
+namespace feng
 {
 
 class Object;

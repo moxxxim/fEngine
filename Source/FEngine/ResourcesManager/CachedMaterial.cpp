@@ -1,7 +1,7 @@
 //#include <FEngine/ResourcesManager/CachedMaterial.h>
 //#include <utility>
 //
-//namespace fengine
+//namespace feng
 //{
 //    CachedMaterial::CachedMaterial(const CachedMaterial& other) :
 //        CachedResource(other),

@@ -1,6 +1,6 @@
 #include <FEngine/App/Time.h>
 
-namespace fengine
+namespace feng
 {
     Time *Time::GetInstance()
     {

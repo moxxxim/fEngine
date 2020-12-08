@@ -2,7 +2,7 @@
 //
 //void CameraController::Start()
 //{
-////	m_input = fengine::Input::GetInstance();
+////	m_input = Input::GetInstance();
 ////	m_cameraTransform = GetTransform();
 //}
 //
@@ -17,14 +17,14 @@
 ////	}
 //}
 //
-//void CameraController::Serialize(fengine::SerializationNode& node) const
+//void CameraController::Serialize(SerializationNode& node) const
 //{
 //	node.SetName("CameraController");
 //	node.SetFloat("MoveSpeed", m_moveSpeed);
 //	node.SetFloat("RotateSpeed", m_rotateSpeed);
 //}
 //
-//void CameraController::Deserialize(const fengine::SerializationNode& node)
+//void CameraController::Deserialize(const SerializationNode& node)
 //{
 //	node.TryGetFloat("MoveSpeed", m_moveSpeed);
 //	node.TryGetFloat("RotateSpeed", m_rotateSpeed);

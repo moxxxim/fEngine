@@ -2,11 +2,11 @@
 //
 //#include <Classes/Globals.h>
 //
-//fengine::ScenesManager *scenesManager;
+//feng::ScenesManager *scenesManager;
 //
 //int Init(ESContext *esContext)
 //{
-//	scenesManager = fengine::ScenesManager::GetInstance();
+//	scenesManager = feng::ScenesManager::GetInstance();
 //
 //	return 0;
 //}
@@ -23,7 +23,7 @@
 //
 //void Key(ESContext *esContext, unsigned char key, bool bIsPressed)
 //{
-//	fengine::Input *inputManager = fengine::Input::GetInstance();
+//	feng::Input *inputManager = feng::Input::GetInstance();
 //	inputManager->PressKey(key, bIsPressed);
 //}
 //

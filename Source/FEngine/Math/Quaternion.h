@@ -1,7 +1,7 @@
 #ifndef Quaternion_hpp
 #define Quaternion_hpp
 
-namespace fengine
+namespace feng
 {
     class Quaternion final
     {

@@ -7,7 +7,7 @@
 //
 //#include <vector>
 //
-//namespace fengine
+//namespace feng
 //{
 //    class ResourceManagerMaterials;
 //    class ResourceManagerShaders;

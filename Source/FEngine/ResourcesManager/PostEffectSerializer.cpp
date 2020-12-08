@@ -2,7 +2,7 @@
 //
 //#include <FEngine/Utils/SerializableObjectParser.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    const char *PostEffectSerializer::k_postEffects = "../Resources/PostEffects.txt";
 //    const char *PostEffectSerializer::k_countTag = "Count ";
@@ -19,8 +19,8 @@
 //        
 //        		for (unsigned i = 0; i < postEffectsCount; ++i)
 //        		{
-//        			fengine::SerializableObject *object = fengine::SerializableObjectParser::ReadResource(file);
-//        			fengine::PostEffectPassBehaviour *passBehaviour = dynamic_cast<fengine::PostEffectPassBehaviour*>(object);
+//        			feng::SerializableObject *object = feng::SerializableObjectParser::ReadResource(file);
+//        			feng::PostEffectPassBehaviour *passBehaviour = dynamic_cast<feng::PostEffectPassBehaviour*>(object);
 //        			obj_id objectId = passBehaviour->GetId();
 //        			if (objectId == id)
 //        			{

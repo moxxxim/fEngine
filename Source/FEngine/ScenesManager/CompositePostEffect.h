@@ -2,7 +2,7 @@
 //
 //#include <FEngine/ScenesManager/PostEffect.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    class RenderPostProcessing;
 //    class FrameBuffersPool;

@@ -6,7 +6,7 @@
 #include <FEngine/Math/Vector3.h>
 #include <FEngine/Math/Vector4.h>
 
-namespace fengine
+namespace feng
 {
     namespace mat4
     {

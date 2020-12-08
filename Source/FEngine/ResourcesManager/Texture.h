@@ -4,7 +4,7 @@
 //
 //#include <FEngine/ResourcesManager/CachedTexture.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    class Texture final : public Object
 //    {

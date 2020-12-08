@@ -3,7 +3,7 @@
 //#include "RenderProperties.h"
 //#include "FrameBuffersPool.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class Renderer;

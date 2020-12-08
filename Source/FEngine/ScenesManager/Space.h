@@ -1,7 +1,7 @@
 #ifndef eSpace_h
 #define eSpace_h
 
-namespace fengine
+namespace feng
 {
     enum class eSpace : uint8_t
     {

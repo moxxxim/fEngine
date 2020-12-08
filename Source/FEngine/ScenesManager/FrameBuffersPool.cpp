@@ -2,7 +2,7 @@
 //
 //#include <Classes/Globals.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    FrameBuffersPool::FrameBuffersPool() :
 //        m_buffers(4)

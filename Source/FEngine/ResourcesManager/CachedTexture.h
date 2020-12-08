@@ -3,7 +3,7 @@
 #include <FEngine/ResourcesManager/CachedResource.h>
 #include <FEngine/ResourcesManager/TextureParameters.h>
 
-namespace fengine
+namespace feng
 {
     class CachedTexture : public CachedResource
     {

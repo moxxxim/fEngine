@@ -7,7 +7,7 @@
 
 #include <vector>
 
-namespace fengine
+namespace feng
 {
     class Material;
     class PostEffectPassBehaviour;

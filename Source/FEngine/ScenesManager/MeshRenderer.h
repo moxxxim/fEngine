@@ -4,13 +4,13 @@
 //#include "../Utils/StringMap.h"
 //#include "../ResourcesManager/Material.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class Mesh;
 //class ResourcesManager;
 //
-//class MeshRenderer : public fengine::Renderer
+//class MeshRenderer : public feng::Renderer
 //{
 //
 //public:
@@ -18,8 +18,8 @@
 //	MeshRenderer();
 //	~MeshRenderer();
 //
-//	void SetMaterial(fengine::Material *material);
-//	void SetMesh(fengine::Mesh *mesh);
+//	void SetMaterial(feng::Material *material);
+//	void SetMesh(feng::Mesh *mesh);
 //
 //	void Serialize(SerializationNode& node) const override;
 //	void Deserialize(const SerializationNode& node) override;
@@ -42,11 +42,11 @@
 //	inline bool IsValidState() const;
 //	void DeserializeMesh(const SerializationNode& node);
 //	void DeserializeMaterial(const SerializationNode& node);
-//	void SetupMeshBuffers(const fengine::Mesh *mesh);
+//	void SetupMeshBuffers(const feng::Mesh *mesh);
 //	void SetupTexturesBuffers();
-//	void SetupTextureBuffer(const fengine::Texture *texture, const char *name);
-//	void GenerateTexture2D(const fengine::Texture *texture);
-//	void GenerateTextureCube(const fengine::Texture *texture);
+//	void SetupTextureBuffer(const feng::Texture *texture, const char *name);
+//	void GenerateTexture2D(const feng::Texture *texture);
+//	void GenerateTextureCube(const feng::Texture *texture);
 //	void ClearTexturesBuffers();
 //	void ActivateTexture(const char *name, int unit);
 //
@@ -54,10 +54,10 @@
 //	unsigned int m_ibo = 0;
 //	StringMap<unsigned int> m_textureBuffers = 0;
 //
-//	fengine::Material *m_material = nullptr;
-//	fengine::Mesh *m_mesh = nullptr;
-//	fengine::ResourcesManager *m_resources = nullptr;
-//	fengine::Shader *m_shader = nullptr;
+//	feng::Material *m_material = nullptr;
+//	feng::Mesh *m_mesh = nullptr;
+//	feng::ResourcesManager *m_resources = nullptr;
+//	feng::Shader *m_shader = nullptr;
 //
 //	unsigned int m_indicesCount = 0;
 //};

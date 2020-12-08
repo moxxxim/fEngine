@@ -6,14 +6,14 @@
 //#include "../ResourcesManager/Shader.h"
 //#include "../ResourcesManager/Vertex.h"
 //
-//fengine::PostEffectRenderer::PostEffectRenderer(Material *material, const StringMap<unsigned int> *textureBuffers) :
+//feng::PostEffectRenderer::PostEffectRenderer(Material *material, const StringMap<unsigned int> *textureBuffers) :
 //	m_material(material),
 //	m_shader(material->GetShader()),
 //	m_textureBuffers(textureBuffers)
 //{
 //}
 //
-//void fengine::PostEffectRenderer::Draw()
+//void feng::PostEffectRenderer::Draw()
 //{
 //	m_shader->StartUse();
 //
@@ -26,20 +26,20 @@
 //	m_shader->StopUse();
 //}
 //
-//void fengine::PostEffectRenderer::SetupVertexAttribute(fengine::ShaderParameters::ReservedAttribute attribute)
+//void feng::PostEffectRenderer::SetupVertexAttribute(feng::ShaderParameters::ReservedAttribute attribute)
 //{
-//	const char *positionAttribute = fengine::ShaderParameters::GetReservedAttributeName(attribute);
+//	const char *positionAttribute = feng::ShaderParameters::GetReservedAttributeName(attribute);
 //	int attributeName = 0;
 //	if (m_shader->TryGetAttribute(positionAttribute, attributeName))
 //	{
-//		fengine::VertexAttributeInfo info(positionAttribute);
+//		feng::VertexAttributeInfo info(positionAttribute);
 //
 //		glEnableVertexAttribArray(attributeName);
 //		glVertexAttribPointer(attributeName, info.Size, info.Type, info.IsNormalized, sizeof(Vertex), info.Pointer);
 //	}
 //}
 //
-//void fengine::PostEffectRenderer::SetupBufferedTextures()
+//void feng::PostEffectRenderer::SetupBufferedTextures()
 //{
 //	auto iterator = m_textureBuffers->GetIterator();
 //	unsigned int textureUnit = 0;
@@ -58,7 +58,7 @@
 //	}
 //}
 //
-//void fengine::PostEffectRenderer::SetCustomDrawUniforms()
+//void feng::PostEffectRenderer::SetCustomDrawUniforms()
 //{
 //	const StringMap<int> *uniforms = m_shader->GetUniforms();
 //	auto iterator = uniforms->GetIterator();
@@ -90,16 +90,16 @@
 //	}
 //}
 //
-//void fengine::PostEffectRenderer::ActivateTexture(const char *name, int unit)
+//void feng::PostEffectRenderer::ActivateTexture(const char *name, int unit)
 //{
 //	const Texture *texture = m_material->GetTexture(name);
-//	GLuint target = texture->GetType() == fengine::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
+//	GLuint target = texture->GetType() == feng::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
 //	glActiveTexture(GL_TEXTURE0 + unit);
 //	glBindTexture(target, m_materialTextures[name]);
 //	m_shader->SetUniformInt(name, unit);
 //}
 //
-//void fengine::PostEffectRenderer::SetupTexturesBuffers()
+//void feng::PostEffectRenderer::SetupTexturesBuffers()
 //{
 //	const StringMap<int> *uniforms = m_shader->GetUniforms();
 //	auto iterator = uniforms->GetIterator();
@@ -109,7 +109,7 @@
 //		KeyValuePair<const char*, int> namedUniform = iterator.GetCurrent();
 //		if (m_material->HasTexture(namedUniform.Key))
 //		{
-//			const fengine::Texture *texture = m_material->GetTexture(namedUniform.Key);
+//			const feng::Texture *texture = m_material->GetTexture(namedUniform.Key);
 //			SetupTextureBuffer(texture, namedUniform.Key);
 //		}
 //
@@ -117,26 +117,26 @@
 //	}
 //}
 //
-//void fengine::PostEffectRenderer::SetupTextureBuffer(const fengine::Texture *texture, const char *name)
+//void feng::PostEffectRenderer::SetupTextureBuffer(const feng::Texture *texture, const char *name)
 //{
 //	if (texture)
 //	{
-//		fengine::TextureType textureType = texture->GetType();
-//		GLuint target = textureType == fengine::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
+//		feng::TextureType textureType = texture->GetType();
+//		GLuint target = textureType == feng::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
 //
 //		unsigned int tbo;
 //		glGenTextures(1, &tbo);
 //		glBindTexture(target, tbo);
 //
-//		GLint wrapMode = fengine::GetTextureWrapMode(texture);
-//		GLint minFilter = fengine::GetTextureMinFilter(texture);
-//		GLint magFilter = fengine::GetTextureMagFilter(texture);
+//		GLint wrapMode = feng::GetTextureWrapMode(texture);
+//		GLint minFilter = feng::GetTextureMinFilter(texture);
+//		GLint magFilter = feng::GetTextureMagFilter(texture);
 //		glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapMode);
 //		glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapMode);
 //		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
 //		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
 //
-//		if (textureType == fengine::TextureType::Texture2D)
+//		if (textureType == feng::TextureType::Texture2D)
 //		{
 //			GenerateTexture2D(texture);
 //		}
@@ -159,33 +159,33 @@
 //	}
 //}
 //
-//void fengine::PostEffectRenderer::GenerateTexture2D(const fengine::Texture *texture)
+//void feng::PostEffectRenderer::GenerateTexture2D(const feng::Texture *texture)
 //{
-//	const GLint format = fengine::GetTextureFormat(texture);
+//	const GLint format = feng::GetTextureFormat(texture);
 //	int width = texture->GetWidth();
 //	int height = texture->GetHeight();
 //	const char *data = texture->GetData();
 //	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 //}
 //
-//void fengine::PostEffectRenderer::GenerateTextureCube(const fengine::Texture *texture)
+//void feng::PostEffectRenderer::GenerateTextureCube(const feng::Texture *texture)
 //{
-//	const GLint format = fengine::GetTextureFormat(texture);
+//	const GLint format = feng::GetTextureFormat(texture);
 //	int faceWidth = texture->GetWidth() / 4;
 //	int faceHeight = texture->GetHeight() / 3;
 //	for (int i = 0; i < 6; ++i)
 //	{
-//		const char *data = texture->GetCubeMapFace((fengine::CubeMapFace)i);
+//		const char *data = texture->GetCubeMapFace((feng::CubeMapFace)i);
 //		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, data);
 //	}
 //}
 //
-//void fengine::PostEffectRenderer::ClearTexturesBuffers()
+//void feng::PostEffectRenderer::ClearTexturesBuffers()
 //{
 //	auto iterator = m_materialTextures.GetIterator();
 //	while (iterator.HasCurrent())
 //	{
-//		fengine::KeyValuePair<const char*, unsigned>& buffer = iterator.GetCurrent();
+//		feng::KeyValuePair<const char*, unsigned>& buffer = iterator.GetCurrent();
 //		glDeleteTextures(1, &buffer.Value);
 //		iterator.MoveNext();
 //	}

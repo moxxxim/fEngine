@@ -3,7 +3,7 @@
 //#include <FEngine/ResourcesManager/ResourceManager.h>
 //#include <FEngine/Utils/Debug.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    bool Material::HasTexture(const char *name) const
 //    {

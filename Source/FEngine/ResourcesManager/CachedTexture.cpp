@@ -3,7 +3,7 @@
 #include <cstring>
 #include <utility>
 
-namespace fengine
+namespace feng
 {
     CachedTexture::CachedTexture(const CachedTexture& other):
         CachedResource(other),

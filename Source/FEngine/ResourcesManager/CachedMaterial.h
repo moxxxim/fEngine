@@ -3,7 +3,7 @@
 #include <FEngine/ResourcesManager/CachedResource.h>
 #include <map>
 
-namespace fengine
+namespace feng
 {
 //    class CachedMaterial final: public CachedResource
 //    {

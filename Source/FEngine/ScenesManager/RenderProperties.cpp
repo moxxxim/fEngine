@@ -5,35 +5,35 @@
 //#include "Light.h"
 //#include "GameObject.h"
 //
-//fengine::RenderProperties::RenderProperties(fengine::RenderSystem *renderSystem) :
+//feng::RenderProperties::RenderProperties(feng::RenderSystem *renderSystem) :
 //	m_renderSystem(renderSystem)
 //{
 //}
 //
-//const fengine::Fog& fengine::RenderProperties::GetFog() const
+//const feng::Fog& feng::RenderProperties::GetFog() const
 //{
-//	fengine::ScenesManager *scenesManager = fengine::ScenesManager::GetInstance();
-//	fengine::Scene *scene = scenesManager->GetCurrentScene();
-//	fengine::SceneSettings *sceneSettings = scene->GetSettings();
+//	feng::ScenesManager *scenesManager = feng::ScenesManager::GetInstance();
+//	feng::Scene *scene = scenesManager->GetCurrentScene();
+//	feng::SceneSettings *sceneSettings = scene->GetSettings();
 //
 //	return sceneSettings->GetFog();
 //}
 //
-//const fengine::Camera * fengine::RenderProperties::GetCamera() const
+//const feng::Camera * feng::RenderProperties::GetCamera() const
 //{
 //	return m_renderSystem->m_camera;
 //}
 //
-//Vector4 fengine::RenderProperties::GetAmbientLightColor() const
+//Vector4 feng::RenderProperties::GetAmbientLightColor() const
 //{
-//	fengine::ScenesManager *scenesManager = fengine::ScenesManager::GetInstance();
-//	fengine::Scene *scene = scenesManager->GetCurrentScene();
-//	fengine::SceneSettings *sceneSettings = scene->GetSettings();
+//	feng::ScenesManager *scenesManager = feng::ScenesManager::GetInstance();
+//	feng::Scene *scene = scenesManager->GetCurrentScene();
+//	feng::SceneSettings *sceneSettings = scene->GetSettings();
 //
 //	return sceneSettings->GetAmbientLightColor();
 //}
 //
-//void fengine::RenderProperties::Update()
+//void feng::RenderProperties::Update()
 //{
 //	m_directLightDirections.Clear();
 //	m_directLightColors.Clear();
@@ -61,7 +61,7 @@
 //	}
 //}
 //
-//void fengine::RenderProperties::CacheDirectLight(Light *light)
+//void feng::RenderProperties::CacheDirectLight(Light *light)
 //{
 //	Transform *lightTransform = light->GetTransform();
 //
@@ -70,7 +70,7 @@
 //	m_directLightIntensities.Add(light->GetIntecity());
 //}
 //
-//void fengine::RenderProperties::CachePointLight(Light *light)
+//void feng::RenderProperties::CachePointLight(Light *light)
 //{
 //	Transform *lightTransform = light->GetTransform();
 //

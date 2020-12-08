@@ -2,7 +2,7 @@
 
 #include <FEngine/ScenesManager/Transform.h>
 
-namespace fengine
+namespace feng
 {
     Entity::Entity(const std::string& aName)
         : name {aName}

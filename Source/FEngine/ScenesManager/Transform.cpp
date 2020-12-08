@@ -2,7 +2,7 @@
 
 #include <FEngine/Math/MatrixUtils.h>
 
-namespace fengine
+namespace feng
 {
     Transform::Transform()
         : rotation { Matrix3::Identity }

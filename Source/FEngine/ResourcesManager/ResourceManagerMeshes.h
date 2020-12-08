@@ -4,7 +4,7 @@
 #include <FEngine/ResourcesManager/Mesh.h>
 #include <FEngine/ResourcesManager/CachedMesh.h>
 
-namespace fengine
+namespace feng
 {
 //    class ResourceManagerMeshes final: public ResourceManager<Mesh, CachedMesh>
 //    {

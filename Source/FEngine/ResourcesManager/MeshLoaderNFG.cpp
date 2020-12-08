@@ -4,20 +4,20 @@
 //#include "Mesh.h"
 //#include "../Utils/Debug.h"
 //
-//const char *const fengine::MeshLoaderNFG::k_verticesCountTag = "NrVertices:";
-//const char *const fengine::MeshLoaderNFG::k_indicesCountTag = "NrIndices:";
-//const char *const fengine::MeshLoaderNFG::k_positionTag = "pos:";
-//const char *const fengine::MeshLoaderNFG::k_normTag = "norm:";
-//const char *const fengine::MeshLoaderNFG::k_binormTag = "binorm:";
-//const char *const fengine::MeshLoaderNFG::k_tangentTag = "tgt:";
-//const char *const fengine::MeshLoaderNFG::k_uvTag = "uv:";
+//const char *const feng::MeshLoaderNFG::k_verticesCountTag = "NrVertices:";
+//const char *const feng::MeshLoaderNFG::k_indicesCountTag = "NrIndices:";
+//const char *const feng::MeshLoaderNFG::k_positionTag = "pos:";
+//const char *const feng::MeshLoaderNFG::k_normTag = "norm:";
+//const char *const feng::MeshLoaderNFG::k_binormTag = "binorm:";
+//const char *const feng::MeshLoaderNFG::k_tangentTag = "tgt:";
+//const char *const feng::MeshLoaderNFG::k_uvTag = "uv:";
 //
-//fengine::MeshLoaderNFG::MeshLoaderNFG(const char *path) :
+//feng::MeshLoaderNFG::MeshLoaderNFG(const char *path) :
 //	m_path(path)
 //{
 //}
 //
-//fengine::Mesh * fengine::MeshLoaderNFG::Load()
+//feng::Mesh * feng::MeshLoaderNFG::Load()
 //{
 //	FILE *file = fopen(m_path, "r");
 //
@@ -40,7 +40,7 @@
 //	return nullptr;
 //}
 //
-//void fengine::MeshLoaderNFG::ReadVertices(FILE *file, Vertex *&vertices, unsigned& verticesCount)
+//void feng::MeshLoaderNFG::ReadVertices(FILE *file, Vertex *&vertices, unsigned& verticesCount)
 //{
 //	verticesCount = ReadVerticesCount(file);
 //	vertices = new Vertex[verticesCount];
@@ -53,7 +53,7 @@
 //	}
 //}
 //
-//unsigned int fengine::MeshLoaderNFG::ReadVerticesCount(FILE *file)
+//unsigned int feng::MeshLoaderNFG::ReadVerticesCount(FILE *file)
 //{
 //	unsigned int verticesCount;
 //	const char *const format = "%u";
@@ -65,7 +65,7 @@
 //	return verticesCount;
 //}
 //
-//void fengine::MeshLoaderNFG::ReadVertex(FILE *file, Vertex& vertex)
+//void feng::MeshLoaderNFG::ReadVertex(FILE *file, Vertex& vertex)
 //{
 //	ReadTaggedVector3(file, k_positionTag, vertex.Position);
 //	ReadTaggedVector3(file, k_normTag, vertex.Norm);
@@ -74,7 +74,7 @@
 //	ReadTaggedVector2(file, k_uvTag, vertex.UV1);
 //}
 //
-//void fengine::MeshLoaderNFG::ReadTaggedVector3(FILE *file, const char *tag, Vector3& vec)
+//void feng::MeshLoaderNFG::ReadTaggedVector3(FILE *file, const char *tag, Vector3& vec)
 //{
 //	const char *delimiter = "; ";
 //	const char *whitespace = " ";
@@ -84,13 +84,13 @@
 //	fscanf_s(file, delimiter);
 //}
 //
-//void fengine::MeshLoaderNFG::ReadVector3(FILE *file, Vector3& vec)
+//void feng::MeshLoaderNFG::ReadVector3(FILE *file, Vector3& vec)
 //{
 //	const char *const format = "[%f, %f, %f]";
 //	fscanf_s(file, format, &vec.x, &vec.y, &vec.z);
 //}
 //
-//void fengine::MeshLoaderNFG::ReadTaggedVector2(FILE *file, const char *tag, Vector2& vec)
+//void feng::MeshLoaderNFG::ReadTaggedVector2(FILE *file, const char *tag, Vector2& vec)
 //{
 //	const char *delimiter = "; ";
 //	const char *whitespace = " ";
@@ -100,13 +100,13 @@
 //	fscanf_s(file, delimiter);
 //}
 //
-//void fengine::MeshLoaderNFG::ReadVector2(FILE *file, Vector2& vec)
+//void feng::MeshLoaderNFG::ReadVector2(FILE *file, Vector2& vec)
 //{
 //	const char *const format = "[%f, %f]";
 //	fscanf_s(file, format, &vec.x, &vec.y);
 //}
 //
-//void fengine::MeshLoaderNFG::ReadIndices(FILE *file, unsigned *&indices, unsigned& indicesCount)
+//void feng::MeshLoaderNFG::ReadIndices(FILE *file, unsigned *&indices, unsigned& indicesCount)
 //{
 //	indicesCount = ReadIndicesCount(file);
 //	indices = new unsigned[indicesCount];
@@ -117,7 +117,7 @@
 //	}
 //}
 //
-//unsigned int fengine::MeshLoaderNFG::ReadIndicesCount(FILE *file)
+//unsigned int feng::MeshLoaderNFG::ReadIndicesCount(FILE *file)
 //{
 //	unsigned int indicesCount;
 //	const char *const format = "%u";
@@ -129,7 +129,7 @@
 //	return indicesCount;
 //}
 //
-//void fengine::MeshLoaderNFG::ReadIndicesTriangle(FILE *file, unsigned int *triangle)
+//void feng::MeshLoaderNFG::ReadIndicesTriangle(FILE *file, unsigned int *triangle)
 //{
 //	const char *const triangleIndexFormat = "%*u. ";
 //	const char *const triangleIndicesFormat = "%u, %u, %u, ";

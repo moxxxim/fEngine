@@ -2,7 +2,7 @@
 //
 //#include "PostEffectContext.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class PostEffect

@@ -2,7 +2,7 @@
 
 #include <FEngine/ResourcesManager/ResourceManager.h>
 
-namespace fengine
+namespace feng
 {
 //    Mesh::Mesh(Vertex *vertices, unsigned *indices, unsigned verticesCount, unsigned indicesCount) :
 //        Object(ObjectType::Resource),

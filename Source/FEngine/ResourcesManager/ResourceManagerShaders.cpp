@@ -2,7 +2,7 @@
 //
 //#include <FEngine/App/GuidGenerator.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    ResourceManagerShaders::ResourceManagerShaders(CachedShader *cachedShaders, unsigned cachedShadersCount) :
 //        ResourceManager<Shader, CachedShader>(cachedShaders, cachedShadersCount)

@@ -7,14 +7,14 @@
 //#include "ResourcesSerializer.h"
 //#include "../Utils/Debug.h"
 //
-//fengine::ResourcesManager * fengine::ResourcesManager::GetInstance()
+//feng::ResourcesManager * feng::ResourcesManager::GetInstance()
 //{
 //	static ResourcesManager resources;
 //
 //	return &resources;
 //}
 //
-//fengine::ResourcesManager::ResourcesManager()
+//feng::ResourcesManager::ResourcesManager()
 //{
 //	ResourcesSerializer serializer;
 //	if (serializer.Deserialize(*this))
@@ -23,7 +23,7 @@
 //	}
 //}
 //
-//fengine::ResourcesManager::~ResourcesManager()
+//feng::ResourcesManager::~ResourcesManager()
 //{
 //	delete m_texturesManager;
 //	delete m_meshesManager;
@@ -32,47 +32,47 @@
 //	delete m_postEffectsManager;
 //}
 //
-//unsigned int fengine::ResourcesManager::GetTextureInstancesCount() const
+//unsigned int feng::ResourcesManager::GetTextureInstancesCount() const
 //{
 //	return m_texturesManager->GetInstancesCount();
 //}
 //
-//unsigned int fengine::ResourcesManager::GetMeshInstancesCount() const
+//unsigned int feng::ResourcesManager::GetMeshInstancesCount() const
 //{
 //	return m_meshesManager->GetInstancesCount();
 //}
 //
-//unsigned int fengine::ResourcesManager::GetShaderInstancesCount() const
+//unsigned int feng::ResourcesManager::GetShaderInstancesCount() const
 //{
 //	return m_shadersManager->GetInstancesCount();
 //}
 //
-//fengine::Texture * fengine::ResourcesManager::GetTexture(fengine::obj_id id)
+//feng::Texture * feng::ResourcesManager::GetTexture(feng::obj_id id)
 //{
 //	return m_texturesManager->GetInstance(id);
 //}
 //
-//fengine::Mesh * fengine::ResourcesManager::GetMesh(fengine::obj_id id)
+//feng::Mesh * feng::ResourcesManager::GetMesh(feng::obj_id id)
 //{
 //	return m_meshesManager->GetInstance(id);
 //}
 //
-//fengine::Shader * fengine::ResourcesManager::GetShader(fengine::obj_id id)
+//feng::Shader * feng::ResourcesManager::GetShader(feng::obj_id id)
 //{
 //	return m_shadersManager->GetInstance(id);
 //}
 //
-//fengine::Material * fengine::ResourcesManager::GetMaterial(fengine::obj_id id)
+//feng::Material * feng::ResourcesManager::GetMaterial(feng::obj_id id)
 //{
 //	return m_materialsManager->GetInstance(id);
 //}
 //
-//fengine::PostEffectDefinition * fengine::ResourcesManager::GetPostEffect(fengine::obj_id id)
+//feng::PostEffectDefinition * feng::ResourcesManager::GetPostEffect(feng::obj_id id)
 //{
 //	return m_postEffectsManager->GetInstance(id);
 //}
 //
-//void fengine::ResourcesManager::Purge()
+//void feng::ResourcesManager::Purge()
 //{
 //	m_texturesManager->Purge();
 //	m_meshesManager->Purge();
@@ -81,7 +81,7 @@
 //	m_postEffectsManager->Purge();
 //}
 //
-//bool fengine::ResourcesManager::DestroyResource(unsigned long id)
+//bool feng::ResourcesManager::DestroyResource(unsigned long id)
 //{
 //	bool isDestoyed = m_texturesManager->DestroyResource(id);
 //

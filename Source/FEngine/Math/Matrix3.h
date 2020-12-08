@@ -4,7 +4,7 @@
 #include <FEngine/Math/Vector3.h>
 #include <cstdint>
 
-namespace fengine
+namespace feng
 {
     class Matrix3 final
     {
@@ -62,7 +62,7 @@ namespace fengine
     };
 }
 
-namespace fengine
+namespace feng
 {
     inline Matrix3 Matrix3::Rows(const Vector3& ex, const Vector3& ey, const Vector3& ez)
     {

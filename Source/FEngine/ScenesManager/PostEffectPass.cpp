@@ -3,7 +3,7 @@
 //#include <FEngine/ResourcesManager/Material.h>
 //#include <FEngine/ScenesManager/FrameBuffersPool.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    PostEffectPass::PostEffectPass(
 //        Material *material,
@@ -42,13 +42,13 @@
 //
 //    void PostEffectPass::SetTextureFromOriginal(InputTextureType type, const char *textureName)
 //    {
-//        GLuint textureBuffer = type == fengine::PostEffectPass::InputTextureType::Color ? m_context.Original.Color : m_context.Original.Depth;
+//        GLuint textureBuffer = type == feng::PostEffectPass::InputTextureType::Color ? m_context.Original.Color : m_context.Original.Depth;
 //        SetShaderInput(textureName, textureBuffer);
 //    }
 //
 //    void PostEffectPass::SetTextureFromInput(InputTextureType type, const char *textureName)
 //    {
-//        GLuint textureBuffer = type == fengine::PostEffectPass::InputTextureType::Color ? m_context.Input.Color : m_context.Input.Depth;
+//        GLuint textureBuffer = type == feng::PostEffectPass::InputTextureType::Color ? m_context.Input.Color : m_context.Input.Depth;
 //        SetShaderInput(textureName, textureBuffer);
 //    }
 //
@@ -57,7 +57,7 @@
 //        if (textureBufferIndex < m_customBuffersCount && textureBufferIndex >= 0)
 //        {
 //            FrameBuffer buffer = m_buffers[textureBufferIndex];
-//            GLuint textureBuffer = type == fengine::PostEffectPass::InputTextureType::Color ? buffer.Color : buffer.Depth;
+//            GLuint textureBuffer = type == feng::PostEffectPass::InputTextureType::Color ? buffer.Color : buffer.Depth;
 //            SetShaderInput(textureName, textureBuffer);
 //        }
 //    }

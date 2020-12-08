@@ -1,7 +1,7 @@
 //#include <cstring>
 //#include "SerializableObjectsFactory.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //    Vector<const char *> SerializableObjectsFactory::s_names;
 //    Vector<SerializableObjectsFactory::SerialiableObjectFactory *> SerializableObjectsFactory::s_factories;

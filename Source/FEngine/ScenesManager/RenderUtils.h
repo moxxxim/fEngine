@@ -3,7 +3,7 @@
 //#include "../../../Utilities/utilities.h"
 //#include "../ResourcesManager/Texture.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //inline GLint GetTextureFormat(const Texture *texture) 

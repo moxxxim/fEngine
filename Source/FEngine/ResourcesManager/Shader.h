@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-namespace fengine
+namespace feng
 {
     enum class ShaderStates : int;
 
@@ -59,7 +59,7 @@ namespace fengine
     std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath);
 }
 
-namespace fengine
+namespace feng
 {
     inline const std::map<std::string, int32_t> &Shader::GetAttributes() const
     {

@@ -2,7 +2,7 @@
 
 #include <FEngine/ResourcesManager/CachedResource.h>
 
-namespace fengine
+namespace feng
 {
 //    class CachedMesh : public CachedResource
 //    {

@@ -6,8 +6,8 @@
 //
 //void SceneLoader::Start()
 //{
-////	m_input = fengine::Input::GetInstance();
-////	m_scenesManager = fengine::ScenesManager::GetInstance();
+////	m_input = feng::Input::GetInstance();
+////	m_scenesManager = feng::ScenesManager::GetInstance();
 //}
 //
 //void SceneLoader::Update(float deltaTime)
@@ -20,7 +20,7 @@
 ////			unsigned char pressedKey = m_input->GetPressedKey();
 ////			if (k_switchSceneKey == pressedKey)
 ////			{
-////				int scenesCount = fengine::AppSettings::GetScenesCount();
+////				int scenesCount = feng::AppSettings::GetScenesCount();
 ////				int nextScene = (s_sceneIndex + 1) % scenesCount;
 ////				LoadScene(nextScene);
 ////			}
@@ -39,7 +39,7 @@
 //
 //const char * SceneLoader::GetSceneName(int index)
 //{
-////	const char ** scenes = fengine::AppSettings::GetScenes();
+////	const char ** scenes = feng::AppSettings::GetScenes();
 ////	return scenes[index];
 //    return "";
 //}

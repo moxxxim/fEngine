@@ -9,26 +9,26 @@
 //
 //static void RegisterBuiltinComponents()
 //{
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<fengine::Camera>("Camera");
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<fengine::MeshRenderer>("MeshRenderer");
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<fengine::Light>("Light");
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<fengine::FollowTransform>("FollowTransform");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<feng::Camera>("Camera");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<feng::MeshRenderer>("MeshRenderer");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<feng::Light>("Light");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<feng::FollowTransform>("FollowTransform");
 //}
 //
 //static void RegisterCustomScripts()
 //{
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<CameraController>("CameraController");
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<GameObjectRotation>("GameObjectRotation");
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<SceneLoader>("SceneLoader");
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<PostEffectsSwitcher>("PostEffectsSwitcher");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<CameraController>("CameraController");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<GameObjectRotation>("GameObjectRotation");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<SceneLoader>("SceneLoader");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<PostEffectsSwitcher>("PostEffectsSwitcher");
 //}
 //
 //static void RegisterBuiltinPostEffects()
 //{
-//	fengine::SerializableObjectsFactory::RegisterSerializableObject<fengine::BlurPassBehaviour>("BlurPassBehaviour");
+//	feng::SerializableObjectsFactory::RegisterSerializableObject<feng::BlurPassBehaviour>("BlurPassBehaviour");
 //}
 //
-//void fengine::RegisterSerializableObjects()
+//void feng::RegisterSerializableObjects()
 //{
 //	RegisterBuiltinComponents();
 //	RegisterCustomScripts();

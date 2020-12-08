@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace fengine
+namespace feng
 {
     void Debug::LogMessage(const std::string &message)
     {

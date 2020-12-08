@@ -4,7 +4,7 @@
 //#include <FEngine/ScenesManager/Scene.h>
 //#include <FEngine/ScenesManager/ScenesManager.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    void FollowTransform::Start()
 //    {
@@ -53,7 +53,7 @@
 //        node.TryGetBool("FollowRotation", m_isFollowRotation);
 //        node.TryGetFloat("Smoothness", smoothness);
 //
-//        ScenesManager *scenesManager = fengine::ScenesManager::GetInstance();
+//        ScenesManager *scenesManager = feng::ScenesManager::GetInstance();
 //        Scene *scene = scenesManager->GetCurrentScene();
 //        m_target = scene->GetGameObject((obj_id)targetId);
 //        if (smoothness > 1)

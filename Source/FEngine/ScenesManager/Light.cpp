@@ -1,12 +1,12 @@
 //#include "Light.h"
 //
-//fengine::Light::Light() :
+//feng::Light::Light() :
 //	m_color(Vector4(0, 0, 0, 0))
 //{
 //
 //}
 //
-//void fengine::Light::Serialize(SerializationNode& node) const
+//void feng::Light::Serialize(SerializationNode& node) const
 //{
 //	node.SetName("Light");
 //	node.SetLong("Type", (int)m_type);
@@ -18,7 +18,7 @@
 //	node.SetFloat("Range", m_range);
 //}
 //
-//void fengine::Light::Deserialize(const SerializationNode& node)
+//void feng::Light::Deserialize(const SerializationNode& node)
 //{
 //	long type;
 //	node.TryGetLong("Type", type);

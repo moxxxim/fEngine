@@ -3,7 +3,7 @@
 #include <FEngine/Math/Matrix4.h>
 #include <FEngine/ScenesManager/Component.h>
 
-namespace fengine
+namespace feng
 {
     class Camera final : public Component
     {

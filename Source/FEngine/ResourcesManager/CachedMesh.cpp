@@ -3,7 +3,7 @@
 //#include <cstring>
 //#include <utility>
 //
-//namespace fengine
+//namespace feng
 //{
 //    CachedMesh::CachedMesh(const CachedMesh& other):
 //        CachedResource(other)

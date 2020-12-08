@@ -2,7 +2,7 @@
 //
 //#include <FEngine/ScenesManager/PostEffectPassBehaviour.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    typedef unsigned long int obj_id;
 //

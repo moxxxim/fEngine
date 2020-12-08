@@ -4,7 +4,7 @@
 //#include <FEngine/ScenesManager/PostEffectPrePass.h>
 //#include <FEngine/Serialization/SerializableObject.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    class PostEffectPassBehaviour : public SerializableObject
 //    {

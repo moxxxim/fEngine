@@ -4,7 +4,7 @@
 //#include "FrameBuffersPool.h"
 //#include "../ResourcesManager/PostEffectDefinition.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class PostEffect;

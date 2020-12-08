@@ -22,17 +22,17 @@
 //	"../Resources/Scenes/Light.txt"
 //};
 //
-//int fengine::AppSettings::GetScenesCount()
+//int feng::AppSettings::GetScenesCount()
 //{
 //	return k_scenesCount;
 //}
 //
-//const char ** fengine::AppSettings::GetScenes()
+//const char ** feng::AppSettings::GetScenes()
 //{
 //	return k_sceneNames;
 //}
 //
-//int fengine::AppSettings::GetSceneIndex(const char *sceneName)
+//int feng::AppSettings::GetSceneIndex(const char *sceneName)
 //{
 ////	for (int i = 0; i < k_scenesCount; ++i)
 ////	{
@@ -46,12 +46,12 @@
 //	return -1;
 //}
 //
-//const char * fengine::AppSettings::GetInitialSceneLocation()
+//const char * feng::AppSettings::GetInitialSceneLocation()
 //{
 //	return k_sceneLocations[4];
 //}
 //
-//const char * fengine::AppSettings::GetSceneLocation(const char *sceneName)
+//const char * feng::AppSettings::GetSceneLocation(const char *sceneName)
 //{
 //	int sceneIndex = GetSceneIndex(sceneName);
 //

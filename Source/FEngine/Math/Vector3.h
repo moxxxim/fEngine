@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstring>
 
-namespace fengine
+namespace feng
 {
     class Vector3 final
     {
@@ -60,7 +60,7 @@ namespace fengine
     };
 }
 
-namespace fengine
+namespace feng
 {
     inline Vector3::Vector3(float aX, float aY, float aZ)
         : data {aX, aY, aZ}

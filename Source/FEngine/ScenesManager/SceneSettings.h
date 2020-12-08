@@ -3,7 +3,7 @@
 //#include "../../../Utilities/utilities.h"
 //#include "Fog.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class Texture;

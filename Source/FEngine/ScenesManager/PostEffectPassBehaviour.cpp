@@ -1,6 +1,6 @@
 //#include <FEngine/ScenesManager/PostEffectPassBehaviour.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    void PostEffectPassBehaviour::Destroy()
 //    {

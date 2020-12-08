@@ -5,7 +5,7 @@
 
 #include <list>
 
-namespace fengine
+namespace feng
 {
     template <class T, class TCachedResource>
     class ResourceManager
@@ -31,14 +31,14 @@ namespace fengine
 }
 
 template <class T, class TCachedResource>
-fengine::ResourceManager<T, TCachedResource>::ResourceManager(TCachedResource *cachedResources, unsigned cachedResourcesCount) :
+feng::ResourceManager<T, TCachedResource>::ResourceManager(TCachedResource *cachedResources, unsigned cachedResourcesCount) :
     m_cachedResources{cachedResources},
     m_cachedResourcesCount{cachedResourcesCount}
 {
 }
 
 template <class T, class TCachedResource>
-fengine::ResourceManager<T, TCachedResource>::~ResourceManager()
+feng::ResourceManager<T, TCachedResource>::~ResourceManager()
 {
 	Purge();
 
@@ -46,13 +46,13 @@ fengine::ResourceManager<T, TCachedResource>::~ResourceManager()
 }
 
 template <class T, class TCachedResource>
-inline unsigned int fengine::ResourceManager<T, TCachedResource>::GetInstancesCount() const
+inline unsigned int feng::ResourceManager<T, TCachedResource>::GetInstancesCount() const
 {
 	return m_resources.GetSize();
 }
 
 template <class T, class TCachedResource>
-T * fengine::ResourceManager<T, TCachedResource>::GetInstance(fengine::obj_id id)
+T * feng::ResourceManager<T, TCachedResource>::GetInstance(feng::obj_id id)
 {
 	auto iterator = m_resources.GetIterator();
 	do
@@ -60,7 +60,7 @@ T * fengine::ResourceManager<T, TCachedResource>::GetInstance(fengine::obj_id id
 		T *resource = iterator.GetCurrent();
 		if (resource)
 		{
-			fengine::Object *obj = dynamic_cast<fengine::Object *>(resource);
+			feng::Object *obj = dynamic_cast<feng::Object *>(resource);
 			if (obj->GetId() == id)
 			{
 				return resource;
@@ -81,7 +81,7 @@ T * fengine::ResourceManager<T, TCachedResource>::GetInstance(fengine::obj_id id
 }
 
 template <class T, class TCachedResource>
-void fengine::ResourceManager<T, TCachedResource>::Purge()
+void feng::ResourceManager<T, TCachedResource>::Purge()
 {
 	auto iterator = m_resources.GetIterator();
 	do
@@ -98,7 +98,7 @@ void fengine::ResourceManager<T, TCachedResource>::Purge()
 }
 
 template <class T, class TCachedResource>
-bool fengine::ResourceManager<T, TCachedResource>::DestroyResource(fengine::obj_id id)
+bool feng::ResourceManager<T, TCachedResource>::DestroyResource(feng::obj_id id)
 {
 	auto iterator = m_resources.GetIterator();
 	T *target = nullptr;
@@ -128,7 +128,7 @@ bool fengine::ResourceManager<T, TCachedResource>::DestroyResource(fengine::obj_
 }
 
 template <class T, class TCachedResource>
-bool fengine::ResourceManager<T, TCachedResource>::TryGetCachedResource(fengine::obj_id id, TCachedResource& resource) const
+bool feng::ResourceManager<T, TCachedResource>::TryGetCachedResource(feng::obj_id id, TCachedResource& resource) const
 {
 	for (unsigned i = 0; i < m_cachedResourcesCount; ++i)
 	{

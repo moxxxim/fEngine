@@ -2,10 +2,10 @@
 
 #include <FEngine/ResourcesManager/ResourceManager.h>
 
-namespace fengine
+namespace feng
 {
 //    PostEffectDefinition::PostEffectDefinition(Material *material, PostEffectPassBehaviour *passBehaviour) :
-//        Object(fengine::Object::ObjectType::Resource),
+//        Object(feng::Object::ObjectType::Resource),
 //        m_type(PostEffectType::Material),
 //        m_material(material),
 //        m_passBehaviour(passBehaviour)

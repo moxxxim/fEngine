@@ -21,12 +21,12 @@
 ////	}
 //}
 //
-//void GameObjectRotation::Serialize(fengine::SerializationNode& node) const
+//void GameObjectRotation::Serialize(feng::SerializationNode& node) const
 //{
 //	node.SetFloat("FullTurnDuration", m_fullTurnDuration);
 //}
 //
-//void GameObjectRotation::Deserialize(const fengine::SerializationNode& node)
+//void GameObjectRotation::Deserialize(const feng::SerializationNode& node)
 //{
 //	node.TryGetFloat("FullTurnDuration", m_fullTurnDuration);
 //}

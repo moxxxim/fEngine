@@ -4,7 +4,7 @@
 #include <FEngine/ScenesManager/Entity.h>
 #include <FEngine/ScenesManager/Transform.h>
 
-namespace fengine
+namespace feng
 {
     void Camera::SetFovY(float fov)
     {

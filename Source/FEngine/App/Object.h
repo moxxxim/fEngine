@@ -3,7 +3,7 @@
 #include "GuidGenerator.h"
 #include "Globals.h"
 
-namespace fengine
+namespace feng
 {
     class Object
     {
@@ -29,7 +29,7 @@ private:
 
 };
 
-inline fengine::obj_id Object::GetId() const
+inline feng::obj_id Object::GetId() const
 {
 	return m_id;
 }

@@ -2,12 +2,12 @@
 //
 //#include <FEngine/ScenesManager/GameObjectScript.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    class Input;
 //}
 //
-//class CameraController final : public fengine::GameObjectScript
+//class CameraController final : public feng::GameObjectScript
 //{
 //public:
 //	CameraController() = default;
@@ -16,11 +16,11 @@
 //	void Start() override;
 //	void Update(float deltaTime) override;
 //
-//	inline void SetCamera(fengine::Transform *cameraTransform);
-//	inline void SetInputManager(fengine::Input *inputManager);
+//	inline void SetCamera(feng::Transform *cameraTransform);
+//	inline void SetInputManager(feng::Input *inputManager);
 //
-//	void Serialize(fengine::SerializationNode& node) const override;
-//	void Deserialize(const fengine::SerializationNode& node) override;
+//	void Serialize(feng::SerializationNode& node) const override;
+//	void Deserialize(const feng::SerializationNode& node) override;
 //
 //private:
 //
@@ -30,8 +30,8 @@
 //	void MoveCamX(float distance);
 //	void MoveCamZ(float distance);
 //
-//	fengine::Transform *m_cameraTransform = nullptr;
-//	fengine::Input *m_input = nullptr;
+//	feng::Transform *m_cameraTransform = nullptr;
+//	feng::Input *m_input = nullptr;
 //
 //	float m_moveSpeed = 1;
 //	float m_rotateSpeed = 1;
@@ -46,12 +46,12 @@
 //	static const unsigned char k_camPanRightKey = (unsigned char)39;
 //};
 //
-//inline void CameraController::SetCamera(fengine::Transform *cameraTransform)
+//inline void CameraController::SetCamera(feng::Transform *cameraTransform)
 //{
 //	m_cameraTransform = cameraTransform;
 //}
 //
-//inline void CameraController::SetInputManager(fengine::Input *inputManager)
+//inline void CameraController::SetInputManager(feng::Input *inputManager)
 //{
 //	m_input = inputManager;
 //}

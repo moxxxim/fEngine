@@ -5,7 +5,7 @@
 //#include <FEngine/ResourcesManager/ResourceManagerTextures.h>
 //#include <FEngine/ResourcesManager/ResourceManagerShaders.h>
 //
-//namespace fengine
+//namespace feng
 //{
 //    ResourceManagerMaterials::ResourceManagerMaterials(CachedMaterial *cachedMaterials,
 //        unsigned cachedMaterialsCount,
@@ -23,7 +23,7 @@
 //        auto texturesIterator = cachedMaterial.Textures.GetIterator();
 //        while (texturesIterator.HasCurrent())
 //        {
-//            fengine::KeyValuePair<const char *, obj_id> namedTexture = texturesIterator.GetCurrent();
+//            feng::KeyValuePair<const char *, obj_id> namedTexture = texturesIterator.GetCurrent();
 //            Texture *texture = m_materialsManager->GetInstance(namedTexture.Value);
 //            material->SetTexture(namedTexture.Key, texture);
 //            texturesIterator.MoveNext();
@@ -32,7 +32,7 @@
 //        auto floatsIterator = cachedMaterial.Floats.GetIterator();
 //        while (floatsIterator.HasCurrent())
 //        {
-//            fengine::KeyValuePair<const char *, float> namedFloat = floatsIterator.GetCurrent();
+//            feng::KeyValuePair<const char *, float> namedFloat = floatsIterator.GetCurrent();
 //            material->SetFloat(namedFloat.Key, namedFloat.Value);
 //            floatsIterator.MoveNext();
 //        }
@@ -40,7 +40,7 @@
 //        auto vec4ValuesIterator = cachedMaterial.Vec4Values.GetIterator();
 //        while (vec4ValuesIterator.HasCurrent())
 //        {
-//            fengine::KeyValuePair<const char *, Vector4> namedVector = vec4ValuesIterator.GetCurrent();
+//            feng::KeyValuePair<const char *, Vector4> namedVector = vec4ValuesIterator.GetCurrent();
 //            material->SetVector4(namedVector.Key, namedVector.Value);
 //            vec4ValuesIterator.MoveNext();
 //        }

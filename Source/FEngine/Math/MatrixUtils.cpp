@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-namespace fengine
+namespace feng
 {
     namespace SMath
     {

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fengine
+namespace feng
 {
     class Entity;
     class Transform;

@@ -4,7 +4,7 @@
 
 #include "FrameBuffer.h"
 
-namespace fengine
+namespace feng
 {
 //    struct PostEffectContext
 //    {

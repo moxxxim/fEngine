@@ -3,7 +3,7 @@
 #include <FEngine/ResourcesManager/CachedResource.h>
 #include <FEngine/ResourcesManager/PostEffectType.h>
 
-namespace fengine
+namespace feng
 {
     class CachedPostEffectDefinition final: public CachedResource
     {

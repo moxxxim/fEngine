@@ -3,7 +3,7 @@
 #include <FEngine/App/Object.h>
 #include <FEngine/ResourcesManager/Vertex.h>
 
-namespace fengine
+namespace feng
 {
 //    class Mesh final : public Object
 //    {

@@ -11,34 +11,34 @@
 //#include "../Utils/Debug.h"
 //#include "../Utils/SerializableObjectParser.h"
 //
-//const char *fengine::SceneSerializer::k_sceneSettingsTag = "Settings ";
-//const char *fengine::SceneSerializer::k_sceneFogTag = "Fog ";
-//const char *fengine::SceneSerializer::k_fogStartTag = "FogStart ";
-//const char *fengine::SceneSerializer::k_fogRangeTag = "FogRange ";
-//const char *fengine::SceneSerializer::k_fogDensityTag = "FogDensity ";
-//const char *fengine::SceneSerializer::k_fogColorTag = "FogColor ";
-//const char *fengine::SceneSerializer::k_sceneSkyboxTag = "Skybox ";
-//const char *fengine::SceneSerializer::k_sceneSkyboxTextureTag = "Texture ";
-//const char *fengine::SceneSerializer::k_sceneAmbientLightTag = "AmbientLight ";
-//const char *fengine::SceneSerializer::k_sceneAmbientLightColorTag = "Color ";
-//const char *fengine::SceneSerializer::k_gameObjectsCountTag = "GameObjectsCount ";
-//const char *fengine::SceneSerializer::k_gameObjectComponentsCountTag = "ComponentsCount ";
-//const char *fengine::SceneSerializer::k_objectIdTag = "Id ";
-//const char *fengine::SceneSerializer::k_gameObjectPositionTag = "Position ";
-//const char *fengine::SceneSerializer::k_gameObjectRotationTag = "Rotation ";
-//const char *fengine::SceneSerializer::k_gameObjectScaleTag = "Scale ";
-//const char *fengine::SceneSerializer::k_gameObjectComponentTag = "Component ";
+//const char *feng::SceneSerializer::k_sceneSettingsTag = "Settings ";
+//const char *feng::SceneSerializer::k_sceneFogTag = "Fog ";
+//const char *feng::SceneSerializer::k_fogStartTag = "FogStart ";
+//const char *feng::SceneSerializer::k_fogRangeTag = "FogRange ";
+//const char *feng::SceneSerializer::k_fogDensityTag = "FogDensity ";
+//const char *feng::SceneSerializer::k_fogColorTag = "FogColor ";
+//const char *feng::SceneSerializer::k_sceneSkyboxTag = "Skybox ";
+//const char *feng::SceneSerializer::k_sceneSkyboxTextureTag = "Texture ";
+//const char *feng::SceneSerializer::k_sceneAmbientLightTag = "AmbientLight ";
+//const char *feng::SceneSerializer::k_sceneAmbientLightColorTag = "Color ";
+//const char *feng::SceneSerializer::k_gameObjectsCountTag = "GameObjectsCount ";
+//const char *feng::SceneSerializer::k_gameObjectComponentsCountTag = "ComponentsCount ";
+//const char *feng::SceneSerializer::k_objectIdTag = "Id ";
+//const char *feng::SceneSerializer::k_gameObjectPositionTag = "Position ";
+//const char *feng::SceneSerializer::k_gameObjectRotationTag = "Rotation ";
+//const char *feng::SceneSerializer::k_gameObjectScaleTag = "Scale ";
+//const char *feng::SceneSerializer::k_gameObjectComponentTag = "Component ";
 //
-//const char *fengine::SceneSerializer::k_serializedObjectInfoStart = "[";
-//const char *fengine::SceneSerializer::k_serializedObjectInfoEnd = "]";
-//const char *fengine::SceneSerializer::k_longValuePrefix = "l_";
-//const char *fengine::SceneSerializer::k_floatValuePrefix = "f_";
+//const char *feng::SceneSerializer::k_serializedObjectInfoStart = "[";
+//const char *feng::SceneSerializer::k_serializedObjectInfoEnd = "]";
+//const char *feng::SceneSerializer::k_longValuePrefix = "l_";
+//const char *feng::SceneSerializer::k_floatValuePrefix = "f_";
 //
-//void fengine::SceneSerializer::Serialize(Scene *scene, const char *sceneFile)
+//void feng::SceneSerializer::Serialize(Scene *scene, const char *sceneFile)
 //{
 //}
 //
-//int fengine::SceneSerializer::Deserialize(Scene *scene, const char * sceneFile)
+//int feng::SceneSerializer::Deserialize(Scene *scene, const char * sceneFile)
 //{
 //	FILE *file = fopen(sceneFile, "r");
 //
@@ -63,7 +63,7 @@
 //	return 1;
 //}
 //
-//void fengine::SceneSerializer::ReadSceneSettings(FILE *file, Scene *scene)
+//void feng::SceneSerializer::ReadSceneSettings(FILE *file, Scene *scene)
 //{
 //	fscanf_s(file, k_sceneSettingsTag);
 //
@@ -73,7 +73,7 @@
 //	ReadSceneAmbientLight(file, settings);
 //}
 //
-//void fengine::SceneSerializer::ReadSceneFog(FILE *file, Fog& fog) const
+//void feng::SceneSerializer::ReadSceneFog(FILE *file, Fog& fog) const
 //{
 //	fscanf_s(file, k_sceneFogTag);
 //
@@ -98,7 +98,7 @@
 //	fog.SetColor(fogColor);
 //}
 //
-//void fengine::SceneSerializer::ReadSceneSkybox(FILE *file, Scene *scene)
+//void feng::SceneSerializer::ReadSceneSkybox(FILE *file, Scene *scene)
 //{
 //	fscanf_s(file, k_sceneSkyboxTag);
 //
@@ -110,7 +110,7 @@
 //		const char *skyboxComponentName = "MeshRenderer";
 //		GuidGenerator::SetNextSceneObjectId(skyboxId);
 //		SerializableObject *skyboxComponent = SerializableObjectsFactory::GetSerializableObject(skyboxComponentName);
-//		m_skybox = dynamic_cast<fengine::Renderer*>(skyboxComponent);
+//		m_skybox = dynamic_cast<feng::Renderer*>(skyboxComponent);
 //		unsigned int componentsCount = ReadGameObjectComponentsCount(file);
 //		SerializationNode *node = new SerializationNode();
 //		node->SetName(skyboxComponentName);
@@ -121,14 +121,14 @@
 //	}
 //}
 //
-//void fengine::SceneSerializer::ReadSceneAmbientLight(FILE *file, SceneSettings *sceneSettings)
+//void feng::SceneSerializer::ReadSceneAmbientLight(FILE *file, SceneSettings *sceneSettings)
 //{
 //	fscanf_s(file, k_sceneAmbientLightTag);
 //	fscanf_s(file, k_sceneAmbientLightColorTag);
 //	ReadVector4(file, sceneSettings->GetAmbientLightColor());
 //}
 //
-//unsigned int fengine::SceneSerializer::ReadGameObjectsCount(FILE *file) const
+//unsigned int feng::SceneSerializer::ReadGameObjectsCount(FILE *file) const
 //{
 //	unsigned int count;
 //	fscanf_s(file, k_gameObjectsCountTag);
@@ -137,9 +137,9 @@
 //	return count;
 //}
 //
-//void fengine::SceneSerializer::ReadGameObject(FILE *file, Scene *scene)
+//void feng::SceneSerializer::ReadGameObject(FILE *file, Scene *scene)
 //{
-//	fengine::obj_id id;
+//	feng::obj_id id;
 //	fscanf_s(file, k_objectIdTag);
 //	fscanf_s(file, "%lu ", &id);
 //	GuidGenerator::SetNextSceneObjectId(id);
@@ -152,7 +152,7 @@
 //	}
 //}
 //
-//unsigned int fengine::SceneSerializer::ReadGameObjectComponentsCount(FILE *file) const
+//unsigned int feng::SceneSerializer::ReadGameObjectComponentsCount(FILE *file) const
 //{
 //	unsigned int count;
 //	fscanf_s(file, k_gameObjectComponentsCountTag);
@@ -161,7 +161,7 @@
 //	return count;
 //}
 //
-//void fengine::SceneSerializer::ReadGameObjectTransform(FILE *file, Transform *transform) const
+//void feng::SceneSerializer::ReadGameObjectTransform(FILE *file, Transform *transform) const
 //{
 //	Vector3 vec;
 //	fscanf_s(file, k_gameObjectPositionTag);
@@ -177,23 +177,23 @@
 //	transform->SetScale(vec);
 //}
 //
-//void fengine::SceneSerializer::ReadGameObjectComponent(FILE *file, GameObject *go)
+//void feng::SceneSerializer::ReadGameObjectComponent(FILE *file, GameObject *go)
 //{
 //	fscanf(file, k_gameObjectComponentTag);
 //
 //	SerializableObject *serializableObject = nullptr;
 //	SerializationNode *node = nullptr;
-//	fengine::SerializableObjectParser::ReadSceneObject(file, serializableObject, node);
+//	feng::SerializableObjectParser::ReadSceneObject(file, serializableObject, node);
 //	if (serializableObject)
 //	{
-//		GameObjectComponent *component = dynamic_cast<fengine::GameObjectComponent*>(serializableObject);
+//		GameObjectComponent *component = dynamic_cast<feng::GameObjectComponent*>(serializableObject);
 //		go->AddComponent(component);
 //		m_components.Add(component);
 //		m_serializationData.Add(node);
 //	}
 //}
 //
-//void fengine::SceneSerializer::ReadComponentInfo(FILE *file, fengine::SerializationNode *node) const
+//void feng::SceneSerializer::ReadComponentInfo(FILE *file, feng::SerializationNode *node) const
 //{
 //	char key[128];
 //	fscanf(file, k_serializedObjectInfoStart);
@@ -218,7 +218,7 @@
 //	}
 //}
 //
-//void fengine::SceneSerializer::DeserializeComponents()
+//void feng::SceneSerializer::DeserializeComponents()
 //{
 //	unsigned int componentsCount = m_components.GetSize();
 //	for (unsigned int i = 0; i < componentsCount; ++i)
@@ -229,15 +229,15 @@
 //	}
 //}
 //
-//void fengine::SceneSerializer::SetupSkybox(fengine::Scene *scene)
+//void feng::SceneSerializer::SetupSkybox(feng::Scene *scene)
 //{
 //	if (m_skybox)
 //	{
 //		auto gameObjectsIterator = scene->GetGameObjectsIterator();
 //		while (gameObjectsIterator.HasCurrent())
 //		{
-//			fengine::GameObject *go = gameObjectsIterator.GetCurrent();
-//			fengine::Camera * camera = go->GetComponent<fengine::Camera>();
+//			feng::GameObject *go = gameObjectsIterator.GetCurrent();
+//			feng::Camera * camera = go->GetComponent<feng::Camera>();
 //			if (camera)
 //			{
 //				go->AddComponent(m_skybox);
@@ -249,7 +249,7 @@
 //	}
 //}
 //
-//void fengine::SceneSerializer::CleanUp()
+//void feng::SceneSerializer::CleanUp()
 //{
 //	unsigned int componentsCount = m_components.GetSize();
 //	for (unsigned int i = 0; i < componentsCount; ++i)
@@ -261,18 +261,18 @@
 //	m_serializationData.Clear();
 //}
 //
-//bool fengine::SceneSerializer::IsLongValue(const char *key) const
+//bool feng::SceneSerializer::IsLongValue(const char *key) const
 //{
 //	return !strncmp(k_longValuePrefix, key, k_prefixLength);
 //}
 //
-//void fengine::SceneSerializer::ReadVector3(FILE *file, Vector3& vec) const
+//void feng::SceneSerializer::ReadVector3(FILE *file, Vector3& vec) const
 //{
 //	const char *const format = "[%f, %f, %f] ";
 //	fscanf_s(file, format, &vec.x, &vec.y, &vec.z);
 //}
 //
-//void fengine::SceneSerializer::ReadVector4(FILE *file, Vector4& vec) const
+//void feng::SceneSerializer::ReadVector4(FILE *file, Vector4& vec) const
 //{
 //	const char *const format = "[%f, %f, %f, %f] ";
 //	fscanf_s(file, format, &vec.x, &vec.y, &vec.z, &vec.w);

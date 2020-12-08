@@ -3,7 +3,7 @@
 //#include <cstring>
 //#include <utility>
 //
-//namespace fengine
+//namespace feng
 //{
 //    CachedShader::CachedShader(const CachedShader& other)
 //        : CachedResource{other}

@@ -6,7 +6,7 @@
 //
 //#include <cstring>
 //
-//namespace fengine
+//namespace feng
 //{
 //    const char *SerializableObjectParser::k_objectIdTag = "Id ";
 //    const char *SerializableObjectParser::k_serializedObjectInfoStart = "[";
@@ -48,7 +48,7 @@
 //                                              bool isSceneObject)
 //    {
 ////        char objectName[256];
-////        fengine::obj_id id;
+////        feng::obj_id id;
 ////
 ////        fscanf(file, "%s ", objectName);
 ////        fscanf(file, k_objectIdTag);
@@ -77,7 +77,7 @@
 ////                objectName
 ////            };
 ////
-////            fengine::Debug::LogError(message, 2);
+////            feng::Debug::LogError(message, 2);
 ////        }
 //    }
 //

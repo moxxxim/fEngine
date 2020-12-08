@@ -3,7 +3,7 @@
 //#include "GameObjectComponent.h"
 //#include "../../../Utilities/utilities.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class Light final : public GameObjectComponent

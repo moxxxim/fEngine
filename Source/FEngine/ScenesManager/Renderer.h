@@ -3,7 +3,7 @@
 //#include "../Utilities/utilities.h"
 //#include "GameObjectComponent.h"
 //
-//namespace fengine
+//namespace feng
 //{
 //
 //class RenderSystem;

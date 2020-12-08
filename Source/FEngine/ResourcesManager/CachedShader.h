@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace fengine
+namespace feng
 {
     class CachedShader : public CachedResource
     {
