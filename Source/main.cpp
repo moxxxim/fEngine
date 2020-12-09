@@ -113,6 +113,7 @@ namespace SMain
         {
             camPitch =  89.0f;
         }
+
         if(camPitch < -89.0f)
         {
             camPitch = -89.0f;
@@ -130,6 +131,7 @@ namespace SMain
         {
             Zoom = 1.0f;
         }
+
         if (Zoom > 45.0f)
         {
             Zoom = 45.0f;
