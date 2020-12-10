@@ -4,11 +4,11 @@
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
 #include <FEngine/ResourcesManager/Shader.h>
+#include <FEngine/ResourcesManager/TextureData.h>
 #include <FEngine/ScenesManager/Camera.h>
 #include <FEngine/ScenesManager/Entity.h>
 #include <FEngine/ScenesManager/Transform.h>
 #include <FEngine/Utils/Debug.h>
-#include <Classes/TextureLoader.h>
 #include <FEngine/Math/Matrix4.h>
 #include <FEngine/Math/MatrixUtils.h>
 #include <FEngine/Math/Vector3.h>
@@ -22,7 +22,6 @@ namespace SMain
     std::string BaseResourcesDir = "../../../Resources/";
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
-    std::string BaseTempShadersDir = BaseShadersDir + "Temp/";
 
     constexpr uint32_t Width = 800;
     constexpr uint32_t Height = 600;
@@ -166,8 +165,8 @@ namespace SMain
 
     std::unique_ptr<feng::Shader> LoadTempShader(const std::string& vsFileName, const std::string& fsFileName)
     {
-        std::string vsFilePath = BaseTempShadersDir + vsFileName;
-        std::string fsFilePath = BaseTempShadersDir + fsFileName;
+        std::string vsFilePath = BaseShadersDir + vsFileName;
+        std::string fsFilePath = BaseShadersDir + fsFileName;
         return feng::LoadShader(vsFilePath, fsFilePath);
     }
 
@@ -193,93 +192,65 @@ namespace SMain
 
         return window;
     }
-
-    class TextureData final
-    {
-    public:
-        TextureData() = default;
-
-        TextureData(unsigned char *aData, int32_t aWidth, int32_t aHeight, int32_t aChanelsCount)
-        : data {aData}
-        , width {aWidth}
-        , height {aHeight}
-        , chanelsCount {aChanelsCount}
-        {}
-
-        ~TextureData()
-        {
-            if(data != nullptr)
-            {
-                stbi_image_free(data);
-            }
-        }
-
-        void Load(const std::string& textureName, bool flip)
-        {
-            std::string texturePath = SMain::BaseTexturesDir + textureName;
-            stbi_set_flip_vertically_on_load(flip);
-            stbi_uc *textureData = stbi_load(texturePath.c_str(), &width, &height, &chanelsCount, 0);
-            data = static_cast<unsigned char*>(textureData);
-        }
-
-        unsigned char *data = nullptr;
-        int32_t width;
-        int32_t height;
-        int32_t chanelsCount;
-    };
 }
 
 namespace SRender
 {
-    const char *twoTexturesFsName = "TriangleTexture2Fs.fs";
-    const char *ModelViewProjVsName = "ModelViewProjVs.vs";
+    const char *UnlitTexture2MixFsName = "Unlit/UnlitTexture2MixFs.fs";
+    const char *UnlitTexture2MixVsName = "Unlit/UnlitTexture2MixVs.vs";
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *awesomeFacePng = "awesomeface.png";
 
     float cube[] =
     {
-            // position       // color         // uv
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+             // position        // uv
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+
+    const unsigned int rectIndices[]
+    {
+        0, 1, 3,
+        1, 2, 3
     };
 
     std::array<feng::Vector3, 10> cubePositions = {
@@ -295,12 +266,6 @@ namespace SRender
         feng::Vector3(-1.3f,  1.0f, -1.5f)
     };
 
-    const unsigned int rectIndices[]
-    {
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    };
-
     // Loaded data.
 
     GLuint shapeVao;
@@ -309,8 +274,8 @@ namespace SRender
     GLuint textureObj3;
     std::unique_ptr<feng::Shader> modelViewProjShader;
 
-    SMain::TextureData woodenContainerTexture;
-    SMain::TextureData awesomeFaceTexture;
+    std::unique_ptr<feng::TextureData> woodenContainerTexture;
+    std::unique_ptr<feng::TextureData> awesomeFaceTexture;
 
     GLuint CreateVaoWithColorAndTexture(const float* vertices, int verticesCount, int stride)
     {
@@ -342,20 +307,15 @@ namespace SRender
          */
 
         const uint32_t vec3Size = sizeof(float) * 3;
-        const uint32_t vec2Size = sizeof(float) * 2;
 
         // Position.
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(0));
         // Enable vertex attribute in location 0.
         glEnableVertexAttribArray(0);
 
-        // Color
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(vec3Size));
-        glEnableVertexAttribArray(1);
-
         // Texture.
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(2 * vec3Size));
-        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(vec3Size));
+        glEnableVertexAttribArray(1);
 
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -376,13 +336,16 @@ namespace SRender
 
     void LoadShaders()
     {
-        modelViewProjShader = SMain::LoadTempShader(SRender::ModelViewProjVsName, SRender::twoTexturesFsName);
+        modelViewProjShader = SMain::LoadTempShader(SRender::UnlitTexture2MixVsName, SRender::UnlitTexture2MixFsName);
     }
 
     void LoadTextures()
     {
-        woodenContainerTexture.Load(woodenContainerJpg, false);
-        awesomeFaceTexture.Load(awesomeFacePng, true);
+        std::string woodTexturePath = SMain::BaseTexturesDir + woodenContainerJpg;
+        woodenContainerTexture = feng::TextureData::Load(woodTexturePath, false);
+
+        std::string awesomeTexturePath = SMain::BaseTexturesDir + awesomeFacePng;
+        awesomeFaceTexture = feng::TextureData::Load(awesomeTexturePath, true);
     }
 
     void InitializeTransforms()
@@ -399,9 +362,9 @@ namespace SRender
         camera.SetFarClipPlane(100.f);
     }
 
-    GLuint InitTextureObj(const SMain::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
+    GLuint InitTextureObj(const feng::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
     {
-        if(textureData.data != nullptr)
+        if(textureData.IsValid())
         {
             GLuint texture;
             glGenTextures(1, &texture);
@@ -410,12 +373,12 @@ namespace SRender
                          GL_TEXTURE_2D,
                          0,
                          GL_RGB,
-                         textureData.width,
-                         textureData.height,
+                         textureData.GetWidth(),
+                         textureData.GetHeight(),
                          0,
                          (withAlpha ? GL_RGBA : GL_RGB),
                          GL_UNSIGNED_BYTE,
-                         textureData.data);
+                         textureData.GetData());
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -443,8 +406,8 @@ namespace SRender
         InitializeTransforms();
         LoadShaders();
         LoadTextures();
-        textureObj1 = InitTextureObj(woodenContainerTexture, GL_REPEAT, GL_REPEAT, false);
-        textureObj3 = InitTextureObj(awesomeFaceTexture, GL_REPEAT, GL_REPEAT, true);
+        textureObj1 = InitTextureObj(*woodenContainerTexture, GL_REPEAT, GL_REPEAT, false);
+        textureObj3 = InitTextureObj(*awesomeFaceTexture, GL_REPEAT, GL_REPEAT, true);
         shapeVao = CreateVaoWithColorAndTexture(cube, 36, sizeof(cube) / 36);
 
         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
@@ -501,9 +464,9 @@ namespace SRender
             feng::Matrix4 modelTransformMatrix = modelTransform.GetGlobalMatrix();
             feng::Camera *camera = SMain::camEntity->GetComponent<feng::Camera>();
 
-            shader.SetUniformMatrix4("uModelMat", modelTransformMatrix);
-            shader.SetUniformMatrix4("uViewProjMat", camera->GetViewProjectionMatrix());
-            shader.SetUniformFloat("mixValue", SMain::mixValue);
+            shader.SetUniformMatrix4("uModelMatrix", modelTransformMatrix);
+            shader.SetUniformMatrix4("uViewProjMatrix", camera->GetViewProjectionMatrix());
+            shader.SetUniformFloat("uMixValue", SMain::mixValue);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
     }
@@ -521,8 +484,8 @@ int main(int argc, const char * argv[])
         feng::Debug::LogMessage("Start loop.");
 
         SRender::modelViewProjShader->StartUse();
-        SRender::modelViewProjShader->SetUniformInt("uTex1", 0);
-        SRender::modelViewProjShader->SetUniformInt("uTex2", 1);
+        SRender::modelViewProjShader->SetUniformInt("uTexture0", 0);
+        SRender::modelViewProjShader->SetUniformInt("uTexture1", 1);
         SRender::modelViewProjShader->StopUse();
 
         while(!glfwWindowShouldClose(window))

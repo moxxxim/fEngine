@@ -1,60 +1,84 @@
-//#pragma once
-//
-//#include "GameObjectComponent.h"
-//#include "../../../Utilities/utilities.h"
-//
-//namespace feng
-//{
-//
-//class Light final : public GameObjectComponent
-//{
-//
-//public:
-//
-//	enum class Type : int
-//	{
-//		Directional = 0,
-//		Point = 1
-//	};
-//
-//	Light();
-//	~Light() = default;
-//
-//	void Serialize(SerializationNode& node) const override;
-//	void Deserialize(const SerializationNode& node) override;
-//
-//	inline Type GetType() const;
-//	inline Vector4 GetColor() const;
-//	inline float GetIntecity() const;
-//	inline float GetRange() const;
-//
-//private:
-//
-//	Type m_type = Type::Directional;
-//	Vector4 m_color;
-//	float m_intensity = 1;
-//	float m_range = 0;
-//
-//};
-//
-//inline Light::Type Light::GetType() const
-//{
-//	return m_type;
-//}
-//
-//inline Vector4 Light::GetColor() const
-//{
-//	return m_color;
-//}
-//
-//inline float Light::GetIntecity() const
-//{
-//	return m_intensity;
-//}
-//
-//inline float Light::GetRange() const
-//{
-//	return m_range;
-//}
-//
-//}
+#pragma once
+
+#include <FEngine/Math/Vector4.h>
+#include <FEngine/ScenesManager/Component.h>
+
+#include <cstdint>
+
+namespace feng
+{
+    class Light final : public Component
+    {
+    public:
+        enum class eType : uint8_t
+        {
+            Directional = 0,
+            Point = 1,
+            Spot = 2,
+        };
+
+        Light();
+        ~Light() = default;
+
+        eType GetType() const;
+        void SetType(eType aType);
+
+        Vector4 GetColor() const;
+        void SetColor(const Vector4& aColor);
+
+        float GetIntesity() const;
+        void SetIntensity(float aIntencity);
+
+        float GetRange() const;
+        void SetRange(float aRange);
+
+    private:
+        Vector4 color;
+        float intensity = 1.f;
+        float range = 1.f;
+        eType type = eType::Directional;
+    };
+}
+
+namespace feng
+{
+    inline Light::eType Light::GetType() const
+    {
+        return type;
+    }
+
+    inline void Light::SetType(Light::eType aType)
+    {
+        type = aType;
+    }
+
+    inline Vector4 Light::GetColor() const
+    {
+        return color;
+    }
+
+    inline void Light::SetColor(const Vector4& aColor)
+    {
+        color = aColor;
+    }
+
+    inline float Light::GetIntesity() const
+    {
+        return intensity;
+    }
+
+    inline void Light::SetIntensity(float aIntensity)
+    {
+        intensity = aIntensity;
+    }
+
+    inline float Light::GetRange() const
+    {
+        return range;
+    }
+
+    inline void Light::SetRange(float aRange)
+    {
+        range = aRange;
+    }
+}

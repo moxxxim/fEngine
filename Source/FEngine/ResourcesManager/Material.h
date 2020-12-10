@@ -1,62 +1,55 @@
 #pragma once
 
-#include <FEngine/App/Object.h>
+#include <FEngine/Math/Vector2.h>
+#include <FEngine/Math/Vector3.h>
+#include <FEngine/Math/Vector4.h>
+
 #include <map>
+#include <utility>
 
 namespace feng
 {
     class Texture;
     class Shader;
 
-    // TODO: m.alekseev remove this forwards.
-    class Vector2;
-    class Vector3;
-    class Vector4;
-
-    class Material final : public Object
+    class Material final
     {
     public:
-        explicit Material(Shader *shader);
+        explicit Material(std::unique_ptr<Shader>&& aShader);
 
-        bool HasTexture(const char *name) const;
-        bool HasFloat(const char *name) const;
-        bool HasVector4(const char *name) const;
+        bool HasTexture(const std::string& name) const;
+        bool HasFloat(const std::string& name) const;
+        bool HasVector4(const std::string& name) const;
 
-        Shader * GetShader() const;
-        const Texture * GetTexture(const char *name) const;
-        float GetFloat(const char *name) const;
-        Vector4 GetVector4(const char *name) const;
+        Shader* GetShader() const;
+        void SetShader(std::unique_ptr<Shader>&& aShader);
 
-        void SetShader(Shader *shader);
-        void SetTexture(const char *name, Texture *texture);
-        void SetFloat(const char *name, float value);
-        void SetVector4(const char *name, const Vector4& value);
+        const Texture * GetTexture(const std::string& name) const;
+        void SetTexture(const std::string& name, Texture *texture);
 
-        void Destroy() override;
+        bool TryGetFloat(const std::string& name, float& value) const;
+        void SetFloat(const std::string& name, float value);
+
+        bool TryGetVector4(const std::string& name, Vector4& value) const;
+        void SetVector4(const std::string& name, const Vector4& value);
 
     private:
-        Shader *m_shader = nullptr;
-        std::map<const char*, Texture*> m_textures;
-        std::map<const char*, float> m_floats;
-        std::map<const char*, int> m_ints;
-        std::map<const char*, Vector2> m_vectors2;
-        std::map<const char*, Vector3> m_vectors3;
-        std::map<const char*, Vector4> m_vectors4;
+        std::unique_ptr<Shader> shader;
+        std::map<std::string, Texture*> textures;
+        std::map<std::string, float> floats;
+        std::map<std::string, int> ints;
+        std::map<std::string, Vector2> vectors2;
+        std::map<std::string, Vector3> vectors3;
+        std::map<std::string, Vector4> vectors4;
     };
 
-    Material::Material(Shader *shader) :
-        Object(ObjectType::Resource),
-        m_shader(shader)
+    inline Shader* Material::GetShader() const
     {
+        return shader.get();
     }
 
-    inline feng::Shader * Material::GetShader() const
+    inline void Material::SetShader(std::unique_ptr<Shader>&& aShader)
     {
-        return m_shader;
-    }
-
-    inline void Material::SetShader(Shader *shader)
-    {
-        m_shader = shader;
+        shader = std::move(aShader);
     }
 }

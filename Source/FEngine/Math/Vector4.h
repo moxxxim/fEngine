@@ -1,5 +1,4 @@
-#ifndef Vector4_hpp
-#define Vector4_hpp
+#pragma once
 
 #include <FEngine/Math/Vector3.h>
 
@@ -41,5 +40,3 @@ namespace feng
         : data {aXyz.x, aXyz.y, aXyz.z, aW}
     { }
 }
-
-#endif

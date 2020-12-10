@@ -1,12 +1,12 @@
 //#pragma once
 //
-//#include <FEngine/App/Object.h>
-//
 //#include <FEngine/ResourcesManager/CachedTexture.h>
+//
+//#include <cstdint>
 //
 //namespace feng
 //{
-//    class Texture final : public Object
+//    class Texture final
 //    {
 //    public:
 //        Texture(const CachedTexture& texture, char *data, int width, int height, int bpp);
@@ -17,59 +17,51 @@
 //        Texture& operator = (const Texture& other) = delete;
 //        Texture& operator = (Texture&& other) = delete;
 //
-//        void Destroy() override;
+//        int32_t GetWidth() const;
+//        int32_t GetHeight() const;
+//        int32_t GetBpp() const;
 //
-//        int GetWidth() const;
-//        int GetHeight() const;
-//        int GetBpp() const;
 //	    const char * GetData() const;
 //        TextureType GetType() const;
 //	    TextureWarapMode GetWrapMode() const;
 //	    TextureMinFilter GetMinFilter() const;
 //	    TextureMagFilter GetMagFilter() const;
 //	    bool HasMipMaps() const;
-//        const char * GetCubeMapFace(CubeMapFace face) const;
 //
 //    private:
-//        char * CreateCubeMapFace(unsigned start, unsigned width, unsigned height) const;
-//
-//        CachedTexture m_textureInfo;
-//        char *m_data = nullptr;
-//        int m_width = 0;
-//        int m_height = 0;
-//        int m_bitsPerPixel = 0;
-//
-//        mutable char *m_cubeMap_Pos_X = nullptr;
-//        mutable char *m_cubeMap_Neg_X = nullptr;
-//        mutable char *m_cubeMap_Pos_Y = nullptr;
-//        mutable char *m_cubeMap_Neg_Y = nullptr;
-//        mutable char *m_cubeMap_Pos_Z = nullptr;
-//        mutable char *m_cubeMap_Neg_Z = nullptr;
+//        CachedTexture textureInfo;
+//        char *data = nullptr;
+//        int32_t width = 0;
+//        int32_t height = 0;
+//        int32_t bitsPerPixel = 0;
 //    };
+//}
 //
-//    inline int Texture::GetWidth() const
+//namespace feng
+//{
+//    inline int32_t Texture::GetWidth() const
 //    {
-//        return m_width;
+//        return width;
 //    }
 //
-//    inline int Texture::GetHeight() const
+//    inline int32_t Texture::GetHeight() const
 //    {
-//        return m_height;
+//        return height;
 //    }
 //
-//    inline int Texture::GetBpp() const
+//    inline int32_t Texture::GetBpp() const
 //    {
-//        return m_bitsPerPixel;
+//        return bitsPerPixel;
 //    }
 //
 //    inline const char * Texture::GetData() const
 //    {
-//        return m_data;
+//        return data;
 //    }
 //
 //    inline TextureType Texture::GetType() const
 //    {
-//        return m_textureInfo.Type;
+//        return textureInfo.Type;
 //    }
 //
 //    inline TextureWarapMode Texture::GetWrapMode() const

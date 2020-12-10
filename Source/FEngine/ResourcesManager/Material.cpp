@@ -1,98 +1,73 @@
-//#include <FEngine/ResourcesManager/Material.h>
-//
-//#include <FEngine/ResourcesManager/ResourceManager.h>
-//#include <FEngine/Utils/Debug.h>
-//
-//namespace feng
-//{
-//    bool Material::HasTexture(const char *name) const
-//    {
-//        return m_textures.HasKey(name);
-//    }
-//
-//    bool Material::HasFloat(const char *name) const
-//    {
-//        return m_floats.HasKey(name);
-//    }
-//
-//    bool Material::HasVector4(const char *name) const
-//    {
-//        return m_vectors4.HasKey(name);
-//    }
-//
-//    const Texture * Material::GetTexture(const char *name) const
-//    {
-//        Texture *texture = nullptr;
-//        if (m_textures.TryGetValue(name, texture))
-//        {
-//            return texture;
-//        }
-//
-//        Debug::LogError("Attempt to get material's texture with wrong name.");
-//        return nullptr;
-//    }
-//
-//    float Material::GetFloat(const char *name) const
-//    {
-//        float value;
-//        if (m_floats.TryGetValue(name, value))
-//        {
-//            return value;
-//        }
-//
-//        return 0;
-//    }
-//
-//    Vector4 Material::GetVector4(const char *name) const
-//    {
-//        Vector4 value;
-//        if (m_vectors4.TryGetValue(name, value))
-//        {
-//            return value;
-//        }
-//
-//        return Vector4(0, 0, 0, 0);
-//    }
-//
-//    void Material::SetTexture(const char *name, Texture *texture)
-//    {
-//        if (m_textures.HasKey(name))
-//        {
-//            m_textures[name] = texture;
-//        }
-//        else
-//        {
-//            m_textures.Add(name, texture);
-//        }
-//    }
-//
-//    void Material::SetFloat(const char *name, float value)
-//    {
-//        if (m_floats.HasKey(name))
-//        {
-//            m_floats[name] = value;
-//        }
-//        else
-//        {
-//            m_floats.Add(name, value);
-//        }
-//    }
-//
-//    void Material::SetVector4(const char *name, const Vector4& value)
-//    {
-//        if (m_vectors4.HasKey(name))
-//        {
-//            m_vectors4[name] = value;
-//        }
-//        else
-//        {
-//            m_vectors4.Add(name, value);
-//        }
-//    }
-//
-//    void Material::Destroy()
-//    {
-//        ResourcesManager *manager = ResourcesManager::GetInstance();
-//        manager->DestroyResource(GetId());
-//    }
-//}
+#include <FEngine/ResourcesManager/Material.h>
+
+#include <FEngine/ResourcesManager/ResourceManager.h>
+#include <FEngine/ResourcesManager/Shader.h>
+
+namespace feng
+{
+    Material::Material(std::unique_ptr<Shader>&& aShader)
+        : shader {std::move(aShader)}
+    { }
+
+    bool Material::HasTexture(const std::string& name) const
+    {
+        return textures.find(name) != textures.end();
+    }
+
+    bool Material::HasFloat(const std::string& name) const
+    {
+        return floats.find(name) != floats.end();
+    }
+
+    bool Material::HasVector4(const std::string& name) const
+    {
+        return vectors4.find(name) != vectors4.end();
+    }
+
+    const Texture * Material::GetTexture(const std::string& name) const
+    {
+        if(auto it = textures.find(name); it != textures.end())
+        {
+            return it->second;
+        }
+
+        return nullptr;
+    }
+
+    void Material::SetTexture(const std::string& name, Texture *texture)
+    {
+        textures[name] = texture;
+    }
+
+    bool Material::TryGetFloat(const std::string& name, float& value) const
+    {
+        if (auto it = floats.find(name); it != floats.end())
+        {
+            value = it->second;
+            return true;
+        }
+
+        return false;
+    }
+
+    void Material::SetFloat(const std::string& name, float value)
+    {
+        floats[name] = value;
+    }
+
+    bool Material::TryGetVector4(const std::string& name, Vector4& value) const
+    {
+        if (auto it = vectors4.find(name); it != vectors4.end())
+        {
+            value = it->second;
+            return true;
+        }
+
+        return false;
+    }
+
+    void Material::SetVector4(const std::string& name, const Vector4& value)
+    {
+        vectors4[name] = value;
+    }
+}
