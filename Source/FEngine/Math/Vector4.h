@@ -13,6 +13,8 @@ namespace feng
         Vector4(const Vector4&) = default;
         Vector4(Vector4&&) = default;
 
+        Vector3 GetXyz() const;
+
         Vector4& operator = (const Vector4& other) = default;
         Vector4& operator = (Vector4&& other) = default;
 
@@ -39,4 +41,9 @@ namespace feng
     inline Vector4::Vector4(const Vector3& aXyz, float aW)
         : data {aXyz.x, aXyz.y, aXyz.z, aW}
     { }
+
+    inline Vector3 Vector4::GetXyz() const
+    {
+        return Vector3 {x, y, z};
+    }
 }

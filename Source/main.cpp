@@ -3,15 +3,16 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
+#include <FEngine/Math/Matrix4.h>
+#include <FEngine/Math/MatrixUtils.h>
+#include <FEngine/Math/Vector3.h>
 #include <FEngine/ResourcesManager/Shader.h>
 #include <FEngine/ResourcesManager/TextureData.h>
 #include <FEngine/ScenesManager/Camera.h>
 #include <FEngine/ScenesManager/Entity.h>
 #include <FEngine/ScenesManager/Transform.h>
 #include <FEngine/Utils/Debug.h>
-#include <FEngine/Math/Matrix4.h>
-#include <FEngine/Math/MatrixUtils.h>
-#include <FEngine/Math/Vector3.h>
+#include <FEngine/Utils/MaterialConstants.h>
 
 #include <cmath>
 #include <sstream>
@@ -198,6 +199,8 @@ namespace SRender
 {
     const char *UnlitTexture2MixFsName = "Unlit/UnlitTexture2MixFs.fs";
     const char *UnlitTexture2MixVsName = "Unlit/UnlitTexture2MixVs.vs";
+    const char *TextureFsName = "TextureFs.fs";
+    const char *TextureVsName = "TextureVs.vs";
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *awesomeFacePng = "awesomeface.png";
 
@@ -266,13 +269,16 @@ namespace SRender
         feng::Vector3(-1.3f,  1.0f, -1.5f)
     };
 
+    feng::Vector4 lightColor {1.f, 0.f, 0.f, 0.f};
+
     // Loaded data.
 
     GLuint shapeVao;
     GLuint shapeEbo;
     GLuint textureObj1;
     GLuint textureObj3;
-    std::unique_ptr<feng::Shader> modelViewProjShader;
+    std::unique_ptr<feng::Shader> unlitTexture2MixShader;
+    std::unique_ptr<feng::Shader> textureShader;
 
     std::unique_ptr<feng::TextureData> woodenContainerTexture;
     std::unique_ptr<feng::TextureData> awesomeFaceTexture;
@@ -336,7 +342,8 @@ namespace SRender
 
     void LoadShaders()
     {
-        modelViewProjShader = SMain::LoadTempShader(SRender::UnlitTexture2MixVsName, SRender::UnlitTexture2MixFsName);
+        unlitTexture2MixShader = SMain::LoadTempShader(SRender::UnlitTexture2MixVsName, SRender::UnlitTexture2MixFsName);
+        textureShader = SMain::LoadTempShader(SRender::TextureVsName, SRender::TextureFsName);
     }
 
     void LoadTextures()
@@ -452,8 +459,8 @@ namespace SRender
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureObj1);
 
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, textureObj3);
+//        glActiveTexture(GL_TEXTURE1);
+//        glBindTexture(GL_TEXTURE_2D, textureObj3);
 
         glBindVertexArray(vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -464,9 +471,8 @@ namespace SRender
             feng::Matrix4 modelTransformMatrix = modelTransform.GetGlobalMatrix();
             feng::Camera *camera = SMain::camEntity->GetComponent<feng::Camera>();
 
-            shader.SetUniformMatrix4("uModelMatrix", modelTransformMatrix);
-            shader.SetUniformMatrix4("uViewProjMatrix", camera->GetViewProjectionMatrix());
-            shader.SetUniformFloat("uMixValue", SMain::mixValue);
+            shader.SetUniformMatrix4(feng::uniform::ModelMatrix, modelTransformMatrix);
+            shader.SetUniformMatrix4(feng::uniform::ViewProjMatrix, camera->GetViewProjectionMatrix());
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
     }
@@ -483,10 +489,16 @@ int main(int argc, const char * argv[])
         Print_Errors_OpengGL();
         feng::Debug::LogMessage("Start loop.");
 
-        SRender::modelViewProjShader->StartUse();
-        SRender::modelViewProjShader->SetUniformInt("uTexture0", 0);
-        SRender::modelViewProjShader->SetUniformInt("uTexture1", 1);
-        SRender::modelViewProjShader->StopUse();
+//        SRender::unlitTexture2MixShader->StartUse();
+//        SRender::unlitTexture2MixShader->SetUniformInt(feng::uniform::Texture0, 0);
+//        SRender::unlitTexture2MixShader->SetUniformInt(feng::uniform::Texture1, 1);
+//        SRender::unlitTexture2MixShader->StopUse();
+
+        SRender::textureShader->StartUse();
+        SRender::textureShader->SetUniformInt(feng::uniform::Texture0, 0);
+        SRender::textureShader->SetUniformVector3(feng::uniform::LightColor, SRender::lightColor.GetXyz());
+//        SRender::textureShader->SetUniformInt(feng::uniform::Texture1, 1);
+        SRender::textureShader->StopUse();
 
         while(!glfwWindowShouldClose(window))
         {
@@ -498,7 +510,7 @@ int main(int argc, const char * argv[])
             SRender::UpdateCamera();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::modelViewProjShader);
+            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::textureShader);
             glfwSwapBuffers(window);
             glfwPollEvents();
 

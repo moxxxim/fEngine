@@ -179,6 +179,33 @@ namespace feng
         return false;
     }
 
+    bool Shader::SetUniformVector3(const std::string& name, const Vector3& value)
+    {
+        uint32_t location = k_undefinedShaderParamLocation;
+        if(TryGetUniformLocation(name, location))
+        {
+            glUniform3f(location, value.x, value.y, value.z);
+        }
+    }
+
+    bool Shader::SetUniformVector4(const std::string& name, const Vector4& value)
+    {
+        uint32_t location = k_undefinedShaderParamLocation;
+        if(TryGetUniformLocation(name, location))
+        {
+            glUniform4f(location, value.x, value.y, value.z, value.w);
+        }
+    }
+
+    bool Shader::SetUniformMatrix4(const std::string& name, const Matrix4& matrix)
+    {
+        uint32_t location = k_undefinedShaderParamLocation;
+        if(TryGetUniformLocation(name, location))
+        {
+            glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data);
+        }
+    }
+
     bool Shader::SetUniformFloatArray(const std::string& name, const float *value, int size)
     {
         uint32_t location = k_undefinedShaderParamLocation;
@@ -189,15 +216,6 @@ namespace feng
         }
 
         return false;
-    }
-
-    bool Shader::SetUniformMatrix4(const std::string& name, const Matrix4& matrix)
-    {
-        uint32_t location = k_undefinedShaderParamLocation;
-        if(TryGetUniformLocation(name, location))
-        {
-            glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data);
-        }
     }
 
     void Shader::EnableState() const

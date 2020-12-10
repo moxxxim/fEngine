@@ -2,6 +2,8 @@
 
 #include <FEngine/ResourcesManager/CachedShader.h>
 #include <FEngine/Math/Matrix4.h>
+#include <FEngine/Math/Vector3.h>
+#include <FEngine/Math/Vector4.h>
 
 #include <map>
 #include <string>
@@ -37,10 +39,12 @@ namespace feng
         bool SetUniformBool(const std::string& name, bool value);
         bool SetUniformInt(const std::string& name, int32_t value);
         bool SetUniformFloat(const std::string& name, float value);
-        bool SetUniformFloatArray(const std::string& name, const float *value, int size);
+        bool SetUniformVector3(const std::string& name, const Vector3& value);
+        bool SetUniformVector4(const std::string& name, const Vector4& value);
         bool SetUniformMatrix4(const std::string& name, const Matrix4& matrix);
 
     private:
+        bool SetUniformFloatArray(const std::string& name, const float *value, int size);
         void EnableState() const;
         void DisableStates() const;
         void FetchActiveAttributes();
