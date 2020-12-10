@@ -61,6 +61,34 @@ namespace SMain
 
     std::unique_ptr<feng::Entity> camEntity;
 
+    void LogOpenGLInfo()
+    {
+        GLint extensionsCount = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &extensionsCount);
+
+        std::vector<const GLubyte*> extensions;
+        for(GLint i = 0; i < extensionsCount; ++i)
+        {
+            const GLubyte* extension = glGetStringi(GL_EXTENSIONS, i);
+            extensions.push_back(extension);
+        }
+
+        const GLubyte *version = glGetString(GL_VERSION);
+        const GLubyte *vendor = glGetString(GL_VENDOR);
+        const GLubyte *renderer = glGetString(GL_RENDERER);
+
+        std::cout << "OpenGL Version: " << version << "\n";
+        std::cout << "OpenGL Vendor: " << vendor << "\n";
+        std::cout << "OpenGL Renderer: " << renderer << "\n";
+        std::cout << "OpenGL Supported Extensions:\n";
+        for(const GLubyte* extension : extensions)
+        {
+            std::cout << extension << "\n";
+        }
+        
+        std::cout << "\n";
+    }
+
     bool TryInitGlfw()
     {
         int initResult = glfwInit();
@@ -540,6 +568,7 @@ int main(int argc, const char * argv[])
     if(SMain::TryInitGlfw())
     {
         GLFWwindow *window = SMain::CreateWindow();
+        SMain::LogOpenGLInfo();
 
         SRender::InitRender();
 
