@@ -1,6 +1,5 @@
 #pragma once
 
-//#include <FEngine/App/Object.h>
 #include <FEngine/ResourcesManager/CachedShader.h>
 #include <FEngine/Math/Matrix4.h>
 
@@ -11,7 +10,7 @@ namespace feng
 {
     enum class ShaderStates : int;
 
-    class Shader final // : public Object
+    class Shader final
     {
     public:
         enum class eType : uint8_t
@@ -27,7 +26,6 @@ namespace feng
         void Unload();
         void StartUse() const;
         void StopUse() const;
-        //void Destroy() override;
 
         const std::map<std::string, int32_t> &GetAttributes() const;
         const std::map<std::string, int32_t> &GetUniforms() const;

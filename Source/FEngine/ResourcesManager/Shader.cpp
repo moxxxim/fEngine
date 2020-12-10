@@ -18,8 +18,8 @@ namespace feng
         uint32_t CompileShader(Shader::eType type, const std::string& sourceCode)
         {
             int glShaderType = (type == Shader::eType::Vertex)
-            ? GL_VERTEX_SHADER
-            : GL_FRAGMENT_SHADER;
+                ? GL_VERTEX_SHADER
+                : GL_FRAGMENT_SHADER;
             GLuint shader = glCreateShader(glShaderType);
             if(shader != 0)
             {
@@ -48,10 +48,9 @@ namespace feng
         }
     }
 
-    Shader::Shader(const CachedShader& cachedShader) :
-        //Object(ObjectType::Resource),
-        m_program(k_undefinedShaderParamLocation),
-        m_cachedInfo(cachedShader)
+    Shader::Shader(const CachedShader& cachedShader)
+        : m_program(k_undefinedShaderParamLocation)
+        , m_cachedInfo(cachedShader)
     {
         Load();
     }
@@ -123,12 +122,6 @@ namespace feng
     {
         DisableStates();
     }
-
-    //    void Shader::Destroy()
-    //    {
-    //        ResourcesManager *manager = ResourcesManager::GetInstance();
-    //        manager->DestroyResource(GetId());
-    //    }
 
     bool Shader::TryGetAttributeLocation(const std::string& name, uint32_t& location) const
     {
