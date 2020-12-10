@@ -13,3 +13,4 @@
 12. Add unit tests.
 13. math utils.
 14. Introduce Compnent/System + Behaviours.
+15. Implement Color class.

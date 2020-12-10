@@ -77,6 +77,9 @@ namespace feng
             extensions.push_back(extension);
         }
 
+        int maxAttributes;
+        glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttributes);
+
         const GLubyte *version = glGetString(GL_VERSION);
         const GLubyte *vendor = glGetString(GL_VENDOR);
         const GLubyte *renderer = glGetString(GL_RENDERER);
@@ -84,6 +87,7 @@ namespace feng
         std::cout << "OpenGL Version: " << version << "\n";
         std::cout << "OpenGL Vendor: " << vendor << "\n";
         std::cout << "OpenGL Renderer: " << renderer << "\n";
+        std::cout << "OpenGL Maximum vertex attributes number: " << maxAttributes << "\n";
         std::cout << "OpenGL Supported Extensions:\n";
         for(const GLubyte* extension : extensions)
         {

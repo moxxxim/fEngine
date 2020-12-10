@@ -30,7 +30,7 @@ namespace SMain
     float lastY = Height / 2.f;
     float Zoom = 45;
 
-    float deltaTime = 0.0f;    // Time between current frame and last frame
+    float deltaTime = 0.0f;
     float lastFrame = 0.0f;
     float mixValue = 0.f;
     const float cameraSpeed = 3.f;
@@ -322,7 +322,7 @@ namespace SRender
         GLuint vbo;
         glGenBuffers(1, &vbo);
 
-        // Vind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+        // Bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
         glBindVertexArray(vao);
 
         // Bind buffer object.
@@ -436,11 +436,6 @@ namespace SRender
     {
         feng::Debug::LogRenderInfoOpenGL();
         feng::Debug::LogMessage("Initialize render.");
-        // Log maximal number of vertex attributes available
-
-        int nrAttributes;
-        glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-        std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << "\n";
 
         // Specify clear value for color buffer: color to fill color buffer with after call to "glClear(GL_COLOR_BUFFER_BIT)".
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
