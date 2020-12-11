@@ -1,8 +1,7 @@
 #include <Feng/ResourcesManager/Shader.h>
 
-#include <Feng/ResourcesManager/CachedShader.h>
 #include <Feng/ResourcesManager/ResourcesManager.h>
-#include <Feng/ResourcesManager/ShaderParams.h>
+#include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/Utils/Debug.h>
 
 #include <OpenGL/gl.h>
@@ -44,15 +43,14 @@ namespace feng
                 }
             }
 
-            return shader;
+            return static_cast<uint32_t>(shader);
         }
     }
 
-    Shader::Shader(const CachedShader& cachedShader)
-        : m_program(k_undefinedShaderParamLocation)
-        , m_cachedInfo(cachedShader)
+    Shader::Shader(const std::string& vs, const std::string& fs)
+        : program{UndefinedProgram}
     {
-        Load();
+        Load(vs, fs);
     }
 
     Shader::~Shader()
@@ -60,62 +58,10 @@ namespace feng
         Unload();
     }
 
-    void Shader::Load()
-    {
-        uint32_t vertexShader = SShader::CompileShader(Shader::eType::Vertex, m_cachedInfo.Vs);
-        if (vertexShader == 0)
-        {
-            return;
-        }
-
-        uint32_t fragmentShader = SShader::CompileShader(Shader::eType::Fragment, m_cachedInfo.Fs);
-        if (fragmentShader == 0)
-        {
-            glDeleteShader(vertexShader);
-            return;
-        }
-
-        m_program = glCreateProgram();
-        if(m_program != 0)
-        {
-            glAttachShader(m_program, vertexShader);
-            glAttachShader(m_program, fragmentShader);
-            glLinkProgram(m_program);
-
-            GLint success;
-            glGetProgramiv(m_program, GL_LINK_STATUS, &success);
-            if(!success)
-            {
-                constexpr int logSize = 512;
-                char errorLog[logSize];
-                glGetProgramInfoLog(m_program, logSize, nullptr, errorLog);
-
-                Debug::LogError("Failed to create shader program:");
-                Debug::LogError(errorLog);
-
-                glDeleteProgram(m_program);
-            }
-        }
-
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        if (m_program != 0)
-        {
-            FetchActiveAttributes();
-            FetchActiveUniforms();
-        }
-    }
-
-    void Shader::Unload()
-    {
-        glDeleteProgram(m_program);
-    }
-
     void Shader::StartUse() const
     {
         EnableState();
-        glUseProgram(m_program);
+        glUseProgram(program);
     }
 
     void Shader::StopUse() const
@@ -125,7 +71,7 @@ namespace feng
 
     bool Shader::TryGetAttributeLocation(const char *name, uint32_t& location) const
     {
-        if(auto it = m_attributes.find(name); it != m_attributes.end())
+        if(auto it = attributes.find(name); it != attributes.end())
         {
             location = it->second;
             return true;
@@ -136,7 +82,7 @@ namespace feng
 
     bool Shader::TryGetUniformLocation(const char *name, uint32_t& location) const
     {
-        if(auto it = m_uniforms.find(name); it != m_uniforms.end())
+        if(auto it = uniforms.find(name); it != uniforms.end())
         {
             location = it->second;
             return true;
@@ -147,18 +93,18 @@ namespace feng
 
     bool Shader::HasUniform(const char *name) const
     {
-        auto it = m_uniforms.find(name);
-        return it != m_uniforms.end();
+        auto it = uniforms.find(name);
+        return it != uniforms.end();
     }
 
-    bool Shader::SetUniformBool(const char *name, bool value)
+    bool Shader::SetUniformBool(const char *name, bool value) const
     {
         SetUniformInt(name, static_cast<int32_t>(value));
     }
 
-    bool Shader::SetUniformInt(const char *name, int32_t value)
+    bool Shader::SetUniformInt(const char *name, int32_t value) const
     {
-        if(auto it = m_uniforms.find(name); it != m_uniforms.end())
+        if(auto it = uniforms.find(name); it != uniforms.end())
         {
             glUniform1i(it->second, value);
             return true;
@@ -167,9 +113,9 @@ namespace feng
         return false;
     }
 
-    bool Shader::SetUniformFloat(const char *name, float value)
+    bool Shader::SetUniformFloat(const char *name, float value) const
     {
-        uint32_t location = k_undefinedShaderParamLocation;
+        uint32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniform1f(location, value);
@@ -179,36 +125,45 @@ namespace feng
         return false;
     }
 
-    bool Shader::SetUniformVector3(const char *name, const Vector3& value)
+    bool Shader::SetUniformVector2(const char *name, const Vector2& value) const
     {
-        uint32_t location = k_undefinedShaderParamLocation;
+        uint32_t location = UndefinedParamLocation;
+        if(TryGetUniformLocation(name, location))
+        {
+            glUniform2f(location, value.x, value.y);
+        }
+    }
+
+    bool Shader::SetUniformVector3(const char *name, const Vector3& value) const
+    {
+        uint32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniform3f(location, value.x, value.y, value.z);
         }
     }
 
-    bool Shader::SetUniformVector4(const char *name, const Vector4& value)
+    bool Shader::SetUniformVector4(const char *name, const Vector4& value) const
     {
-        uint32_t location = k_undefinedShaderParamLocation;
+        uint32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniform4f(location, value.x, value.y, value.z, value.w);
         }
     }
 
-    bool Shader::SetUniformMatrix4(const char *name, const Matrix4& matrix)
+    bool Shader::SetUniformMatrix4(const char *name, const Matrix4& matrix) const
     {
-        uint32_t location = k_undefinedShaderParamLocation;
+        uint32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data);
         }
     }
 
-    bool Shader::SetUniformFloatArray(const char *name, const float *value, int size)
+    bool Shader::SetUniformFloatArray(const char *name, const float *value, int size) const
     {
-        uint32_t location = k_undefinedShaderParamLocation;
+        uint32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniform1fv(location, size, value);
@@ -220,45 +175,45 @@ namespace feng
 
     void Shader::EnableState() const
     {
-        if ((int)m_cachedInfo.States & (int)ShaderStates::Culling)
-        {
-            glEnable(GL_CULL_FACE);
-        }
-
-        if ((int)m_cachedInfo.States & (int)ShaderStates::AlphaTest)
-        {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        }
-
-        if ((int)m_cachedInfo.States & (int)ShaderStates::DepthTest)
-        {
-            glEnable(GL_DEPTH_TEST);
-        }
+//        if ((int)m_cachedInfo.States & (int)ShaderStates::Culling)
+//        {
+//            glEnable(GL_CULL_FACE);
+//        }
+//
+//        if ((int)m_cachedInfo.States & (int)ShaderStates::AlphaTest)
+//        {
+//            glEnable(GL_BLEND);
+//            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//        }
+//
+//        if ((int)m_cachedInfo.States & (int)ShaderStates::DepthTest)
+//        {
+//            glEnable(GL_DEPTH_TEST);
+//        }
     }
 
     void Shader::DisableStates() const
     {
-        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::Culling)
-        {
-            glDisable(GL_CULL_FACE);
-        }
-
-        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::AlphaTest)
-        {
-            glDisable(GL_BLEND);
-        }
-
-        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::DepthTest)
-        {
-            glDisable(GL_DEPTH_TEST);
-        }
+//        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::Culling)
+//        {
+//            glDisable(GL_CULL_FACE);
+//        }
+//
+//        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::AlphaTest)
+//        {
+//            glDisable(GL_BLEND);
+//        }
+//
+//        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::DepthTest)
+//        {
+//            glDisable(GL_DEPTH_TEST);
+//        }
     }
 
     void Shader::FetchActiveAttributes()
     {
         int attributesCount;
-        glGetProgramiv(m_program, GL_ACTIVE_ATTRIBUTES, &attributesCount);
+        glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &attributesCount);
 
         for (int i = 0; i < attributesCount; ++i)
         {
@@ -266,11 +221,11 @@ namespace feng
             GLint length = 0;
             GLint size = 0;
             GLenum type = 0;
-            glGetActiveAttrib(m_program, i, 80, &length, &size, &type, name);
-            int attributeLocation = glGetAttribLocation(m_program, name);
-            if (attributeLocation != k_undefinedShaderParamLocation)
+            glGetActiveAttrib(program, i, 80, &length, &size, &type, name);
+            int attributeLocation = glGetAttribLocation(program, name);
+            if (attributeLocation != UndefinedParamLocation)
             {
-                m_attributes[name] = attributeLocation;
+                attributes[name] = attributeLocation;
             }
         }
     }
@@ -278,7 +233,7 @@ namespace feng
     void Shader::FetchActiveUniforms()
     {
         int uniformsCount;
-        glGetProgramiv(m_program, GL_ACTIVE_UNIFORMS, &uniformsCount);
+        glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformsCount);
 
         for (int i = 0; i < uniformsCount; ++i)
         {
@@ -286,31 +241,82 @@ namespace feng
             GLint length = 0;
             GLint size = 0;
             GLenum type = 0;
-            glGetActiveUniform(m_program, i, 80, &length, &size, &type, name);
-            int uniformLocation = glGetUniformLocation(m_program, name);
-            if (uniformLocation != k_undefinedShaderParamLocation)
+            glGetActiveUniform(program, i, 80, &length, &size, &type, name);
+            int uniformLocation = glGetUniformLocation(program, name);
+            if (uniformLocation != UndefinedParamLocation)
             {
-                m_uniforms[name] = uniformLocation;
+                uniforms[name] = uniformLocation;
             }
         }
     }
 
+    void Shader::Load(const std::string& vs, const std::string& fs)
+    {
+        uint32_t vertexShader = SShader::CompileShader(Shader::eType::Vertex, vs);
+        if (vertexShader == UndefinedProgram)
+        {
+            return;
+        }
+
+        uint32_t fragmentShader = SShader::CompileShader(Shader::eType::Fragment, fs);
+        if (fragmentShader == UndefinedProgram)
+        {
+            glDeleteShader(vertexShader);
+            return;
+        }
+
+        program = glCreateProgram();
+        if(program != UndefinedProgram)
+        {
+            glAttachShader(program, vertexShader);
+            glAttachShader(program, fragmentShader);
+            glLinkProgram(program);
+
+            GLint success;
+            glGetProgramiv(program, GL_LINK_STATUS, &success);
+            if(!success)
+            {
+                constexpr int logSize = 512;
+                char errorLog[logSize];
+                glGetProgramInfoLog(program, logSize, nullptr, errorLog);
+
+                Debug::LogError("Failed to create shader program:");
+                Debug::LogError(errorLog);
+
+                glDeleteProgram(program);
+            }
+        }
+
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+
+        if (program != UndefinedProgram)
+        {
+            FetchActiveAttributes();
+            FetchActiveUniforms();
+        }
+    }
+
+    void Shader::Unload()
+    {
+        glDeleteProgram(program);
+    }
+
     std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath)
     {
-        CachedShader cachedShader;
         std::ifstream vShaderFile;
         std::ifstream fShaderFile;
 
         vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
         fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+
+        std::stringstream vShaderStream;
+        std::stringstream fShaderStream;
         try
         {
             // open files
             vShaderFile.open(vsPath);
             fShaderFile.open(fsPath);
-
-            std::stringstream vShaderStream;
-            std::stringstream fShaderStream;
 
             // read file's buffer contents into streams
             vShaderStream << vShaderFile.rdbuf();
@@ -319,15 +325,12 @@ namespace feng
             // close file handlers
             vShaderFile.close();
             fShaderFile.close();
-
-            cachedShader.Vs = vShaderStream.str();
-            cachedShader.Fs = fShaderStream.str();
         }
         catch(const std::ifstream::failure &e)
         {
             Debug::LogError("Failed to load shader file: " + vsPath + ", " + fsPath + ". Error: " + e.what());
         }
 
-        return std::make_unique<Shader>(cachedShader);
+        return std::make_unique<Shader>(vShaderStream.str(), fShaderStream.str());
     }
 }

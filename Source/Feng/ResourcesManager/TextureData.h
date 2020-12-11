@@ -14,13 +14,13 @@ namespace feng
         ~TextureData();
 
         bool IsValid() const;
-        const unsigned char* GetData() const;
+        const uint8_t* GetData() const;
         int32_t GetWidth() const;
         int32_t GetHeight() const;
-        int32_t GetChanelsCount() const;
+        int32_t GetChanels() const;
 
     private:
-        unsigned char *data = nullptr;
+        uint8_t *data = nullptr;
         int32_t width;
         int32_t height;
         int32_t chanelsCount;
@@ -34,7 +34,7 @@ namespace feng
         return data != nullptr;
     }
 
-    inline const unsigned char* TextureData::GetData() const
+    inline const uint8_t* TextureData::GetData() const
     {
         return data;
     }
@@ -49,7 +49,7 @@ namespace feng
         return height;
     }
 
-    inline int32_t TextureData::GetChanelsCount() const
+    inline int32_t TextureData::GetChanels() const
     {
         return chanelsCount;
     }

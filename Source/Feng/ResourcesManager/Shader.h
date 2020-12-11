@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Feng/ResourcesManager/CachedShader.h>
 #include <Feng/Math/Matrix4.h>
+#include <Feng/Math/Vector2.h>
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
 
@@ -21,11 +21,10 @@ namespace feng
             Fragment = 1,
         };
 
-        Shader(const CachedShader& cachedShader);
+        Shader(const std::string& vs, const std::string& fs);
         ~Shader();
 
-        void Load();
-        void Unload();
+        bool IsLoaded() const;
         void StartUse() const;
         void StopUse() const;
 
@@ -36,26 +35,29 @@ namespace feng
         bool TryGetUniformLocation(const char *name, uint32_t& location) const;
         bool HasUniform(const char *name) const;
 
-        bool SetUniformBool(const char *name, bool value);
-        bool SetUniformInt(const char *name, int32_t value);
-        bool SetUniformFloat(const char *name, float value);
-        bool SetUniformVector3(const char *name, const Vector3& value);
-        bool SetUniformVector4(const char *name, const Vector4& value);
-        bool SetUniformMatrix4(const char *name, const Matrix4& matrix);
+        bool SetUniformBool(const char *name, bool value) const;
+        bool SetUniformInt(const char *name, int32_t value) const;
+        bool SetUniformFloat(const char *name, float value) const;
+        bool SetUniformVector2(const char *name, const Vector2& value) const;
+        bool SetUniformVector3(const char *name, const Vector3& value) const;
+        bool SetUniformVector4(const char *name, const Vector4& value) const;
+        bool SetUniformMatrix4(const char *name, const Matrix4& matrix) const;
 
     private:
-        bool SetUniformFloatArray(const char *name, const float *value, int size);
+        bool SetUniformFloatArray(const char *name, const float *value, int size) const;
         void EnableState() const;
         void DisableStates() const;
         void FetchActiveAttributes();
         void FetchActiveUniforms();
+        void Load(const std::string& vs, const std::string& fs);
+        void Unload();
 
-        static const int32_t k_undefinedShaderParamLocation = -1;
+        static const int32_t UndefinedProgram = 0;
+        static const int32_t UndefinedParamLocation = -1;
 
-        uint32_t m_program = 0;
-        std::map<std::string, int32_t> m_attributes;
-        std::map<std::string, int32_t> m_uniforms;
-        CachedShader m_cachedInfo;
+        std::map<std::string, int32_t> attributes;
+        std::map<std::string, int32_t> uniforms;
+        uint32_t program = Shader::UndefinedProgram;
     };
 
     std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath);
@@ -63,13 +65,18 @@ namespace feng
 
 namespace feng
 {
+    inline bool Shader::IsLoaded() const
+    {
+        return program != Shader::UndefinedProgram;
+    }
+
     inline const std::map<std::string, int32_t> &Shader::GetAttributes() const
     {
-        return m_attributes;
+        return attributes;
     }
 
     inline const std::map<std::string, int32_t> &Shader::GetUniforms() const
     {
-        return m_uniforms;
+        return uniforms;
     }
 }

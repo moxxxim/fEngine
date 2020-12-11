@@ -7,7 +7,7 @@
 #include <Feng/Math/MatrixUtils.h>
 #include <Feng/Math/Vector3.h>
 #include <Feng/ResourcesManager/Shader.h>
-#include <Feng/ResourcesManager/ShaderParams.h>
+#include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/ResourcesManager/TextureData.h>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>

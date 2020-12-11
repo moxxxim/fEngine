@@ -34,8 +34,5 @@ namespace feng
         static constexpr std::string_view VertexNorm {"aNorm"};
         static constexpr std::string_view VertexBinorm {"aBinorm"};
         static constexpr std::string_view VertexTangent {"aTangent"};
-
-//        const std::array<std::string_view, ReservedAttributesCount> ReservedAttributes;
-//        const std::array<std::string_view, ReservedUniformsCount> ReservedUniforms;
     };
 }

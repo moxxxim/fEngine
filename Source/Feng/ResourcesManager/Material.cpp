@@ -9,6 +9,16 @@ namespace feng
         : shader {std::move(aShader)}
     { }
 
+    bool Material::HasShader() const
+    {
+        if(shader != nullptr)
+        {
+            return shader->IsLoaded();
+        }
+
+        return false;
+    }
+
     bool Material::HasTexture(const std::string& name) const
     {
         return textures.find(name) != textures.end();
@@ -24,7 +34,43 @@ namespace feng
         return vectors4.find(name) != vectors4.end();
     }
 
-    const Texture * Material::GetTexture(const std::string& name) const
+    void Material::SetFloat(const std::string& name, float value)
+    {
+        floats[name] = value;
+    }
+
+    void Material::SetInt(const std::string& name, int value)
+    {
+        ints[name] = value;
+    }
+
+    void Material::SetTexture(const std::string& name, const Texture *texture)
+    {
+        textures[name] = texture;
+    }
+
+    void Material::SetVector2(const std::string& name, Vector2 value)
+    {
+        vectors2[name] = value;
+    }
+
+    void Material::SetVector3(const std::string& name, Vector3 value)
+    {
+        vectors3[name] = value;
+    }
+
+    void Material::SetVector4(const std::string& name, const Vector4& value)
+    {
+        vectors4[name] = value;
+    }
+
+    Texture* Material::GetTexture(const std::string& name)
+    {
+        const Texture* texture = static_cast<const Material*>(this)->GetTexture(name);
+        return const_cast<Texture*>(texture);
+    }
+
+    const Texture* Material::GetTexture(const std::string& name) const
     {
         if(auto it = textures.find(name); it != textures.end())
         {
@@ -32,42 +78,5 @@ namespace feng
         }
 
         return nullptr;
-    }
-
-    void Material::SetTexture(const std::string& name, Texture *texture)
-    {
-        textures[name] = texture;
-    }
-
-    bool Material::TryGetFloat(const std::string& name, float& value) const
-    {
-        if (auto it = floats.find(name); it != floats.end())
-        {
-            value = it->second;
-            return true;
-        }
-
-        return false;
-    }
-
-    void Material::SetFloat(const std::string& name, float value)
-    {
-        floats[name] = value;
-    }
-
-    bool Material::TryGetVector4(const std::string& name, Vector4& value) const
-    {
-        if (auto it = vectors4.find(name); it != vectors4.end())
-        {
-            value = it->second;
-            return true;
-        }
-
-        return false;
-    }
-
-    void Material::SetVector4(const std::string& name, const Vector4& value)
-    {
-        vectors4[name] = value;
     }
 }

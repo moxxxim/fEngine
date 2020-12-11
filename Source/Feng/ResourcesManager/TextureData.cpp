@@ -10,7 +10,7 @@ namespace feng
 
         stbi_set_flip_vertically_on_load(flipOnLoad);
         stbi_uc *textureData = stbi_load(path.c_str(), &texture->width, &texture->height, &texture->chanelsCount, 0);
-        texture->data = static_cast<unsigned char*>(textureData);
+        texture->data = static_cast<uint8_t*>(textureData);
 
         return texture;
     }

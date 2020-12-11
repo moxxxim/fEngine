@@ -4,15 +4,33 @@
 
 namespace feng
 {
-    Mesh::Mesh(const std::vector<float> &aData, const std::vector<int32_t> &aIndices, eVertexAtribute aAttributes)
-        : data { aData }
+    Mesh::Mesh(const std::vector<float> &aVertices, const std::vector<uint32_t> &aIndices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives)
+        : vertices { aVertices }
         , indices { aIndices }
         , attributes { aAttributes }
+        , primitiveType { aPrimitives }
+        , vertexStride { AttributesParser::GetStride(attributes) }
     { }
 
-    Mesh::Mesh(std::vector<float> &&aData, std::vector<int32_t> &&aIndices, eVertexAtribute aAttributes)
-        : data { std::move(aData) }
+    Mesh::Mesh(std::vector<float> &&aVertices, std::vector<uint32_t> &&aIndices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives)
+        : vertices { std::move(aVertices) }
         , indices { std::move(aIndices) }
         , attributes { aAttributes }
+        , primitiveType { aPrimitives }
+        , vertexStride { AttributesParser::GetStride(attributes) }
+    { }
+
+    Mesh::Mesh(const std::vector<float> &aVertices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives)
+        : vertices { aVertices }
+        , attributes { aAttributes }
+        , primitiveType { aPrimitives }
+        , vertexStride { AttributesParser::GetStride(attributes) }
+    { }
+
+    Mesh::Mesh(std::vector<float> &&aVertices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives)
+        : vertices { std::move(aVertices) }
+        , attributes { aAttributes }
+        , primitiveType { aPrimitives }
+        , vertexStride { AttributesParser::GetStride(attributes) }
     { }
 }

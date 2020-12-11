@@ -1,411 +1,391 @@
-//#include "Transform.h"
-//#include "../App/Time.h"
-//#include "../Feng.h"
-//#include "../ResourcesManager/ResourcesManager.h"
-//#include "../ResourcesManager/ShaderParameters.h"
-//#include "RenderUtils.h"
-//#include "RenderProperties.h"
-//#include "Fog.h" 
-//#include "../Utils/VertexAttributeInfo.h"
-//#include "ScenesManager.h"
+#include <Feng/ScenesManager/MeshRenderer.h>
+
+#include <Feng/ScenesManager/Camera.h>
+#include <Feng/ScenesManager/Entity.h>
+#include <Feng/ScenesManager/Light.h>
+#include <Feng/ScenesManager/Transform.h>
+#include <Feng/ScenesManager/RenderProperties.h>
+#include <Feng/ResourcesManager/Material.h>
+#include <Feng/ResourcesManager/Mesh.h>
+#include <Feng/ResourcesManager/Shader.h>
+#include <Feng/ResourcesManager/Texture.h>
+#include <Feng/Utils/Render/ShaderParams.h>
+
+#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
+
+namespace feng
+{
+    MeshRenderer::~MeshRenderer()
+    {
+        DeleteGeomertyBuffers();
+        DeleteTextureBuffers();
+    }
+
+    void MeshRenderer::SetMaterial(const Material *aMaterial)
+    {
+        if (material != aMaterial)
+        {
+            material = aMaterial;
+            DeleteTextureBuffers();
+            if(material != nullptr)
+            {
+                CreateTexturesBuffers();
+            }
+        }
+    }
+
+    void MeshRenderer::SetMesh(const Mesh *aMesh)
+    {
+        if (mesh != aMesh)
+        {
+            mesh = aMesh;
+            DeleteGeomertyBuffers();
+            if(mesh != nullptr)
+            {
+                CreateGeometryBuffers();
+            }
+        }
+    }
+
+    bool MeshRenderer::CanDraw() const
+    {
+        if ((material != nullptr) && (mesh != nullptr))
+        {
+            return material->HasShader();
+        }
+
+        return false;
+    }
+
+    void MeshRenderer::Draw(const RenderProperties &renderProperties)
+    {
+        if (CanDraw())
+        {
+            StartDraw();
+            SetupFog(renderProperties);
+            SetupLight(renderProperties);
+            SetGlobalUniforms(*renderProperties.cam);
+            SetMaterialUniforms();
+            ExecuteDraw();
+            FinishDraw();
+        }
+    }
+
+    void MeshRenderer::StartDraw()
+    {
+        const Shader *shader = material->GetShader();
+        shader->StartUse();
+    }
+
+    void MeshRenderer::FinishDraw()
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
+
+        const Shader *shader = material->GetShader();
+        shader->StopUse();
+    }
+
+    void MeshRenderer::SetupLight(const RenderProperties &renderProperties)
+    {
+//        const char *ambientLightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::AmbientLightColor);
+//        m_shader->SetUniformVector4(ambientLightColorUniform, renderProperties->GetAmbientLightColor());
 //
-//feng::MeshRenderer::MeshRenderer()
-//{
-//	m_resources = ResourcesManager::GetInstance();
-//}
+//        int directLightsCount = renderProperties->GetDirectLightsCount();
+//        if (directLightsCount > 0)
+//        {
+//            const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightCount);
+//            m_shader->SetUniformInt(lightsCountUniform, directLightsCount);
+//            const char *lightDirectionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightDirection);
+//            const Vector3 *directions = renderProperties->GetDirectLightDirections();
+//            m_shader->SetUniformVector3Array(lightDirectionsUniform, directions, directLightsCount);
+//            const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightColor);
+//            const Vector4 *colors = renderProperties->GetDirectLightColors();
+//            m_shader->SetUniformVector4Array(lightColorUniform, colors, directLightsCount);
+//            const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightIntensity);
+//            const float *intensities = renderProperties->GetDirectLightIntensities();
+//            m_shader->SetUniformFloatArray(lightsIntensityUniform, intensities, directLightsCount);
+//        }
+
+//        int pointLightsCount = renderProperties->GetPointLightsCount();
+//        if (pointLightsCount > 0)
+//        {
+//            const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightCount);
+//            m_shader->SetUniformInt(lightsCountUniform, pointLightsCount);
+//            const char *lightPositionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightPosition);
+//            m_shader->SetUniformVector3Array(lightPositionsUniform, renderProperties->GetPointLightPositions(), pointLightsCount);
+//            const char *lightsRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightRange);
+//            m_shader->SetUniformFloatArray(lightsRangeUniform, renderProperties->GetPointLightRanges(), pointLightsCount);
+//            const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightColor);
+//            m_shader->SetUniformVector4Array(lightColorUniform, renderProperties->GetPointLightColors(), pointLightsCount);
+//            const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightIntensity);
+//            m_shader->SetUniformFloatArray(lightsIntensityUniform, renderProperties->GetPointLightIntensities(), pointLightsCount);
+//        }
+    }
+
+    void MeshRenderer::SetupFog(const RenderProperties &renderProperties)
+    {
+//        const feng::Camera *cam = renderProperties->GetCamera();
+//        const feng::Fog& fog = renderProperties->GetFog();
 //
-//feng::MeshRenderer::~MeshRenderer()
-//{
-//	glDeleteBuffers(1, &m_vbo);
-//	glDeleteBuffers(1, &m_ibo);
-//	ClearTexturesBuffers();
-//}
-//
-//void feng::MeshRenderer::SetMaterial(Material *material)
-//{
-//	if (material)
-//	{
-//		ClearTexturesBuffers();
-//
-//		m_material = material;
-//		m_shader = m_material->GetShader();
-//		SetupTexturesBuffers();
-//	}
-//}
-//
-//void feng::MeshRenderer::SetMesh(Mesh *mesh)
-//{
-//	if (mesh)
-//	{
-//		if (m_vbo)
-//		{
-//			glDeleteBuffers(1, &m_vbo);
-//		}
-//
-//		if (m_ibo)
-//		{
-//			glDeleteBuffers(1, &m_ibo);
-//		}
-//
-//		m_mesh = mesh;
-//		m_indicesCount = m_mesh->GetIndicesCount();
-//		SetupMeshBuffers(mesh);
-//	}
-//}
-//
-//void feng::MeshRenderer::Serialize(feng::SerializationNode& node) const
-//{
-//	node.SetName("MeshRenderer");
-//	node.SetFloat("MaterialId", m_material ? m_material->GetId() : -1);
-//	node.SetFloat("MeshId", m_mesh ? m_mesh->GetId() : -1);
-//}
-//
-//void feng::MeshRenderer::Deserialize(const feng::SerializationNode& node)
-//{
-//	DeserializeMesh(node);
-//	DeserializeMaterial(node);
-//}
-//
-//void feng::MeshRenderer::Draw(const RenderProperties *renderProperties)
-//{
-//	if (IsValidState())
-//	{
-//		StartDraw();
-//		SetupDrawVertices();
-//		SetupFog(renderProperties);
-//		SetupLight(renderProperties);
-//		SetViewProjectionMatrix(renderProperties->GetCamera());
-//		SetupReservedUniforms(renderProperties->GetCamera());
-//		SetCustomDrawUniforms();
-//		DrawElements();
-//		FinishDraw();
-//	}
-//}
-//
-//void feng::MeshRenderer::StartDraw()
-//{
-//	m_shader->StartUse();
-//}
-//
-//void feng::MeshRenderer::SetupDrawVertices()
-//{
-//	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-//
-//	const StringMap<int> *attributes = m_shader->GetAttributes();
-//	unsigned int attributesCount = attributes->GetSize();
-//	auto iterator = attributes->GetIterator();
-//
-//	while (iterator.HasCurrent())
-//	{
-//		KeyValuePair<const char*, int> namedAttribute = iterator.GetCurrent();
-//		GLint attributeLocation = 0;
-//		if (m_shader->TryGetAttribute(namedAttribute.Key, attributeLocation))
-//		{
-//			feng::VertexAttributeInfo info(namedAttribute.Key);
-//
-//			glEnableVertexAttribArray(attributeLocation);
-//			glVertexAttribPointer(attributeLocation, info.Size, info.Type, info.IsNormalized, sizeof(Vertex), info.Pointer);
-//		}
-//
-//		iterator.MoveNext();
-//	}
-//}
-//
-//void feng::MeshRenderer::SetupLight(const RenderProperties *renderProperties)
-//{
-//	const char *ambientLightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::AmbientLightColor);
-//	m_shader->SetUniformVector4(ambientLightColorUniform, renderProperties->GetAmbientLightColor());
-//
-//	int directLightsCount = renderProperties->GetDirectLightsCount();
-//	if (directLightsCount > 0)
-//	{
-//		const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightCount);
-//		m_shader->SetUniformInt(lightsCountUniform, directLightsCount);
-//		const char *lightDirectionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightDirection);
-//		const Vector3 *directions = renderProperties->GetDirectLightDirections();
-//		m_shader->SetUniformVector3Array(lightDirectionsUniform, directions, directLightsCount);
-//		const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightColor);
-//		const Vector4 *colors = renderProperties->GetDirectLightColors();
-//		m_shader->SetUniformVector4Array(lightColorUniform, colors, directLightsCount);
-//		const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightIntensity);
-//		const float *intensities = renderProperties->GetDirectLightIntensities();
-//		m_shader->SetUniformFloatArray(lightsIntensityUniform, intensities, directLightsCount);
-//	}
-//
-//	int pointLightsCount = renderProperties->GetPointLightsCount();
-//	if (pointLightsCount > 0)
-//	{
-//		const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightCount);
-//		m_shader->SetUniformInt(lightsCountUniform, pointLightsCount);
-//		const char *lightPositionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightPosition);
-//		m_shader->SetUniformVector3Array(lightPositionsUniform, renderProperties->GetPointLightPositions(), pointLightsCount);
-//		const char *lightsRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightRange);
-//		m_shader->SetUniformFloatArray(lightsRangeUniform, renderProperties->GetPointLightRanges(), pointLightsCount);
-//		const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightColor);
-//		m_shader->SetUniformVector4Array(lightColorUniform, renderProperties->GetPointLightColors(), pointLightsCount);
-//		const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightIntensity);
-//		m_shader->SetUniformFloatArray(lightsIntensityUniform, renderProperties->GetPointLightIntensities(), pointLightsCount);
-//	}
-//}
-//
-//void feng::MeshRenderer::SetupFog(const RenderProperties *renderProperties)
-//{
-//	const feng::Camera *cam = renderProperties->GetCamera();
-//	const feng::Fog& fog = renderProperties->GetFog();
-//
-//	const char *fogStartUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogStart);
-//	m_shader->SetUniformFloat(fogStartUniform, fog.GetStart());
-//	const char *fogRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogRange);
-//	m_shader->SetUniformFloat(fogRangeUniform, fog.GetRange());
-//	const char *fogDensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogDensity);
-//	m_shader->SetUniformFloat(fogDensityUniform, fog.GetDensity());
-//	const char *fogColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogColor);
-//	m_shader->SetUniformVector3(fogColorUniform, fog.GetColor());
-//}
-//
-//void feng::MeshRenderer::SetViewProjectionMatrix(const Camera *cam)
-//{
-//	const char *viewProjectionMatrixUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::ViewProjMatrix);
-//	Transform *transform = GetTransform();
-//
-//	if (cam->GetGameObject() == GetGameObject())
-//	{
-//		Matrix camProjectionMatrix = cam->GetProjectionMatrix();
-//		Matrix camRotationMatrix = transform->GetRotationMatrix();
-//		float nearClipPlane = cam->GetNearClipPlane();
-//		Matrix scale;
-//		scale.SetScale(nearClipPlane + 1);
-//
-//		m_shader->SetUniformMatrix4(viewProjectionMatrixUniform, scale * camRotationMatrix * camProjectionMatrix);
-//	}
-//	else
-//	{
-//		Matrix transformMatrix = transform->GetTransformMatrix();
-//		Matrix viewProjectionMatrix = cam->GetViewProjectionMatrix();
-//		m_shader->SetUniformMatrix4(viewProjectionMatrixUniform, transformMatrix * viewProjectionMatrix);
-//	}
-//}
-//
-//void feng::MeshRenderer::SetupReservedUniforms(const Camera *cam)
-//{
-//	Time *time = Time::GetInstance();
-//	Transform *camTransform = cam->GetTransform();
-//	Transform *myTransform = GetTransform();
-//
-//	const char *modelTransformMatrix = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::ModelGlobalMatrix);
-//	m_shader->SetUniformMatrix4(modelTransformMatrix, myTransform->GetTransformMatrix());
-//	const char *camPosUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::CamPos);
-//	m_shader->SetUniformVector3(camPosUniform, camTransform->GetPosition());
-//	const char *timeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::Time);
-//	m_shader->SetUniformFloat(timeUniform, time->GetSceneTime());
-//}
-//
-//void feng::MeshRenderer::SetCustomDrawUniforms()
-//{
-//	const StringMap<int> *uniforms = m_shader->GetUniforms();
-//	auto iterator = uniforms->GetIterator();
-//	unsigned int textureUnit = 0;
-//
-//	while (iterator.HasCurrent())
-//	{
-//		KeyValuePair<const char*, int> namedUniform = iterator.GetCurrent();
-//
-//		if (m_material->HasTexture(namedUniform.Key))
-//		{
-//			ActivateTexture(namedUniform.Key, textureUnit);
-//			textureUnit++;
-//		}
-//
-//		if (m_material->HasFloat(namedUniform.Key))
-//		{
-//			float value = m_material->GetFloat(namedUniform.Key);
-//			m_shader->SetUniformFloat(namedUniform.Key, value);
-//		}
-//
-//		if (m_material->HasVector4(namedUniform.Key))
-//		{
-//			Vector4 value = m_material->GetVector4(namedUniform.Key);
-//			m_shader->SetUniformVector4(namedUniform.Key, value);
-//		}
-//
-//		iterator.MoveNext();
-//	}
-//}
-//
-//void feng::MeshRenderer::DrawElements()
-//{
-//	glDrawElements(GL_TRIANGLES, m_indicesCount, GL_UNSIGNED_INT, 0);
-//}
-//
-//void feng::MeshRenderer::FinishDraw()
-//{
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//	glBindBuffer(GL_ARRAY_BUFFER, 0);
-//
-//	m_shader->StopUse();
-//}
-//
-//void feng::MeshRenderer::ActivateTexture(const char *name, int unit)
-//{
-//	const Texture *texture = m_material->GetTexture(name);
-//	GLuint target = texture->GetType() == feng::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
-//	glActiveTexture(GL_TEXTURE0 + unit);
-//	glBindTexture(target, m_textureBuffers[name]);
-//	m_shader->SetUniformInt(name, unit);
-//}
-//
-//void feng::MeshRenderer::DeserializeMesh(const feng::SerializationNode& node)
-//{
-//	long meshId;
-//	node.TryGetLong("MeshId", meshId);
-//
-//	feng::Mesh *mesh = m_resources->GetMesh(meshId);
-//	if (mesh)
-//	{
-//		SetMesh(mesh);
-//	}
-//	else
-//	{
-//		feng::Debug::LogError("Couldn't find mesh.");
-//	}
-//}
-//
-//void feng::MeshRenderer::DeserializeMaterial(const feng::SerializationNode& node)
-//{
-//	long materialId;
-//	node.TryGetLong("MaterialId", materialId);
-//
-//	feng::Material *material = m_resources->GetMaterial(materialId);
-//	if (material)
-//	{
-//		SetMaterial(material);
-//	}
-//	else
-//	{
-//		feng::Debug::LogError("Couldn't find material.\n");
-//	}
-//}
-//
-//void feng::MeshRenderer::SetupMeshBuffers(const feng::Mesh *mesh)
-//{
-//	if (mesh)
-//	{
-//		const unsigned verticesCount = mesh->GetVerticesCount();
-//		const unsigned indicesCount = mesh->GetIndicesCount();
-//		const Vertex *vertices = mesh->GetVertices();
-//		const unsigned *indices = mesh->GetIndices();
-//
-//		// Create vertices buffer.
-//
-//		glGenBuffers(1, &m_vbo);
-//		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-//		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * verticesCount, vertices, GL_STATIC_DRAW);
-//		glBindBuffer(GL_ARRAY_BUFFER, 0);
-//
-//		// Create indices buffer.
-//
-//		glGenBuffers(1, &m_ibo);
-//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-//		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * indicesCount, indices, GL_STATIC_DRAW);
-//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//	}
-//	else
-//	{
-//		Debug::LogError("Couldn't create vertices buffer. Mesh is null.\n");
-//	}
-//}
-//
-//void feng::MeshRenderer::SetupTexturesBuffers()
-//{
-//	const StringMap<int> *uniforms = m_shader->GetUniforms();
-//	auto iterator = uniforms->GetIterator();
-//
-//	while (iterator.HasCurrent())
-//	{
-//		KeyValuePair<const char*, int> namedUniform = iterator.GetCurrent();
-//		if (m_material->HasTexture(namedUniform.Key))
-//		{
-//			const feng::Texture *texture = m_material->GetTexture(namedUniform.Key);
-//			SetupTextureBuffer(texture, namedUniform.Key);
-//		}
-//
-//		iterator.MoveNext();
-//	}
-//}
-//
-//void feng::MeshRenderer::SetupTextureBuffer(const feng::Texture *texture, const char *name)
-//{
-//	if (texture)
-//	{
-//		feng::TextureType textureType = texture->GetType();
-//		GLuint target = textureType == feng::TextureType::Texture2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
-//
-//		unsigned int tbo;
-//		glGenTextures(1, &tbo);
-//		glBindTexture(target, tbo);
-//
-//		GLint wrapMode = feng::GetTextureWrapMode(texture);
-//		GLint minFilter = feng::GetTextureMinFilter(texture);
-//		GLint magFilter = feng::GetTextureMagFilter(texture);
-//		glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapMode);
-//		glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapMode);
-//		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-//		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
-//
-//		if (textureType == feng::TextureType::Texture2D)
-//		{
-//			GenerateTexture2D(texture);
-//		}
-//		else
-//		{
-//			GenerateTextureCube(texture);
-//		}
-//
-//		if (texture->HasMipMaps())
-//		{
-//			glGenerateMipmap(target);
-//		}
-//
-//		m_textureBuffers.Add(name, tbo);
-//		glBindTexture(target, 0);
-//	}
-//	else
-//	{
-//		Debug::LogError("Couldn't create texture buffer. Texture is null.\n");
-//	}
-//}
-//
-//void feng::MeshRenderer::GenerateTexture2D(const feng::Texture *texture)
-//{
-//	const GLint format = feng::GetTextureFormat(texture);
-//	int width = texture->GetWidth();
-//	int height = texture->GetHeight();
-//	const char *data = texture->GetData();
-//	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-//}
-//
-//void feng::MeshRenderer::GenerateTextureCube(const feng::Texture *texture)
-//{
-//	const GLint format = feng::GetTextureFormat(texture);
-//	int faceWidth = texture->GetWidth() / 4;
-//	int faceHeight = texture->GetHeight() / 3;
-//	for (int i = 0; i < 6; ++i)
-//	{
-//		const char *data = texture->GetCubeMapFace((feng::CubeMapFace)i);
-//		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, data);
-//	}
-//}
-//
-//void feng::MeshRenderer::ClearTexturesBuffers()
-//{
-//	auto iterator = m_textureBuffers.GetIterator();
-//	while (iterator.HasCurrent())
-//	{
-//		feng::KeyValuePair<const char*, unsigned>& buffer = iterator.GetCurrent();
-//		glDeleteTextures(1, &buffer.Value);
-//		iterator.MoveNext();
-//	}
-//
-//	m_textureBuffers.Clear();
-//}
+//        const char *fogStartUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogStart);
+//        m_shader->SetUniformFloat(fogStartUniform, fog.GetStart());
+//        const char *fogRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogRange);
+//        m_shader->SetUniformFloat(fogRangeUniform, fog.GetRange());
+//        const char *fogDensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogDensity);
+//        m_shader->SetUniformFloat(fogDensityUniform, fog.GetDensity());
+//        const char *fogColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogColor);
+//        m_shader->SetUniformVector3(fogColorUniform, fog.GetColor());
+    }
+
+    void MeshRenderer::SetGlobalUniforms(const Camera& cam)
+    {
+        Transform *camTransform = cam.GetEntity()->GetComponent<Transform>();
+        Transform *myTransform = GetEntity()->GetComponent<Transform>();
+        const Shader *shader = material->GetShader();
+
+        shader->SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
+        shader->SetUniformMatrix4(feng::ShaderParams::ViewProjMatrix.data(), cam.GetViewProjectionMatrix());
+    }
+
+    void MeshRenderer::SetMaterialUniforms()
+    {
+        const Shader* shader = material->GetShader();
+        const std::map<std::string, int> uniforms = shader->GetUniforms();
+
+        uint32_t textureUnit = 0;
+
+        for(const auto& [name, location] : uniforms)
+        {
+            int intValue;
+            if(material->TryGetInt(name, intValue))
+            {
+                shader->SetUniformInt(name.c_str(), intValue);
+                continue;
+            }
+
+            float floatValue;
+            if(material->TryGetFloat(name, floatValue))
+            {
+                shader->SetUniformFloat(name.c_str(), floatValue);
+                continue;
+            }
+
+            Vector2 vector2Value;
+            if(material->TryGetVector2(name, vector2Value))
+            {
+                shader->SetUniformVector2(name.c_str(), vector2Value);
+                continue;
+            }
+
+            Vector3 vector3Value;
+            if(material->TryGetVector3(name, vector3Value))
+            {
+                shader->SetUniformVector3(name.c_str(), vector3Value);
+                continue;
+            }
+
+            Vector4 vector4Value;
+            if(material->TryGetVector4(name, vector4Value))
+            {
+                shader->SetUniformVector4(name.c_str(), vector4Value);
+                continue;
+            }
+
+            if(const Texture *texture = material->GetTexture(name))
+            {
+                ActivateTexture(name, *texture, textureUnit);
+                ++textureUnit;
+                continue;
+            }
+        }
+    }
+
+    void MeshRenderer::ExecuteDraw()
+    {
+        glBindVertexArray(vao);
+
+        ePrimitiveType primitiveType = mesh->GetPrimitiveType();
+
+        if(ibo != MeshRenderer::UndefinedBuffer)
+        {
+            const std::vector<uint32_t>& indices = mesh->GetIndices();
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+            glDrawElements(ToOpenGLValue(primitiveType), indices.size(), GL_UNSIGNED_INT, 0);
+        }
+        else
+        {
+            glDrawArrays(ToOpenGLValue(primitiveType), 0, mesh->GetVerticesCount());
+        }
+    }
+
+    void MeshRenderer::ActivateTexture(const std::string& name, const Texture &texture, uint32_t unit)
+    {
+        GLenum target = ToOpenGLValue(texture.GetType());
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(target, textureBuffers[name]);
+
+        const Shader *shader = material->GetShader();
+        shader->SetUniformInt(name.c_str(), unit);
+    }
+
+    void MeshRenderer::CreateGeometryBuffers()
+    {
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        vbo = CreateVertexBuffer();
+
+        if(mesh->HasIndices())
+        {
+            ibo = CreateIndexBuffer();
+        }
+
+        glBindVertexArray(MeshRenderer::UndefinedBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
+    }
+
+    void MeshRenderer::DeleteGeomertyBuffers()
+    {
+        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &ibo);
+        glDeleteBuffers(1, &vao);
+
+        vao = vbo = ibo = MeshRenderer::UndefinedBuffer;
+    }
+
+    void MeshRenderer::CreateTexturesBuffers()
+    {
+        const std::map<std::string, const Texture*> &textures = material->GetTextures();
+
+        for(const auto& [name, texture] : textures)
+        {
+            CreateTextureBuffer(*texture, name.c_str());
+        }
+    }
+
+    void MeshRenderer::DeleteTextureBuffers()
+    {
+        for(const auto& [name, tbo] : textureBuffers)
+        {
+            glDeleteTextures(1, &tbo);
+        }
+    }
+
+    uint32_t MeshRenderer::CreateVertexBuffer()
+    {
+        uint32_t bufferObject;
+        glGenBuffers(1, &bufferObject);
+        glBindBuffer(GL_ARRAY_BUFFER, bufferObject);
+        glBufferData(GL_ARRAY_BUFFER, mesh->GetDataSize(), mesh->GetData(), GL_STATIC_DRAW);
+
+        AttributesParser attributes { mesh->GetAttributes() };
+
+        GLuint attributeIndex = 0;
+        GLsizei offset = 0;
+        while(attributes.HasCurrent())
+        {
+            if(attributes.IsCurrentSet())
+            {
+                GLint componentsNumber;
+                GLenum type;
+                GLboolean isNormalized;
+                GLsizei size;
+                attributes.GetCurrent(componentsNumber, type, isNormalized, size);
+
+                glVertexAttribPointer(
+                                    attributeIndex,
+                                    componentsNumber,
+                                    type,
+                                    isNormalized,
+                                    static_cast<GLsizei>(mesh->GetVertexStride()),
+                                    reinterpret_cast<const GLvoid *>(offset));
+                glEnableVertexAttribArray(attributeIndex);
+                offset += size;
+                ++attributeIndex;
+            }
+
+            attributes.Next();
+        }
+
+        return bufferObject;
+    }
+
+    uint32_t MeshRenderer::CreateIndexBuffer()
+    {
+        const std::vector<uint32_t>& indices = mesh->GetIndices();
+
+        GLuint bufferObject;
+        glGenBuffers(1, &bufferObject);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferObject);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
+
+        return bufferObject;
+    }
+
+    void MeshRenderer::CreateTextureBuffer(const Texture& texture, const char *name)
+    {
+        GLenum target = ToOpenGLValue(texture.GetType());
+
+        GLuint tbo;
+        glGenTextures(1, &tbo);
+        glBindTexture(target, tbo);
+
+        GLint wrapModeS = static_cast<GLint>(ToOpenGLValue(texture.GetWrapModeS()));
+        GLint wrapModeT = static_cast<GLint>(ToOpenGLValue(texture.GetWrapModeT()));
+        GLint minFilter = static_cast<GLint>(ToOpenGLValue(texture.GetMinFilter()));
+        GLint magFilter = static_cast<GLint>(ToOpenGLValue(texture.GetMagFilter()));
+
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapModeS);
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapModeT);
+        glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
+        glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+
+        GenerateTexture(texture);
+        if (texture.HasMipMaps())
+        {
+            glGenerateMipmap(target);
+        }
+
+        textureBuffers[name] = tbo;
+        glBindTexture(target, 0);
+    }
+
+    void MeshRenderer::GenerateTexture(const Texture& texture)
+    {
+        eTextureType type = texture.GetType();
+        if (type == eTextureType::Tex2d)
+        {
+            GenerateTexture2D(texture);
+        }
+        else if (type == eTextureType::CubeMap)
+        {
+            GenerateTextureCube(texture);
+        }
+    }
+
+    void MeshRenderer::GenerateTexture2D(const Texture& texture)
+    {
+        GLenum format = GetTextureFormat(texture);
+        GLsizei width = static_cast<GLsizei>(texture.GetWidth());
+        GLsizei height = static_cast<GLsizei>(texture.GetHeight());
+        const GLvoid *data = static_cast<const GLvoid*>(texture.GetData());
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    }
+
+    void MeshRenderer::GenerateTextureCube(const Texture& texture)
+    {
+//        const GLint format = feng::GetTextureFormat(texture);
+//        int faceWidth = texture->GetWidth() / 4;
+//        int faceHeight = texture->GetHeight() / 3;
+//        for (int i = 0; i < 6; ++i)
+//        {
+//            const char *data = texture->GetCubeMapFace((feng::CubeMapFace)i);
+//            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, data);
+//        }
+    }
+}
