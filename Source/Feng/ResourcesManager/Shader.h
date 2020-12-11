@@ -1,0 +1,75 @@
+#pragma once
+
+#include <Feng/ResourcesManager/CachedShader.h>
+#include <Feng/Math/Matrix4.h>
+#include <Feng/Math/Vector3.h>
+#include <Feng/Math/Vector4.h>
+
+#include <map>
+#include <string>
+
+namespace feng
+{
+    enum class ShaderStates : int;
+
+    class Shader final
+    {
+    public:
+        enum class eType : uint8_t
+        {
+            Vertex = 0,
+            Fragment = 1,
+        };
+
+        Shader(const CachedShader& cachedShader);
+        ~Shader();
+
+        void Load();
+        void Unload();
+        void StartUse() const;
+        void StopUse() const;
+
+        const std::map<std::string, int32_t> &GetAttributes() const;
+        const std::map<std::string, int32_t> &GetUniforms() const;
+
+        bool TryGetAttributeLocation(const char *name, uint32_t& location) const;
+        bool TryGetUniformLocation(const char *name, uint32_t& location) const;
+        bool HasUniform(const char *name) const;
+
+        bool SetUniformBool(const char *name, bool value);
+        bool SetUniformInt(const char *name, int32_t value);
+        bool SetUniformFloat(const char *name, float value);
+        bool SetUniformVector3(const char *name, const Vector3& value);
+        bool SetUniformVector4(const char *name, const Vector4& value);
+        bool SetUniformMatrix4(const char *name, const Matrix4& matrix);
+
+    private:
+        bool SetUniformFloatArray(const char *name, const float *value, int size);
+        void EnableState() const;
+        void DisableStates() const;
+        void FetchActiveAttributes();
+        void FetchActiveUniforms();
+
+        static const int32_t k_undefinedShaderParamLocation = -1;
+
+        uint32_t m_program = 0;
+        std::map<std::string, int32_t> m_attributes;
+        std::map<std::string, int32_t> m_uniforms;
+        CachedShader m_cachedInfo;
+    };
+
+    std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath);
+}
+
+namespace feng
+{
+    inline const std::map<std::string, int32_t> &Shader::GetAttributes() const
+    {
+        return m_attributes;
+    }
+
+    inline const std::map<std::string, int32_t> &Shader::GetUniforms() const
+    {
+        return m_uniforms;
+    }
+}

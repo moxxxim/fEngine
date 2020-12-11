@@ -3,16 +3,16 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
-#include <FEngine/Math/Matrix4.h>
-#include <FEngine/Math/MatrixUtils.h>
-#include <FEngine/Math/Vector3.h>
-#include <FEngine/ResourcesManager/Shader.h>
-#include <FEngine/ResourcesManager/TextureData.h>
-#include <FEngine/ScenesManager/Camera.h>
-#include <FEngine/ScenesManager/Entity.h>
-#include <FEngine/ScenesManager/Transform.h>
-#include <FEngine/Utils/Debug.h>
-#include <FEngine/Utils/MaterialConstants.h>
+#include <Feng/Math/Matrix4.h>
+#include <Feng/Math/MatrixUtils.h>
+#include <Feng/Math/Vector3.h>
+#include <Feng/ResourcesManager/Shader.h>
+#include <Feng/ResourcesManager/ShaderParams.h>
+#include <Feng/ResourcesManager/TextureData.h>
+#include <Feng/ScenesManager/Camera.h>
+#include <Feng/ScenesManager/Entity.h>
+#include <Feng/ScenesManager/Transform.h>
+#include <Feng/Utils/Debug.h>
 
 #include <cmath>
 #include <sstream>
@@ -471,8 +471,8 @@ namespace SRender
             feng::Matrix4 modelTransformMatrix = modelTransform.GetGlobalMatrix();
             feng::Camera *camera = SMain::camEntity->GetComponent<feng::Camera>();
 
-            shader.SetUniformMatrix4(feng::uniform::ModelMatrix, modelTransformMatrix);
-            shader.SetUniformMatrix4(feng::uniform::ViewProjMatrix, camera->GetViewProjectionMatrix());
+            shader.SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), modelTransformMatrix);
+            shader.SetUniformMatrix4(feng::ShaderParams::ViewProjMatrix.data(), camera->GetViewProjectionMatrix());
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
     }
@@ -495,8 +495,8 @@ int main(int argc, const char * argv[])
 //        SRender::unlitTexture2MixShader->StopUse();
 
         SRender::textureShader->StartUse();
-        SRender::textureShader->SetUniformInt(feng::uniform::Texture0, 0);
-        SRender::textureShader->SetUniformVector3(feng::uniform::LightColor, SRender::lightColor.GetXyz());
+        SRender::textureShader->SetUniformInt(feng::ShaderParams::Texture0.data(), 0);
+        SRender::textureShader->SetUniformVector3(feng::ShaderParams::DirLightColor.data(), SRender::lightColor.GetXyz());
 //        SRender::textureShader->SetUniformInt(feng::uniform::Texture1, 1);
         SRender::textureShader->StopUse();
 
