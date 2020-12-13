@@ -9,194 +9,26 @@
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/ResourcesManager/TextureData.h>
+#include <Feng/ResourcesManager/Material.h>
+#include <Feng/ResourcesManager/Mesh.h>
+#include <Feng/ResourcesManager/Texture.h>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
+#include <Feng/ScenesManager/MeshRenderer.h>
 #include <Feng/ScenesManager/Transform.h>
+#include <Feng/ScenesManager/RenderProperties.h>
 #include <Feng/Utils/Debug.h>
 
 #include <cmath>
 #include <sstream>
 #include <array>
 
-namespace SMain
+namespace SRes
 {
     std::string BaseResourcesDir = "../../../Resources/";
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
 
-    constexpr uint32_t Width = 800;
-    constexpr uint32_t Height = 600;
-    float lastX = Width / 2.f;
-    float lastY = Height / 2.f;
-    float Zoom = 45;
-
-    float deltaTime = 0.0f;
-    float lastFrame = 0.0f;
-    float mixValue = 0.f;
-    const float cameraSpeed = 3.f;
-    float camPitch = 0.f;
-    float camYaw = 0.f;
-
-    std::unique_ptr<feng::Entity> camEntity;
-
-    bool TryInitGlfw()
-    {
-        int initResult = glfwInit();
-        if(initResult == GL_TRUE)
-        {
-            // Set required OpenGL version to 3.3.
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-            // Set OpenGL context to be created under core-profile (without backward compatability features).
-            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-            std::cout << "[TryInitGlfw]: Initialize GLFW with OpenGL version " << glfwGetVersionString() << "\n";
-
-            return true;
-        }
-
-        std::cout << "[TryInitGlfw]: Cannot initialize GLFW\n";
-        return false;
-    }
-
-    void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
-    {
-        glViewport(0, 0, width, height);
-    }
-
-    void MouseCallback(GLFWwindow* window, double x, double y)
-    {
-        static bool firstMouse = true;
-        if (firstMouse) // initially set to true
-        {
-            lastX = x;
-            lastY = y;
-            firstMouse = false;
-        }
-
-        float xoffset = x - lastX;
-        float yoffset = lastY - y; // reversed since y-coordinates range from bottom to top
-        lastX = x;
-        lastY = y;
-
-        const float sensitivity = 0.1f;
-        xoffset *= sensitivity;
-        yoffset *= sensitivity;
-
-        camYaw += xoffset;
-        camPitch += yoffset;
-
-        if(camPitch > 89.0f)
-        {
-            camPitch =  89.0f;
-        }
-
-        if(camPitch < -89.0f)
-        {
-            camPitch = -89.0f;
-        }
-
-        feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
-        camTransform->SetRotation(feng::mat3::MakeRotationY(camYaw), feng::eSpace::World);
-        camTransform->SetRotation(feng::mat3::MakeRotationX(camPitch), feng::eSpace::Self);
-    }
-
-    void ScrollCallback(GLFWwindow* window, double x, double y)
-    {
-        Zoom -= static_cast<float>(y);
-        if (Zoom < 1.0f)
-        {
-            Zoom = 1.0f;
-        }
-
-        if (Zoom > 45.0f)
-        {
-            Zoom = 45.0f;
-        }
-    }
-
-    void UpdateMixValue(bool increase)
-    {
-        float delta = increase ? 0.005 : -0.005;
-        mixValue += delta;
-    }
-
-    void ProcessWindowInput(GLFWwindow &window)
-    {
-        float speedMultiplier = (glfwGetKey(&window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? 2 : 1;
-
-        if(glfwGetKey(&window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        {
-            glfwSetWindowShouldClose(&window, true);
-        }
-        else if(glfwGetKey(&window, GLFW_KEY_UP) == GLFW_PRESS)
-        {
-            UpdateMixValue(true);
-        }
-        else if(glfwGetKey(&window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        {
-            UpdateMixValue(false);
-        }
-        else if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
-        {
-            feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
-            feng::Vector3 forward = camTransform->GetForward();
-            camTransform->Move(cameraSpeed * deltaTime * speedMultiplier * forward);
-        }
-        if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
-        {
-            feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
-            feng::Vector3 forward = camTransform->GetForward();
-            camTransform->Move(-cameraSpeed * deltaTime * speedMultiplier * forward);
-        }
-        if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
-        {
-            feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
-            feng::Vector3 right = camTransform->GetRight();
-            camTransform->Move(-cameraSpeed * deltaTime * speedMultiplier * right);
-        }
-        if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
-        {
-            feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
-            feng::Vector3 right = camTransform->GetRight();
-            camTransform->Move(cameraSpeed * deltaTime * speedMultiplier * right);
-        }
-    }
-
-    std::unique_ptr<feng::Shader> LoadTempShader(const std::string& vsFileName, const std::string& fsFileName)
-    {
-        std::string vsFilePath = BaseShadersDir + vsFileName;
-        std::string fsFilePath = BaseShadersDir + fsFileName;
-        return feng::LoadShader(vsFilePath, fsFilePath);
-    }
-
-    GLFWwindow* CreateWindow()
-    {
-        constexpr int width = 800;
-        constexpr int height = 600;
-        GLFWwindow* window = glfwCreateWindow(width, height, "Sweet OpenGL Window", nullptr, nullptr);
-        if (window != nullptr)
-        {
-            glfwMakeContextCurrent(window);
-            glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-            glfwSetCursorPosCallback(window, MouseCallback);
-            glfwSetScrollCallback(window, ScrollCallback);
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glViewport(0, 0, width, height);
-        }
-        else
-        {
-            std::cout << "Failed to create GLFW window" << std::endl;
-            glfwTerminate();
-        }
-
-        return window;
-    }
-}
-
-namespace SRender
-{
     const char *UnlitTexture2MixFsName = "Unlit/UnlitTexture2MixFs.fs";
     const char *UnlitTexture2MixVsName = "Unlit/UnlitTexture2MixVs.vs";
     const char *TextureFsName = "TextureFs.fs";
@@ -204,7 +36,7 @@ namespace SRender
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *awesomeFacePng = "awesomeface.png";
 
-    float cube[] =
+    std::vector<float> cube
     {
              // position        // uv
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -256,6 +88,86 @@ namespace SRender
         1, 2, 3
     };
 
+    std::unique_ptr<feng::TextureData> woodContainerTextureData;
+    std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
+
+    std::unique_ptr<feng::Material> unlitTex2MixMaterial;
+    std::unique_ptr<feng::Material> texMaterial;
+
+    std::unique_ptr<feng::Mesh> cubeMesh;
+
+    std::unique_ptr<feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
+    {
+        std::string vsFilePath = BaseShadersDir + vsFileName;
+        std::string fsFilePath = BaseShadersDir + fsFileName;
+        return feng::LoadShader(vsFilePath, fsFilePath);
+    }
+
+    std::unique_ptr<feng::TextureData> LoadTexture(std::string name, bool flip)
+    {
+        std::string texturePath = SRes::BaseTexturesDir + name;
+        return feng::TextureData::Load(texturePath, flip);
+    }
+
+    void LoadMaterials()
+    {
+        std::unique_ptr<feng::Shader> unlitTexture2MixShader = LoadShader(UnlitTexture2MixVsName, UnlitTexture2MixFsName);
+        std::unique_ptr<feng::Shader> textureShader = LoadShader(TextureVsName, TextureFsName);;
+
+        unlitTex2MixMaterial = std::make_unique<feng::Material>(std::move(unlitTexture2MixShader));
+        texMaterial = std::make_unique<feng::Material>(std::move(textureShader));
+
+        woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
+        awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
+
+        std::unique_ptr<feng::Texture> woodContainerTexture = std::make_unique<feng::Texture>(*woodContainerTextureData);
+        std::unique_ptr<feng::Texture> awesomeFaceTexture = std::make_unique<feng::Texture>(*awesomeFaceTextureData);
+    }
+
+    void LoadMeshes()
+    {
+        uint32_t attributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Uv0;
+        feng::eVertexAtributes attributes = static_cast<feng::eVertexAtributes>(attributesValue);
+        cubeMesh = std::make_unique<feng::Mesh>(cube, attributes, feng::ePrimitiveType::Triangles);
+    }
+
+    void LoadResources()
+    {
+        LoadMaterials();
+        LoadMeshes();
+    }
+}
+
+namespace SApp
+{
+    constexpr uint32_t Width = 800;
+    constexpr uint32_t Height = 600;
+
+    float deltaTime = 0.0f;
+    float time = 0.0f;
+
+    void UpdateTime()
+    {
+        float currentFrame = glfwGetTime();
+        SApp::deltaTime = currentFrame - SApp::time;
+        SApp::time = currentFrame;
+    }
+}
+
+namespace SCamController
+{
+    float lastX = SApp::Width / 2.f;
+    float lastY = SApp::Height / 2.f;
+    float Zoom = 45;
+    const float cameraSpeed = 3.f;
+    float camPitch = 0.f;
+    float camYaw = 0.f;
+}
+
+namespace SObjects
+{
+    std::unique_ptr<feng::Entity> camEntity;
+
     std::array<feng::Vector3, 10> cubePositions = {
         feng::Vector3( 0.0f,  0.0f,  0.0f),
         feng::Vector3( 2.0f,  5.0f, -15.0f),
@@ -269,6 +181,220 @@ namespace SRender
         feng::Vector3(-1.3f,  1.0f, -1.5f)
     };
 
+    std::vector<std::unique_ptr<feng::Entity>> objects;
+
+    feng::RenderProperties renderProperties;
+
+    std::unique_ptr<feng::Entity> CreateCamera()
+    {
+        std::unique_ptr<feng::Entity> camEntity = std::make_unique<feng::Entity>("Camera");
+        feng::Camera &camera = camEntity->AddComponent<feng::Camera>();
+        feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
+        camTransform->SetPosition(0.f, 0.f, 3.f);
+        camTransform->SetEuler(SCamController::camPitch, SCamController::camYaw, 0.f);
+
+        camera.SetFovY(SCamController::Zoom);
+        camera.SetAspectRatio(static_cast<float>(SApp::Width)/SApp::Height);
+        camera.SetNearClipPlane(0.1f);
+        camera.SetFarClipPlane(100.f);
+
+        return camEntity;
+    }
+
+    std::unique_ptr<feng::Entity> CreateCube(const feng::Vector3& position, const std::string& name, const feng::Mesh &mesh, const feng::Material& material)
+    {
+        std::unique_ptr<feng::Entity> cube = std::make_unique<feng::Entity>(name);
+
+        feng::Transform *cubeTransform = cube->GetComponent<feng::Transform>();
+        cubeTransform->SetPosition(position);
+
+        feng::MeshRenderer& meshRenderer = cube->AddComponent<feng::MeshRenderer>();
+        meshRenderer.SetMesh(SRes::cubeMesh.get());
+        meshRenderer.SetMaterial(SRes::texMaterial.get());
+
+        return cube;
+    }
+
+    void CreateObjects()
+    {
+        SObjects::camEntity = SObjects::CreateCamera();
+
+        for(int32_t i = 0; i < cubePositions.size(); ++i)
+        {
+            const feng::Vector3& position = cubePositions[i];
+            std::string name = "cube " + std::to_string(i);
+            std::unique_ptr<feng::Entity> entity = CreateCube(position, name, *SRes::cubeMesh, *SRes::texMaterial);
+            objects.push_back(std::move(entity));
+        }
+    }
+
+    void UpdateCamera()
+    {
+        feng::Camera *camera = SObjects::camEntity->GetComponent<feng::Camera>();
+
+        camera->SetFovY(SCamController::Zoom);
+        camera->SetAspectRatio(static_cast<float>(SApp::Width)/SApp::Height);
+        camera->SetNearClipPlane(0.1f);
+        camera->SetFarClipPlane(100.f);
+    }
+
+    void UpdateObjects()
+    {
+        for(const std::unique_ptr<feng::Entity>& entity : objects)
+        {
+            feng::Transform *transform = entity->GetComponent<feng::Transform>();
+
+            float angle = 20.f * SApp::time;
+            transform->SetEuler(0.f, 0.f, angle);
+        }
+    }
+
+    void Update()
+    {
+        UpdateCamera();
+        UpdateObjects();
+    }
+}
+
+namespace SMain
+{
+    bool TryInitGlfw()
+    {
+        int initResult = glfwInit();
+        if(initResult == GL_TRUE)
+        {
+            // Set required OpenGL version to 3.3.
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+            // Set OpenGL context to be created under core-profile (without backward compatability features).
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+            std::cout << "[TryInitGlfw]: Initialize GLFW with OpenGL version " << glfwGetVersionString() << "\n";
+
+            return true;
+        }
+
+        std::cout << "[TryInitGlfw]: Cannot initialize GLFW\n";
+        return false;
+    }
+
+    void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+    {
+        glViewport(0, 0, width, height);
+    }
+
+    void MouseCallback(GLFWwindow* window, double x, double y)
+    {
+        static bool firstMouse = true;
+        if (firstMouse) // initially set to true
+        {
+            SCamController::lastX = x;
+            SCamController::lastY = y;
+            firstMouse = false;
+        }
+
+        float xoffset = x - SCamController::lastX;
+        float yoffset = SCamController::lastY - y; // reversed since y-coordinates range from bottom to top
+        SCamController::lastX = x;
+        SCamController::lastY = y;
+
+        const float sensitivity = 0.1f;
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
+
+        SCamController::camYaw += xoffset;
+        SCamController::camPitch += yoffset;
+
+        if(SCamController::camPitch > 89.0f)
+        {
+            SCamController::camPitch =  89.0f;
+        }
+
+        if(SCamController::camPitch < -89.0f)
+        {
+            SCamController::camPitch = -89.0f;
+        }
+
+        feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
+        camTransform->SetRotation(feng::mat3::MakeRotationY(SCamController::camYaw), feng::eSpace::World);
+        camTransform->SetRotation(feng::mat3::MakeRotationX(SCamController::camPitch), feng::eSpace::Self);
+    }
+
+    void ScrollCallback(GLFWwindow* window, double x, double y)
+    {
+        SCamController::Zoom -= static_cast<float>(y);
+        if (SCamController::Zoom < 1.0f)
+        {
+            SCamController::Zoom = 1.0f;
+        }
+
+        if (SCamController::Zoom > 45.0f)
+        {
+            SCamController::Zoom = 45.0f;
+        }
+    }
+
+    void ProcessWindowInput(GLFWwindow &window)
+    {
+        float speedMultiplier = (glfwGetKey(&window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? 2 : 1;
+
+        if(glfwGetKey(&window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            glfwSetWindowShouldClose(&window, true);
+        }
+        else if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
+        {
+            feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 forward = camTransform->GetForward();
+            camTransform->Move(SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * forward);
+        }
+        if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
+        {
+            feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 forward = camTransform->GetForward();
+            camTransform->Move(-SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * forward);
+        }
+        if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
+        {
+            feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 right = camTransform->GetRight();
+            camTransform->Move(-SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * right);
+        }
+        if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
+        {
+            feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 right = camTransform->GetRight();
+            camTransform->Move(SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * right);
+        }
+    }
+
+    GLFWwindow* CreateWindow()
+    {
+        constexpr int width = 800;
+        constexpr int height = 600;
+        GLFWwindow* window = glfwCreateWindow(width, height, "Sweet OpenGL Window", nullptr, nullptr);
+        if (window != nullptr)
+        {
+            glfwMakeContextCurrent(window);
+            glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+            glfwSetCursorPosCallback(window, MouseCallback);
+            glfwSetScrollCallback(window, ScrollCallback);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glViewport(0, 0, width, height);
+        }
+        else
+        {
+            std::cout << "Failed to create GLFW window" << std::endl;
+            glfwTerminate();
+        }
+
+        return window;
+    }
+}
+
+namespace SRender
+{
     feng::Vector4 lightColor {1.f, 0.f, 0.f, 0.f};
 
     // Loaded data.
@@ -277,11 +403,6 @@ namespace SRender
     GLuint shapeEbo;
     GLuint textureObj1;
     GLuint textureObj3;
-    std::unique_ptr<feng::Shader> unlitTexture2MixShader;
-    std::unique_ptr<feng::Shader> textureShader;
-
-    std::unique_ptr<feng::TextureData> woodenContainerTexture;
-    std::unique_ptr<feng::TextureData> awesomeFaceTexture;
 
     GLuint CreateVaoWithColorAndTexture(const float* vertices, int verticesCount, int stride)
     {
@@ -340,35 +461,6 @@ namespace SRender
         return ebo;
     }
 
-    void LoadShaders()
-    {
-        unlitTexture2MixShader = SMain::LoadTempShader(SRender::UnlitTexture2MixVsName, SRender::UnlitTexture2MixFsName);
-        textureShader = SMain::LoadTempShader(SRender::TextureVsName, SRender::TextureFsName);
-    }
-
-    void LoadTextures()
-    {
-        std::string woodTexturePath = SMain::BaseTexturesDir + woodenContainerJpg;
-        woodenContainerTexture = feng::TextureData::Load(woodTexturePath, false);
-
-        std::string awesomeTexturePath = SMain::BaseTexturesDir + awesomeFacePng;
-        awesomeFaceTexture = feng::TextureData::Load(awesomeTexturePath, true);
-    }
-
-    void InitializeTransforms()
-    {
-        SMain::camEntity = std::make_unique<feng::Entity>("Camera");
-        feng::Camera &camera = SMain::camEntity->AddComponent<feng::Camera>();
-        feng::Transform *camTransform = SMain::camEntity->GetComponent<feng::Transform>();
-        camTransform->SetPosition(0.f, 0.f, 3.f);
-        camTransform->SetEuler(SMain::camPitch, SMain::camYaw, 0.f);
-
-        camera.SetFovY(SMain::Zoom);
-        camera.SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
-        camera.SetNearClipPlane(0.1f);
-        camera.SetFarClipPlane(100.f);
-    }
-
     GLuint InitTextureObj(const feng::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
     {
         if(textureData.IsValid())
@@ -407,21 +499,21 @@ namespace SRender
         feng::Debug::LogRenderInfoOpenGL();
         feng::Debug::LogMessage("Initialize render.");
 
+        SRes::LoadResources();
+        SObjects::CreateObjects();
+
         // Specify clear value for color buffer: color to fill color buffer with after call to "glClear(GL_COLOR_BUFFER_BIT)".
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-        InitializeTransforms();
-        LoadShaders();
-        LoadTextures();
-        textureObj1 = InitTextureObj(*woodenContainerTexture, GL_REPEAT, GL_REPEAT, false);
-        textureObj3 = InitTextureObj(*awesomeFaceTexture, GL_REPEAT, GL_REPEAT, true);
-        shapeVao = CreateVaoWithColorAndTexture(cube, 36, sizeof(cube) / 36);
+        textureObj1 = InitTextureObj(*SRes::woodContainerTextureData, GL_REPEAT, GL_REPEAT, false);
+        textureObj3 = InitTextureObj(*SRes::awesomeFaceTextureData, GL_REPEAT, GL_REPEAT, true);
+        shapeVao = CreateVaoWithColorAndTexture(SRes::cube.data(), 36, SRes::cube.size() * sizeof(float) / 36);
 
         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
         // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
         //glBindVertexArray(0);
 
-        shapeEbo = CreateEbo(rectIndices, 6);
+        shapeEbo = CreateEbo(SRes::rectIndices, 6);
 
         glBindVertexArray(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -431,50 +523,32 @@ namespace SRender
         glEnable(GL_DEPTH_TEST);
     }
 
-    void UpdateCamera()
+    void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, const feng::Shader& shader)
     {
-        feng::Camera *camera = SMain::camEntity->GetComponent<feng::Camera>();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        camera->SetFovY(SMain::Zoom);
-        camera->SetAspectRatio(static_cast<float>(SMain::Width)/SMain::Height);
-        camera->SetNearClipPlane(0.1f);
-        camera->SetFarClipPlane(100.f);
-    }
-
-    feng::Transform UpdateTransform(int32_t i)
-    {
-        feng::Transform transform;
-        transform.SetPosition(cubePositions[i]);
-        float time = static_cast<float>(glfwGetTime());
-
-        float angle = ((i % 3) == 0) ? 20.f * time : (20.f * i);
-        transform.SetEuler(0.f, 0.f, angle);
-
-        return transform;
-    }
-
-    void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, feng::Shader& shader)
-    {
         shader.StartUse();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureObj1);
 
-//        glActiveTexture(GL_TEXTURE1);
-//        glBindTexture(GL_TEXTURE_2D, textureObj3);
-
         glBindVertexArray(vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        for(size_t i = 0; i < SRender::cubePositions.size(); ++i)
+        for(std::unique_ptr<feng::Entity>& entity : SObjects::objects)
         {
-            feng::Transform modelTransform = UpdateTransform(i);
-            feng::Matrix4 modelTransformMatrix = modelTransform.GetGlobalMatrix();
-            feng::Camera *camera = SMain::camEntity->GetComponent<feng::Camera>();
+            feng::Transform *transform = entity->GetComponent<feng::Transform>();
+            feng::Matrix4 modelTransformMatrix = transform->GetGlobalMatrix();
+            feng::Camera *camera = SObjects::camEntity->GetComponent<feng::Camera>();
 
             shader.SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), modelTransformMatrix);
             shader.SetUniformMatrix4(feng::ShaderParams::ViewProjMatrix.data(), camera->GetViewProjectionMatrix());
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+    }
+
+    void Render()
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 }
 
@@ -489,28 +563,19 @@ int main(int argc, const char * argv[])
         Print_Errors_OpengGL();
         feng::Debug::LogMessage("Start loop.");
 
-//        SRender::unlitTexture2MixShader->StartUse();
-//        SRender::unlitTexture2MixShader->SetUniformInt(feng::uniform::Texture0, 0);
-//        SRender::unlitTexture2MixShader->SetUniformInt(feng::uniform::Texture1, 1);
-//        SRender::unlitTexture2MixShader->StopUse();
-
-        SRender::textureShader->StartUse();
-        SRender::textureShader->SetUniformInt(feng::ShaderParams::Texture0.data(), 0);
-        SRender::textureShader->SetUniformVector3(feng::ShaderParams::DirLightColor.data(), SRender::lightColor.GetXyz());
-//        SRender::textureShader->SetUniformInt(feng::uniform::Texture1, 1);
-        SRender::textureShader->StopUse();
+        SRes::texMaterial->GetShader()->StartUse();
+        SRes::texMaterial->GetShader()->SetUniformInt(feng::ShaderParams::Texture0.data(), 0);
+        SRes::texMaterial->GetShader()->SetUniformVector3(feng::ShaderParams::DirLightColor.data(), SRender::lightColor.GetXyz());
+        SRes::texMaterial->GetShader()->StopUse();
 
         while(!glfwWindowShouldClose(window))
         {
-            float currentFrame = glfwGetTime();
-            SMain::deltaTime = currentFrame - SMain::lastFrame;
-            SMain::lastFrame = currentFrame;
+            SApp::UpdateTime();
             SMain::ProcessWindowInput(*window);
+            SObjects::Update();
+            SRender::Render();
 
-            SRender::UpdateCamera();
-
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRender::textureShader);
+            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRes::texMaterial->GetShader());
             glfwSwapBuffers(window);
             glfwPollEvents();
 

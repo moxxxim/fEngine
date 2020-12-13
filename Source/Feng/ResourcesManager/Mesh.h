@@ -10,11 +10,19 @@ namespace feng
     class Mesh
     {
     public:
-        Mesh(const std::vector<float> &aVertices, const std::vector<uint32_t> &aIndices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives);
-        Mesh(std::vector<float> &&aVertices, std::vector<uint32_t> &&aIndices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives);
+        Mesh(
+             const std::vector<float>& aVertices,
+             const std::vector<uint32_t>& aIndices,
+             eVertexAtributes aAttributes,
+             ePrimitiveType aPrimitives);
+        Mesh(
+             std::vector<float>&& aVertices,
+             std::vector<uint32_t>&& aIndices,
+             eVertexAtributes aAttributes,
+             ePrimitiveType aPrimitives);
 
-        Mesh(const std::vector<float> &aVertices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives);
-        Mesh(std::vector<float> &&aVertices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives);
+        Mesh(const std::vector<float>& aVertices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives);
+        Mesh(std::vector<float>&& aVertices, eVertexAtributes aAttributes, ePrimitiveType aPrimitives);
 
         bool HasIndices() const;
         eVertexAtributes GetAttributes() const;

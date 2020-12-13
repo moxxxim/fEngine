@@ -12,7 +12,6 @@ namespace feng
     {
     public:
         Texture(const TextureData& aData);
-        ~Texture();
 
         Texture(const Texture& other) = delete;
         Texture(Texture&& other) = delete;

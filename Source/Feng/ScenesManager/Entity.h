@@ -13,9 +13,6 @@ namespace feng
         explicit Entity(const std::string& aName);
         explicit Entity(std::string&& aName);
         ~Entity();
-        
-        const Transform& GetTransform() const;
-        Transform& GetTransform();
 
         template <class TComponent> TComponent* GetComponent() const;
         template <class TComponent> TComponent& AddComponent();
