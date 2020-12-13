@@ -30,6 +30,11 @@ namespace feng
 	    eTextureMagFilter GetMagFilter() const;
 	    bool HasMipMaps() const;
 
+        void SetType(eTextureType aType);
+        void SetWrapping(eTextureWrapping sWrap, eTextureWrapping tWrap);
+        void SetFilters(eTextureMinFilter aMinFilter, eTextureMagFilter aMagFilter);
+        void SetUseMipmaps(bool useMipMaps);
+
     private:
         const TextureData& data;
 
@@ -72,5 +77,27 @@ namespace feng
     inline bool Texture::HasMipMaps() const
     {
         return generateMipMaps;
+    }
+
+    inline void Texture::SetType(eTextureType aType)
+    {
+        type = aType;
+    }
+
+    inline void Texture::SetWrapping(eTextureWrapping sWrap, eTextureWrapping tWrap)
+    {
+        wrapS = sWrap;
+        wrapT = tWrap;
+    }
+
+    inline void Texture::SetFilters(eTextureMinFilter aMinFilter, eTextureMagFilter aMagFilter)
+    {
+        minFilter = aMinFilter;
+        magFilter = aMagFilter;
+    }
+
+    inline void Texture::SetUseMipmaps(bool useMipMaps)
+    {
+        generateMipMaps = useMipMaps;
     }
 }

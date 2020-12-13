@@ -36,7 +36,7 @@ namespace feng
 
         bool HasCurrent() const;
         bool IsCurrentSet() const;
-        void GetCurrent(GLint &componentsNumber, GLenum& type, GLboolean& normalize, GLsizei dataSize);
+        void GetCurrent(GLint &componentsNumber, GLenum& type, GLboolean& normalize, GLsizei& dataSize);
         void Next();
 
     private:
@@ -63,7 +63,7 @@ namespace feng
         return (attributes & Order[index]) != 0;
     }
 
-    inline void AttributesParser::GetCurrent(GLint &componentsNumber, GLenum& type, GLboolean& normalize, GLsizei dataSize)
+    inline void AttributesParser::GetCurrent(GLint &componentsNumber, GLenum& type, GLboolean& normalize, GLsizei& dataSize)
     {
         componentsNumber = ComponentNumbers[index];
         type = DataTypes[index];

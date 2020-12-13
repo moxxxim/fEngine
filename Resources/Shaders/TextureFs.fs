@@ -10,5 +10,5 @@ out vec4 FragColor;
 void main()
 {
     FragColor = texture(uTexture0, varUv0);
-    FragColor.xyz *= uDirLightColor;
+    //FragColor.xyz *= uDirLightColor;
 }

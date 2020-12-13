@@ -67,7 +67,7 @@ namespace feng
 
     inline int32_t Mesh::GetVerticesCount() const
     {
-        return static_cast<int32_t>(vertices.size() / vertexStride);
+        return static_cast<int32_t>(vertices.size() / vertexStride) * sizeof(float);
     }
 
     inline int32_t Mesh::GetIndicesCount() const

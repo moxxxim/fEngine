@@ -217,7 +217,8 @@ namespace feng
         }
         else
         {
-            glDrawArrays(ToOpenGLValue(primitiveType), 0, mesh->GetVerticesCount());
+            int32_t verticesCount = mesh->GetVerticesCount();
+            glDrawArrays(ToOpenGLValue(primitiveType), 0, verticesCount);
         }
     }
 
@@ -263,7 +264,8 @@ namespace feng
 
         for(const auto& [name, texture] : textures)
         {
-            CreateTextureBuffer(*texture, name.c_str());
+            uint32_t tbo = CreateTextureBuffer(*texture);
+            textureBuffers[name] = tbo;
         }
     }
 
@@ -327,7 +329,7 @@ namespace feng
         return bufferObject;
     }
 
-    void MeshRenderer::CreateTextureBuffer(const Texture& texture, const char *name)
+    uint32_t MeshRenderer::CreateTextureBuffer(const Texture& texture)
     {
         GLenum target = ToOpenGLValue(texture.GetType());
 
@@ -351,8 +353,9 @@ namespace feng
             glGenerateMipmap(target);
         }
 
-        textureBuffers[name] = tbo;
         glBindTexture(target, 0);
+
+        return tbo;
     }
 
     void MeshRenderer::GenerateTexture(const Texture& texture)

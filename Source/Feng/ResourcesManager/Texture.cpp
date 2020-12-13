@@ -5,7 +5,7 @@
 namespace feng
 {
     Texture::Texture(const TextureData& aData)
-        : data {aData}
+        : data { aData }
     { }
 
     int32_t Texture::GetWidth() const

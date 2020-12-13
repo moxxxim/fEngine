@@ -45,11 +45,12 @@ namespace feng
 
     uint32_t AttributesParser::GetStride(eVertexAtributes aAttributes)
     {
-        uint32_t stride;
+        uint32_t stride = 0;
 
         for(int i = 0; i < Order.size(); ++i)
         {
-            if((Order[i] & aAttributes) != 0)
+            eVertexAtributes attribute = Order[i];
+            if((attribute & aAttributes) != 0)
             {
                 stride += DataSizes[i];
             }

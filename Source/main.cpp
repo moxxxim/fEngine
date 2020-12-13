@@ -91,6 +91,9 @@ namespace SRes
     std::unique_ptr<feng::TextureData> woodContainerTextureData;
     std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
 
+    std::unique_ptr<feng::Texture> woodContainerTexture;
+    std::unique_ptr<feng::Texture> awesomeFaceTexture;
+
     std::unique_ptr<feng::Material> unlitTex2MixMaterial;
     std::unique_ptr<feng::Material> texMaterial;
 
@@ -111,17 +114,21 @@ namespace SRes
 
     void LoadMaterials()
     {
+        woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
+        awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
+
+        woodContainerTexture = std::make_unique<feng::Texture>(*woodContainerTextureData);
+        awesomeFaceTexture = std::make_unique<feng::Texture>(*awesomeFaceTextureData);
+
         std::unique_ptr<feng::Shader> unlitTexture2MixShader = LoadShader(UnlitTexture2MixVsName, UnlitTexture2MixFsName);
         std::unique_ptr<feng::Shader> textureShader = LoadShader(TextureVsName, TextureFsName);;
 
         unlitTex2MixMaterial = std::make_unique<feng::Material>(std::move(unlitTexture2MixShader));
+        unlitTex2MixMaterial->SetTexture(feng::ShaderParams::Texture0.data(), woodContainerTexture.get());
+        unlitTex2MixMaterial->SetTexture(feng::ShaderParams::Texture0.data(), awesomeFaceTexture.get());
+
         texMaterial = std::make_unique<feng::Material>(std::move(textureShader));
-
-        woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
-        awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
-
-        std::unique_ptr<feng::Texture> woodContainerTexture = std::make_unique<feng::Texture>(*woodContainerTextureData);
-        std::unique_ptr<feng::Texture> awesomeFaceTexture = std::make_unique<feng::Texture>(*awesomeFaceTextureData);
+        texMaterial->SetTexture(feng::ShaderParams::Texture0.data(), woodContainerTexture.get());
     }
 
     void LoadMeshes()
@@ -226,6 +233,8 @@ namespace SObjects
             std::unique_ptr<feng::Entity> entity = CreateCube(position, name, *SRes::cubeMesh, *SRes::texMaterial);
             objects.push_back(std::move(entity));
         }
+
+        renderProperties.cam = camEntity->GetComponent<feng::Camera>();
     }
 
     void UpdateCamera()
@@ -397,103 +406,6 @@ namespace SRender
 {
     feng::Vector4 lightColor {1.f, 0.f, 0.f, 0.f};
 
-    // Loaded data.
-
-    GLuint shapeVao;
-    GLuint shapeEbo;
-    GLuint textureObj1;
-    GLuint textureObj3;
-
-    GLuint CreateVaoWithColorAndTexture(const float* vertices, int verticesCount, int stride)
-    {
-        // Generate and bind vertex array object.
-        GLuint vao;
-        glGenVertexArrays(1, &vao);
-
-        // Generate vertex buffer object.
-        GLuint vbo;
-        glGenBuffers(1, &vbo);
-
-        // Bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        glBindVertexArray(vao);
-
-        // Bind buffer object.
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, verticesCount * stride, vertices, GL_STATIC_DRAW);
-
-        // Setup vertex alignment in vertex buffer.
-
-        /*
-         1 - position of vertex attribute in shader: in our case this is position with location 0.
-         2 - number of components in vertex attribute: in our case this is 3 (Vector3 dimension).
-         3 - data type of each component in array.
-         4 - whether data should be normalized (clamed to range [-1, 1], or [0, 1]). WTF????
-         5 - offset between consecutive vertex attributes. Can be 0 in our case (indicates that attributes tightly packed).
-         6 - offset of the first argument in array.
-         */
-
-        const uint32_t vec3Size = sizeof(float) * 3;
-
-        // Position.
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(0));
-        // Enable vertex attribute in location 0.
-        glEnableVertexAttribArray(0);
-
-        // Texture.
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(vec3Size));
-        glEnableVertexAttribArray(1);
-
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        return vao;
-    }
-
-    GLuint CreateEbo(const unsigned int* indices, unsigned int indicesCount)
-    {
-        GLuint ebo;
-        glGenBuffers(1, &ebo);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-
-        return ebo;
-    }
-
-    GLuint InitTextureObj(const feng::TextureData& textureData, int wrap_s, int wrap_t, bool withAlpha)
-    {
-        if(textureData.IsValid())
-        {
-            GLuint texture;
-            glGenTextures(1, &texture);
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glTexImage2D(
-                         GL_TEXTURE_2D,
-                         0,
-                         GL_RGB,
-                         textureData.GetWidth(),
-                         textureData.GetHeight(),
-                         0,
-                         (withAlpha ? GL_RGBA : GL_RGB),
-                         GL_UNSIGNED_BYTE,
-                         textureData.GetData());
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            return texture;
-        }
-        else
-        {
-            feng::Debug::LogError("No texture object created.");
-            return 0;
-        }
-    }
-
     void InitRender()
     {
         feng::Debug::LogRenderInfoOpenGL();
@@ -502,53 +414,22 @@ namespace SRender
         SRes::LoadResources();
         SObjects::CreateObjects();
 
-        // Specify clear value for color buffer: color to fill color buffer with after call to "glClear(GL_COLOR_BUFFER_BIT)".
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-        textureObj1 = InitTextureObj(*SRes::woodContainerTextureData, GL_REPEAT, GL_REPEAT, false);
-        textureObj3 = InitTextureObj(*SRes::awesomeFaceTextureData, GL_REPEAT, GL_REPEAT, true);
-        shapeVao = CreateVaoWithColorAndTexture(SRes::cube.data(), 36, SRes::cube.size() * sizeof(float) / 36);
-
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-        //glBindVertexArray(0);
-
-        shapeEbo = CreateEbo(SRes::rectIndices, 6);
-
-        glBindVertexArray(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        // Draw in wireframe polygons.
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glEnable(GL_DEPTH_TEST);
-    }
-
-    void RenderEbo(GLuint ebo, GLuint vao, int indicesCount, const feng::Shader& shader)
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader.StartUse();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureObj1);
-
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-        for(std::unique_ptr<feng::Entity>& entity : SObjects::objects)
-        {
-            feng::Transform *transform = entity->GetComponent<feng::Transform>();
-            feng::Matrix4 modelTransformMatrix = transform->GetGlobalMatrix();
-            feng::Camera *camera = SObjects::camEntity->GetComponent<feng::Camera>();
-
-            shader.SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), modelTransformMatrix);
-            shader.SetUniformMatrix4(feng::ShaderParams::ViewProjMatrix.data(), camera->GetViewProjectionMatrix());
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
     }
 
     void Render()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        for(std::unique_ptr<feng::Entity>& entity : SObjects::objects)
+        {
+            feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>();
+            renderer->Draw(SObjects::renderProperties);
+        }
     }
 }
 
@@ -563,19 +444,12 @@ int main(int argc, const char * argv[])
         Print_Errors_OpengGL();
         feng::Debug::LogMessage("Start loop.");
 
-        SRes::texMaterial->GetShader()->StartUse();
-        SRes::texMaterial->GetShader()->SetUniformInt(feng::ShaderParams::Texture0.data(), 0);
-        SRes::texMaterial->GetShader()->SetUniformVector3(feng::ShaderParams::DirLightColor.data(), SRender::lightColor.GetXyz());
-        SRes::texMaterial->GetShader()->StopUse();
-
         while(!glfwWindowShouldClose(window))
         {
             SApp::UpdateTime();
             SMain::ProcessWindowInput(*window);
             SObjects::Update();
             SRender::Render();
-
-            SRender::RenderEbo(SRender::shapeEbo, SRender::shapeVao, 6, *SRes::texMaterial->GetShader());
             glfwSwapBuffers(window);
             glfwPollEvents();
 

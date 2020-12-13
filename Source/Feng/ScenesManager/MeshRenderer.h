@@ -46,7 +46,7 @@ namespace feng
         uint32_t CreateVertexBuffer();
         uint32_t CreateIndexBuffer();
 
-        void CreateTextureBuffer(const Texture& texture, const char *name);
+        uint32_t CreateTextureBuffer(const Texture& texture);
         void GenerateTexture(const Texture& texture);
         void GenerateTexture2D(const Texture& texture);
         void GenerateTextureCube(const Texture& texture);
