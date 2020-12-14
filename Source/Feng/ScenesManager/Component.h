@@ -16,23 +16,23 @@ namespace feng
     protected:
         Component() = default;
 
-        void SetOwner(Entity *owner);
+        void SetOwner(Entity *aOwner);
 
-        Entity *m_owner = nullptr;
+        Entity *owner = nullptr;
     };
 
     inline const Entity* Component::GetEntity() const
     {
-        return m_owner;
+        return owner;
     }
 
     inline Entity* Component::GetEntity()
     {
-        return m_owner;
+        return owner;
     }
 
-    inline void Component::SetOwner(Entity *owner)
+    inline void Component::SetOwner(Entity *aOwner)
     {
-        m_owner = owner;
+        owner = aOwner;
     }
 }

@@ -14,7 +14,7 @@ namespace feng
         Transform();
         ~Transform() = default;
 
-        const Vector3& GetPosition() const;
+        const Vector3& GetPosition(eSpace space = eSpace::World) const;
         void SetPosition(const Vector3& aPosition, eSpace space = eSpace::World);
         void SetPosition(float x, float y, float z, eSpace space = eSpace::World);
 
@@ -48,7 +48,7 @@ namespace feng
 
 namespace feng
 {
-    inline const Vector3& Transform::GetPosition() const
+    inline const Vector3& Transform::GetPosition(eSpace space /*= eSpace::World*/) const
     {
         return position;
     }

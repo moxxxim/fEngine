@@ -30,9 +30,7 @@ namespace feng
         void StartDraw();
         void FinishDraw();
 
-        void SetupLight(const RenderProperties &renderProperties);
-        void SetupFog(const RenderProperties &renderProperties);
-        void SetGlobalUniforms(const Camera& cam);
+        void SetGlobalUniforms(const RenderProperties &renderProperties);
         void SetMaterialUniforms();
         void ExecuteDraw();
         void ActivateTexture(const std::string& name, const Texture &texture, uint32_t unit);
@@ -50,6 +48,10 @@ namespace feng
         void GenerateTexture(const Texture& texture);
         void GenerateTexture2D(const Texture& texture);
         void GenerateTextureCube(const Texture& texture);
+
+        void SetCameraUniforms(const RenderProperties &renderProperties);
+        void SetLightUniforms(const RenderProperties &renderProperties);
+        void SetFogUniforms(const RenderProperties &renderProperties);
 
         static constexpr uint32_t UndefinedBuffer = 0;
 

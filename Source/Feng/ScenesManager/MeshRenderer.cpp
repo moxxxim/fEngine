@@ -63,9 +63,7 @@ namespace feng
         if (CanDraw())
         {
             StartDraw();
-            SetupFog(renderProperties);
-            SetupLight(renderProperties);
-            SetGlobalUniforms(*renderProperties.cam);
+            SetGlobalUniforms(renderProperties);
             SetMaterialUniforms();
             ExecuteDraw();
             FinishDraw();
@@ -87,66 +85,11 @@ namespace feng
         shader->StopUse();
     }
 
-    void MeshRenderer::SetupLight(const RenderProperties &renderProperties)
+    void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties)
     {
-//        const char *ambientLightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::AmbientLightColor);
-//        m_shader->SetUniformVector4(ambientLightColorUniform, renderProperties->GetAmbientLightColor());
-//
-//        int directLightsCount = renderProperties->GetDirectLightsCount();
-//        if (directLightsCount > 0)
-//        {
-//            const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightCount);
-//            m_shader->SetUniformInt(lightsCountUniform, directLightsCount);
-//            const char *lightDirectionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightDirection);
-//            const Vector3 *directions = renderProperties->GetDirectLightDirections();
-//            m_shader->SetUniformVector3Array(lightDirectionsUniform, directions, directLightsCount);
-//            const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightColor);
-//            const Vector4 *colors = renderProperties->GetDirectLightColors();
-//            m_shader->SetUniformVector4Array(lightColorUniform, colors, directLightsCount);
-//            const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightIntensity);
-//            const float *intensities = renderProperties->GetDirectLightIntensities();
-//            m_shader->SetUniformFloatArray(lightsIntensityUniform, intensities, directLightsCount);
-//        }
-
-//        int pointLightsCount = renderProperties->GetPointLightsCount();
-//        if (pointLightsCount > 0)
-//        {
-//            const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightCount);
-//            m_shader->SetUniformInt(lightsCountUniform, pointLightsCount);
-//            const char *lightPositionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightPosition);
-//            m_shader->SetUniformVector3Array(lightPositionsUniform, renderProperties->GetPointLightPositions(), pointLightsCount);
-//            const char *lightsRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightRange);
-//            m_shader->SetUniformFloatArray(lightsRangeUniform, renderProperties->GetPointLightRanges(), pointLightsCount);
-//            const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightColor);
-//            m_shader->SetUniformVector4Array(lightColorUniform, renderProperties->GetPointLightColors(), pointLightsCount);
-//            const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightIntensity);
-//            m_shader->SetUniformFloatArray(lightsIntensityUniform, renderProperties->GetPointLightIntensities(), pointLightsCount);
-//        }
-    }
-
-    void MeshRenderer::SetupFog(const RenderProperties &renderProperties)
-    {
-//        const feng::Camera *cam = renderProperties->GetCamera();
-//        const feng::Fog& fog = renderProperties->GetFog();
-//
-//        const char *fogStartUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogStart);
-//        m_shader->SetUniformFloat(fogStartUniform, fog.GetStart());
-//        const char *fogRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogRange);
-//        m_shader->SetUniformFloat(fogRangeUniform, fog.GetRange());
-//        const char *fogDensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogDensity);
-//        m_shader->SetUniformFloat(fogDensityUniform, fog.GetDensity());
-//        const char *fogColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogColor);
-//        m_shader->SetUniformVector3(fogColorUniform, fog.GetColor());
-    }
-
-    void MeshRenderer::SetGlobalUniforms(const Camera& cam)
-    {
-        Transform *camTransform = cam.GetEntity()->GetComponent<Transform>();
-        Transform *myTransform = GetEntity()->GetComponent<Transform>();
-        const Shader *shader = material->GetShader();
-
-        shader->SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
-        shader->SetUniformMatrix4(feng::ShaderParams::ViewProjMatrix.data(), cam.GetViewProjectionMatrix());
+        SetCameraUniforms(renderProperties);
+        SetLightUniforms(renderProperties);
+        SetFogUniforms(renderProperties);
     }
 
     void MeshRenderer::SetMaterialUniforms()
@@ -212,7 +155,7 @@ namespace feng
         {
             const std::vector<uint32_t>& indices = mesh->GetIndices();
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+            // No need to call 'glBindBuffer' because it was bound while VAO was still bound.
             glDrawElements(ToOpenGLValue(primitiveType), indices.size(), GL_UNSIGNED_INT, 0);
         }
         else
@@ -220,6 +163,8 @@ namespace feng
             int32_t verticesCount = mesh->GetVerticesCount();
             glDrawArrays(ToOpenGLValue(primitiveType), 0, verticesCount);
         }
+
+        glBindVertexArray(UndefinedBuffer);
     }
 
     void MeshRenderer::ActivateTexture(const std::string& name, const Texture &texture, uint32_t unit)
@@ -377,6 +322,7 @@ namespace feng
         GLsizei width = static_cast<GLsizei>(texture.GetWidth());
         GLsizei height = static_cast<GLsizei>(texture.GetHeight());
         const GLvoid *data = static_cast<const GLvoid*>(texture.GetData());
+        // TODO: m.alekseev Format here is used incorrectly.
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     }
 
@@ -390,5 +336,83 @@ namespace feng
 //            const char *data = texture->GetCubeMapFace((feng::CubeMapFace)i);
 //            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, data);
 //        }
+    }
+
+    void MeshRenderer::SetCameraUniforms(const RenderProperties &renderProperties)
+    {
+        const Shader *shader = material->GetShader();
+        const Entity *camEntity = renderProperties.cam->GetEntity();
+        const Transform *camTransform = camEntity->GetComponent<Transform>();
+        const Transform *myTransform = GetEntity()->GetComponent<Transform>();
+
+        shader->SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
+        shader->SetUniformMatrix4(feng::ShaderParams::ViewProjMatrix.data(), renderProperties.cam->GetViewProjectionMatrix());
+        shader->SetUniformVector3(feng::ShaderParams::CameraPos.data(), camTransform->GetPosition());
+        shader->SetUniformVector3(feng::ShaderParams::CameraDir.data(), camTransform->GetForward());
+    }
+
+    void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties)
+    {
+        const Shader *shader = material->GetShader();
+        shader->SetUniformVector4(ShaderParams::AmbientColor.data(), renderProperties.ambientColor);
+
+        const Transform *pointLightTransform = renderProperties.pointLight->GetEntity()->GetComponent<Transform>();
+        Vector4 pointLightPositionAndRange = pointLightTransform->GetPosition();
+        pointLightPositionAndRange.w = renderProperties.pointLight->GetRange();
+
+        Vector4 pointLightColor = renderProperties.pointLight->GetColor();
+        pointLightColor.w = renderProperties.pointLight->GetIntesity();
+
+        shader->SetUniformVector4(ShaderParams::PointLightPositionAndRange.data(), pointLightPositionAndRange);
+        shader->SetUniformVector4(ShaderParams::PointLightColor.data(), pointLightColor);
+
+//        const char *ambientLightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::AmbientLightColor);
+//        m_shader->SetUniformVector4(ambientLightColorUniform, renderProperties->GetAmbientLightColor());
+//
+//        int directLightsCount = renderProperties->GetDirectLightsCount();
+//        if (directLightsCount > 0)
+//        {
+//            const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightCount);
+//            m_shader->SetUniformInt(lightsCountUniform, directLightsCount);
+//            const char *lightDirectionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightDirection);
+//            const Vector3 *directions = renderProperties->GetDirectLightDirections();
+//            m_shader->SetUniformVector3Array(lightDirectionsUniform, directions, directLightsCount);
+//            const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightColor);
+//            const Vector4 *colors = renderProperties->GetDirectLightColors();
+//            m_shader->SetUniformVector4Array(lightColorUniform, colors, directLightsCount);
+//            const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::DirectLightIntensity);
+//            const float *intensities = renderProperties->GetDirectLightIntensities();
+//            m_shader->SetUniformFloatArray(lightsIntensityUniform, intensities, directLightsCount);
+//        }
+
+//        int pointLightsCount = renderProperties->GetPointLightsCount();
+//        if (pointLightsCount > 0)
+//        {
+//            const char *lightsCountUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightCount);
+//            m_shader->SetUniformInt(lightsCountUniform, pointLightsCount);
+//            const char *lightPositionsUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightPosition);
+//            m_shader->SetUniformVector3Array(lightPositionsUniform, renderProperties->GetPointLightPositions(), pointLightsCount);
+//            const char *lightsRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightRange);
+//            m_shader->SetUniformFloatArray(lightsRangeUniform, renderProperties->GetPointLightRanges(), pointLightsCount);
+//            const char *lightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightColor);
+//            m_shader->SetUniformVector4Array(lightColorUniform, renderProperties->GetPointLightColors(), pointLightsCount);
+//            const char *lightsIntensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::PointLightIntensity);
+//            m_shader->SetUniformFloatArray(lightsIntensityUniform, renderProperties->GetPointLightIntensities(), pointLightsCount);
+//        }
+    }
+
+    void MeshRenderer::SetFogUniforms(const RenderProperties &renderProperties)
+    {
+//        const feng::Camera *cam = renderProperties->GetCamera();
+//        const feng::Fog& fog = renderProperties->GetFog();
+//
+//        const char *fogStartUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogStart);
+//        m_shader->SetUniformFloat(fogStartUniform, fog.GetStart());
+//        const char *fogRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogRange);
+//        m_shader->SetUniformFloat(fogRangeUniform, fog.GetRange());
+//        const char *fogDensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogDensity);
+//        m_shader->SetUniformFloat(fogDensityUniform, fog.GetDensity());
+//        const char *fogColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogColor);
+//        m_shader->SetUniformVector3(fogColorUniform, fog.GetColor());
     }
 }

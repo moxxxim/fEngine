@@ -10,6 +10,7 @@ namespace feng
         Vector4() = default;
         Vector4(float aX, float aY, float aZ, float aW);
         Vector4(const Vector3& aXyz, float aW);
+        Vector4(const Vector3& aXyz);
         Vector4(const Vector4&) = default;
         Vector4(Vector4&&) = default;
 
@@ -40,6 +41,10 @@ namespace feng
 
     inline Vector4::Vector4(const Vector3& aXyz, float aW)
         : data {aXyz.x, aXyz.y, aXyz.z, aW}
+    { }
+
+    inline Vector4::Vector4(const Vector3& aXyz)
+        : Vector4(aXyz, 0.f)
     { }
 
     inline Vector3 Vector4::GetXyz() const

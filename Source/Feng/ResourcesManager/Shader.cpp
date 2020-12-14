@@ -131,7 +131,10 @@ namespace feng
         if(TryGetUniformLocation(name, location))
         {
             glUniform2f(location, value.x, value.y);
+            return true;
         }
+
+        return false;
     }
 
     bool Shader::SetUniformVector3(const char *name, const Vector3& value) const
@@ -140,7 +143,10 @@ namespace feng
         if(TryGetUniformLocation(name, location))
         {
             glUniform3f(location, value.x, value.y, value.z);
+            return true;
         }
+
+        return false;
     }
 
     bool Shader::SetUniformVector4(const char *name, const Vector4& value) const
@@ -149,7 +155,10 @@ namespace feng
         if(TryGetUniformLocation(name, location))
         {
             glUniform4f(location, value.x, value.y, value.z, value.w);
+            return true;
         }
+
+        return false;
     }
 
     bool Shader::SetUniformMatrix4(const char *name, const Matrix4& matrix) const
@@ -158,7 +167,10 @@ namespace feng
         if(TryGetUniformLocation(name, location))
         {
             glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data);
+            return true;
         }
+
+        return false;
     }
 
     bool Shader::SetUniformFloatArray(const char *name, const float *value, int size) const

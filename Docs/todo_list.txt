@@ -15,3 +15,12 @@
 14. Introduce Compnent/System + Behaviours.
 15. Implement Color class.
 16. Tempaltes for material/type erasure.
+17. Camera frustum culling.
+18. How linera filtering is calculated?
+19. Performance impact with mip-maps.
+20. How mip-maps works? When filtering applied (on which pipeline stage)?
+21. Checkered white-black texture on plane for testing mip-maps filtering.
+22. glTexImage2D - formats parameters?
+23. Visualize light sources: point - cube/sphere, directional - gram, spot - pyramid/cone.
+24. Gizmos for light sources.
+25. Do local intermediate variables have impact on shader performance?

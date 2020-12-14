@@ -3,9 +3,8 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
-#include <Feng/Math/Matrix4.h>
-#include <Feng/Math/MatrixUtils.h>
 #include <Feng/Math/Vector3.h>
+#include <Feng/Math/MatrixUtils.h>
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/ResourcesManager/TextureData.h>
@@ -13,6 +12,7 @@
 #include <Feng/ResourcesManager/Mesh.h>
 #include <Feng/ResourcesManager/Texture.h>
 #include <Feng/ScenesManager/Camera.h>
+#include <Feng/ScenesManager/Light.h>
 #include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/MeshRenderer.h>
 #include <Feng/ScenesManager/Transform.h>
@@ -29,57 +29,58 @@ namespace SRes
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
 
-    const char *UnlitTexture2MixFsName = "Unlit/UnlitTexture2MixFs.fs";
-    const char *UnlitTexture2MixVsName = "Unlit/UnlitTexture2MixVs.vs";
-    const char *TextureFsName = "TextureFs.fs";
-    const char *TextureVsName = "TextureVs.vs";
+    const char *DiffuseTextureFsName = "DiffuseTextureFs.fs";
+    const char *DiffuseTextureVsName = "DiffuseTextureVs.vs";
+    const char *SpecularTextureFsName = "SpecularTextureFs.fs";
+    const char *SpecularTextureVsName = "SpecularTextureVs.vs";
     const char *woodenContainerJpg = "wood_container.jpg";
+    const char *brickWallJpg = "brick_wall.jpg";
     const char *awesomeFacePng = "awesomeface.png";
 
     std::vector<float> cube
     {
-             // position        // uv
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+             // position            // normal          // uv
+        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f
     };
 
     const unsigned int rectIndices[]
@@ -89,13 +90,15 @@ namespace SRes
     };
 
     std::unique_ptr<feng::TextureData> woodContainerTextureData;
+    std::unique_ptr<feng::TextureData> brickWallTextureData;
     std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
 
     std::unique_ptr<feng::Texture> woodContainerTexture;
+    std::unique_ptr<feng::Texture> brickWallTexture;
     std::unique_ptr<feng::Texture> awesomeFaceTexture;
 
-    std::unique_ptr<feng::Material> unlitTex2MixMaterial;
-    std::unique_ptr<feng::Material> texMaterial;
+    std::unique_ptr<feng::Material> diffuseTexMaterial;
+    std::unique_ptr<feng::Material> specularTexMaterial;
 
     std::unique_ptr<feng::Mesh> cubeMesh;
 
@@ -115,25 +118,29 @@ namespace SRes
     void LoadMaterials()
     {
         woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
-        awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
-
         woodContainerTexture = std::make_unique<feng::Texture>(*woodContainerTextureData);
+        woodContainerTexture->SetFilters(feng::eTextureMinFilter::Linear, feng::eTextureMagFilter::Linear);
+
+        brickWallTextureData = LoadTexture(brickWallJpg, false);
+        brickWallTexture = std::make_unique<feng::Texture>(*brickWallTextureData);
+
+        awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
         awesomeFaceTexture = std::make_unique<feng::Texture>(*awesomeFaceTextureData);
 
-        std::unique_ptr<feng::Shader> unlitTexture2MixShader = LoadShader(UnlitTexture2MixVsName, UnlitTexture2MixFsName);
-        std::unique_ptr<feng::Shader> textureShader = LoadShader(TextureVsName, TextureFsName);;
+        std::unique_ptr<feng::Shader> diffuseTextureShader = LoadShader(DiffuseTextureVsName, DiffuseTextureFsName);
+        diffuseTexMaterial = std::make_unique<feng::Material>(std::move(diffuseTextureShader));
+        diffuseTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), woodContainerTexture.get());
 
-        unlitTex2MixMaterial = std::make_unique<feng::Material>(std::move(unlitTexture2MixShader));
-        unlitTex2MixMaterial->SetTexture(feng::ShaderParams::Texture0.data(), woodContainerTexture.get());
-        unlitTex2MixMaterial->SetTexture(feng::ShaderParams::Texture0.data(), awesomeFaceTexture.get());
-
-        texMaterial = std::make_unique<feng::Material>(std::move(textureShader));
-        texMaterial->SetTexture(feng::ShaderParams::Texture0.data(), woodContainerTexture.get());
+        std::unique_ptr<feng::Shader> specularTextureShader = LoadShader(SpecularTextureVsName, SpecularTextureFsName);
+        specularTexMaterial = std::make_unique<feng::Material>(std::move(specularTextureShader));
+        specularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
+        specularTexMaterial->SetFloat("uSpecularity", 0.8f);
+        specularTexMaterial->SetFloat("uShininess", 32.0f);
     }
 
     void LoadMeshes()
     {
-        uint32_t attributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Uv0;
+        uint32_t attributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Normal | feng::eVertexAtributes::Uv0;
         feng::eVertexAtributes attributes = static_cast<feng::eVertexAtributes>(attributesValue);
         cubeMesh = std::make_unique<feng::Mesh>(cube, attributes, feng::ePrimitiveType::Triangles);
     }
@@ -174,18 +181,19 @@ namespace SCamController
 namespace SObjects
 {
     std::unique_ptr<feng::Entity> camEntity;
+    std::unique_ptr<feng::Entity> pointLightEntity;
 
     std::array<feng::Vector3, 10> cubePositions = {
+        feng::Vector3(-2.0f, 0.0f, 0.0f),
         feng::Vector3( 0.0f,  0.0f,  0.0f),
-        feng::Vector3( 2.0f,  5.0f, -15.0f),
-        feng::Vector3(-1.5f, -2.2f, -2.5f),
-        feng::Vector3(-3.8f, -2.0f, -12.3f),
-        feng::Vector3( 2.4f, -0.4f, -3.5f),
-        feng::Vector3(-1.7f,  3.0f, -7.5f),
-        feng::Vector3( 1.3f, -2.0f, -2.5f),
-        feng::Vector3( 1.5f,  2.0f, -2.5f),
-        feng::Vector3( 1.5f,  0.2f, -1.5f),
-        feng::Vector3(-1.3f,  1.0f, -1.5f)
+        feng::Vector3( 2.0f,  0.0f, 0.0f),
+        feng::Vector3(-2.0f, 2.0f, 0.0f),
+        feng::Vector3(0.0f, 2.0f, 0.0f),
+        feng::Vector3(2.0f, 2.0f, 0.0f),
+        feng::Vector3( -2.0f, 1.0f, -4.0f),
+        feng::Vector3( 0.0f, 1.0f, -4.0f),
+        feng::Vector3( 2.0f, 1.0f, -4.0f),
+        feng::Vector3( 0.0f, -3.0f, -2.0f),
     };
 
     std::vector<std::unique_ptr<feng::Entity>> objects;
@@ -195,20 +203,41 @@ namespace SObjects
     std::unique_ptr<feng::Entity> CreateCamera()
     {
         std::unique_ptr<feng::Entity> camEntity = std::make_unique<feng::Entity>("Camera");
-        feng::Camera &camera = camEntity->AddComponent<feng::Camera>();
-        feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
-        camTransform->SetPosition(0.f, 0.f, 3.f);
-        camTransform->SetEuler(SCamController::camPitch, SCamController::camYaw, 0.f);
 
+        feng::Camera &camera = camEntity->AddComponent<feng::Camera>();
         camera.SetFovY(SCamController::Zoom);
         camera.SetAspectRatio(static_cast<float>(SApp::Width)/SApp::Height);
         camera.SetNearClipPlane(0.1f);
         camera.SetFarClipPlane(100.f);
 
+        feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
+        camTransform->SetPosition(0.f, 0.f, 3.f);
+        camTransform->SetEuler(SCamController::camPitch, SCamController::camYaw, 0.f);
+
         return camEntity;
     }
 
-    std::unique_ptr<feng::Entity> CreateCube(const feng::Vector3& position, const std::string& name, const feng::Mesh &mesh, const feng::Material& material)
+    std::unique_ptr<feng::Entity> CreateLight()
+    {
+        std::unique_ptr<feng::Entity> lightEntity = std::make_unique<feng::Entity>("Light");
+
+        feng::Light &light = lightEntity->AddComponent<feng::Light>();
+        light.SetType(feng::Light::eType::Point);
+        light.SetRange(8.f);
+        light.SetColor(feng::Vector4{1.f, 1.f, 1.f, 1.f});
+        light.SetIntensity(1.f);
+
+        feng::Transform *lightTransform = lightEntity->GetComponent<feng::Transform>();
+        lightTransform->SetPosition(0.f, 4.f, -1.f);
+
+        return lightEntity;
+    }
+
+    std::unique_ptr<feng::Entity> CreateCube(
+                                            const feng::Vector3& position,
+                                            const std::string& name,
+                                            const feng::Mesh &mesh,
+                                            const feng::Material& material)
     {
         std::unique_ptr<feng::Entity> cube = std::make_unique<feng::Entity>(name);
 
@@ -216,8 +245,8 @@ namespace SObjects
         cubeTransform->SetPosition(position);
 
         feng::MeshRenderer& meshRenderer = cube->AddComponent<feng::MeshRenderer>();
-        meshRenderer.SetMesh(SRes::cubeMesh.get());
-        meshRenderer.SetMaterial(SRes::texMaterial.get());
+        meshRenderer.SetMesh(&mesh);
+        meshRenderer.SetMaterial(&material);
 
         return cube;
     }
@@ -225,16 +254,31 @@ namespace SObjects
     void CreateObjects()
     {
         SObjects::camEntity = SObjects::CreateCamera();
+        SObjects::pointLightEntity = SObjects::CreateLight();
 
         for(int32_t i = 0; i < cubePositions.size(); ++i)
         {
             const feng::Vector3& position = cubePositions[i];
             std::string name = "cube " + std::to_string(i);
-            std::unique_ptr<feng::Entity> entity = CreateCube(position, name, *SRes::cubeMesh, *SRes::texMaterial);
+            const feng::Material *material = ((i % 2) == 0)
+                ? SRes::diffuseTexMaterial.get()
+                : SRes::specularTexMaterial.get();
+            std::unique_ptr<feng::Entity> entity = CreateCube(position, name, *SRes::cubeMesh, *material);
             objects.push_back(std::move(entity));
         }
+    }
 
+    void InitRenderProperties()
+    {
         renderProperties.cam = camEntity->GetComponent<feng::Camera>();
+        renderProperties.ambientColor = feng::Vector4{1.f, 1.f, 1.f, 0.5f};
+        renderProperties.pointLight = pointLightEntity->GetComponent<feng::Light>();
+    }
+
+    void CreateScene()
+    {
+        CreateObjects();
+        InitRenderProperties();
     }
 
     void UpdateCamera()
@@ -248,6 +292,17 @@ namespace SObjects
     }
 
     void UpdateObjects()
+    {
+        for(const std::unique_ptr<feng::Entity>& entity : objects)
+        {
+            feng::Transform *transform = entity->GetComponent<feng::Transform>();
+
+            float angle = 20.f * SApp::time;
+            transform->SetEuler(0.f, 0.f, angle);
+        }
+    }
+
+    void UpdateLight()
     {
         for(const std::unique_ptr<feng::Entity>& entity : objects)
         {
@@ -412,12 +467,9 @@ namespace SRender
         feng::Debug::LogMessage("Initialize render.");
 
         SRes::LoadResources();
-        SObjects::CreateObjects();
+        SObjects::CreateScene();
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glEnable(GL_DEPTH_TEST);
     }
 

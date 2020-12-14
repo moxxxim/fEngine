@@ -1,6 +1,6 @@
 #include <Feng/ResourcesManager/TextureData.h>
 
-#include <Classes/TextureLoader.h>
+#include <Feng/ResourcesManager/TextureLoader.h>
 
 namespace feng
 {
