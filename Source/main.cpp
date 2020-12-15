@@ -364,19 +364,19 @@ namespace SObjects
 
     void UpdateLight()
     {
-        for(const std::unique_ptr<feng::Entity>& entity : objects)
-        {
-            feng::Transform *transform = entity->GetComponent<feng::Transform>();
+        constexpr float zLightOffset = 4.f;
+        float lightPosZ = -1.f + zLightOffset * std::cos(0.5f * SApp::time);
 
-            float angle = 20.f * SApp::time;
-            transform->SetEuler(0.f, 0.f, angle);
-        }
+        feng::Transform *lightTransform = pointLightEntity->GetComponent<feng::Transform>();
+        const feng::Vector3& lightPosition = lightTransform->GetPosition();
+        lightTransform->SetPosition(lightPosition.x, lightPosition.y, lightPosZ);
     }
 
     void Update()
     {
         UpdateCamera();
         UpdateObjects();
+        UpdateLight();
     }
 }
 
