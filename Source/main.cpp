@@ -271,7 +271,7 @@ namespace SObjects
         feng::Light &light = lightEntity->AddComponent<feng::Light>();
         light.SetType(feng::Light::eType::Point);
         light.SetRange(8.f);
-        light.SetColor(feng::Vector4{1.f, 0.5f, 0.5f, 1.f});
+        light.SetColor(feng::Vector4{1.f, 0.9f, 0.5f, 1.f});
         light.SetIntensity(1.f);
 
         feng::Transform *lightTransform = lightEntity->GetComponent<feng::Transform>();
