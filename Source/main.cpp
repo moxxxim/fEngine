@@ -29,6 +29,9 @@ namespace SRes
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
 
+    const char *FlatColorFsName = "Unlit/UnlitFlatColorFs.fs";
+    const char *FlatColorVsName = "Unlit/UnlitFlatColorVs.vs";
+
     const char *DiffuseTextureFsName = "DiffuseTextureFs.fs";
     const char *DiffuseTextureVsName = "DiffuseTextureVs.vs";
     const char *SpecularTextureFsName = "SpecularTextureFs.fs";
@@ -109,6 +112,8 @@ namespace SRes
     std::unique_ptr<feng::Material> vertexDiffuseTexMaterial;
     std::unique_ptr<feng::Material> vertexSpecularTexMaterial;
 
+    std::unique_ptr<feng::Material> flatColorMaterial;
+
     std::unique_ptr<feng::Mesh> cubeMesh;
 
     std::unique_ptr<feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
@@ -160,6 +165,9 @@ namespace SRes
         vertexSpecularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
         vertexSpecularTexMaterial->SetFloat("uSpecularity", 0.8f);
         vertexSpecularTexMaterial->SetFloat("uShininess", 32.0f);
+
+        std::unique_ptr<feng::Shader> flatColorShader = LoadShader(FlatColorVsName, FlatColorFsName);
+        flatColorMaterial = std::make_unique<feng::Material>(std::move(flatColorShader));
     }
 
     void LoadMeshes()
@@ -222,6 +230,8 @@ namespace SObjects
 
     std::vector<std::unique_ptr<feng::Entity>> objects;
 
+    std::vector<feng::Entity *> scene;
+
     feng::RenderProperties renderProperties;
 
     std::unique_ptr<feng::Entity> CreateCamera()
@@ -241,6 +251,19 @@ namespace SObjects
         return camEntity;
     }
 
+    void AddLightGizmoRenderer(feng::Light &light)
+    {
+        feng::Entity *lightEntity = light.GetEntity();
+        feng::Transform *cubeTransform = lightEntity->GetComponent<feng::Transform>();
+        cubeTransform->SetScale(0.2f);
+
+        feng::MeshRenderer& meshRenderer = lightEntity->AddComponent<feng::MeshRenderer>();
+        meshRenderer.SetMesh(SRes::cubeMesh.get());
+        meshRenderer.SetMaterial(SRes::flatColorMaterial.get());
+
+        SRes::flatColorMaterial->SetVector3(feng::ShaderParams::MainColor.data(), light.GetColor().GetXyz());
+    }
+
     std::unique_ptr<feng::Entity> CreateLight()
     {
         std::unique_ptr<feng::Entity> lightEntity = std::make_unique<feng::Entity>("Light");
@@ -248,11 +271,13 @@ namespace SObjects
         feng::Light &light = lightEntity->AddComponent<feng::Light>();
         light.SetType(feng::Light::eType::Point);
         light.SetRange(8.f);
-        light.SetColor(feng::Vector4{1.f, 1.f, 1.f, 1.f});
+        light.SetColor(feng::Vector4{1.f, 0.5f, 0.5f, 1.f});
         light.SetIntensity(1.f);
 
         feng::Transform *lightTransform = lightEntity->GetComponent<feng::Transform>();
         lightTransform->SetPosition(0.f, 4.f, -1.f);
+
+        AddLightGizmoRenderer(light);
 
         return lightEntity;
     }
@@ -292,6 +317,16 @@ namespace SObjects
         }
     }
 
+    void AddObjectsToScene()
+    {
+        for(std::unique_ptr<feng::Entity>& object : objects)
+        {
+            scene.push_back(object.get());
+        }
+
+        scene.push_back(pointLightEntity.get());
+    }
+
     void InitRenderProperties()
     {
         renderProperties.cam = camEntity->GetComponent<feng::Camera>();
@@ -302,6 +337,7 @@ namespace SObjects
     void CreateScene()
     {
         CreateObjects();
+        AddObjectsToScene();
         InitRenderProperties();
     }
 
@@ -512,10 +548,12 @@ namespace SRender
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        for(std::unique_ptr<feng::Entity>& entity : SObjects::objects)
+        for(feng::Entity *entity : SObjects::scene)
         {
-            feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>();
-            renderer->Draw(SObjects::renderProperties);
+            if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
+            {
+                renderer->Draw(SObjects::renderProperties);
+            }
         }
     }
 }

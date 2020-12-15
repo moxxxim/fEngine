@@ -2,7 +2,7 @@
 
 uniform vec3 uMainColor;
 
-out vec3 FragColor;
+out vec4 FragColor;
 
 void main()
 {
