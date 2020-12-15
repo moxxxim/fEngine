@@ -33,6 +33,12 @@ namespace SRes
     const char *DiffuseTextureVsName = "DiffuseTextureVs.vs";
     const char *SpecularTextureFsName = "SpecularTextureFs.fs";
     const char *SpecularTextureVsName = "SpecularTextureVs.vs";
+
+    const char *VertexDiffuseTextureFsName = "VertexDiffuseTextureFs.fs";
+    const char *VertexDiffuseTextureVsName = "VertexDiffuseTextureVs.vs";
+    const char *VertexSpecularTextureFsName = "VertexSpecularTextureFs.fs";
+    const char *VertexSpecularTextureVsName = "VertexSpecularTextureVs.vs";
+
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *brickWallJpg = "brick_wall.jpg";
     const char *awesomeFacePng = "awesomeface.png";
@@ -100,6 +106,9 @@ namespace SRes
     std::unique_ptr<feng::Material> diffuseTexMaterial;
     std::unique_ptr<feng::Material> specularTexMaterial;
 
+    std::unique_ptr<feng::Material> vertexDiffuseTexMaterial;
+    std::unique_ptr<feng::Material> vertexSpecularTexMaterial;
+
     std::unique_ptr<feng::Mesh> cubeMesh;
 
     std::unique_ptr<feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
@@ -115,7 +124,7 @@ namespace SRes
         return feng::TextureData::Load(texturePath, flip);
     }
 
-    void LoadMaterials()
+    void LoadTextures()
     {
         woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
         woodContainerTexture = std::make_unique<feng::Texture>(*woodContainerTextureData);
@@ -126,6 +135,11 @@ namespace SRes
 
         awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
         awesomeFaceTexture = std::make_unique<feng::Texture>(*awesomeFaceTextureData);
+    }
+
+    void LoadMaterials()
+    {
+        LoadTextures();
 
         std::unique_ptr<feng::Shader> diffuseTextureShader = LoadShader(DiffuseTextureVsName, DiffuseTextureFsName);
         diffuseTexMaterial = std::make_unique<feng::Material>(std::move(diffuseTextureShader));
@@ -136,6 +150,16 @@ namespace SRes
         specularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
         specularTexMaterial->SetFloat("uSpecularity", 0.8f);
         specularTexMaterial->SetFloat("uShininess", 32.0f);
+
+        std::unique_ptr<feng::Shader> vertexDiffuseTextureShader = LoadShader(VertexDiffuseTextureVsName, VertexDiffuseTextureFsName);
+        vertexDiffuseTexMaterial = std::make_unique<feng::Material>(std::move(vertexDiffuseTextureShader));
+        vertexDiffuseTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), woodContainerTexture.get());
+
+        std::unique_ptr<feng::Shader> vertexSpecularTextureShader = LoadShader(VertexSpecularTextureVsName, VertexSpecularTextureFsName);
+        vertexSpecularTexMaterial = std::make_unique<feng::Material>(std::move(vertexSpecularTextureShader));
+        vertexSpecularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
+        vertexSpecularTexMaterial->SetFloat("uSpecularity", 0.8f);
+        vertexSpecularTexMaterial->SetFloat("uShininess", 32.0f);
     }
 
     void LoadMeshes()
@@ -407,24 +431,35 @@ namespace SMain
         {
             glfwSetWindowShouldClose(&window, true);
         }
-        else if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
+
+        if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
         {
             feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
             feng::Vector3 forward = camTransform->GetForward();
             camTransform->Move(SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * forward);
         }
+
         if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
         {
             feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
             feng::Vector3 forward = camTransform->GetForward();
             camTransform->Move(-SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * forward);
         }
+
         if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
         {
             feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
             feng::Vector3 right = camTransform->GetRight();
             camTransform->Move(-SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * right);
         }
+
+        if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
+        {
+            feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
+            feng::Vector3 right = camTransform->GetRight();
+            camTransform->Move(SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * right);
+        }
+
         if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
         {
             feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();

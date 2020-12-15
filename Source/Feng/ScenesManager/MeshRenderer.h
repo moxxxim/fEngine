@@ -20,7 +20,10 @@ namespace feng
         MeshRenderer() = default;
         ~MeshRenderer() override;
 
+        const Material *GetMaterial() const;
         void SetMaterial(const Material *aMaterial);
+
+        const Mesh *GetMesh() const;
         void SetMesh(const Mesh *aMesh);
 
         bool CanDraw() const;
@@ -63,4 +66,17 @@ namespace feng
         const Material *material = nullptr;
         const Mesh *mesh = nullptr;
     };
+}
+
+namespace feng
+{
+    inline const Material *MeshRenderer::GetMaterial() const
+    {
+        return material;
+    }
+
+    inline const Mesh *MeshRenderer::GetMesh() const
+    {
+        return mesh;
+    }
 }
