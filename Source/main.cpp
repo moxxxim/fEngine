@@ -36,6 +36,8 @@ namespace SRes
     const char *DiffuseTextureVsName = "DiffuseTextureVs.vs";
     const char *SpecularTextureFsName = "SpecularTextureFs.fs";
     const char *SpecularTextureVsName = "SpecularTextureVs.vs";
+    const char *diffTex1SpecTex2FsName = "DiffuseTex1SpecTex2Fs.fs";
+    const char *diffTex1SpecTex2VsName = "DiffuseTex1SpecTex2Vs.vs";
 
     const char *VertexDiffuseTextureFsName = "VertexDiffuseTextureFs.fs";
     const char *VertexDiffuseTextureVsName = "VertexDiffuseTextureVs.vs";
@@ -45,6 +47,9 @@ namespace SRes
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *brickWallJpg = "brick_wall.jpg";
     const char *awesomeFacePng = "awesomeface.png";
+    const char *steeledWoodPng = "steeled_wood.png";
+    const char *steeledBorderPng = "steel_border.png";
+    const char *steeledBorderColoredPng = "steel_border_colored.png";
 
     std::vector<float> cube
     {
@@ -101,13 +106,18 @@ namespace SRes
     std::unique_ptr<feng::TextureData> woodContainerTextureData;
     std::unique_ptr<feng::TextureData> brickWallTextureData;
     std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
+    std::unique_ptr<feng::TextureData> steeledWoodTextureData;
+    std::unique_ptr<feng::TextureData> steelBorderTextureData;
 
     std::unique_ptr<feng::Texture> woodContainerTexture;
     std::unique_ptr<feng::Texture> brickWallTexture;
     std::unique_ptr<feng::Texture> awesomeFaceTexture;
+    std::unique_ptr<feng::Texture> steeledWoodTexture;
+    std::unique_ptr<feng::Texture> steelBorderTexture;
 
     std::unique_ptr<feng::Material> diffuseTexMaterial;
     std::unique_ptr<feng::Material> specularTexMaterial;
+    std::unique_ptr<feng::Material> diffTex1SpecTex2Material;
 
     std::unique_ptr<feng::Material> vertexDiffuseTexMaterial;
     std::unique_ptr<feng::Material> vertexSpecularTexMaterial;
@@ -140,6 +150,12 @@ namespace SRes
 
         awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
         awesomeFaceTexture = std::make_unique<feng::Texture>(*awesomeFaceTextureData);
+
+        steeledWoodTextureData = LoadTexture(steeledWoodPng, true);
+        steeledWoodTexture = std::make_unique<feng::Texture>(*steeledWoodTextureData);
+
+        steelBorderTextureData = LoadTexture(steeledBorderPng, true);
+        steelBorderTexture = std::make_unique<feng::Texture>(*steelBorderTextureData);
     }
 
     void LoadMaterials()
@@ -155,6 +171,13 @@ namespace SRes
         specularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
         specularTexMaterial->SetFloat("uSpecularity", 0.8f);
         specularTexMaterial->SetFloat("uShininess", 32.0f);
+
+        std::unique_ptr<feng::Shader> diff1Spec2Shader = LoadShader(diffTex1SpecTex2VsName, diffTex1SpecTex2FsName);
+        diffTex1SpecTex2Material = std::make_unique<feng::Material>(std::move(diff1Spec2Shader));
+        diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture0.data(), steeledWoodTexture.get());
+        diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), steelBorderTexture.get());
+        diffTex1SpecTex2Material->SetFloat("uSpecularity", 8.f);
+        diffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
 
         std::unique_ptr<feng::Shader> vertexDiffuseTextureShader = LoadShader(VertexDiffuseTextureVsName, VertexDiffuseTextureFsName);
         vertexDiffuseTexMaterial = std::make_unique<feng::Material>(std::move(vertexDiffuseTextureShader));
@@ -229,10 +252,9 @@ namespace SObjects
     };
 
     std::vector<std::unique_ptr<feng::Entity>> objects;
-
     std::vector<feng::Entity *> scene;
-
     feng::RenderProperties renderProperties;
+    bool moveLight = false;
 
     std::unique_ptr<feng::Entity> CreateCamera()
     {
@@ -245,7 +267,7 @@ namespace SObjects
         camera.SetFarClipPlane(100.f);
 
         feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
-        camTransform->SetPosition(0.f, 0.f, 3.f);
+        camTransform->SetPosition(0.f, 3.5f, 3.f);
         camTransform->SetEuler(SCamController::camPitch, SCamController::camYaw, 0.f);
 
         return camEntity;
@@ -271,7 +293,7 @@ namespace SObjects
         feng::Light &light = lightEntity->AddComponent<feng::Light>();
         light.SetType(feng::Light::eType::Point);
         light.SetRange(8.f);
-        light.SetColor(feng::Vector4{1.f, 0.9f, 0.5f, 1.f});
+        light.SetColor(feng::Vector4{1.f, 0.95f, 0.8f, 1.f});
         light.SetIntensity(1.f);
 
         feng::Transform *lightTransform = lightEntity->GetComponent<feng::Transform>();
@@ -310,7 +332,7 @@ namespace SObjects
             const feng::Vector3& position = cubePositions[i];
             std::string name = "cube " + std::to_string(i);
             const feng::Material *material = ((i % 2) == 0)
-                ? SRes::diffuseTexMaterial.get()
+                ? SRes::diffTex1SpecTex2Material.get()
                 : SRes::specularTexMaterial.get();
             std::unique_ptr<feng::Entity> entity = CreateCube(position, name, *SRes::cubeMesh, *material);
             objects.push_back(std::move(entity));
@@ -364,12 +386,24 @@ namespace SObjects
 
     void UpdateLight()
     {
-        constexpr float zLightOffset = 4.f;
-        float lightPosZ = -1.f + zLightOffset * std::cos(0.5f * SApp::time);
-
-        feng::Transform *lightTransform = pointLightEntity->GetComponent<feng::Transform>();
-        const feng::Vector3& lightPosition = lightTransform->GetPosition();
-        lightTransform->SetPosition(lightPosition.x, lightPosition.y, lightPosZ);
+        if(moveLight)
+        {
+//            constexpr float lightOffsetMax = 4.f;
+//            static float lightOffset = 0;
+//            static float lightOffsetDir = 1;
+//
+//            feng::Transform *lightTransform = pointLightEntity->GetComponent<feng::Transform>();
+//            feng::Vector3 lightPosition = lightTransform->GetPosition();
+//
+//            lightOffset += lightOffsetMax * (0.25f * SApp::deltaTime) * lightOffsetDir;
+//            if(std::abs(lightOffset) >= lightOffsetMax)
+//            {
+//                lightOffsetDir *= -1;
+//            }
+//
+//            lightPosition.z += lightOffset;
+//            lightTransform->SetPosition(lightPosition);
+        }
     }
 
     void Update()
@@ -461,7 +495,15 @@ namespace SMain
 
     void ProcessWindowInput(GLFWwindow &window)
     {
-        float speedMultiplier = (glfwGetKey(&window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? 2 : 1;
+        float speedMultiplier = 1;
+        if(glfwGetKey(&window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        {
+            speedMultiplier = 2;
+        }
+        else if (glfwGetKey(&window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        {
+            speedMultiplier = 0.5f;
+        }
 
         if(glfwGetKey(&window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
@@ -501,6 +543,11 @@ namespace SMain
             feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
             feng::Vector3 right = camTransform->GetRight();
             camTransform->Move(SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * right);
+        }
+
+        if (glfwGetKey(&window, GLFW_KEY_L) == GLFW_PRESS)
+        {
+            SObjects::moveLight = !SObjects::moveLight;
         }
     }
 
