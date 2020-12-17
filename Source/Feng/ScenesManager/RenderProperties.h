@@ -11,7 +11,9 @@ namespace feng
     struct RenderProperties final
     {
         const Camera *cam = nullptr;
+        const Light *directLight = nullptr;
         const Light *pointLight = nullptr;
+        const Light *spotLight = nullptr;
         Vector4 ambientColor = Vector4{1.f, 1.f, 1.f, 1.f};
     };
 }

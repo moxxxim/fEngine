@@ -24,3 +24,5 @@
 23. Visualize light sources: point - cube/sphere, directional - gram, spot - pyramid/cone.
 24. Gizmos for light sources.
 25. Do local intermediate variables have impact on shader performance?
+26. How to combine multiple light sources in shader.
+27. all degrees to rad by default.

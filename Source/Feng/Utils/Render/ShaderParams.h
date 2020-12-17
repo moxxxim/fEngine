@@ -19,8 +19,15 @@ namespace feng
         static constexpr std::string_view Texture2 {"uTexture2"};
 
         static constexpr std::string_view AmbientColor {"uAmbientColor"};
-        static constexpr std::string_view PointLightColor {"uPointLightColor"};
-        static constexpr std::string_view PointLightPositionAndRange {"uPointLightPositionAndRange"};
+        static constexpr std::string_view PointLightColor {"uPointLight.Color"};
+        static constexpr std::string_view PointLightPositionAndRange {"uPointLight.PositionAndRange"};
+
+        static constexpr std::string_view DirectLightColor {"uDirectLight.Color"};
+        static constexpr std::string_view DirectLightDir {"uDirectLight.Dir"};
+
+        static constexpr std::string_view SpotLightColor {"uSpotLight.Color"};
+        static constexpr std::string_view SpotLightPositionAndRange {"uSpotLight.PositionAndRange"};
+        static constexpr std::string_view SpotLightDirAndAngle {"uSpotLight.DirAndAngle"};
 
         static constexpr std::string_view VertexPos {"aPos"};
         static constexpr std::string_view VertexUv0 {"aUv0"};

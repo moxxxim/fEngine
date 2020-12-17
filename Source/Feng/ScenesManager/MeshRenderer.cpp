@@ -359,12 +359,31 @@ namespace feng
         const Transform *pointLightTransform = renderProperties.pointLight->GetEntity()->GetComponent<Transform>();
         Vector4 pointLightPositionAndRange = pointLightTransform->GetPosition();
         pointLightPositionAndRange.w = renderProperties.pointLight->GetRange();
-
         Vector4 pointLightColor = renderProperties.pointLight->GetColor();
         pointLightColor.w = renderProperties.pointLight->GetIntesity();
 
-        shader->SetUniformVector4(ShaderParams::PointLightPositionAndRange.data(), pointLightPositionAndRange);
         shader->SetUniformVector4(ShaderParams::PointLightColor.data(), pointLightColor);
+        shader->SetUniformVector4(ShaderParams::PointLightPositionAndRange.data(), pointLightPositionAndRange);
+
+        const Transform *directLightTransform = renderProperties.directLight->GetEntity()->GetComponent<Transform>();
+        Vector3 directLightDirection = directLightTransform->GetForward();
+        Vector4 directLightColor = renderProperties.directLight->GetColor();
+        directLightColor.w = renderProperties.directLight->GetIntesity();
+
+        shader->SetUniformVector4(ShaderParams::DirectLightColor.data(), directLightColor);
+        shader->SetUniformVector3(ShaderParams::DirectLightDir.data(), directLightDirection);
+
+        const Transform *spotLightTransform = renderProperties.spotLight->GetEntity()->GetComponent<Transform>();
+        Vector4 spotLightDirectionAndAngle = spotLightTransform->GetForward();
+        spotLightDirectionAndAngle.w = renderProperties.spotLight->GetSpotAngle();
+        Vector4 spotLightColor = renderProperties.spotLight->GetColor();
+        spotLightColor.w = renderProperties.spotLight->GetIntesity();
+        Vector4 spotLightPosAndRange = spotLightTransform->GetPosition();
+        spotLightPosAndRange.w = renderProperties.spotLight->GetRange();
+
+        shader->SetUniformVector4(ShaderParams::SpotLightColor.data(), spotLightColor);
+        shader->SetUniformVector4(ShaderParams::SpotLightPositionAndRange.data(), spotLightPosAndRange);
+        shader->SetUniformVector4(ShaderParams::SpotLightDirAndAngle.data(), spotLightDirectionAndAngle);
 
 //        const char *ambientLightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::AmbientLightColor);
 //        m_shader->SetUniformVector4(ambientLightColorUniform, renderProperties->GetAmbientLightColor());

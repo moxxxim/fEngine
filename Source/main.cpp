@@ -20,6 +20,7 @@
 #include <Feng/Utils/Debug.h>
 
 #include <cmath>
+#include <math.h>
 #include <sstream>
 #include <array>
 
@@ -161,14 +162,14 @@ namespace SRes
         std::unique_ptr<feng::Shader> specularTextureShader = LoadShader(SpecularTextureVsName, SpecularTextureFsName);
         specularTexMaterial = std::make_unique<feng::Material>(std::move(specularTextureShader));
         specularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
-        specularTexMaterial->SetFloat("uSpecularity", 0.8f);
+        specularTexMaterial->SetFloat("uSpecularity", 0.5f);
         specularTexMaterial->SetFloat("uShininess", 32.0f);
 
         std::unique_ptr<feng::Shader> diff1Spec2Shader = LoadShader(diffTex1SpecTex2VsName, diffTex1SpecTex2FsName);
         diffTex1SpecTex2Material = std::make_unique<feng::Material>(std::move(diff1Spec2Shader));
         diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture0.data(), steeledWoodTexture.get());
         diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), steelBorderTexture.get());
-        diffTex1SpecTex2Material->SetFloat("uSpecularity", 8.f);
+        diffTex1SpecTex2Material->SetFloat("uSpecularity", 1.f);
         diffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
 
         std::unique_ptr<feng::Shader> flatColorShader = LoadShader(FlatColorVsName, FlatColorFsName);
@@ -218,7 +219,9 @@ namespace SCamController
 namespace SObjects
 {
     std::unique_ptr<feng::Entity> camEntity;
+    std::unique_ptr<feng::Entity> directLightEntity;
     std::unique_ptr<feng::Entity> pointLightEntity;
+    std::unique_ptr<feng::Entity> spotLightEntity;
 
     std::array<feng::Vector3, 10> cubePositions = {
         feng::Vector3(-2.0f, 0.0f, 0.0f),
@@ -233,7 +236,10 @@ namespace SObjects
         feng::Vector3( 0.0f, -3.0f, -2.0f),
     };
 
+    feng::Vector3 planePos{0.f, -6.f, 0.f};
+
     std::vector<std::unique_ptr<feng::Entity>> objects;
+    std::unique_ptr<feng::Entity> planeEntity;
     std::vector<feng::Entity *> scene;
     feng::RenderProperties renderProperties;
     bool moveLight = false;
@@ -259,7 +265,21 @@ namespace SObjects
     {
         feng::Entity *lightEntity = light.GetEntity();
         feng::Transform *cubeTransform = lightEntity->GetComponent<feng::Transform>();
-        cubeTransform->SetScale(0.2f);
+
+        feng::Light::eType lightType = light.GetType();
+
+        if(lightType == feng::Light::eType::Directional)
+        {
+            cubeTransform->SetScale(0.1f, 0.1f, 0.35f);
+        }
+        else if(lightType == feng::Light::eType::Point)
+        {
+            cubeTransform->SetScale(0.2f);
+        }
+        else
+        {
+            cubeTransform->SetScale(0.35f, 0.35f, 0.1f);
+        }
 
         feng::MeshRenderer& meshRenderer = lightEntity->AddComponent<feng::MeshRenderer>();
         meshRenderer.SetMesh(SRes::cubeMesh.get());
@@ -268,18 +288,78 @@ namespace SObjects
         SRes::flatColorMaterial->SetVector3(feng::ShaderParams::MainColor.data(), light.GetColor().GetXyz());
     }
 
-    std::unique_ptr<feng::Entity> CreateLight()
+    std::unique_ptr<feng::Entity> CreateDirectLight()
     {
-        std::unique_ptr<feng::Entity> lightEntity = std::make_unique<feng::Entity>("Light");
+        std::unique_ptr<feng::Entity> lightEntity = std::make_unique<feng::Entity>("DirLight");
 
         feng::Light &light = lightEntity->AddComponent<feng::Light>();
-        light.SetType(feng::Light::eType::Point);
-        light.SetRange(8.f);
+        light.SetType(feng::Light::eType::Directional);
         light.SetColor(feng::Vector4{1.f, 0.95f, 0.8f, 1.f});
         light.SetIntensity(1.f);
 
         feng::Transform *lightTransform = lightEntity->GetComponent<feng::Transform>();
-        lightTransform->SetPosition(0.f, 4.f, -1.f);
+        lightTransform->SetPosition(0.f, 0.f, 4.f);
+        lightTransform->SetRotation(feng::mat3::MakeRotationY(180), feng::eSpace::World);
+
+        AddLightGizmoRenderer(light);
+
+        return lightEntity;
+    }
+
+    std::unique_ptr<feng::Entity> CreatePointLight()
+    {
+        std::unique_ptr<feng::Entity> lightEntity = std::make_unique<feng::Entity>("PointLight");
+
+        feng::Light &light = lightEntity->AddComponent<feng::Light>();
+        light.SetType(feng::Light::eType::Point);
+        light.SetRange(8.f);
+        light.SetColor(feng::Vector4{1.f, 0.f, 0.f, 1.f});
+        light.SetIntensity(1.5f);
+
+        feng::Transform *lightTransform = lightEntity->GetComponent<feng::Transform>();
+
+        constexpr bool isUp = true;
+        if(isUp)
+        {
+            lightTransform->SetPosition(0.f, 4.f, -1.f);
+        }
+        else
+        {
+            lightTransform->SetPosition(0.f, -12.f, -1.f);
+        }
+
+        AddLightGizmoRenderer(light);
+
+        return lightEntity;
+    }
+
+    std::unique_ptr<feng::Entity> CreateSpotLight()
+    {
+        std::unique_ptr<feng::Entity> lightEntity = std::make_unique<feng::Entity>("SpotLight");
+
+        feng::Light &light = lightEntity->AddComponent<feng::Light>();
+        light.SetType(feng::Light::eType::Spot);
+        light.SetRange(8.f);
+        light.SetColor(feng::Vector4{0.f, 0.f, 1.f, 1.f});
+        light.SetIntensity(10.f);
+        light.SetSpotAngle(M_PI / 4.f);
+
+        feng::Transform *lightTransform = lightEntity->GetComponent<feng::Transform>();
+        constexpr bool isUp = true;
+
+        if(isUp)
+        {
+            lightTransform->SetPosition(4.f, 4.f, 0.f);
+
+            lightTransform->SetRotation(feng::mat3::MakeRotationY(90), feng::eSpace::World);
+            lightTransform->SetRotation(feng::mat3::MakeRotationX(20), feng::eSpace::Self);
+        }
+        else
+        {
+            lightTransform->SetPosition(0.f, -12.f, 2.f);
+
+            lightTransform->SetRotation(feng::mat3::MakeRotationX(-90), feng::eSpace::Self);
+        }
 
         AddLightGizmoRenderer(light);
 
@@ -307,7 +387,9 @@ namespace SObjects
     void CreateObjects()
     {
         SObjects::camEntity = SObjects::CreateCamera();
-        SObjects::pointLightEntity = SObjects::CreateLight();
+        SObjects::directLightEntity = SObjects::CreateDirectLight();
+        SObjects::pointLightEntity = SObjects::CreatePointLight();
+        SObjects::spotLightEntity = SObjects::CreateSpotLight();
 
         for(int32_t i = 0; i < cubePositions.size(); ++i)
         {
@@ -319,6 +401,10 @@ namespace SObjects
             std::unique_ptr<feng::Entity> entity = CreateCube(position, name, *SRes::cubeMesh, *material);
             objects.push_back(std::move(entity));
         }
+
+        planeEntity = CreateCube(planePos, "Plane", *SRes::cubeMesh, *SRes::diffuseTexMaterial);
+        feng::Transform *planeTransform = planeEntity->GetComponent<feng::Transform>();
+        planeTransform->SetScale(40.f, 0.2f, 40.f);
     }
 
     void AddObjectsToScene()
@@ -328,14 +414,19 @@ namespace SObjects
             scene.push_back(object.get());
         }
 
+        scene.push_back(directLightEntity.get());
         scene.push_back(pointLightEntity.get());
+        scene.push_back(spotLightEntity.get());
+        scene.push_back(planeEntity.get());
     }
 
     void InitRenderProperties()
     {
         renderProperties.cam = camEntity->GetComponent<feng::Camera>();
         renderProperties.ambientColor = feng::Vector4{1.f, 1.f, 1.f, 0.5f};
+        renderProperties.directLight = directLightEntity->GetComponent<feng::Light>();
         renderProperties.pointLight = pointLightEntity->GetComponent<feng::Light>();
+        renderProperties.spotLight = spotLightEntity->GetComponent<feng::Light>();
     }
 
     void CreateScene()

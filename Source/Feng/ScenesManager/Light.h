@@ -32,10 +32,14 @@ namespace feng
         float GetRange() const;
         void SetRange(float aRange);
 
+        float GetSpotAngle() const;
+        void SetSpotAngle(float aSpotAngle);
+
     private:
         Vector4 color;
         float intensity = 1.f;
         float range = 1.f;
+        float spotAngle = 20.f;
         eType type = eType::Directional;
     };
 }
@@ -80,5 +84,15 @@ namespace feng
     inline void Light::SetRange(float aRange)
     {
         range = aRange;
+    }
+
+    inline float Light::GetSpotAngle() const
+    {
+        return spotAngle;
+    }
+
+    inline void Light::SetSpotAngle(float aSpotAngle)
+    {
+        spotAngle = aSpotAngle;
     }
 }
