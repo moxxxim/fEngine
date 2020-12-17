@@ -39,11 +39,6 @@ namespace SRes
     const char *diffTex1SpecTex2FsName = "DiffuseTex1SpecTex2Fs.fs";
     const char *diffTex1SpecTex2VsName = "DiffuseTex1SpecTex2Vs.vs";
 
-    const char *VertexDiffuseTextureFsName = "VertexDiffuseTextureFs.fs";
-    const char *VertexDiffuseTextureVsName = "VertexDiffuseTextureVs.vs";
-    const char *VertexSpecularTextureFsName = "VertexSpecularTextureFs.fs";
-    const char *VertexSpecularTextureVsName = "VertexSpecularTextureVs.vs";
-
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *brickWallJpg = "brick_wall.jpg";
     const char *awesomeFacePng = "awesomeface.png";
@@ -119,9 +114,6 @@ namespace SRes
     std::unique_ptr<feng::Material> specularTexMaterial;
     std::unique_ptr<feng::Material> diffTex1SpecTex2Material;
 
-    std::unique_ptr<feng::Material> vertexDiffuseTexMaterial;
-    std::unique_ptr<feng::Material> vertexSpecularTexMaterial;
-
     std::unique_ptr<feng::Material> flatColorMaterial;
 
     std::unique_ptr<feng::Mesh> cubeMesh;
@@ -178,16 +170,6 @@ namespace SRes
         diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), steelBorderTexture.get());
         diffTex1SpecTex2Material->SetFloat("uSpecularity", 8.f);
         diffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
-
-        std::unique_ptr<feng::Shader> vertexDiffuseTextureShader = LoadShader(VertexDiffuseTextureVsName, VertexDiffuseTextureFsName);
-        vertexDiffuseTexMaterial = std::make_unique<feng::Material>(std::move(vertexDiffuseTextureShader));
-        vertexDiffuseTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), woodContainerTexture.get());
-
-        std::unique_ptr<feng::Shader> vertexSpecularTextureShader = LoadShader(VertexSpecularTextureVsName, VertexSpecularTextureFsName);
-        vertexSpecularTexMaterial = std::make_unique<feng::Material>(std::move(vertexSpecularTextureShader));
-        vertexSpecularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
-        vertexSpecularTexMaterial->SetFloat("uSpecularity", 0.8f);
-        vertexSpecularTexMaterial->SetFloat("uShininess", 32.0f);
 
         std::unique_ptr<feng::Shader> flatColorShader = LoadShader(FlatColorVsName, FlatColorFsName);
         flatColorMaterial = std::make_unique<feng::Material>(std::move(flatColorShader));
