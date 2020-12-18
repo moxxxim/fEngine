@@ -1,22 +1,9 @@
 #include <Feng/Math/MatrixUtils.h>
 
-#include <math.h>
+#include <Feng/Math/MathUtils.h>
 
 namespace feng
 {
-    namespace SMath
-    {
-        constexpr float DegToRad(float degrees)
-        {
-            return degrees * M_PI / 180.f;
-        }
-
-        constexpr float RadToDeg(float rad)
-        {
-            return rad * 180.f / M_PI;
-        }
-    }
-
     namespace mat4
     {
         Matrix4 MakeScale(const Vector3& scale)
@@ -72,7 +59,7 @@ namespace feng
         {
             Matrix4 projection = Matrix4::Zero;
 
-            float rad = SMath::DegToRad(fovDegY);
+            float rad = DegToRad(fovDegY);
             float fovHalfTan = std::tan(rad / 2.f);
 
             projection.m00 = 1.f / (aspect * fovHalfTan);
@@ -109,7 +96,7 @@ namespace feng
         {
             Matrix3 rotation = Matrix3::Identity;
 
-            float rad = SMath::DegToRad(degrees);
+            float rad = DegToRad(degrees);
             float rotationCos = std::cos(rad);
             float rotationSin = std::sin(rad);
 
@@ -125,7 +112,7 @@ namespace feng
         {
             Matrix3 rotation = Matrix3::Identity;
 
-            float rad = SMath::DegToRad(degrees);
+            float rad = DegToRad(degrees);
             float rotationCos = std::cos(rad);
             float rotationSin = std::sin(rad);
 
@@ -141,7 +128,7 @@ namespace feng
         {
             Matrix3 rotation = Matrix3::Identity;
 
-            float rad = SMath::DegToRad(degrees);
+            float rad = DegToRad(degrees);
             float rotationCos = std::cos(rad);
             float rotationSin = std::sin(rad);
 

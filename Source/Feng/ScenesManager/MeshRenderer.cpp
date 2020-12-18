@@ -374,8 +374,8 @@ namespace feng
         shader->SetUniformVector3(ShaderParams::DirectLightDir.data(), directLightDirection);
 
         const Transform *spotLightTransform = renderProperties.spotLight->GetEntity()->GetComponent<Transform>();
-        Vector4 spotLightDirectionAndAngle = spotLightTransform->GetForward();
-        spotLightDirectionAndAngle.w = renderProperties.spotLight->GetSpotAngle();
+        Vector4 spotLightDirAndAngle = spotLightTransform->GetForward();
+        spotLightDirAndAngle.w = renderProperties.spotLight->GetSpotAngle();
         Vector4 spotLightColor = renderProperties.spotLight->GetColor();
         spotLightColor.w = renderProperties.spotLight->GetIntesity();
         Vector4 spotLightPosAndRange = spotLightTransform->GetPosition();
@@ -383,7 +383,7 @@ namespace feng
 
         shader->SetUniformVector4(ShaderParams::SpotLightColor.data(), spotLightColor);
         shader->SetUniformVector4(ShaderParams::SpotLightPositionAndRange.data(), spotLightPosAndRange);
-        shader->SetUniformVector4(ShaderParams::SpotLightDirAndAngle.data(), spotLightDirectionAndAngle);
+        shader->SetUniformVector4(ShaderParams::SpotLightDirAndAngle.data(), spotLightDirAndAngle);
 
 //        const char *ambientLightColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::AmbientLightColor);
 //        m_shader->SetUniformVector4(ambientLightColorUniform, renderProperties->GetAmbientLightColor());

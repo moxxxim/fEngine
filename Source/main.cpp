@@ -3,8 +3,9 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
-#include <Feng/Math/Vector3.h>
+#include <Feng/Math/MathUtils.h>
 #include <Feng/Math/MatrixUtils.h>
+#include <Feng/Math/Vector3.h>
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/ResourcesManager/TextureData.h>
@@ -20,7 +21,6 @@
 #include <Feng/Utils/Debug.h>
 
 #include <cmath>
-#include <math.h>
 #include <sstream>
 #include <array>
 
@@ -115,8 +115,6 @@ namespace SRes
     std::unique_ptr<feng::Material> specularTexMaterial;
     std::unique_ptr<feng::Material> diffTex1SpecTex2Material;
 
-    std::unique_ptr<feng::Material> flatColorMaterial;
-
     std::unique_ptr<feng::Mesh> cubeMesh;
 
     std::unique_ptr<feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
@@ -162,18 +160,15 @@ namespace SRes
         std::unique_ptr<feng::Shader> specularTextureShader = LoadShader(SpecularTextureVsName, SpecularTextureFsName);
         specularTexMaterial = std::make_unique<feng::Material>(std::move(specularTextureShader));
         specularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
-        specularTexMaterial->SetFloat("uSpecularity", 0.5f);
+        specularTexMaterial->SetFloat("uSpecularity", 1.0f);
         specularTexMaterial->SetFloat("uShininess", 32.0f);
 
         std::unique_ptr<feng::Shader> diff1Spec2Shader = LoadShader(diffTex1SpecTex2VsName, diffTex1SpecTex2FsName);
         diffTex1SpecTex2Material = std::make_unique<feng::Material>(std::move(diff1Spec2Shader));
         diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture0.data(), steeledWoodTexture.get());
         diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), steelBorderTexture.get());
-        diffTex1SpecTex2Material->SetFloat("uSpecularity", 1.f);
+        diffTex1SpecTex2Material->SetFloat("uSpecularity", 5.f);
         diffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
-
-        std::unique_ptr<feng::Shader> flatColorShader = LoadShader(FlatColorVsName, FlatColorFsName);
-        flatColorMaterial = std::make_unique<feng::Material>(std::move(flatColorShader));
     }
 
     void LoadMeshes()
@@ -222,6 +217,7 @@ namespace SObjects
     std::unique_ptr<feng::Entity> directLightEntity;
     std::unique_ptr<feng::Entity> pointLightEntity;
     std::unique_ptr<feng::Entity> spotLightEntity;
+    std::map<feng::Light *, std::unique_ptr<feng::Material>> lightMaterials;
 
     std::array<feng::Vector3, 10> cubePositions = {
         feng::Vector3(-2.0f, 0.0f, 0.0f),
@@ -243,6 +239,12 @@ namespace SObjects
     std::vector<feng::Entity *> scene;
     feng::RenderProperties renderProperties;
     bool moveLight = false;
+
+    std::unique_ptr<feng::Material> CreateGizmoMaterial()
+    {
+        std::unique_ptr<feng::Shader> flatColorShader = SRes::LoadShader(SRes::FlatColorVsName, SRes::FlatColorFsName);
+        return std::make_unique<feng::Material>(std::move(flatColorShader));
+    }
 
     std::unique_ptr<feng::Entity> CreateCamera()
     {
@@ -281,11 +283,14 @@ namespace SObjects
             cubeTransform->SetScale(0.35f, 0.35f, 0.1f);
         }
 
+        std::unique_ptr<feng::Material> flatColorMaterial = CreateGizmoMaterial();
+
         feng::MeshRenderer& meshRenderer = lightEntity->AddComponent<feng::MeshRenderer>();
         meshRenderer.SetMesh(SRes::cubeMesh.get());
-        meshRenderer.SetMaterial(SRes::flatColorMaterial.get());
+        meshRenderer.SetMaterial(flatColorMaterial.get());
 
-        SRes::flatColorMaterial->SetVector3(feng::ShaderParams::MainColor.data(), light.GetColor().GetXyz());
+        flatColorMaterial->SetVector3(feng::ShaderParams::MainColor.data(), light.GetColor().GetXyz());
+        lightMaterials[&light] = std::move(flatColorMaterial);
     }
 
     std::unique_ptr<feng::Entity> CreateDirectLight()
@@ -339,24 +344,24 @@ namespace SObjects
 
         feng::Light &light = lightEntity->AddComponent<feng::Light>();
         light.SetType(feng::Light::eType::Spot);
-        light.SetRange(8.f);
+        light.SetRange(12.f);
         light.SetColor(feng::Vector4{0.f, 0.f, 1.f, 1.f});
         light.SetIntensity(10.f);
-        light.SetSpotAngle(M_PI / 4.f);
+        light.SetSpotAngle(feng::DegToRad(45));
 
         feng::Transform *lightTransform = lightEntity->GetComponent<feng::Transform>();
         constexpr bool isUp = true;
 
         if(isUp)
         {
-            lightTransform->SetPosition(4.f, 4.f, 0.f);
+            lightTransform->SetPosition(5.f, 4.f, -2.f);
 
             lightTransform->SetRotation(feng::mat3::MakeRotationY(90), feng::eSpace::World);
             lightTransform->SetRotation(feng::mat3::MakeRotationX(20), feng::eSpace::Self);
         }
         else
         {
-            lightTransform->SetPosition(0.f, -12.f, 2.f);
+            lightTransform->SetPosition(0.f, -8.f, 2.f);
 
             lightTransform->SetRotation(feng::mat3::MakeRotationX(-90), feng::eSpace::Self);
         }

@@ -110,9 +110,9 @@ vec3 CalculateSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 speculari
     vec3 rayDirNorm = normalize(rayDir);
     float lightDistance = length(rayDir);
 
-    float rayOffset = dot(rayDirNorm, normalize(light.DirAndAngle.xyz));
     float angleCosine = cos(light.DirAndAngle.w);
-    float angleAttenuation = 1.f - clamp(rayOffset, 0.f, angleCosine) / angleCosine;
+    float rayOffset = abs(dot(rayDirNorm, normalize(light.DirAndAngle.xyz)));
+    float angleAttenuation = clamp((rayOffset - angleCosine) / (1.f - angleCosine), 0.f, 1.f);
     float distanceAttenuation = pow(clamp(1.f - lightDistance / light.PositionAndRange.w, 0.f, 1.f), 2.f);
 
     vec3 lightColor = (angleAttenuation * distanceAttenuation * light.Color.w) * light.Color.rgb;

@@ -1,5 +1,4 @@
-#ifndef Matrix4Utils_hpp
-#define Matrix4Utils_hpp
+#pragma once
 
 #include <Feng/Math/Matrix3.h>
 #include <Feng/Math/Matrix4.h>
@@ -28,6 +27,3 @@ namespace feng
         Matrix3 MakeRotation(float xDegrees, float yDegrees, float zDegrees);
     }
 }
-
-#endif
- 
