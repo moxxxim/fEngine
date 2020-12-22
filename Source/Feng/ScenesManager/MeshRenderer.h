@@ -21,10 +21,12 @@ namespace feng
         ~MeshRenderer() override;
 
         const Material *GetMaterial() const;
-        void SetMaterial(const Material *aMaterial);
+        Material *GetMaterial();
+        void SetMaterial(Material *aMaterial);
 
         const Mesh *GetMesh() const;
-        void SetMesh(const Mesh *aMesh);
+        Mesh *GetMesh();
+        void SetMesh(Mesh *aMesh);
 
         bool CanDraw() const;
         void Draw(const RenderProperties &renderProperties);
@@ -63,8 +65,8 @@ namespace feng
         uint32_t ibo = UndefinedBuffer;
         std::map<std::string, uint32_t> textureBuffers;
 
-        const Material *material = nullptr;
-        const Mesh *mesh = nullptr;
+        Material *material = nullptr;
+        Mesh *mesh = nullptr;
     };
 }
 
@@ -75,7 +77,17 @@ namespace feng
         return material;
     }
 
+    inline Material *MeshRenderer::GetMaterial()
+    {
+        return material;
+    }
+
     inline const Mesh *MeshRenderer::GetMesh() const
+    {
+        return mesh;
+    }
+
+    inline Mesh *MeshRenderer::GetMesh()
     {
         return mesh;
     }

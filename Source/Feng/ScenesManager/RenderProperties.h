@@ -14,6 +14,6 @@ namespace feng
         const Light *directLight = nullptr;
         const Light *pointLight = nullptr;
         const Light *spotLight = nullptr;
-        Vector4 ambientColor = Vector4{1.f, 1.f, 1.f, 1.f};
+        Vector4 ambientColorAndIntencity = Vector4{1.f, 1.f, 1.f, 1.f};
     };
 }

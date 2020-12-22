@@ -53,6 +53,11 @@ namespace feng
             return on * Vector3::Dot(*this, on);
         }
 
+        constexpr Vector3 Reflect(const Vector3& norm) const
+        {
+            return *this - 2 * (Vector3::Dot(*this, norm)) * norm;
+        }
+
         constexpr Vector3& operator = (const Vector3& other) = default;
         constexpr Vector3& operator = (Vector3&& other) = default;
         constexpr Vector3 operator - () const

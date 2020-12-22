@@ -39,6 +39,8 @@ namespace SRes
     const char *SpecularTextureVsName = "SpecularTextureVs.vs";
     const char *diffTex1SpecTex2FsName = "DiffuseTex1SpecTex2Fs.fs";
     const char *diffTex1SpecTex2VsName = "DiffuseTex1SpecTex2Vs.vs";
+    const char *showDepthFsName = "Utils/ShowDepthFs.fs";
+    const char *showDepthVsName = "Utils/ShowDepthVs.vs";
 
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *brickWallJpg = "brick_wall.jpg";
@@ -93,12 +95,6 @@ namespace SRes
         -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f
     };
 
-    const unsigned int rectIndices[]
-    {
-        0, 1, 3,
-        1, 2, 3
-    };
-
     std::unique_ptr<feng::TextureData> woodContainerTextureData;
     std::unique_ptr<feng::TextureData> brickWallTextureData;
     std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
@@ -114,6 +110,7 @@ namespace SRes
     std::unique_ptr<feng::Material> diffuseTexMaterial;
     std::unique_ptr<feng::Material> specularTexMaterial;
     std::unique_ptr<feng::Material> diffTex1SpecTex2Material;
+    std::unique_ptr<feng::Material> showDepthMaterial;
 
     std::unique_ptr<feng::Mesh> cubeMesh;
 
@@ -149,6 +146,12 @@ namespace SRes
         steelBorderTexture = std::make_unique<feng::Texture>(*steelBorderTextureData);
     }
 
+    std::unique_ptr<feng::Material> CreateFlatColorMaterial()
+    {
+        std::unique_ptr<feng::Shader> flatColorShader = SRes::LoadShader(SRes::FlatColorVsName, SRes::FlatColorFsName);
+        return std::make_unique<feng::Material>(std::move(flatColorShader));
+    }
+
     void LoadMaterials()
     {
         LoadTextures();
@@ -169,6 +172,8 @@ namespace SRes
         diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), steelBorderTexture.get());
         diffTex1SpecTex2Material->SetFloat("uSpecularity", 5.f);
         diffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
+
+        showDepthMaterial = std::make_unique<feng::Material>(LoadShader(showDepthVsName, showDepthFsName));
     }
 
     void LoadMeshes()
@@ -236,14 +241,18 @@ namespace SObjects
 
     std::vector<std::unique_ptr<feng::Entity>> objects;
     std::unique_ptr<feng::Entity> planeEntity;
-    std::vector<feng::Entity *> scene;
+    std::map<feng::Entity *, bool> scene;
     feng::RenderProperties renderProperties;
-    bool moveLight = false;
+    bool showDepth = false;
 
     std::unique_ptr<feng::Material> CreateGizmoMaterial()
     {
-        std::unique_ptr<feng::Shader> flatColorShader = SRes::LoadShader(SRes::FlatColorVsName, SRes::FlatColorFsName);
-        return std::make_unique<feng::Material>(std::move(flatColorShader));
+        if(showDepth)
+        {
+            return std::make_unique<feng::Material>(SRes::LoadShader(SRes::showDepthVsName, SRes::showDepthFsName));
+        }
+
+        return SRes::CreateFlatColorMaterial();
     }
 
     std::unique_ptr<feng::Entity> CreateCamera()
@@ -374,8 +383,8 @@ namespace SObjects
     std::unique_ptr<feng::Entity> CreateCube(
                                             const feng::Vector3& position,
                                             const std::string& name,
-                                            const feng::Mesh &mesh,
-                                            const feng::Material& material)
+                                            feng::Mesh &mesh,
+                                            feng::Material& material)
     {
         std::unique_ptr<feng::Entity> cube = std::make_unique<feng::Entity>(name);
 
@@ -384,7 +393,9 @@ namespace SObjects
 
         feng::MeshRenderer& meshRenderer = cube->AddComponent<feng::MeshRenderer>();
         meshRenderer.SetMesh(&mesh);
-        meshRenderer.SetMaterial(&material);
+
+        feng::Material *finalMaterial = showDepth ? SRes::showDepthMaterial.get() : &material;
+        meshRenderer.SetMaterial(finalMaterial);
 
         return cube;
     }
@@ -400,7 +411,7 @@ namespace SObjects
         {
             const feng::Vector3& position = cubePositions[i];
             std::string name = "cube " + std::to_string(i);
-            const feng::Material *material = ((i % 2) == 0)
+            feng::Material *material = ((i % 2) == 0)
                 ? SRes::diffTex1SpecTex2Material.get()
                 : SRes::specularTexMaterial.get();
             std::unique_ptr<feng::Entity> entity = CreateCube(position, name, *SRes::cubeMesh, *material);
@@ -416,19 +427,19 @@ namespace SObjects
     {
         for(std::unique_ptr<feng::Entity>& object : objects)
         {
-            scene.push_back(object.get());
+            scene[object.get()] = false;
         }
 
-        scene.push_back(directLightEntity.get());
-        scene.push_back(pointLightEntity.get());
-        scene.push_back(spotLightEntity.get());
-        scene.push_back(planeEntity.get());
+        scene[directLightEntity.get()] = true;
+        scene[pointLightEntity.get()] = true;
+        scene[spotLightEntity.get()] = true;
+        scene[planeEntity.get()] = true;
     }
 
     void InitRenderProperties()
     {
         renderProperties.cam = camEntity->GetComponent<feng::Camera>();
-        renderProperties.ambientColor = feng::Vector4{1.f, 1.f, 1.f, 0.5f};
+        renderProperties.ambientColorAndIntencity = feng::Vector4{1.f, 1.f, 1.f, 0.2f};
         renderProperties.directLight = directLightEntity->GetComponent<feng::Light>();
         renderProperties.pointLight = pointLightEntity->GetComponent<feng::Light>();
         renderProperties.spotLight = spotLightEntity->GetComponent<feng::Light>();
@@ -449,6 +460,17 @@ namespace SObjects
         camera->SetAspectRatio(static_cast<float>(SApp::Width)/SApp::Height);
         camera->SetNearClipPlane(0.1f);
         camera->SetFarClipPlane(100.f);
+
+        std::vector<feng::Entity*> outlined;
+        for(auto &[entity, isOutlined] : SObjects::scene)
+        {
+            if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
+            {
+                feng::Material *material = renderer->GetMaterial();
+                material->SetFloat(feng::ShaderParams::NearClipPlane.data(), 0.1f);
+                material->SetFloat(feng::ShaderParams::FarClipPlane.data(), 100.f);
+            }
+        }
     }
 
     void UpdateObjects()
@@ -462,37 +484,14 @@ namespace SObjects
         }
     }
 
-    void UpdateLight()
-    {
-        if(moveLight)
-        {
-//            constexpr float lightOffsetMax = 4.f;
-//            static float lightOffset = 0;
-//            static float lightOffsetDir = 1;
-//
-//            feng::Transform *lightTransform = pointLightEntity->GetComponent<feng::Transform>();
-//            feng::Vector3 lightPosition = lightTransform->GetPosition();
-//
-//            lightOffset += lightOffsetMax * (0.25f * SApp::deltaTime) * lightOffsetDir;
-//            if(std::abs(lightOffset) >= lightOffsetMax)
-//            {
-//                lightOffsetDir *= -1;
-//            }
-//
-//            lightPosition.z += lightOffset;
-//            lightTransform->SetPosition(lightPosition);
-        }
-    }
-
     void Update()
     {
         UpdateCamera();
         UpdateObjects();
-        UpdateLight();
     }
 }
 
-namespace SMain
+namespace SWindow
 {
     bool TryInitGlfw()
     {
@@ -622,11 +621,6 @@ namespace SMain
             feng::Vector3 right = camTransform->GetRight();
             camTransform->Move(SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * right);
         }
-
-        if (glfwGetKey(&window, GLFW_KEY_L) == GLFW_PRESS)
-        {
-            SObjects::moveLight = !SObjects::moveLight;
-        }
     }
 
     GLFWwindow* CreateWindow()
@@ -655,8 +649,6 @@ namespace SMain
 
 namespace SRender
 {
-    feng::Vector4 lightColor {1.f, 0.f, 0.f, 0.f};
-
     void InitRender()
     {
         feng::Debug::LogRenderInfoOpenGL();
@@ -665,29 +657,92 @@ namespace SRender
         SRes::LoadResources();
         SObjects::CreateScene();
 
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        if(SObjects::showDepth)
+        {
+            glClearColor(0.f, 0.5f, 0.f, 1.0f);
+        }
+        else
+        {
+            glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        }
+
         glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS); // Default.
+        glDepthMask(GL_TRUE); // Default.
+
+        glEnable(GL_STENCIL_TEST);
     }
 
-    void Render()
+    void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // Put 1s (ones) into stencil buffer for all drawn fragments.
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
 
-        for(feng::Entity *entity : SObjects::scene)
+        for(feng::Entity *entity : outlined)
         {
             if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
             {
                 renderer->Draw(SObjects::renderProperties);
             }
         }
+
+        // Make the stencil test fail for all 1s in stencil buffer (for all previously rendered fragments).
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+
+        std::unique_ptr<feng::Material> outlineMaterial = SRes::CreateFlatColorMaterial();
+        outlineMaterial->SetVector3(feng::ShaderParams::MainColor.data(), feng::Vector3::OneY);
+
+        for(feng::Entity *entity : outlined)
+        {
+            if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
+            {
+                feng::Transform *transform = entity->GetComponent<feng::Transform>();
+                feng::Material *material = renderer->GetMaterial();
+                feng::Vector3 scale = transform->GetScale();
+
+                renderer->SetMaterial(outlineMaterial.get());
+                transform->SetScale(1.05 * scale);
+                renderer->Draw(SObjects::renderProperties);
+
+                transform->SetScale(scale);
+                renderer->SetMaterial(material);
+            }
+        }
+
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+    }
+
+    void Render()
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        
+        std::vector<feng::Entity*> outlined;
+
+        for(auto &[entity, isOutlined] : SObjects::scene)
+        {
+            if(isOutlined)
+            {
+                outlined.push_back(entity);
+            }
+            else if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
+            {
+                renderer->Draw(SObjects::renderProperties);
+            }
+        }
+
+        RenderWithOutline(outlined);
     }
 }
 
 int main(int argc, const char * argv[])
 {
-    if(SMain::TryInitGlfw())
+    if(SWindow::TryInitGlfw())
     {
-        GLFWwindow *window = SMain::CreateWindow();
+        GLFWwindow *window = SWindow::CreateWindow();
 
         SRender::InitRender();
 
@@ -697,7 +752,7 @@ int main(int argc, const char * argv[])
         while(!glfwWindowShouldClose(window))
         {
             SApp::UpdateTime();
-            SMain::ProcessWindowInput(*window);
+            SWindow::ProcessWindowInput(*window);
             SObjects::Update();
             SRender::Render();
             glfwSwapBuffers(window);

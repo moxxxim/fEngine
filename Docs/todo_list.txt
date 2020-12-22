@@ -27,3 +27,10 @@
 26. How to combine multiple light sources in shader.
 27. all degrees to rad by default.
 28. Copy material.
+29. Implementations of spot and point light sources.
+30. Linera color space vs. non-linear?
+31. Texture compression.
+32. Implement texture data sharing.
+33. Implement mesh data sharing.
+34. Complex models, mulitmesh.
+35. Implement outlined shader/pass for a single object (for multiple objects).

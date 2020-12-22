@@ -62,29 +62,21 @@ message("Project source code files' extensions: ${SOURCE_FILES_EXTENSIONS}")
 log_delimeters()
 
 # ---------------- Collect thirdparty libraries -----------------
-set(THIRDPARTY_LIBS)
-set(THIRDPARTY_LIBS_DIRS)
+set(THIRDPARTY_STATIC_LIBS)
 
 # serach for Mac-specific libraries
 if(APPLE)
-    file(GLOB_RECURSE THIRDPARTY_LIBS REGEX "*.a")
-    list(FILTER THIRDPARTY_LIBS INCLUDE REGEX ".*Thirdparty.*Libs.*")
+    # Static.
+    file(GLOB_RECURSE THIRDPARTY_STATIC_LIBS REGEX "*.a")
+    list(FILTER THIRDPARTY_STATIC_LIBS INCLUDE REGEX ".*Thirdparty.*Libs.*")
 endif(APPLE)
 
-# evaluate thirdparty libs' directories
-foreach(lib_path IN ITEMS ${THIRDPARTY_LIBS})
-    get_filename_component(lib_dir ${lib_path} DIRECTORY)
-    string(APPEND lib_dir "/")
-    list(APPEND THIRDPARTY_LIBS_DIRS ${lib_dir})
-endforeach()
+# log thirdparty libs
 
-# log thirdparty libs and directories
 log_delimeters()
-list(JOIN THIRDPARTY_LIBS "\n" THIRDPARTY_LIBS_SEPARATED)
-message("Thirdparty libraries:\n${THIRDPARTY_LIBS_SEPARATED}")
+list(JOIN THIRDPARTY_STATIC_LIBS "\n" THIRDPARTY_STATIC_LIBS_SEPARATED)
+message("Thirdparty static libraries:\n${THIRDPARTY_STATIC_LIBS_SEPARATED}")
 
-list(JOIN THIRDPARTY_LIBS_DIRS "\n" THIRDPARTY_LIBS_DIRS_SEPARATED)
-message("\nThirdparty lib directories:\n${THIRDPARTY_LIBS_DIRS_SEPARATED}")
 log_delimeters()
 
 # ---------------- Collect platform-specifil libraries -----------------
@@ -106,13 +98,20 @@ endif(APPLE)
 list(JOIN PLATFORM_SPECIFIC_LIBS "\n" PLATFORM_SPECIFIC_LIBS_SEPARATED)
 log_message_framed("Platform-specific libraries:\n${PLATFORM_SPECIFIC_LIBS_SEPARATED}")
 
-
 # ---------------- Collect all source files for project -----------------
 file(GLOB_RECURSE MY_PROJECT_SOURCES_FILES ${SOURCE_FILES_EXTENSIONS})
 # remove cmake build directory from source files.
 list(FILTER MY_PROJECT_SOURCES_FILES EXCLUDE REGEX ".*${PROJECT_BINARY_DIR}.*")
-list(JOIN MY_PROJECT_SOURCES_FILES "\n" MY_SOURCES_FILES_SEPARATED)
-log_message_framed("Source code files for project '${PROJECT_NAME}':\n\n${MY_SOURCES_FILES_SEPARATED}")
+
+foreach(src_path IN ITEMS ${MY_PROJECT_SOURCES_FILES})
+    get_filename_component(src_dir ${src_path} DIRECTORY)
+    string(APPEND src_dir "/")
+    list(APPEND MY_PROJECT_SOURCES_FILES_DIRS ${src_dir})
+endforeach()
+list(REMOVE_DUPLICATES MY_PROJECT_SOURCES_FILES_DIRS)
+
+list(JOIN MY_PROJECT_SOURCES_FILES_DIRS "\n" MY_PROJECT_SOURCES_FILES_DIRS_SEPARATED)
+log_message_framed("Source code directories for project '${PROJECT_NAME}':\n\n${MY_PROJECT_SOURCES_FILES_DIRS_SEPARATED}")
 
 # ---------------- Setup executable -----------------
 add_executable(OpenGLWindow)
@@ -133,9 +132,8 @@ target_include_directories(OpenGLWindow PUBLIC
 
 # Link libraries
 target_link_libraries(OpenGLWindow
-                        ${THIRDPARTY_LIBS}
-                        ${PLATFORM_SPECIFIC_LIBS}
-                        )
+                        ${THIRDPARTY_STATIC_LIBS}
+                        ${PLATFORM_SPECIFIC_LIBS})
 
 # ---------------- Make project groups -----------------
 assign_source_group(${MY_PROJECT_SOURCES_FILES})
