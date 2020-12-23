@@ -34,3 +34,7 @@
 33. Implement mesh data sharing.
 34. Complex models, mulitmesh.
 35. Implement outlined shader/pass for a single object (for multiple objects).
+36. Implement effect like in Death Stranding scaning.
+37. "discard" instruction. Only fragment? performance?
+38. glBlendFunc(GLenum sfunc, GLenum dfunc);
+39. "order independent transparency". depth/transparency conflict.

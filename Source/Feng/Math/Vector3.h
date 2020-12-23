@@ -27,6 +27,11 @@ namespace feng
             return ((1 - t) * a) + (t * b);
         }
 
+        constexpr static float DistanceSqr(const Vector3& a, const Vector3& b)
+        {
+            return (b - a).LengthSqr();
+        }
+
         static float Distance(const Vector3& a, const Vector3& b)
         {
             return (b - a).Length();

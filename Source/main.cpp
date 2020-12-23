@@ -32,6 +32,8 @@ namespace SRes
 
     const char *FlatColorFsName = "Unlit/UnlitFlatColorFs.fs";
     const char *FlatColorVsName = "Unlit/UnlitFlatColorVs.vs";
+    const char *UnlitTextureFsName = "Unlit/UnlitTextureFs.fs";
+    const char *UnlitTextureVsName = "Unlit/UnlitTextureVs.vs";
 
     const char *DiffuseTextureFsName = "DiffuseTextureFs.fs";
     const char *DiffuseTextureVsName = "DiffuseTextureVs.vs";
@@ -47,7 +49,8 @@ namespace SRes
     const char *awesomeFacePng = "awesomeface.png";
     const char *steeledWoodPng = "steeled_wood.png";
     const char *steeledBorderPng = "steel_border.png";
-    const char *steeledBorderColoredPng = "steel_border_colored.png";
+    const char *grassPng = "grass.png";
+    const char *windowPng = "window.png";
 
     std::vector<float> cube
     {
@@ -60,18 +63,18 @@ namespace SRes
         -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
 
         -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
          0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 0.0f,
          0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 1.0f,
         -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 1.0f,
 
         -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
         -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
         -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
         -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
 
          0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
          0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
@@ -81,11 +84,11 @@ namespace SRes
          0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
 
         -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
          0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
          0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
         -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
 
         -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
          0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
@@ -95,24 +98,51 @@ namespace SRes
         -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f
     };
 
-    std::unique_ptr<feng::TextureData> woodContainerTextureData;
-    std::unique_ptr<feng::TextureData> brickWallTextureData;
-    std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
-    std::unique_ptr<feng::TextureData> steeledWoodTextureData;
-    std::unique_ptr<feng::TextureData> steelBorderTextureData;
+    std::vector<float> quadVertices
+    {
+             // position          // uv
+         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f,    1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f,    1.0f, 1.0f,
+         -0.5f,  0.5f, 0.0f,   0.0f, 1.0f,
+    };
 
+    std::vector<uint32_t> quadIndices
+    {
+        0, 3, 1,
+        1, 3, 2
+    };
+
+    std::unique_ptr<feng::TextureData> woodContainerTextureData;
     std::unique_ptr<feng::Texture> woodContainerTexture;
+
+    std::unique_ptr<feng::TextureData> brickWallTextureData;
     std::unique_ptr<feng::Texture> brickWallTexture;
+
+    std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
     std::unique_ptr<feng::Texture> awesomeFaceTexture;
+
+    std::unique_ptr<feng::TextureData> steeledWoodTextureData;
     std::unique_ptr<feng::Texture> steeledWoodTexture;
+
+    std::unique_ptr<feng::TextureData> steelBorderTextureData;
     std::unique_ptr<feng::Texture> steelBorderTexture;
+
+    std::unique_ptr<feng::TextureData> grassTextureData;
+    std::unique_ptr<feng::Texture> grassTexture;
+
+    std::unique_ptr<feng::TextureData> windowTextureData;
+    std::unique_ptr<feng::Texture> windowTexture;
 
     std::unique_ptr<feng::Material> diffuseTexMaterial;
     std::unique_ptr<feng::Material> specularTexMaterial;
     std::unique_ptr<feng::Material> diffTex1SpecTex2Material;
     std::unique_ptr<feng::Material> showDepthMaterial;
+    std::unique_ptr<feng::Material> grassMaterial;
+    std::unique_ptr<feng::Material> windowMaterial;
 
     std::unique_ptr<feng::Mesh> cubeMesh;
+    std::unique_ptr<feng::Mesh> quadMesh;
 
     std::unique_ptr<feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
     {
@@ -144,6 +174,14 @@ namespace SRes
 
         steelBorderTextureData = LoadTexture(steeledBorderPng, true);
         steelBorderTexture = std::make_unique<feng::Texture>(*steelBorderTextureData);
+
+        grassTextureData = LoadTexture(grassPng, true);
+        grassTexture = std::make_unique<feng::Texture>(*grassTextureData);
+        grassTexture->SetWrapping(feng::eTextureWrapping::ClampToEdge, feng::eTextureWrapping::ClampToEdge);
+
+        windowTextureData = LoadTexture(windowPng, true);
+        windowTexture = std::make_unique<feng::Texture>(*windowTextureData);
+        windowTexture->SetWrapping(feng::eTextureWrapping::ClampToEdge, feng::eTextureWrapping::ClampToEdge);
     }
 
     std::unique_ptr<feng::Material> CreateFlatColorMaterial()
@@ -174,13 +212,23 @@ namespace SRes
         diffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
 
         showDepthMaterial = std::make_unique<feng::Material>(LoadShader(showDepthVsName, showDepthFsName));
+
+        grassMaterial = std::make_unique<feng::Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
+        grassMaterial->SetTexture(feng::ShaderParams::Texture0.data(), grassTexture.get());
+
+        windowMaterial = std::make_unique<feng::Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
+        windowMaterial->SetTexture(feng::ShaderParams::Texture0.data(), windowTexture.get());
     }
 
     void LoadMeshes()
     {
-        uint32_t attributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Normal | feng::eVertexAtributes::Uv0;
-        feng::eVertexAtributes attributes = static_cast<feng::eVertexAtributes>(attributesValue);
-        cubeMesh = std::make_unique<feng::Mesh>(cube, attributes, feng::ePrimitiveType::Triangles);
+        uint32_t cubeAttributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Normal | feng::eVertexAtributes::Uv0;
+        feng::eVertexAtributes cubeAttributes = static_cast<feng::eVertexAtributes>(cubeAttributesValue);
+        cubeMesh = std::make_unique<feng::Mesh>(cube, cubeAttributes, feng::ePrimitiveType::Triangles);
+
+        uint32_t quadAttributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Uv0;
+        feng::eVertexAtributes quadAttributes = static_cast<feng::eVertexAtributes>(quadAttributesValue);
+        quadMesh = std::make_unique<feng::Mesh>(quadVertices, quadIndices, quadAttributes,  feng::ePrimitiveType::Triangles);
     }
 
     void LoadResources()
@@ -237,11 +285,39 @@ namespace SObjects
         feng::Vector3( 0.0f, -3.0f, -2.0f),
     };
 
+    std::array<feng::Vector3, 10> vegetationPositions
+    {
+        feng::Vector3(10.0f, -5.4f, 10.0f),
+        feng::Vector3(10.0f, -5.4f, -10.0f),
+        feng::Vector3(-10.0f, -5.4f, -10.0f),
+        feng::Vector3(-10.0f, -5.4f, 10.0f),
+        feng::Vector3(10.0f, -5.4f, 5.0f),
+        feng::Vector3(5.0f, -5.4f, 10.0f),
+        feng::Vector3(5.0f, -5.4f, 5.0f),
+        feng::Vector3(10.0f, -5.4f, 1.0f),
+        feng::Vector3(5.0f, -5.4f, 1.0f),
+        feng::Vector3(1.0f, -5.4f, 10.0f),
+    };
+
+    std::array<feng::Vector3, 8> windowPositions
+    {
+        feng::Vector3(10.0f, -5.4f, 20.0f),
+        feng::Vector3(20.0f, -5.4f, -10.0f),
+        feng::Vector3(-10.0f, -5.4f, -20.0f),
+        feng::Vector3(-20.0f, -5.4f, 10.0f),
+        feng::Vector3(0.0f, 0.0f, 2.0f),
+        feng::Vector3(1.0f, 2.0f, 2.0f),
+        feng::Vector3(-1.0f, -2.0f, 2.0f),
+        feng::Vector3(0.5f, 0.5f, 2.5f)
+    };
+
     feng::Vector3 planePos{0.f, -6.f, 0.f};
 
-    std::vector<std::unique_ptr<feng::Entity>> objects;
+    std::vector<std::unique_ptr<feng::Entity>> dynamicObjects;
+    std::vector<std::unique_ptr<feng::Entity>> staticObjects;
     std::unique_ptr<feng::Entity> planeEntity;
-    std::map<feng::Entity *, bool> scene;
+    std::map<feng::Entity *, bool> sceneOutline;
+    std::vector<feng::Entity *> scene;
     feng::RenderProperties renderProperties;
     bool showDepth = false;
 
@@ -380,7 +456,7 @@ namespace SObjects
         return lightEntity;
     }
 
-    std::unique_ptr<feng::Entity> CreateCube(
+    std::unique_ptr<feng::Entity> CreateObject(
                                             const feng::Vector3& position,
                                             const std::string& name,
                                             feng::Mesh &mesh,
@@ -407,6 +483,7 @@ namespace SObjects
         SObjects::pointLightEntity = SObjects::CreatePointLight();
         SObjects::spotLightEntity = SObjects::CreateSpotLight();
 
+        // Cubes.
         for(int32_t i = 0; i < cubePositions.size(); ++i)
         {
             const feng::Vector3& position = cubePositions[i];
@@ -414,26 +491,56 @@ namespace SObjects
             feng::Material *material = ((i % 2) == 0)
                 ? SRes::diffTex1SpecTex2Material.get()
                 : SRes::specularTexMaterial.get();
-            std::unique_ptr<feng::Entity> entity = CreateCube(position, name, *SRes::cubeMesh, *material);
-            objects.push_back(std::move(entity));
+            std::unique_ptr<feng::Entity> entity = CreateObject(position, name, *SRes::cubeMesh, *material);
+            dynamicObjects.push_back(std::move(entity));
         }
 
-        planeEntity = CreateCube(planePos, "Plane", *SRes::cubeMesh, *SRes::diffuseTexMaterial);
+        // Grass.
+        for(int32_t i = 0; i < vegetationPositions.size(); ++i)
+        {
+            const feng::Vector3& position = vegetationPositions[i];
+            std::string name = "grass " + std::to_string(i);
+            std::unique_ptr<feng::Entity> entity = CreateObject(position, name, *SRes::quadMesh, *SRes::grassMaterial);
+            staticObjects.push_back(std::move(entity));
+        }
+
+        // Grass.
+        for(int32_t i = 0; i < windowPositions.size(); ++i)
+        {
+            const feng::Vector3& position = windowPositions[i];
+            std::string name = "window " + std::to_string(i);
+            std::unique_ptr<feng::Entity> entity = CreateObject(position, name, *SRes::quadMesh, *SRes::windowMaterial);
+            staticObjects.push_back(std::move(entity));
+        }
+
+        planeEntity = CreateObject(planePos, "Plane", *SRes::cubeMesh, *SRes::diffuseTexMaterial);
         feng::Transform *planeTransform = planeEntity->GetComponent<feng::Transform>();
         planeTransform->SetScale(40.f, 0.2f, 40.f);
     }
 
     void AddObjectsToScene()
     {
-        for(std::unique_ptr<feng::Entity>& object : objects)
+        sceneOutline[planeEntity.get()] = false;
+        scene.push_back(planeEntity.get());
+
+        for(std::unique_ptr<feng::Entity>& object : dynamicObjects)
         {
-            scene[object.get()] = false;
+            sceneOutline[object.get()] = false;
+            scene.push_back(object.get());
         }
 
-        scene[directLightEntity.get()] = true;
-        scene[pointLightEntity.get()] = true;
-        scene[spotLightEntity.get()] = true;
-        scene[planeEntity.get()] = true;
+        for(std::unique_ptr<feng::Entity>& object : staticObjects)
+        {
+            sceneOutline[object.get()] = false;
+            scene.push_back(object.get());
+        }
+
+        sceneOutline[directLightEntity.get()] = true;
+        scene.push_back(directLightEntity.get());
+        sceneOutline[pointLightEntity.get()] = true;
+        scene.push_back(pointLightEntity.get());
+        sceneOutline[spotLightEntity.get()] = true;
+        scene.push_back(spotLightEntity.get());
     }
 
     void InitRenderProperties()
@@ -462,7 +569,7 @@ namespace SObjects
         camera->SetFarClipPlane(100.f);
 
         std::vector<feng::Entity*> outlined;
-        for(auto &[entity, isOutlined] : SObjects::scene)
+        for(feng::Entity *entity : SObjects::scene)
         {
             if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
             {
@@ -475,7 +582,7 @@ namespace SObjects
 
     void UpdateObjects()
     {
-        for(const std::unique_ptr<feng::Entity>& entity : objects)
+        for(const std::unique_ptr<feng::Entity>& entity : dynamicObjects)
         {
             feng::Transform *transform = entity->GetComponent<feng::Transform>();
 
@@ -671,6 +778,14 @@ namespace SRender
         glDepthMask(GL_TRUE); // Default.
 
         glEnable(GL_STENCIL_TEST);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendEquation(GL_FUNC_ADD);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK); // Default.
+        glFrontFace(GL_CW); 
     }
 
     void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
@@ -716,15 +831,37 @@ namespace SRender
         glStencilMask(0xFF);
     }
 
+    void SortSceneByDistance()
+    {
+        feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
+        const feng::Vector3 &camPosition = camTransform->GetPosition();
+        auto compare = [&camPosition] (const feng::Entity* e1, const feng::Entity* e2)
+        {
+            const feng::Transform *transform1 = e1->GetComponent<feng::Transform>();
+            const feng::Vector3 &position1 = transform1->GetPosition();
+            float distanceSqr1 = feng::Vector3::DistanceSqr(camPosition, position1);
+
+            const feng::Transform *transform2 = e2->GetComponent<feng::Transform>();
+            const feng::Vector3 &position2 = transform2->GetPosition();
+            float distanceSqr2 = feng::Vector3::DistanceSqr(camPosition, position2);
+
+            return distanceSqr2 < distanceSqr1;
+        };
+
+        std::sort(SObjects::scene.begin(), SObjects::scene.end(), compare);
+    }
+
     void Render()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        
+
+        SortSceneByDistance();
+
         std::vector<feng::Entity*> outlined;
 
-        for(auto &[entity, isOutlined] : SObjects::scene)
+        for(feng::Entity* entity : SObjects::scene)
         {
-            if(isOutlined)
+            if(SObjects::sceneOutline[entity])
             {
                 outlined.push_back(entity);
             }
