@@ -1,5 +1,5 @@
-//#include "../../Globals.h"
 //#include "RenderSystem.h"
+//
 //#include "Camera.h"
 //#include "Renderer.h"
 //#include "RenderPostProcessing.h"

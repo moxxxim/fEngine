@@ -38,3 +38,4 @@
 37. "discard" instruction. Only fragment? performance?
 38. glBlendFunc(GLenum sfunc, GLenum dfunc);
 39. "order independent transparency". depth/transparency conflict.
+40. <OpenGL/gl.h> vs./and <OpenGL/gl3.h>

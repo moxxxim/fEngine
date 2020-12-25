@@ -3,6 +3,7 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
+#include <Feng/App/Globals.h>
 #include <Feng/Math/MathUtils.h>
 #include <Feng/Math/MatrixUtils.h>
 #include <Feng/Math/Vector3.h>
@@ -240,8 +241,8 @@ namespace SRes
 
 namespace SApp
 {
-    constexpr uint32_t Width = 800;
-    constexpr uint32_t Height = 600;
+    constexpr uint32_t InitialWidth = 800;
+    constexpr uint32_t InitialHeight = 600;
 
     float deltaTime = 0.0f;
     float time = 0.0f;
@@ -256,8 +257,8 @@ namespace SApp
 
 namespace SCamController
 {
-    float lastX = SApp::Width / 2.f;
-    float lastY = SApp::Height / 2.f;
+    float lastX = 0;
+    float lastY = 0;
     float Zoom = 45;
     const float cameraSpeed = 3.f;
     float camPitch = 0.f;
@@ -337,13 +338,18 @@ namespace SObjects
 
         feng::Camera &camera = camEntity->AddComponent<feng::Camera>();
         camera.SetFovY(SCamController::Zoom);
-        camera.SetAspectRatio(static_cast<float>(SApp::Width)/SApp::Height);
+        camera.SetAspectRatio(static_cast<float>(SApp::InitialWidth)/SApp::InitialHeight);
         camera.SetNearClipPlane(0.1f);
         camera.SetFarClipPlane(100.f);
 
         feng::Transform *camTransform = camEntity->GetComponent<feng::Transform>();
         camTransform->SetPosition(0.f, 3.5f, 3.f);
         camTransform->SetEuler(SCamController::camPitch, SCamController::camYaw, 0.f);
+
+        SCamController::lastX = SApp::InitialWidth / 2.f;
+        SCamController::lastY = SApp::InitialHeight / 2.f;
+        feng::screen::ScreenWidth = SApp::InitialWidth;
+        feng::screen::ScreenHeight = SApp::InitialHeight;
 
         return camEntity;
     }
@@ -564,7 +570,7 @@ namespace SObjects
         feng::Camera *camera = SObjects::camEntity->GetComponent<feng::Camera>();
 
         camera->SetFovY(SCamController::Zoom);
-        camera->SetAspectRatio(static_cast<float>(SApp::Width)/SApp::Height);
+        camera->SetAspectRatio(static_cast<float>(feng::screen::ScreenWidth)/feng::screen::ScreenHeight);
         camera->SetNearClipPlane(0.1f);
         camera->SetFarClipPlane(100.f);
 
@@ -623,6 +629,8 @@ namespace SWindow
 
     void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
     {
+        feng::screen::ScreenWidth = width;
+        feng::screen::ScreenHeight = height;
         glViewport(0, 0, width, height);
     }
 

@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 
+option(USE_GLM_LIB "Add GLM lib to project" OFF)
+
 # set the project name
 set(PROJECT_NAME "OpenGL_Tutorial")
+set(THIRDPARTY_SRC_DIR_NAME "Thirdparty")
+set(GLM_DIR_NAME "Glm")
 project(${PROJECT_NAME})
 
 message(${PROJECT_SOURCE_DIR})
@@ -68,7 +72,7 @@ set(THIRDPARTY_STATIC_LIBS)
 if(APPLE)
     # Static.
     file(GLOB_RECURSE THIRDPARTY_STATIC_LIBS REGEX "*.a")
-    list(FILTER THIRDPARTY_STATIC_LIBS INCLUDE REGEX ".*Thirdparty.*Libs.*")
+    list(FILTER THIRDPARTY_STATIC_LIBS INCLUDE REGEX ".*${THIRDPARTY_SRC_DIR_NAME}.*Libs.*")
 endif(APPLE)
 
 # log thirdparty libs
@@ -102,6 +106,10 @@ log_message_framed("Platform-specific libraries:\n${PLATFORM_SPECIFIC_LIBS_SEPAR
 file(GLOB_RECURSE MY_PROJECT_SOURCES_FILES ${SOURCE_FILES_EXTENSIONS})
 # remove cmake build directory from source files.
 list(FILTER MY_PROJECT_SOURCES_FILES EXCLUDE REGEX ".*${PROJECT_BINARY_DIR}.*")
+
+if(NOT USE_GLM_LIB)
+    list(FILTER MY_PROJECT_SOURCES_FILES EXCLUDE REGEX ".*${THIRDPARTY_SRC_DIR_NAME}.*${GLM_DIR_NAME}.*")
+endif()
 
 foreach(src_path IN ITEMS ${MY_PROJECT_SOURCES_FILES})
     get_filename_component(src_dir ${src_path} DIRECTORY)

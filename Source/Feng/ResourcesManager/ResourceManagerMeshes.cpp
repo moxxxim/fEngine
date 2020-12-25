@@ -1,7 +1,5 @@
 #include <Feng/ResourcesManager/ResourceManagerMeshes.h>
 
-#include <Feng/App/GuidGenerator.h>
-
 namespace feng
 {
 //    ResourceManagerMeshes::ResourceManagerMeshes(CachedMesh *cachedMeshes, unsigned cachedMeshedCount) :

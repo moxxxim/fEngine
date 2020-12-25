@@ -1,9 +1,6 @@
 #pragma once
 
-#include <Feng/App/Object.h>
-#include <Feng/ResourcesManager/PostEffectType.h>
-#include <Feng/ResourcesManager/CachedPostEffectDefinition.h>
-
+#include <Feng/Render/PostEffects/PostEffectType.h>
 
 #include <vector>
 
@@ -12,14 +9,12 @@ namespace feng
     class Material;
     class PostEffectPassBehaviour;
 
-    class PostEffectDefinition final: public Object
+    class PostEffectDefinition final
     {
     public:
         PostEffectDefinition(Material *material, PostEffectPassBehaviour *passBehaviour);
         PostEffectDefinition(const std::vector<PostEffectDefinition*>& innerSequence);
         ~PostEffectDefinition();
-
-        void Destroy() override;
 
         PostEffectType GetType() const;
         Material * GetMaterial() const;
@@ -27,29 +22,32 @@ namespace feng
         const std::vector<PostEffectDefinition*>& GetInnerSequence() const;
 
     private:
-        PostEffectType m_type = PostEffectType::Material;
-        Material *m_material = nullptr;
-        PostEffectPassBehaviour *m_passBehaviour = nullptr;
-        std::vector<PostEffectDefinition*> m_innerSequence;
-};
+        PostEffectType type = PostEffectType::Material;
+        Material *material = nullptr;
+        PostEffectPassBehaviour *passBehaviour = nullptr;
+        std::vector<PostEffectDefinition*> subsequence;
+    };
+}
 
+namespace feng
+{
     inline PostEffectType PostEffectDefinition::GetType() const
     {
-        return m_type;
+        return type;
     }
 
     inline Material * PostEffectDefinition::GetMaterial() const
     {
-        return m_material;
+        return material;
     }
 
     inline PostEffectPassBehaviour * PostEffectDefinition::GetPassBehaviour() const
     {
-        return m_passBehaviour;
+        return passBehaviour;
     }
 
     inline const std::vector<PostEffectDefinition*>& PostEffectDefinition::GetInnerSequence() const
     {
-        return m_innerSequence;
+        return subsequence;
     }
 }

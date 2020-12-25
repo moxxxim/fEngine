@@ -1,6 +1,4 @@
-#include <Feng/ResourcesManager/PostEffectDefinition.h>
-
-#include <Feng/ResourcesManager/ResourceManager.h>
+#include <Feng/Render/PostEffects/PostEffectDefinition.h>
 
 namespace feng
 {
@@ -22,11 +20,5 @@ namespace feng
 //    PostEffectDefinition::~PostEffectDefinition()
 //    {
 //        delete m_passBehaviour;
-//    }
-//
-//    void PostEffectDefinition::Destroy()
-//    {
-//        ResourcesManager *resourcesManager = ResourcesManager::GetInstance();
-//        resourcesManager->DestroyResource(GetId());
 //    }
 }

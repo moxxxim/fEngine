@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Feng/ResourcesManager/CachedResource.h>
-#include <Feng/ResourcesManager/PostEffectType.h>
+#include <Feng/Render/PostEffects/PostEffectType.h>
 
 namespace feng
 {
