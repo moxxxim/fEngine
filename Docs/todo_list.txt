@@ -40,3 +40,4 @@
 39. "order independent transparency". depth/transparency conflict.
 40. <OpenGL/gl.h> vs./and <OpenGL/gl3.h>
 41. glVertexAttribPointer/glEnableVertexAttribArray why every call without VAO.
+42. glViewport and renderbuffer different sizes: what result?

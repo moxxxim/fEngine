@@ -47,8 +47,12 @@ namespace SRes
     const char *showDepthFsName = "Utils/ShowDepthFs.fs";
     const char *showDepthVsName = "Utils/ShowDepthVs.vs";
 
-    const char *postEffectVsName = "Post Effects/PostEffectVs.vs";
-    const char *grayscalePostEffectFsName = "Post Effects/PostEffectGrayscaleFs.fs";
+    const char *postEffectVsName = "PostEffects/PostEffectVs.vs";
+    const char *grayscalePostEffectFsName = "PostEffects/PostEffectGrayscaleFs.fs";
+    const char *invertColorsPostEffectFsName = "PostEffects/PostEffectInvertColorsFs.fs";
+    const char *sharpColorPostEffectFsName = "PostEffects/PostEffectSharpColorFs.fs";
+    const char *blurPostEffectFsName = "PostEffects/PostEffectBlurFs.fs";
+    const char *edgeDetectionPostEffectFsName = "PostEffects/PostEffectEdgeDetectionFs.fs";
 
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *brickWallJpg = "brick_wall.jpg";
@@ -791,6 +795,10 @@ namespace SRender
     feng::FrameBuffer frameBuffer;
 
     std::unique_ptr<feng::PostEffectDefinition> grayscaleEffect;
+    std::unique_ptr<feng::PostEffectDefinition> invertColorsEffect;
+    std::unique_ptr<feng::PostEffectDefinition> sharpColorEffect;
+    std::unique_ptr<feng::PostEffectDefinition> blurEffect;
+    std::unique_ptr<feng::PostEffectDefinition> edgeDetectionEffect;
     std::vector<feng::PostEffectDefinition*> effects;
 
     void CreatePostEffectDefinitions()
@@ -801,7 +809,33 @@ namespace SRender
         std::unique_ptr<feng::Material> grayscaleEffectMaterial = std::make_unique<feng::Material>(std::move(grayscaleShader));
         grayscaleEffect = std::make_unique<feng::PostEffectDefinition>(std::move(grayscaleEffectMaterial));
 
+        std::unique_ptr<feng::Shader> invertColorsShader = SRes::LoadShader(
+                                                                    SRes::postEffectVsName,
+                                                                    SRes::invertColorsPostEffectFsName);
+        std::unique_ptr<feng::Material> invertColorsEffectMaterial = std::make_unique<feng::Material>(std::move(invertColorsShader));
+        invertColorsEffect = std::make_unique<feng::PostEffectDefinition>(std::move(invertColorsEffectMaterial));
+
+        std::unique_ptr<feng::Shader> sharpColorShader = SRes::LoadShader(
+                                                                    SRes::postEffectVsName,
+                                                                    SRes::sharpColorPostEffectFsName);
+        std::unique_ptr<feng::Material> sharpColorEffectMaterial = std::make_unique<feng::Material>(std::move(sharpColorShader));
+        sharpColorEffect = std::make_unique<feng::PostEffectDefinition>(std::move(sharpColorEffectMaterial));
+
+        std::unique_ptr<feng::Shader> blurShader = SRes::LoadShader(SRes::postEffectVsName, SRes::blurPostEffectFsName);
+        std::unique_ptr<feng::Material> blurEffectMaterial = std::make_unique<feng::Material>(std::move(blurShader));
+        blurEffect = std::make_unique<feng::PostEffectDefinition>(std::move(blurEffectMaterial));
+
+        std::unique_ptr<feng::Shader> edgeDetectionShader = SRes::LoadShader(
+                                                                    SRes::postEffectVsName,
+                                                                    SRes::edgeDetectionPostEffectFsName);
+        std::unique_ptr<feng::Material> edgeDetectionEffectMaterial = std::make_unique<feng::Material>(std::move(edgeDetectionShader));
+        edgeDetectionEffect = std::make_unique<feng::PostEffectDefinition>(std::move(edgeDetectionEffectMaterial));
+
+        effects.push_back(blurEffect.get());
         effects.push_back(grayscaleEffect.get());
+        effects.push_back(invertColorsEffect.get());
+        effects.push_back(sharpColorEffect.get());
+        effects.push_back(edgeDetectionEffect.get());
         SWindow::effectsCount = effects.size();
     }
 

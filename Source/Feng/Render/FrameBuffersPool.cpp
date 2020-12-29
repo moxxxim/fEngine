@@ -24,12 +24,13 @@ namespace feng
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorBuffer, 0);
 
-        GLuint depthStencilBuffer;
+        GLuint depthStencilBuffer = 0;
         if (depthStencil)
         {
             glGenRenderbuffers(1, &depthStencilBuffer);
             glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
         }
 
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

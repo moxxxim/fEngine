@@ -14,6 +14,26 @@ namespace feng
 {
     namespace SShader
     {
+        std::string LoadShaderSource(const std::string& path)
+        {
+            std::ifstream shaderFile;
+            shaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+            std::stringstream shaderStream;
+            try
+            {
+                shaderFile.open(path);
+                shaderStream << shaderFile.rdbuf();
+                shaderFile.close();
+            }
+            catch (const std::ifstream::failure &e)
+            {
+                Debug::LogError("Failed to load shader file: " + path + ". Error: " + e.what());
+                return "";
+            }
+
+            return shaderStream.str();
+        }
+
         uint32_t CompileShader(Shader::eType type, const std::string& sourceCode)
         {
             int glShaderType = (type == Shader::eType::Vertex)
@@ -316,33 +336,8 @@ namespace feng
 
     std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath)
     {
-        std::ifstream vShaderFile;
-        std::ifstream fShaderFile;
-
-        vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-        fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-
-        std::stringstream vShaderStream;
-        std::stringstream fShaderStream;
-        try
-        {
-            // open files
-            vShaderFile.open(vsPath);
-            fShaderFile.open(fsPath);
-
-            // read file's buffer contents into streams
-            vShaderStream << vShaderFile.rdbuf();
-            fShaderStream << fShaderFile.rdbuf();
-
-            // close file handlers
-            vShaderFile.close();
-            fShaderFile.close();
-        }
-        catch(const std::ifstream::failure &e)
-        {
-            Debug::LogError("Failed to load shader file: " + vsPath + ", " + fsPath + ". Error: " + e.what());
-        }
-
-        return std::make_unique<Shader>(vShaderStream.str(), fShaderStream.str());
+        std::string vSource = SShader::LoadShaderSource(vsPath);
+        std::string fSource = SShader::LoadShaderSource(fsPath);
+        return std::make_unique<Shader>(vSource, fSource);
     }
 }
