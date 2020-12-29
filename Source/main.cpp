@@ -611,18 +611,24 @@ namespace SObjects
 
 namespace SWindow
 {
+    constexpr float effectChangeInputDelay = 0.5f;
+    float lastEffectChangeTime = 0.f;
     int32_t effectsCount = 0;
     int32_t appliedEffectIndex = -1;
 
     void ApplyNextPostEffect()
     {
-        if(appliedEffectIndex + 1 < effectsCount)
+        if(SApp::time - lastEffectChangeTime > effectChangeInputDelay)
         {
-            ++appliedEffectIndex;
-        }
-        else
-        {
-            appliedEffectIndex = -1;
+            lastEffectChangeTime = SApp::time;
+            if(appliedEffectIndex + 1 < effectsCount)
+            {
+                ++appliedEffectIndex;
+            }
+            else
+            {
+                appliedEffectIndex = -1;
+            }
         }
     }
 
@@ -758,9 +764,7 @@ namespace SWindow
 
     GLFWwindow* CreateWindow()
     {
-        constexpr int width = 800;
-        constexpr int height = 600;
-        GLFWwindow* window = glfwCreateWindow(width, height, "Sweet OpenGL Window", nullptr, nullptr);
+        GLFWwindow* window = glfwCreateWindow(SApp::InitialWidth, SApp::InitialHeight, "Sweet OpenGL Window", nullptr, nullptr);
         if (window != nullptr)
         {
             glfwMakeContextCurrent(window);
@@ -768,7 +772,7 @@ namespace SWindow
             glfwSetCursorPosCallback(window, MouseCallback);
             glfwSetScrollCallback(window, ScrollCallback);
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glViewport(0, 0, width, height);
+            glViewport(0, 0, SApp::InitialWidth, SApp::InitialHeight);
         }
         else
         {
