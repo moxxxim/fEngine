@@ -12,6 +12,7 @@ namespace feng
     {
         GLuint fbo;
         glGenFramebuffers(1, &fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
         GLuint colorBuffer;
         glGenTextures(1, &colorBuffer);
@@ -20,7 +21,7 @@ namespace feng
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen::ScreenWidth, screen::ScreenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen::ScreenWidth, screen::ScreenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorBuffer, 0);
 
         GLuint depthStencilBuffer;
@@ -28,7 +29,7 @@ namespace feng
         {
             glGenRenderbuffers(1, &depthStencilBuffer);
             glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
-            glRenderbufferStorage(GL_FRAMEBUFFER, GL_DEPTH24_STENCIL8, screen::ScreenWidth, screen::ScreenHeight);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screen::ScreenWidth, screen::ScreenHeight);
         }
 
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

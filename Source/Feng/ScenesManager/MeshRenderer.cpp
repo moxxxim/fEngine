@@ -10,6 +10,8 @@
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/ResourcesManager/Texture.h>
 #include <Feng/Utils/Render/ShaderParams.h>
+#include <Feng/Utils/Render/TextureParams.h>
+#include <Feng/Utils/Render/RenderUtils.h>
 
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
@@ -64,7 +66,7 @@ namespace feng
         {
             StartDraw();
             SetGlobalUniforms(renderProperties);
-            SetMaterialUniforms();
+            BindMaterialUniforms(*material, textureBuffers);
             ExecuteDraw();
             FinishDraw();
         }
@@ -90,59 +92,6 @@ namespace feng
         SetCameraUniforms(renderProperties);
         SetLightUniforms(renderProperties);
         SetFogUniforms(renderProperties);
-    }
-
-    void MeshRenderer::SetMaterialUniforms()
-    {
-        const Shader* shader = material->GetShader();
-        const std::map<std::string, int> uniforms = shader->GetUniforms();
-
-        uint32_t textureUnit = 0;
-
-        for(const auto& [name, location] : uniforms)
-        {
-            int intValue;
-            if(material->TryGetInt(name, intValue))
-            {
-                shader->SetUniformInt(name.c_str(), intValue);
-                continue;
-            }
-
-            float floatValue;
-            if(material->TryGetFloat(name, floatValue))
-            {
-                shader->SetUniformFloat(name.c_str(), floatValue);
-                continue;
-            }
-
-            Vector2 vector2Value;
-            if(material->TryGetVector2(name, vector2Value))
-            {
-                shader->SetUniformVector2(name.c_str(), vector2Value);
-                continue;
-            }
-
-            Vector3 vector3Value;
-            if(material->TryGetVector3(name, vector3Value))
-            {
-                shader->SetUniformVector3(name.c_str(), vector3Value);
-                continue;
-            }
-
-            Vector4 vector4Value;
-            if(material->TryGetVector4(name, vector4Value))
-            {
-                shader->SetUniformVector4(name.c_str(), vector4Value);
-                continue;
-            }
-
-            if(const Texture *texture = material->GetTexture(name))
-            {
-                ActivateTexture(name, *texture, textureUnit);
-                ++textureUnit;
-                continue;
-            }
-        }
     }
 
     void MeshRenderer::ExecuteDraw()
@@ -205,13 +154,7 @@ namespace feng
 
     void MeshRenderer::CreateTexturesBuffers()
     {
-        const std::map<std::string, const Texture*> &textures = material->GetTextures();
-
-        for(const auto& [name, texture] : textures)
-        {
-            uint32_t tbo = CreateTextureBuffer(*texture);
-            textureBuffers[name] = tbo;
-        }
+        textureBuffers = CreateTextureBuffers(*material);
     }
 
     void MeshRenderer::DeleteTextureBuffers()
@@ -229,34 +172,7 @@ namespace feng
         glBindBuffer(GL_ARRAY_BUFFER, bufferObject);
         glBufferData(GL_ARRAY_BUFFER, mesh->GetDataSize(), mesh->GetData(), GL_STATIC_DRAW);
 
-        AttributesParser attributes { mesh->GetAttributes() };
-
-        GLuint attributeIndex = 0;
-        GLsizei offset = 0;
-        while(attributes.HasCurrent())
-        {
-            if(attributes.IsCurrentSet())
-            {
-                GLint componentsNumber;
-                GLenum type;
-                GLboolean isNormalized;
-                GLsizei size;
-                attributes.GetCurrent(componentsNumber, type, isNormalized, size);
-
-                glVertexAttribPointer(
-                                    attributeIndex,
-                                    componentsNumber,
-                                    type,
-                                    isNormalized,
-                                    static_cast<GLsizei>(mesh->GetVertexStride()),
-                                    reinterpret_cast<const GLvoid *>(offset));
-                glEnableVertexAttribArray(attributeIndex);
-                offset += size;
-                ++attributeIndex;
-            }
-
-            attributes.Next();
-        }
+        EnableVertexAttributes(mesh->GetAttributes());
 
         return bufferObject;
     }
@@ -272,70 +188,6 @@ namespace feng
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
 
         return bufferObject;
-    }
-
-    uint32_t MeshRenderer::CreateTextureBuffer(const Texture& texture)
-    {
-        GLenum target = ToOpenGLValue(texture.GetType());
-
-        GLuint tbo;
-        glGenTextures(1, &tbo);
-        glBindTexture(target, tbo);
-
-        GLint wrapModeS = static_cast<GLint>(ToOpenGLValue(texture.GetWrapModeS()));
-        GLint wrapModeT = static_cast<GLint>(ToOpenGLValue(texture.GetWrapModeT()));
-        GLint minFilter = static_cast<GLint>(ToOpenGLValue(texture.GetMinFilter()));
-        GLint magFilter = static_cast<GLint>(ToOpenGLValue(texture.GetMagFilter()));
-
-        glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapModeS);
-        glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapModeT);
-        glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-        glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
-
-        GenerateTexture(texture);
-        if (texture.HasMipMaps())
-        {
-            glGenerateMipmap(target);
-        }
-
-        glBindTexture(target, 0);
-
-        return tbo;
-    }
-
-    void MeshRenderer::GenerateTexture(const Texture& texture)
-    {
-        eTextureType type = texture.GetType();
-        if (type == eTextureType::Tex2d)
-        {
-            GenerateTexture2D(texture);
-        }
-        else if (type == eTextureType::CubeMap)
-        {
-            GenerateTextureCube(texture);
-        }
-    }
-
-    void MeshRenderer::GenerateTexture2D(const Texture& texture)
-    {
-        GLenum format = GetTextureFormat(texture);
-        GLsizei width = static_cast<GLsizei>(texture.GetWidth());
-        GLsizei height = static_cast<GLsizei>(texture.GetHeight());
-        const GLvoid *data = static_cast<const GLvoid*>(texture.GetData());
-        // TODO: m.alekseev Format here is used incorrectly.
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-    }
-
-    void MeshRenderer::GenerateTextureCube(const Texture& texture)
-    {
-//        const GLint format = feng::GetTextureFormat(texture);
-//        int faceWidth = texture->GetWidth() / 4;
-//        int faceHeight = texture->GetHeight() / 3;
-//        for (int i = 0; i < 6; ++i)
-//        {
-//            const char *data = texture->GetCubeMapFace((feng::CubeMapFace)i);
-//            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, data);
-//        }
     }
 
     void MeshRenderer::SetCameraUniforms(const RenderProperties &renderProperties)

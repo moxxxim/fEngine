@@ -9,6 +9,8 @@ namespace feng
         : shader {std::move(aShader)}
     { }
 
+    Material::~Material() = default;
+
     bool Material::HasShader() const
     {
         if(shader != nullptr)

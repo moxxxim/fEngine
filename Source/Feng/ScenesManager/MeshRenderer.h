@@ -36,7 +36,6 @@ namespace feng
         void FinishDraw();
 
         void SetGlobalUniforms(const RenderProperties &renderProperties);
-        void SetMaterialUniforms();
         void ExecuteDraw();
         void ActivateTexture(const std::string& name, const Texture &texture, uint32_t unit);
 
@@ -48,11 +47,6 @@ namespace feng
 
         uint32_t CreateVertexBuffer();
         uint32_t CreateIndexBuffer();
-
-        uint32_t CreateTextureBuffer(const Texture& texture);
-        void GenerateTexture(const Texture& texture);
-        void GenerateTexture2D(const Texture& texture);
-        void GenerateTextureCube(const Texture& texture);
 
         void SetCameraUniforms(const RenderProperties &renderProperties);
         void SetLightUniforms(const RenderProperties &renderProperties);

@@ -1,17 +1,20 @@
 #pragma once
 
-#include <Feng/ScenesManager/PostEffectPass.h>
-#include <Feng/ScenesManager/PostEffectPrePass.h>
-#include <Feng/Serialization/SerializableObject.h>
+#include <cstdint>
 
 namespace feng
 {
+    class PostEffectPass;
+    class PostEffectPrePass;
+
     class PostEffectPassBehaviour
     {
     public:
+        virtual ~PostEffectPassBehaviour() = default;
+
         int32_t GetPassesCount() const;
-        virtual void Initialize(PostEffectPrePass *prePass) = 0;
-        virtual void SetupPass(int passIndex, PostEffectPass *pass) = 0;
+        virtual void Initialize(PostEffectPrePass &prePass) = 0;
+        virtual void SetupPass(int32_t passIndex, PostEffectPass &pass) = 0;
 
     protected:
         PostEffectPassBehaviour() = default;

@@ -13,11 +13,11 @@ namespace feng
         Material *aMaterial,
         std::map<std::string, uint32_t>& aShaderInputTextures,
         int32_t aCustomBuffersCount,
-        FrameBuffersPool *aBuffersPool) :
-        material(aMaterial),
-        shaderInputTextures(aShaderInputTextures),
-        customBuffersCount(aCustomBuffersCount),
-        buffersPool(aBuffersPool)
+        FrameBuffersPool *aBuffersPool)
+        : material(aMaterial)
+        , shaderInputTextures(aShaderInputTextures)
+        , customBuffersCount(aCustomBuffersCount)
+        , buffersPool(aBuffersPool)
     {
         if(customBuffersCount > 0)
         {
@@ -25,32 +25,19 @@ namespace feng
         }
     }
 
-    void PostEffectPass::Setup(const PostEffectContext& aContext)
-    {
-        context = aContext;
-        for (int i = 0; i < customBuffersCount; ++i)
-        {
-            buffers[i] = buffersPool->CreateBuffer(false);
-        }
-    }
-
-    void PostEffectPass::Reset()
-    {
-        for (int i = 0; i < customBuffersCount; ++i)
-        {
-            buffersPool->DeleteBuffer(buffers[i]);
-        }
-    }
-
     void PostEffectPass::SetTextureFromOriginal(InputTextureType type, const char *textureName)
     {
-        uint32_t textureBuffer = (type == feng::PostEffectPass::InputTextureType::Color) ? context.Original.Color : context.Original.DepthStencil;
+        uint32_t textureBuffer = (type == feng::PostEffectPass::InputTextureType::Color)
+                ? context.Original.Color
+                : context.Original.DepthStencil;
         SetShaderInput(textureName, textureBuffer);
     }
 
     void PostEffectPass::SetTextureFromInput(InputTextureType type, const char *textureName)
     {
-        uint32_t textureBuffer = (type == feng::PostEffectPass::InputTextureType::Color) ? context.Input.Color : context.Input.DepthStencil;
+        uint32_t textureBuffer = (type == feng::PostEffectPass::InputTextureType::Color)
+                ? context.Input.Color
+                : context.Input.DepthStencil;
         SetShaderInput(textureName, textureBuffer);
     }
 
@@ -78,6 +65,23 @@ namespace feng
     {
         glBindFramebuffer(GL_FRAMEBUFFER, context.Output.Frame);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    void PostEffectPass::Setup(const PostEffectContext& aContext)
+    {
+        context = aContext;
+        for (int i = 0; i < customBuffersCount; ++i)
+        {
+            buffers[i] = buffersPool->CreateBuffer(false);
+        }
+    }
+
+    void PostEffectPass::Reset()
+    {
+        for (int i = 0; i < customBuffersCount; ++i)
+        {
+            buffersPool->DeleteBuffer(buffers[i]);
+        }
     }
 
     void PostEffectPass::SetShaderInput(const char *textureName, unsigned int buffer)

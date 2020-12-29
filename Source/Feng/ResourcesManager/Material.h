@@ -3,6 +3,7 @@
 #include <Feng/Math/Vector2.h>
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
+#include <Feng/ResourcesManager/Shader.h>
 
 #include <map>
 #include <utility>
@@ -10,12 +11,12 @@
 namespace feng
 {
     class Texture;
-    class Shader;
 
     class Material final
     {
     public:
         explicit Material(std::unique_ptr<Shader>&& aShader);
+        ~Material();
 
         bool HasShader() const;
         bool HasTexture(const std::string& name) const;

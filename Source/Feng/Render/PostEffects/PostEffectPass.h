@@ -10,7 +10,6 @@
 namespace feng
 {
     class Material;
-    class Shader;
     class FrameBuffersPool;
 
     class PostEffectPass final
@@ -33,17 +32,17 @@ namespace feng
         void SetTextureFromCustom(InputTextureType type, const char *textureName, int index);
         void SetRenderBufferCustom(int index);
         void SetRenderBufferOutput();
-        Material * GetMaterial() const;
+        Material* GetMaterial() const;
 
-    private:
         void Setup(const PostEffectContext& aContext);
         void Reset();
         void SetShaderInput(const char *textureName, unsigned int buffer);
 
+    private:
         PostEffectContext context;
         Material *material = nullptr;
         FrameBuffersPool *buffersPool = nullptr;
-        std::map<std::string, uint32_t> shaderInputTextures;
+        std::map<std::string, uint32_t>& shaderInputTextures;
         int customBuffersCount = 0;
         std::vector<FrameBuffer> buffers;
     };

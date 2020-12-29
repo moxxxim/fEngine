@@ -19,6 +19,8 @@
 #include <Feng/ScenesManager/MeshRenderer.h>
 #include <Feng/ScenesManager/Transform.h>
 #include <Feng/ScenesManager/RenderProperties.h>
+#include <Feng/Render/PostEffects/RenderPostProcessing.h>
+#include <Feng/Render/PostEffects/PostEffectDefinition.h>
 #include <Feng/Utils/Debug.h>
 
 #include <cmath>
@@ -44,6 +46,9 @@ namespace SRes
     const char *diffTex1SpecTex2VsName = "DiffuseTex1SpecTex2Vs.vs";
     const char *showDepthFsName = "Utils/ShowDepthFs.fs";
     const char *showDepthVsName = "Utils/ShowDepthVs.vs";
+
+    const char *postEffectVsName = "Post Effects/PostEffectVs.vs";
+    const char *grayscalePostEffectFsName = "Post Effects/PostEffectGrayscaleFs.fs";
 
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *brickWallJpg = "brick_wall.jpg";
@@ -606,6 +611,21 @@ namespace SObjects
 
 namespace SWindow
 {
+    int32_t effectsCount = 0;
+    int32_t appliedEffectIndex = -1;
+
+    void ApplyNextPostEffect()
+    {
+        if(appliedEffectIndex + 1 < effectsCount)
+        {
+            ++appliedEffectIndex;
+        }
+        else
+        {
+            appliedEffectIndex = -1;
+        }
+    }
+
     bool TryInitGlfw()
     {
         int initResult = glfwInit();
@@ -730,11 +750,9 @@ namespace SWindow
             camTransform->Move(SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * right);
         }
 
-        if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
+        if (glfwGetKey(&window, GLFW_KEY_O) == GLFW_PRESS)
         {
-            feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
-            feng::Vector3 right = camTransform->GetRight();
-            camTransform->Move(SCamController::cameraSpeed * SApp::deltaTime * speedMultiplier * right);
+            ApplyNextPostEffect();
         }
     }
 
@@ -764,13 +782,67 @@ namespace SWindow
 
 namespace SRender
 {
+    feng::RenderPostProcessing postProcessing;
+    feng::FrameBuffersPool buffersPool;
+    feng::FrameBuffer frameBuffer;
+
+    std::unique_ptr<feng::PostEffectDefinition> grayscaleEffect;
+    std::vector<feng::PostEffectDefinition*> effects;
+
+    void CreatePostEffectDefinitions()
+    {
+        std::unique_ptr<feng::Shader> grayscaleShader = SRes::LoadShader(
+                                                                    SRes::postEffectVsName,
+                                                                    SRes::grayscalePostEffectFsName);
+        std::unique_ptr<feng::Material> grayscaleEffectMaterial = std::make_unique<feng::Material>(std::move(grayscaleShader));
+        grayscaleEffect = std::make_unique<feng::PostEffectDefinition>(std::move(grayscaleEffectMaterial));
+
+        effects.push_back(grayscaleEffect.get());
+        SWindow::effectsCount = effects.size();
+    }
+
+    void PreparePostEffects()
+    {
+        if(SWindow::appliedEffectIndex >= 0)
+        {
+            feng::PostEffectDefinition *postEffect = effects[SWindow::appliedEffectIndex];
+            postProcessing.SetPostEffect(*postEffect);
+        }
+        else
+        {
+            postProcessing.RemoveEffects();
+        }
+
+        if(postProcessing.HasPostEffects())
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.Frame);
+        }
+        else
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+    }
+
+    void ApplyPostEffects()
+    {
+        if(postProcessing.HasPostEffects())
+        {
+            postProcessing.ApplyPostEffects(frameBuffer);
+        }
+    }
+
     void InitRender()
     {
         feng::Debug::LogRenderInfoOpenGL();
         feng::Debug::LogMessage("Initialize render.");
 
         SRes::LoadResources();
+        Print_Errors_OpengGL();
+
         SObjects::CreateScene();
+        CreatePostEffectDefinitions();
+        frameBuffer = buffersPool.CreateBuffer(true);
+        Print_Errors_OpengGL();
 
         if(SObjects::showDepth)
         {
@@ -793,7 +865,8 @@ namespace SRender
 
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK); // Default.
-        glFrontFace(GL_CW); 
+        glFrontFace(GL_CW);
+        Print_Errors_OpengGL();
     }
 
     void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
@@ -861,6 +934,8 @@ namespace SRender
 
     void Render()
     {
+        PreparePostEffects();
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         SortSceneByDistance();
@@ -880,6 +955,10 @@ namespace SRender
         }
 
         RenderWithOutline(outlined);
+        Print_Errors_OpengGL();
+
+        ApplyPostEffects();
+        Print_Errors_OpengGL();
     }
 }
 
@@ -890,8 +969,6 @@ int main(int argc, const char * argv[])
         GLFWwindow *window = SWindow::CreateWindow();
 
         SRender::InitRender();
-
-        Print_Errors_OpengGL();
         feng::Debug::LogMessage("Start loop.");
 
         while(!glfwWindowShouldClose(window))

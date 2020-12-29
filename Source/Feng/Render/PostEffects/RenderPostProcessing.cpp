@@ -1,134 +1,136 @@
-#include "RenderPostProcessing.h"
-#include "MaterialPostEffect.h"
-#include "CompositePostEffect.h"
+#include <Feng/Render/PostEffects/RenderPostProcessing.h>
+
+#include <Feng/Render/PostEffects/CompositePostEffect.h>
+#include <Feng/Render/PostEffects/MaterialPostEffect.h>
+#include <Feng/Render/PostEffects/PostEffect.h>
+#include <Feng/Render/PostEffects/PostEffectContext.h>
+#include <Feng/Render/PostEffects/PostEffectDefinition.h>
+#include <Feng/Utils/Debug.h>
+#include <Feng/Utils/Render/MeshParams.h>
+#include <Feng/Utils/Render/RenderUtils.h>
 
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 
+#include <array>
+
 namespace feng
 {
+    RenderPostProcessing::RenderPostProcessing() = default;
+
     RenderPostProcessing::~RenderPostProcessing()
     {
+        glDeleteBuffers(1, &vao);
         glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &ibo);
     }
 
     bool RenderPostProcessing::HasPostEffects()
     {
-        return !effectsSequence.empty();
+        return !effects.empty();
     }
 
-    void RenderPostProcessing::SetPostEffect(PostEffectDefinition *postEffect)
+    void RenderPostProcessing::SetPostEffect(PostEffectDefinition &postEffect)
     {
         RemoveEffects();
         AddPostEffect(postEffect);
     }
 
-    void RenderPostProcessing::AddPostEffect(PostEffectDefinition *postEffect)
+    void RenderPostProcessing::AddPostEffect(PostEffectDefinition &postEffect)
     {
-        PostEffect *effect = CreatePostEffect(postEffect);
-        effectsSequence.push_back(effect);
+        std::unique_ptr<PostEffect> effect = CreatePostEffect(postEffect);
+        effects.push_back(std::move(effect));
     }
 
     void RenderPostProcessing::RemoveEffects()
     {
-        effectsSequence.clear();
+        effects.clear();
     }
 
     void RenderPostProcessing::ApplyPostEffects(const FrameBuffer& screenBuffer)
     {
-        BindQuadBuffer();
+        if (vao == 0)
+        {
+            CreateQuadBuffer();
+        }
+
+        glBindVertexArray(vao);
         ApplyPostEffectsSequence(screenBuffer);
-        UnbindQuadBuffer();
+        glBindVertexArray(0);
     }
 
     void RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer)
     {
-//        unsigned effectsCount = m_effectsSequence.GetSize();
-//        FrameBuffer intermediateBuffer = effectsCount > 1 ? m_buffersPool.GetBuffer(false) : FrameBuffer(0, 0, 0);
-//
-//        for (unsigned i = 0; i < effectsCount; ++i)
-//        {
-//            bool isFirst = i == 0;
-//            bool isLast = i == effectsCount - 1;
-//
-//            FrameBuffer input = isFirst ? screenBuffer : intermediateBuffer;
-//            FrameBuffer output = isLast ? FrameBuffer(0, 0, 0) : intermediateBuffer;
-//            PostEffectContext context(screenBuffer, input, output);
-//            PostEffect *effect = m_effectsSequence[i];
-//            effect->Apply(context);
-//        }
-//
-//        if (effectsCount > 1)
-//        {
-//            m_buffersPool.PutBuffer(intermediateBuffer);
-//        }
-    }
+        size_t effectsCount = effects.size();
+        FrameBuffer intermediateBuffer = effectsCount > 1 ? buffersPool.CreateBuffer(false) : FrameBuffer{};
 
-    void RenderPostProcessing::BindQuadBuffer()
-    {
-//        if (!m_vbo)
-//        {
-//            CreateQuadBuffer();
-//        }
-//
-//        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-    }
+        PostEffectContext context;
+        context.Original = screenBuffer;
 
-    void RenderPostProcessing::UnbindQuadBuffer()
-    {
-//        glBindBuffer(GL_ARRAY_BUFFER, 0);
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        for (size_t i = 0; i < effectsCount; ++i)
+        {
+            // TODO: m.alekseev Seems like it doesn't work correctly for multiple effects.
+            context.Input = (i == 0) ? screenBuffer : intermediateBuffer;
+            context.Output = (i == (effectsCount - 1)) ? FrameBuffer{} : intermediateBuffer;
+
+            std::unique_ptr<PostEffect> &effect = effects[i];
+            effect->Apply(context);
+            Print_Errors_OpengGL();
+        }
+
+        if (effectsCount > 1)
+        {
+            buffersPool.DeleteBuffer(intermediateBuffer);
+        }
     }
 
     void RenderPostProcessing::CreateQuadBuffer()
     {
-//        Vertex vertices[4];
-//        vertices[0].Position = Vector3(-1.0, -1.0, 0.0);
-//        vertices[0].UV1 = Vector2(0.0, 0.0);
-//
-//        vertices[1].Position = Vector3(-1.0, 1.0, 0.0);
-//        vertices[1].UV1 = Vector2(0.0, 1.0);
-//
-//        vertices[2].Position = Vector3(1.0, 1.0, 0.0);
-//        vertices[2].UV1 = Vector2(1.0, 1.0);
-//
-//        vertices[3].Position = Vector3(1.0, -1.0, 0.0);
-//        vertices[3].UV1 = Vector2(1.0, 0.0);
-//
-//        GLuint indices[6] = {0, 1, 2, 0, 2, 3};
-//
-//        glGenBuffers(1, &m_vbo);
-//        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-//        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-//        glBindBuffer(GL_ARRAY_BUFFER, 0);
-//
-//        glGenBuffers(1, &m_ibo);
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-//        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        std::array<float, 6 * (3 + 2)> quadVertices
+        {
+            -1.0, -1.0, 0.0,    0.0, 0.0,
+            -1.0,  1.0, 0.0,    0.0, 1.0,
+             1.0, -1.0, 0.0,    1.0, 0.0,
+
+             1.0, -1.0, 0.0,    1.0, 0.0,
+            -1.0,  1.0, 0.0,    0.0, 1.0,
+             1.0,  1.0, 0.0,    1.0, 1.0
+        };
+
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * quadVertices.size(), quadVertices.data(), GL_STATIC_DRAW);
+
+        EnableVertexAttributes(static_cast<eVertexAtributes>(eVertexAtributes::Position | eVertexAtributes::Uv0));
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
     }
 
-    PostEffect* RenderPostProcessing::CreatePostEffect(PostEffectDefinition *postEffect)
+    std::unique_ptr<PostEffect> RenderPostProcessing::CreatePostEffect(PostEffectDefinition &effectDefinition)
     {
-//        PostEffectType type = postEffect->GetType();
-//        if (type == PostEffectType::Material)
-//        {
-//            return new MaterialPostEffect(postEffect->GetMaterial(), &m_buffersPool, postEffect->GetPassBehaviour());
-//        }
-//        else
-//        {
-//            const Vector<PostEffectDefinition*>& postEffects = postEffect->GetInnerSequence();
-//            int effectsCount = postEffects.GetSize();
-//            PostEffect **effects = new PostEffect*[effectsCount];
-//
-//            for (int i = 0; i < effectsCount; ++i)
-//            {
-//                effects[i] = CreatePostEffect(postEffects[i]);
-//            }
-//
-//            return new CompositePostEffect(effects, effectsCount, &m_buffersPool);
-//        }
+        PostEffectType type = effectDefinition.GetType();
+        if (type == PostEffectType::Material)
+        {
+            Material* material = effectDefinition.GetMaterial();
+            PostEffectPassBehaviour* passBehaviour = effectDefinition.GetPassBehaviour();
+            return std::make_unique<MaterialPostEffect>(material, &buffersPool, passBehaviour);
+        }
+        else
+        {
+            const std::vector<std::unique_ptr<PostEffectDefinition>>& subsequence = effectDefinition.GetSubsequence();
+            int effectsCount = subsequence.size();
+            std::vector<std::unique_ptr<PostEffect>> subEffects;
+            subEffects.reserve(effectsCount);
+
+            for (uint32_t i = 0; i < effectsCount; ++i)
+            {
+                subEffects.push_back(CreatePostEffect(*subsequence[i]));
+            }
+
+            return std::make_unique<CompositePostEffect>(std::move(subEffects), &buffersPool);
+        }
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Feng/Render/FrameBuffersPool.h>
+#include <memory>
 #include <vector>
 
 namespace feng
@@ -12,24 +13,22 @@ namespace feng
     class RenderPostProcessing final
     {
     public:
-        RenderPostProcessing() = default;
+        RenderPostProcessing();
         ~RenderPostProcessing();
         bool HasPostEffects();
-        void SetPostEffect(PostEffectDefinition *postEffect);
-        void AddPostEffect(PostEffectDefinition *postEffect);
+        void SetPostEffect(PostEffectDefinition &postEffect);
+        void AddPostEffect(PostEffectDefinition &postEffect);
         void RemoveEffects();
         void ApplyPostEffects(const FrameBuffer& screenBuffer);
 
     private:
         void ApplyPostEffectsSequence(const FrameBuffer& screenBuffer);
-        void BindQuadBuffer();
-        void UnbindQuadBuffer();
         void CreateQuadBuffer();
-        PostEffect* CreatePostEffect(PostEffectDefinition *postEffect);
+        std::unique_ptr<PostEffect> CreatePostEffect(PostEffectDefinition &postEffect);
 
-        std::vector<PostEffect*> effectsSequence;
+        std::vector<std::unique_ptr<PostEffect>> effects;
         FrameBuffersPool buffersPool;
+        uint32_t vao = 0;
         uint32_t vbo = 0;
-        uint32_t ibo = 0;
     };
 }

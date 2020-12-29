@@ -1,24 +1,23 @@
-//#pragma once
-//
-//#include <Feng/ScenesManager/PostEffectPassBehaviour.h>
-//
-//namespace feng
-//{
-//    class BlurPassBehaviour final : public PostEffectPassBehaviour
-//    {
-//    public:
-//        BlurPassBehaviour() = default;
-//        BlurPassBehaviour(float *blurStrength, int passesCount);
-//
-//        void OnSerialize(SerializationNode& node) const override;
-//        void OnDeserialize(const SerializationNode& node) override;
-//
-//        void Initialize(PostEffectPrePass *prePass) override;
-//        void SetupPass(int passIndex, PostEffectPass *pass) override;
-//
-//    private:
-//        void SetupMaterial(int passIndex, Material *material);
-//
-//        float *m_blurStrength = nullptr;
-//    };
-//}
+#pragma once
+
+#include <Feng/Render/PostEffects/PostEffectPassBehaviour.h>
+
+namespace feng
+{
+    class Material;
+
+    class BlurPassBehaviour final : public PostEffectPassBehaviour
+    {
+    public:
+        BlurPassBehaviour() = default;
+        BlurPassBehaviour(float *blurStrength, int passesCount);
+
+        void Initialize(PostEffectPrePass& prePass) override;
+        void SetupPass(int passIndex, PostEffectPass& pass) override;
+
+    private:
+        void SetupMaterial(int passIndex, Material *material);
+
+        float *m_blurStrength = nullptr;
+    };
+}

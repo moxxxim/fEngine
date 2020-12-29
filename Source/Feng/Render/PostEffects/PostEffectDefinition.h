@@ -12,20 +12,23 @@ namespace feng
     class PostEffectDefinition final
     {
     public:
-        PostEffectDefinition(Material *material, PostEffectPassBehaviour *passBehaviour);
-        PostEffectDefinition(const std::vector<PostEffectDefinition*>& innerSequence);
+        PostEffectDefinition(std::unique_ptr<Material>&& aMaterial);
+        PostEffectDefinition(
+                        std::unique_ptr<Material>&& aMaterial,
+                        std::unique_ptr<PostEffectPassBehaviour>&& aPassBehaviour);
+        PostEffectDefinition(std::vector<std::unique_ptr<PostEffectDefinition>>&& aSubsequence);
         ~PostEffectDefinition();
 
         PostEffectType GetType() const;
-        Material * GetMaterial() const;
-        PostEffectPassBehaviour * GetPassBehaviour() const;
-        const std::vector<PostEffectDefinition*>& GetInnerSequence() const;
+        Material* GetMaterial();
+        PostEffectPassBehaviour* GetPassBehaviour();
+        const std::vector<std::unique_ptr<PostEffectDefinition>>& GetSubsequence() const;
 
     private:
         PostEffectType type = PostEffectType::Material;
-        Material *material = nullptr;
-        PostEffectPassBehaviour *passBehaviour = nullptr;
-        std::vector<PostEffectDefinition*> subsequence;
+        std::unique_ptr<Material> material;
+        std::unique_ptr<PostEffectPassBehaviour> passBehaviour;
+        std::vector<std::unique_ptr<PostEffectDefinition>> subsequence;
     };
 }
 
@@ -36,17 +39,17 @@ namespace feng
         return type;
     }
 
-    inline Material * PostEffectDefinition::GetMaterial() const
+    inline Material* PostEffectDefinition::GetMaterial()
     {
-        return material;
+        return material.get();
     }
 
-    inline PostEffectPassBehaviour * PostEffectDefinition::GetPassBehaviour() const
+    inline PostEffectPassBehaviour* PostEffectDefinition::GetPassBehaviour()
     {
-        return passBehaviour;
+        return passBehaviour.get();
     }
 
-    inline const std::vector<PostEffectDefinition*>& PostEffectDefinition::GetInnerSequence() const
+    inline const std::vector<std::unique_ptr<PostEffectDefinition>>& PostEffectDefinition::GetSubsequence() const
     {
         return subsequence;
     }

@@ -31,6 +31,10 @@ namespace feng
         static constexpr std::string_view NearClipPlane {"uNearClipPlane"};
         static constexpr std::string_view FarClipPlane {"uFarClipPlane"};
 
+        static constexpr std::string_view ScreenColorOriginal {"uScreenColorOriginal"};
+        static constexpr std::string_view ScreenDepthOriginal {"uScreenDepthOriginal"};
+        static constexpr std::string_view ScreenColorProcessed {"uScreenColorProcessed"};
+
         static constexpr std::string_view VertexPos {"aPos"};
         static constexpr std::string_view VertexUv0 {"aUv0"};
         static constexpr std::string_view VertexNorm {"aNorm"};
