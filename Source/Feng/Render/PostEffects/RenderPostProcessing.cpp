@@ -61,7 +61,9 @@ namespace feng
     void RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer)
     {
         size_t effectsCount = effects.size();
-        FrameBuffer intermediateBuffer = effectsCount > 1 ? buffersPool.CreateBuffer(false) : FrameBuffer{};
+        FrameBuffer intermediateBuffer = (effectsCount > 1)
+            ? buffersPool.CreateBuffer(screenBuffer.Width, screenBuffer.Height, false)
+            : FrameBuffer{};
 
         PostEffectContext context;
         context.Original = screenBuffer;

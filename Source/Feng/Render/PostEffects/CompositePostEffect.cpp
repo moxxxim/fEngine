@@ -16,7 +16,7 @@ namespace feng
     {
         if (effects.size() > 1)
         {
-            FrameBuffer intermediateBuffer = buffersPool->CreateBuffer(false);
+            FrameBuffer intermediateBuffer = buffersPool->CreateBuffer(context.Input.Width, context.Input.Height, false);
 
             for (uint32_t i = 0; i < effects.size(); ++i)
             {

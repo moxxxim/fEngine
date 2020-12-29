@@ -611,7 +611,7 @@ namespace SObjects
 
 namespace SWindow
 {
-    constexpr float effectChangeInputDelay = 0.5f;
+    constexpr float effectChangeInputDelay = 0.3f;
     float lastEffectChangeTime = 0.f;
     int32_t effectsCount = 0;
     int32_t appliedEffectIndex = -1;
@@ -845,7 +845,11 @@ namespace SRender
 
         SObjects::CreateScene();
         CreatePostEffectDefinitions();
-        frameBuffer = buffersPool.CreateBuffer(true);
+#ifdef __APPLE__
+        frameBuffer = buffersPool.CreateBuffer(2 * feng::screen::ScreenWidth, 2 * feng::screen::ScreenHeight, true);
+#else
+        frameBuffer = buffersPool.CreateBuffer(feng::screen::ScreenWidth, feng::screen::ScreenHeight, true);
+#endif
         Print_Errors_OpengGL();
 
         if(SObjects::showDepth)

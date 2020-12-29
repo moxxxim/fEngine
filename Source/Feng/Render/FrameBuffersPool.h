@@ -11,7 +11,7 @@ namespace feng
     public:
         FrameBuffersPool() = default;
 
-        FrameBuffer CreateBuffer(bool depthStencil);
+        FrameBuffer CreateBuffer(uint32_t width, uint32_t height, bool depthStencil);
         void DeleteBuffer(const FrameBuffer& buffer);
 
     private:
