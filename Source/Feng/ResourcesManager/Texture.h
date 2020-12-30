@@ -2,6 +2,7 @@
 
 #include <Feng/Utils/Render/TextureParams.h>
 
+#include <array>
 #include <cstdint>
 
 namespace feng
@@ -12,6 +13,7 @@ namespace feng
     {
     public:
         Texture(const TextureData& aData);
+        Texture(const std::array<const TextureData*, 6>& aCubemapFaces);
 
         Texture(const Texture& other) = delete;
         Texture(Texture&& other) = delete;
@@ -23,24 +25,27 @@ namespace feng
         int32_t GetChanels() const;
 
 	    const uint8_t* GetData() const;
+        const uint8_t* GetCubemapFaceData(eCubemapFace face) const;
         eTextureType GetType() const;
-	    eTextureWrapping GetWrapModeS() const;
-        eTextureWrapping GetWrapModeT() const;
+	    eTextureWrapping GetWrapS() const;
+        eTextureWrapping GetWrapT() const;
+        eTextureWrapping GetWrapR() const;
 	    eTextureMinFilter GetMinFilter() const;
 	    eTextureMagFilter GetMagFilter() const;
 	    bool HasMipMaps() const;
 
-        void SetType(eTextureType aType);
         void SetWrapping(eTextureWrapping sWrap, eTextureWrapping tWrap);
+        void SetWrapping(eTextureWrapping sWrap, eTextureWrapping tWrap, eTextureWrapping rWrap);
         void SetFilters(eTextureMinFilter aMinFilter, eTextureMagFilter aMagFilter);
         void SetUseMipmaps(bool useMipMaps);
 
     private:
-        const TextureData& data;
+        std::array<const TextureData*, 6> data;
 
         eTextureType type = eTextureType::Tex2d;
         eTextureWrapping wrapS = eTextureWrapping::Repeat;
         eTextureWrapping wrapT = eTextureWrapping::Repeat;
+        eTextureWrapping wrapR = eTextureWrapping::Repeat;
         eTextureMinFilter minFilter = eTextureMinFilter::Nearest;
         eTextureMagFilter magFilter = eTextureMagFilter::Nearest;
         bool generateMipMaps = false;
@@ -54,14 +59,19 @@ namespace feng
         return type;
     }
 
-    inline eTextureWrapping Texture::GetWrapModeS() const
+    inline eTextureWrapping Texture::GetWrapS() const
     {
         return wrapS;
     }
 
-    inline eTextureWrapping Texture::GetWrapModeT() const
+    inline eTextureWrapping Texture::GetWrapT() const
     {
         return wrapT;
+    }
+
+    inline eTextureWrapping Texture::GetWrapR() const
+    {
+        return wrapR;
     }
 
     inline eTextureMinFilter Texture::GetMinFilter() const
@@ -79,15 +89,16 @@ namespace feng
         return generateMipMaps;
     }
 
-    inline void Texture::SetType(eTextureType aType)
-    {
-        type = aType;
-    }
-
     inline void Texture::SetWrapping(eTextureWrapping sWrap, eTextureWrapping tWrap)
     {
         wrapS = sWrap;
         wrapT = tWrap;
+    }
+
+    inline void Texture::SetWrapping(eTextureWrapping sWrap, eTextureWrapping tWrap, eTextureWrapping rWrap)
+    {
+        SetWrapping(sWrap, tWrap);
+        wrapR = rWrap;
     }
 
     inline void Texture::SetFilters(eTextureMinFilter aMinFilter, eTextureMagFilter aMagFilter)

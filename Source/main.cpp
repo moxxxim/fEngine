@@ -42,17 +42,19 @@ namespace SRes
     const char *DiffuseTextureVsName = "DiffuseTextureVs.vs";
     const char *SpecularTextureFsName = "SpecularTextureFs.fs";
     const char *SpecularTextureVsName = "SpecularTextureVs.vs";
-    const char *diffTex1SpecTex2FsName = "DiffuseTex1SpecTex2Fs.fs";
-    const char *diffTex1SpecTex2VsName = "DiffuseTex1SpecTex2Vs.vs";
-    const char *showDepthFsName = "Utils/ShowDepthFs.fs";
-    const char *showDepthVsName = "Utils/ShowDepthVs.vs";
+    const char *DiffTex1SpecTex2FsName = "DiffuseTex1SpecTex2Fs.fs";
+    const char *DiffTex1SpecTex2VsName = "DiffuseTex1SpecTex2Vs.vs";
+    const char *ShowDepthFsName = "Utils/ShowDepthFs.fs";
+    const char *ShowDepthVsName = "Utils/ShowDepthVs.vs";
+    const char *SkyboxFsName = "SkyboxFs.fs";
+    const char *SkyboxVsName = "SkyboxVs.vs";
 
-    const char *postEffectVsName = "PostEffects/PostEffectVs.vs";
-    const char *grayscalePostEffectFsName = "PostEffects/PostEffectGrayscaleFs.fs";
-    const char *invertColorsPostEffectFsName = "PostEffects/PostEffectInvertColorsFs.fs";
-    const char *sharpColorPostEffectFsName = "PostEffects/PostEffectSharpColorFs.fs";
-    const char *blurPostEffectFsName = "PostEffects/PostEffectBlurFs.fs";
-    const char *edgeDetectionPostEffectFsName = "PostEffects/PostEffectEdgeDetectionFs.fs";
+    const char *PostEffectVsName = "PostEffects/PostEffectVs.vs";
+    const char *GrayscalePostEffectFsName = "PostEffects/PostEffectGrayscaleFs.fs";
+    const char *InvertColorsPostEffectFsName = "PostEffects/PostEffectInvertColorsFs.fs";
+    const char *SharpColorPostEffectFsName = "PostEffects/PostEffectSharpColorFs.fs";
+    const char *BlurPostEffectFsName = "PostEffects/PostEffectBlurFs.fs";
+    const char *EdgeDetectionPostEffectFsName = "PostEffects/PostEffectEdgeDetectionFs.fs";
 
     const char *woodenContainerJpg = "wood_container.jpg";
     const char *brickWallJpg = "brick_wall.jpg";
@@ -61,6 +63,16 @@ namespace SRes
     const char *steeledBorderPng = "steel_border.png";
     const char *grassPng = "grass.png";
     const char *windowPng = "window.png";
+
+    std::array<std::string, 6> skyboxJpg =
+    {
+        "SkyboxBay/Bay_XPos.jpg",
+        "SkyboxBay/Bay_XNeg.jpg",
+        "SkyboxBay/Bay_YPos.jpg",
+        "SkyboxBay/Bay_YNeg.jpg",
+        "SkyboxBay/Bay_ZPos.jpg",
+        "SkyboxBay/Bay_ZNeg.jpg"
+    };
 
     std::vector<float> cube
     {
@@ -108,6 +120,52 @@ namespace SRes
         -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f
     };
 
+    std::vector<float> skyboxCube
+    {
+        -1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+
+        -1.0f,  -1.0f, -1.0f,
+        1.0f,  -1.0f, -1.0f,
+         1.0f,  -1.0f,  1.0f,
+
+         1.0f,  -1.0f,  1.0f,
+        -1.0f,  -1.0f,  1.0f,
+        -1.0f,  -1.0f, -1.0f
+    };
+
     std::vector<float> quadVertices
     {
              // position          // uv
@@ -144,15 +202,20 @@ namespace SRes
     std::unique_ptr<feng::TextureData> windowTextureData;
     std::unique_ptr<feng::Texture> windowTexture;
 
+    std::array<std::unique_ptr<feng::TextureData>, 6> skyboxData;
+    std::unique_ptr<feng::Texture> skyboxTexture;
+
     std::unique_ptr<feng::Material> diffuseTexMaterial;
     std::unique_ptr<feng::Material> specularTexMaterial;
     std::unique_ptr<feng::Material> diffTex1SpecTex2Material;
     std::unique_ptr<feng::Material> showDepthMaterial;
     std::unique_ptr<feng::Material> grassMaterial;
     std::unique_ptr<feng::Material> windowMaterial;
+    std::unique_ptr<feng::Material> skyboxMaterial;
 
     std::unique_ptr<feng::Mesh> cubeMesh;
     std::unique_ptr<feng::Mesh> quadMesh;
+    std::unique_ptr<feng::Mesh> skyboxMesh;
 
     std::unique_ptr<feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
     {
@@ -165,6 +228,18 @@ namespace SRes
     {
         std::string texturePath = SRes::BaseTexturesDir + name;
         return feng::TextureData::Load(texturePath, flip);
+    }
+
+    std::array<std::unique_ptr<feng::TextureData>, 6> LoadCubemapTexture(std::array<std::string, 6> relativePaths, bool flip)
+    {
+        std::array<std::string, 6> absolutePaths;
+        std::transform(
+                relativePaths.begin(),
+                relativePaths.end(),
+                absolutePaths.begin(),
+                [](const std::string& relativePath) { return SRes::BaseTexturesDir + relativePath; });
+
+        return feng::TextureData::LoadCubemap(absolutePaths, { flip, flip, flip, flip, flip, flip });
     }
 
     void LoadTextures()
@@ -192,6 +267,15 @@ namespace SRes
         windowTextureData = LoadTexture(windowPng, true);
         windowTexture = std::make_unique<feng::Texture>(*windowTextureData);
         windowTexture->SetWrapping(feng::eTextureWrapping::ClampToEdge, feng::eTextureWrapping::ClampToEdge);
+
+        skyboxData = LoadCubemapTexture(skyboxJpg, false);
+        std::array<const feng::TextureData*, 6> skyboxFaces;
+        for(uint8_t i = 0; i < 6; ++i)
+        {
+            skyboxFaces[i] = skyboxData[i].get();
+        }
+
+        skyboxTexture = std::make_unique<feng::Texture>(skyboxFaces);
     }
 
     std::unique_ptr<feng::Material> CreateFlatColorMaterial()
@@ -214,20 +298,23 @@ namespace SRes
         specularTexMaterial->SetFloat("uSpecularity", 1.0f);
         specularTexMaterial->SetFloat("uShininess", 32.0f);
 
-        std::unique_ptr<feng::Shader> diff1Spec2Shader = LoadShader(diffTex1SpecTex2VsName, diffTex1SpecTex2FsName);
+        std::unique_ptr<feng::Shader> diff1Spec2Shader = LoadShader(DiffTex1SpecTex2VsName, DiffTex1SpecTex2FsName);
         diffTex1SpecTex2Material = std::make_unique<feng::Material>(std::move(diff1Spec2Shader));
         diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture0.data(), steeledWoodTexture.get());
         diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), steelBorderTexture.get());
         diffTex1SpecTex2Material->SetFloat("uSpecularity", 5.f);
         diffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
 
-        showDepthMaterial = std::make_unique<feng::Material>(LoadShader(showDepthVsName, showDepthFsName));
+        showDepthMaterial = std::make_unique<feng::Material>(LoadShader(ShowDepthVsName, ShowDepthFsName));
 
         grassMaterial = std::make_unique<feng::Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
         grassMaterial->SetTexture(feng::ShaderParams::Texture0.data(), grassTexture.get());
 
         windowMaterial = std::make_unique<feng::Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
         windowMaterial->SetTexture(feng::ShaderParams::Texture0.data(), windowTexture.get());
+
+        skyboxMaterial = std::make_unique<feng::Material>(LoadShader(SkyboxVsName, SkyboxFsName));
+        skyboxMaterial->SetTexture(feng::ShaderParams::Texture0.data(), skyboxTexture.get());
     }
 
     void LoadMeshes()
@@ -239,6 +326,8 @@ namespace SRes
         uint32_t quadAttributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Uv0;
         feng::eVertexAtributes quadAttributes = static_cast<feng::eVertexAtributes>(quadAttributesValue);
         quadMesh = std::make_unique<feng::Mesh>(quadVertices, quadIndices, quadAttributes,  feng::ePrimitiveType::Triangles);
+
+        skyboxMesh = std::make_unique<feng::Mesh>(skyboxCube, feng::eVertexAtributes::Position, feng::ePrimitiveType::Triangles);
     }
 
     void LoadResources()
@@ -281,6 +370,7 @@ namespace SObjects
     std::unique_ptr<feng::Entity> pointLightEntity;
     std::unique_ptr<feng::Entity> spotLightEntity;
     std::map<feng::Light *, std::unique_ptr<feng::Material>> lightMaterials;
+    std::unique_ptr<feng::Entity> skybox;
 
     std::array<feng::Vector3, 10> cubePositions = {
         feng::Vector3(-2.0f, 0.0f, 0.0f),
@@ -335,7 +425,7 @@ namespace SObjects
     {
         if(showDepth)
         {
-            return std::make_unique<feng::Material>(SRes::LoadShader(SRes::showDepthVsName, SRes::showDepthFsName));
+            return std::make_unique<feng::Material>(SRes::LoadShader(SRes::ShowDepthVsName, SRes::ShowDepthFsName));
         }
 
         return SRes::CreateFlatColorMaterial();
@@ -491,12 +581,23 @@ namespace SObjects
         return cube;
     }
 
+    std::unique_ptr<feng::Entity> CreateSkybox()
+    {
+        std::unique_ptr<feng::Entity> skybox = std::make_unique<feng::Entity>("Skybox");
+        feng::MeshRenderer& renderer = skybox->AddComponent<feng::MeshRenderer>();
+        renderer.SetMesh(SRes::skyboxMesh.get());
+        renderer.SetMaterial(SRes::skyboxMaterial.get());
+
+        return skybox;
+    }
+
     void CreateObjects()
     {
         SObjects::camEntity = SObjects::CreateCamera();
         SObjects::directLightEntity = SObjects::CreateDirectLight();
         SObjects::pointLightEntity = SObjects::CreatePointLight();
         SObjects::spotLightEntity = SObjects::CreateSpotLight();
+        SObjects::skybox = CreateSkybox();
 
         // Cubes.
         for(int32_t i = 0; i < cubePositions.size(); ++i)
@@ -804,30 +905,30 @@ namespace SRender
     void CreatePostEffectDefinitions()
     {
         std::unique_ptr<feng::Shader> grayscaleShader = SRes::LoadShader(
-                                                                    SRes::postEffectVsName,
-                                                                    SRes::grayscalePostEffectFsName);
+                                                                    SRes::PostEffectVsName,
+                                                                    SRes::GrayscalePostEffectFsName);
         std::unique_ptr<feng::Material> grayscaleEffectMaterial = std::make_unique<feng::Material>(std::move(grayscaleShader));
         grayscaleEffect = std::make_unique<feng::PostEffectDefinition>(std::move(grayscaleEffectMaterial));
 
         std::unique_ptr<feng::Shader> invertColorsShader = SRes::LoadShader(
-                                                                    SRes::postEffectVsName,
-                                                                    SRes::invertColorsPostEffectFsName);
+                                                                    SRes::PostEffectVsName,
+                                                                    SRes::InvertColorsPostEffectFsName);
         std::unique_ptr<feng::Material> invertColorsEffectMaterial = std::make_unique<feng::Material>(std::move(invertColorsShader));
         invertColorsEffect = std::make_unique<feng::PostEffectDefinition>(std::move(invertColorsEffectMaterial));
 
         std::unique_ptr<feng::Shader> sharpColorShader = SRes::LoadShader(
-                                                                    SRes::postEffectVsName,
-                                                                    SRes::sharpColorPostEffectFsName);
+                                                                    SRes::PostEffectVsName,
+                                                                    SRes::SharpColorPostEffectFsName);
         std::unique_ptr<feng::Material> sharpColorEffectMaterial = std::make_unique<feng::Material>(std::move(sharpColorShader));
         sharpColorEffect = std::make_unique<feng::PostEffectDefinition>(std::move(sharpColorEffectMaterial));
 
-        std::unique_ptr<feng::Shader> blurShader = SRes::LoadShader(SRes::postEffectVsName, SRes::blurPostEffectFsName);
+        std::unique_ptr<feng::Shader> blurShader = SRes::LoadShader(SRes::PostEffectVsName, SRes::BlurPostEffectFsName);
         std::unique_ptr<feng::Material> blurEffectMaterial = std::make_unique<feng::Material>(std::move(blurShader));
         blurEffect = std::make_unique<feng::PostEffectDefinition>(std::move(blurEffectMaterial));
 
         std::unique_ptr<feng::Shader> edgeDetectionShader = SRes::LoadShader(
-                                                                    SRes::postEffectVsName,
-                                                                    SRes::edgeDetectionPostEffectFsName);
+                                                                    SRes::PostEffectVsName,
+                                                                    SRes::EdgeDetectionPostEffectFsName);
         std::unique_ptr<feng::Material> edgeDetectionEffectMaterial = std::make_unique<feng::Material>(std::move(edgeDetectionShader));
         edgeDetectionEffect = std::make_unique<feng::PostEffectDefinition>(std::move(edgeDetectionEffectMaterial));
 
@@ -974,12 +1075,21 @@ namespace SRender
         std::sort(SObjects::scene.begin(), SObjects::scene.end(), compare);
     }
 
+    void RenderSkybox()
+    {
+        glDisable(GL_DEPTH_TEST);
+        //glDisable(GL_CULL_FACE);
+        SObjects::skybox->GetComponent<feng::MeshRenderer>()->Draw(SObjects::renderProperties);
+        glEnable(GL_DEPTH_TEST);
+        //glEnable(GL_CULL_FACE);
+    }
+
     void Render()
     {
         PreparePostEffects();
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+        RenderSkybox();
         SortSceneByDistance();
 
         std::vector<feng::Entity*> outlined;

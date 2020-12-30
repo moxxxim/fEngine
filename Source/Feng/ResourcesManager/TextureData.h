@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <string>
 
@@ -9,6 +10,9 @@ namespace feng
     {
     public:
         static std::unique_ptr<TextureData> Load(const std::string& path, bool flipOnLoad);
+        static std::array<std::unique_ptr<TextureData>, 6> LoadCubemap(
+                                                                const std::array<std::string, 6>& paths,
+                                                                const std::array<bool, 6>& flipOnLoad);
 
         TextureData() = default;
         ~TextureData();

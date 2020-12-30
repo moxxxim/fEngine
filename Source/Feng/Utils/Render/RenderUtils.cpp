@@ -22,14 +22,16 @@ namespace feng
 
         void LoadTextureDataCube(const Texture& texture)
         {
-    //        const GLint format = feng::GetTextureFormat(texture);
-    //        int faceWidth = texture->GetWidth() / 4;
-    //        int faceHeight = texture->GetHeight() / 3;
-    //        for (int i = 0; i < 6; ++i)
-    //        {
-    //            const char *data = texture->GetCubeMapFace((feng::CubeMapFace)i);
-    //            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, data);
-    //        }
+            const GLint format = feng::GetTextureFormat(texture);
+            GLsizei faceWidth = static_cast<GLsizei>(texture.GetWidth());
+            GLsizei faceHeight = static_cast<GLsizei>(texture.GetHeight());
+            for (int32_t i = 0; i < 6; ++i)
+            {
+                const uint8_t *data = texture.GetCubemapFaceData(static_cast<eCubemapFace>(i));
+                const GLenum target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
+                // TODO: m.alekseev Format here is used incorrectly.
+                glTexImage2D(target, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, data);
+            }
         }
     }
 
@@ -153,19 +155,26 @@ namespace feng
 
     uint32_t CreateTextureBuffer(const Texture& texture)
     {
-        GLenum target = ToOpenGLValue(texture.GetType());
+        eTextureType textureType = texture.GetType();
+        GLenum target = ToOpenGLValue(textureType);
 
         GLuint tbo;
         glGenTextures(1, &tbo);
         glBindTexture(target, tbo);
 
-        GLint wrapModeS = static_cast<GLint>(ToOpenGLValue(texture.GetWrapModeS()));
-        GLint wrapModeT = static_cast<GLint>(ToOpenGLValue(texture.GetWrapModeT()));
-        GLint minFilter = static_cast<GLint>(ToOpenGLValue(texture.GetMinFilter()));
-        GLint magFilter = static_cast<GLint>(ToOpenGLValue(texture.GetMagFilter()));
+        GLint wrapModeS = static_cast<GLint>(ToOpenGLValue(texture.GetWrapS()));
+        GLint wrapModeT = static_cast<GLint>(ToOpenGLValue(texture.GetWrapT()));
 
         glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapModeS);
         glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapModeT);
+        if(textureType == eTextureType::Cubemap)
+        {
+            GLint wrapModeR = static_cast<GLint>(ToOpenGLValue(texture.GetWrapR()));
+            glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapModeR);
+        }
+
+        GLint minFilter = static_cast<GLint>(ToOpenGLValue(texture.GetMinFilter()));
+        GLint magFilter = static_cast<GLint>(ToOpenGLValue(texture.GetMagFilter()));
         glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
         glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
 
@@ -187,7 +196,7 @@ namespace feng
         {
             SRenderUtils::LoadTextureData2d(texture);
         }
-        else if (type == eTextureType::CubeMap)
+        else if (type == eTextureType::Cubemap)
         {
             SRenderUtils::LoadTextureDataCube(texture);
         }

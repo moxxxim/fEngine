@@ -196,11 +196,14 @@ namespace feng
         const Entity *camEntity = renderProperties.cam->GetEntity();
         const Transform *camTransform = camEntity->GetComponent<Transform>();
         const Transform *myTransform = GetEntity()->GetComponent<Transform>();
+        const Camera *cam = camEntity->GetComponent<Camera>();
 
         shader->SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
         shader->SetUniformMatrix4(feng::ShaderParams::ViewProjMatrix.data(), renderProperties.cam->GetViewProjectionMatrix());
         shader->SetUniformVector3(feng::ShaderParams::CameraPos.data(), camTransform->GetPosition());
         shader->SetUniformVector3(feng::ShaderParams::CameraDir.data(), camTransform->GetForward());
+        shader->SetUniformMatrix3(feng::ShaderParams::CameraRotation.data(), camTransform->GetRotation());
+        shader->SetUniformMatrix4(feng::ShaderParams::ProjMatrix.data(), cam->GetProjectionMatrix());
     }
 
     void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties)

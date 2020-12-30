@@ -12,7 +12,7 @@ namespace feng
             case eTextureType::Tex2d:
                 return GL_TEXTURE_2D;
 
-            case eTextureType::CubeMap:
+            case eTextureType::Cubemap:
                 return GL_TEXTURE_CUBE_MAP;
         }
     }

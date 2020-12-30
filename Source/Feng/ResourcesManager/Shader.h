@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Feng/Math/Matrix3.h>
 #include <Feng/Math/Matrix4.h>
 #include <Feng/Math/Vector2.h>
 #include <Feng/Math/Vector3.h>
@@ -41,6 +42,7 @@ namespace feng
         bool SetUniformVector2(const char *name, const Vector2& value) const;
         bool SetUniformVector3(const char *name, const Vector3& value) const;
         bool SetUniformVector4(const char *name, const Vector4& value) const;
+        bool SetUniformMatrix3(const char *name, const Matrix3& matrix) const;
         bool SetUniformMatrix4(const char *name, const Matrix4& matrix) const;
 
     private:

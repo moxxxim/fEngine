@@ -18,7 +18,7 @@ namespace feng
     enum class eTextureType : uint8_t
     {
         Tex2d = 0,
-        CubeMap = 1,
+        Cubemap = 1,
     };
 
     enum class eTextureMinFilter : uint8_t
@@ -37,7 +37,7 @@ namespace feng
         Linear = 1
     };
 
-    enum class eCubeMapFace : uint8_t
+    enum class eCubemapFace : uint8_t
     {
         XPos = 0,
         XNeg = 1,

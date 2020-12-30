@@ -181,6 +181,18 @@ namespace feng
         return false;
     }
 
+    bool Shader::SetUniformMatrix3(const char *name, const Matrix3& matrix) const
+    {
+        uint32_t location = UndefinedParamLocation;
+        if(TryGetUniformLocation(name, location))
+        {
+            glUniformMatrix3fv(location, 1, GL_FALSE, matrix.data);
+            return true;
+        }
+
+        return false;
+    }
+
     bool Shader::SetUniformMatrix4(const char *name, const Matrix4& matrix) const
     {
         uint32_t location = UndefinedParamLocation;
