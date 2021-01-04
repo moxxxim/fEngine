@@ -1077,11 +1077,9 @@ namespace SRender
 
     void RenderSkybox()
     {
-        glDisable(GL_DEPTH_TEST);
-        //glDisable(GL_CULL_FACE);
+        glDepthFunc(GL_LEQUAL);
         SObjects::skybox->GetComponent<feng::MeshRenderer>()->Draw(SObjects::renderProperties);
-        glEnable(GL_DEPTH_TEST);
-        //glEnable(GL_CULL_FACE);
+        glDepthFunc(GL_LESS); // Default.
     }
 
     void Render()
@@ -1089,7 +1087,6 @@ namespace SRender
         PreparePostEffects();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        RenderSkybox();
         SortSceneByDistance();
 
         std::vector<feng::Entity*> outlined;
@@ -1108,6 +1105,8 @@ namespace SRender
 
         RenderWithOutline(outlined);
         Print_Errors_OpengGL();
+
+        RenderSkybox();
 
         ApplyPostEffects();
         Print_Errors_OpengGL();

@@ -9,6 +9,7 @@ out vec3 varPos;
 
 void main()
 {
-	gl_Position = uProjMatrix * (vec4(aPos, 1.0) * mat4(uCamRotation));
+	vec4 pos = uProjMatrix * (vec4(aPos, 1.0) * mat4(uCamRotation));
+	gl_Position = pos.xyww;
 	varPos = aPos;
 }
