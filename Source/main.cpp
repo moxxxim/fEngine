@@ -48,6 +48,8 @@ namespace SRes
     const char *ShowDepthVsName = "Utils/ShowDepthVs.vs";
     const char *SkyboxFsName = "SkyboxFs.fs";
     const char *SkyboxVsName = "SkyboxVs.vs";
+    const char *CubemapReflectiveFsName = "Unlit/CubemapReflectiveColorFs.fs";
+    const char *CubemapReflectiveVsName = "Unlit/CubemapReflectiveColorVs.vs";
 
     const char *PostEffectVsName = "PostEffects/PostEffectVs.vs";
     const char *GrayscalePostEffectFsName = "PostEffects/PostEffectGrayscaleFs.fs";
@@ -84,13 +86,6 @@ namespace SRes
         -0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
         -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
 
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 1.0f,
-
         -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
         -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
         -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
@@ -98,30 +93,38 @@ namespace SRes
         -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
         -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
 
-         0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 1.0f,
 
         -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
          0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
          0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
          0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
         -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
+
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f
     };
 
     std::vector<float> skyboxCube
     {
+        // front
         -1.0f,  1.0f, -1.0f,
          1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
@@ -129,6 +132,15 @@ namespace SRes
         -1.0f,  1.0f, -1.0f,
          1.0f,  1.0f, -1.0f,
 
+        // back
+        -1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+
+        // left
         -1.0f, -1.0f,  1.0f,
         -1.0f,  1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
@@ -136,6 +148,7 @@ namespace SRes
         -1.0f, -1.0f,  1.0f,
         -1.0f,  1.0f,  1.0f,
 
+        // right
          1.0f, -1.0f, -1.0f,
          1.0f,  1.0f,  1.0f,
          1.0f, -1.0f,  1.0f,
@@ -143,13 +156,7 @@ namespace SRes
          1.0f, -1.0f, -1.0f,
          1.0f,  1.0f, -1.0f,
 
-        -1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-
+        // top
         -1.0f,  1.0f, -1.0f,
          1.0f,  1.0f,  1.0f,
          1.0f,  1.0f, -1.0f,
@@ -157,10 +164,10 @@ namespace SRes
         -1.0f,  1.0f, -1.0f,
         -1.0f,  1.0f,  1.0f,
 
+        // bottom
         -1.0f,  -1.0f, -1.0f,
-        1.0f,  -1.0f, -1.0f,
+         1.0f,  -1.0f, -1.0f,
          1.0f,  -1.0f,  1.0f,
-
          1.0f,  -1.0f,  1.0f,
         -1.0f,  -1.0f,  1.0f,
         -1.0f,  -1.0f, -1.0f
@@ -212,6 +219,7 @@ namespace SRes
     std::unique_ptr<feng::Material> grassMaterial;
     std::unique_ptr<feng::Material> windowMaterial;
     std::unique_ptr<feng::Material> skyboxMaterial;
+    std::unique_ptr<feng::Material> cubemapReflectiveMaterial;
 
     std::unique_ptr<feng::Mesh> cubeMesh;
     std::unique_ptr<feng::Mesh> quadMesh;
@@ -315,6 +323,9 @@ namespace SRes
 
         skyboxMaterial = std::make_unique<feng::Material>(LoadShader(SkyboxVsName, SkyboxFsName));
         skyboxMaterial->SetTexture(feng::ShaderParams::Texture0.data(), skyboxTexture.get());
+
+        cubemapReflectiveMaterial = std::make_unique<feng::Material>(LoadShader(CubemapReflectiveVsName, CubemapReflectiveFsName));
+        skyboxMaterial->SetTexture(feng::ShaderParams::Texture0.data(), skyboxTexture.get());
     }
 
     void LoadMeshes()
@@ -371,8 +382,10 @@ namespace SObjects
     std::unique_ptr<feng::Entity> spotLightEntity;
     std::map<feng::Light *, std::unique_ptr<feng::Material>> lightMaterials;
     std::unique_ptr<feng::Entity> skybox;
+    std::unique_ptr<feng::Entity> reflectiveCube;
 
-    std::array<feng::Vector3, 10> cubePositions = {
+    std::array<feng::Vector3, 10> cubePositions =
+    {
         feng::Vector3(-2.0f, 0.0f, 0.0f),
         feng::Vector3( 0.0f,  0.0f,  0.0f),
         feng::Vector3( 2.0f,  0.0f, 0.0f),
@@ -629,6 +642,12 @@ namespace SObjects
             staticObjects.push_back(std::move(entity));
         }
 
+        reflectiveCube = CreateObject(
+                                feng::Vector3(0.f, 2.f, -2.5f),
+                                "Reflective",
+                                *SRes::cubeMesh,
+                                *SRes::cubemapReflectiveMaterial);
+
         planeEntity = CreateObject(planePos, "Plane", *SRes::cubeMesh, *SRes::diffuseTexMaterial);
         feng::Transform *planeTransform = planeEntity->GetComponent<feng::Transform>();
         planeTransform->SetScale(40.f, 0.2f, 40.f);
@@ -657,6 +676,7 @@ namespace SObjects
         scene.push_back(pointLightEntity.get());
         sceneOutline[spotLightEntity.get()] = true;
         scene.push_back(spotLightEntity.get());
+        scene.push_back(reflectiveCube.get());
     }
 
     void InitRenderProperties()

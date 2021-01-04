@@ -29,8 +29,6 @@ uniform PointLight uPointLight;
 uniform DirectLight uDirectLight;
 uniform SpotLight uSpotLight;
 
-uniform vec3 uCamPos;
-
 in vec3 varFragPos;
 in vec3 varNorm;
 in vec2 varUv0;
