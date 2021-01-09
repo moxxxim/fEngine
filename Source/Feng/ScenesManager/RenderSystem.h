@@ -1,49 +1,59 @@
-//#pragma once
-//
-//#include "RenderProperties.h"
-//#include "FrameBuffersPool.h"
-//
-//namespace feng
-//{
-//    class Camera;
-//    class ScenesManager;
-//    class RenderPostProcessing;
-//
-//    class RenderSystem
-//    {
-//        friend ScenesManager;
-//        friend RenderProperties;
-//
-//    public:
-//        void SetCamera(Camera *camera);
-//        void SetSkybox(Renderer *skyboxRenderer);
-//        void AddRenderer(Renderer *renderer);
-//        void AddLight(Light *light);
-//
-//        void RemoveCamera(Camera *camera);
-//        void RemoveSkybox(Renderer *skyboxRenderer);
-//        void RemoveRenderer(Renderer *renderer);
-//        void RemoveLight(Light *light);
-//
-//        void Reset();
-//        void Draw(ESContext *esContext);
-//
-//    private:
-//        RenderSystem();
-//        ~RenderSystem();
-//
-//        void SetupDraw();
-//        void DrawRenderers(ESContext *esContext);
-//        void ApplyPostProcessing();
-//        void BindFrameBuffer();
-//
-//        LinkedList<Renderer> m_renderers;
-//        LinkedList<Light> m_lights;
-//        Camera *m_camera = nullptr;
-//        Renderer *m_skybox = nullptr;
-//        FrameBuffersPool m_buffersPool;
-//        RenderPostProcessing *m_postProcessing = nullptr;
-//        RenderProperties m_renderProperties;
-//        FrameBuffer m_frameBuffer;
-//    };
-//}
+#pragma once
+
+#include <Feng/Render/FrameBuffersPool.h>
+#include <Feng/Render/FrameBuffer.h>
+#include <Feng/Render/PostEffects/RenderPostProcessing.h>
+#include <Feng/ScenesManager/RenderProperties.h>
+
+#include <vector>
+
+namespace feng
+{
+    class Camera;
+    class Entity;
+    class Light;
+    class MeshRenderer;
+
+    class RenderSystem final
+    {
+    public:
+        RenderSystem();
+        ~RenderSystem();
+
+        void SetCamera(Camera *aCamera);
+        void SetSkybox(MeshRenderer *aSkybox);
+
+        void AddRenderer(MeshRenderer *renderer);
+        void RemoveRenderer(MeshRenderer *renderer);
+
+        void AddLight(Light *light);
+
+        void Reset();
+        void Draw();
+
+    private:
+        void SetupDraw();
+        void DrawRenderers();
+        void ApplyPostProcessing();
+        void BindFrameBuffer();
+
+        std::vector<MeshRenderer*> renderers;
+        std::vector<Light*> lights;
+        FrameBuffersPool buffersPool;
+        RenderPostProcessing postProcessing;
+        RenderProperties renderProperties;
+        FrameBuffer frameBuffer;
+        Camera *camera = nullptr;
+        MeshRenderer *skybox = nullptr;
+    };
+
+    inline void RenderSystem::SetCamera(Camera *aCamera)
+    {
+        camera = aCamera;
+    }
+
+    inline void RenderSystem::SetSkybox(MeshRenderer *aSkybox)
+    {
+        skybox = aSkybox;
+    }
+}

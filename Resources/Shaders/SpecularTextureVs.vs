@@ -7,16 +7,19 @@ layout (location = 2) in vec2 aUv0;
 uniform mat4 uModelMatrix;
 uniform mat4 uViewProjMatrix;
 
-out vec3 varFragPos;
-out vec3 varNorm;
-out vec2 varUv0;
+out VsOut
+{
+    vec3 FragPos;
+    vec3 Norm;
+    vec2 Uv0;
+} vsOut;
 
 void main()
 {
     vec4 worlPos = uModelMatrix * vec4(aPos, 1.0);
     gl_Position = uViewProjMatrix * worlPos;
-    varFragPos = worlPos.xyz;
+    vsOut.FragPos = worlPos.xyz;
     // Inverse is a costly operation, it should not be used in shader.
-    varNorm = transpose(inverse(mat3(uModelMatrix))) * aNorm;
-    varUv0 = aUv0;
+    vsOut.Norm = transpose(inverse(mat3(uModelMatrix))) * aNorm;
+    vsOut.Uv0 = aUv0;
 }

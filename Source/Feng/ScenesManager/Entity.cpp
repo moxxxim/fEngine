@@ -4,6 +4,10 @@
 
 namespace feng
 {
+    Entity::Entity()
+        : Entity {""}
+    { }
+
     Entity::Entity(const std::string& aName)
         : name {aName}
     {

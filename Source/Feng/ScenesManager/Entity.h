@@ -10,6 +10,7 @@ namespace feng
     class Entity final
     {
     public:
+        Entity();
         explicit Entity(const std::string& aName);
         explicit Entity(std::string&& aName);
         ~Entity();

@@ -1,130 +1,185 @@
-//#include "Scene.h"
-//#include "GameObject.h"
-//#include "Renderer.h"
-//#include "RenderSystem.h"
-//#include "MeshRenderer.h"
-//#include "../ResourcesManager/ResourcesManager.h"
+#include <Feng/ScenesManager/Scene.h>
+
+#include <Feng/ScenesManager/Camera.h>
+#include <Feng/ScenesManager/Entity.h>
+#include <Feng/ScenesManager/MeshRenderer.h>
+#include <Feng/ScenesManager/RenderSystem.h>
+#include <Feng/ScenesManager/SceneSettings.h>
+#include <Feng/ScenesManager/Transform.h>
+#include <Feng/ResourcesManager/Mesh.h>
+
+namespace feng
+{
+    namespace SScene
+    {
+        std::vector<float> skyboxCube
+        {
+            // front
+            -1.0f,  1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+
+            // back
+            -1.0f, -1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f,
+
+            // left
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+
+            // right
+            1.0f, -1.0f, -1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+
+            // top
+            -1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f,  1.0f,
+
+            // bottom
+            -1.0f,  -1.0f, -1.0f,
+            1.0f,  -1.0f, -1.0f,
+            1.0f,  -1.0f,  1.0f,
+            1.0f,  -1.0f,  1.0f,
+            -1.0f,  -1.0f,  1.0f,
+            -1.0f,  -1.0f, -1.0f
+        };
+
+        std::unique_ptr<Mesh> skyboxMesh;
+
+        void AddLightGizmoRenderer(Light &light, Material *material, Mesh *mesh)
+        {
+            Entity *lightEntity = light.GetEntity();
+            Transform *cubeTransform = lightEntity->GetComponent<Transform>();
+
+            Light::eType lightType = light.GetType();
+
+            if(lightType == Light::eType::Directional)
+            {
+                cubeTransform->SetScale(0.1f, 0.1f, 0.35f);
+            }
+            else if(lightType == Light::eType::Point)
+            {
+                cubeTransform->SetScale(0.2f);
+            }
+            else
+            {
+                cubeTransform->SetScale(0.35f, 0.35f, 0.1f);
+            }
+
+            MeshRenderer& meshRenderer = lightEntity->AddComponent<MeshRenderer>();
+            meshRenderer.SetMesh(mesh);
+            meshRenderer.SetMaterial(material);
+        }
+    }
+
+    Scene::Scene()
+        : renderSystem {std::make_unique<RenderSystem>()}
+        , settings {std::make_unique<SceneSettings>()}
+    { }
+
+    Scene::~Scene() = default;
+
+    Entity& Scene::CreateEntity()
+    {
+        std::unique_ptr<Entity> entity = std::make_unique<Entity>();
+        Entity& entityRef = *entity;
+
+        entities.push_back(std::move(entity));
+        return entityRef;
+    }
+
+    Entity& Scene::CreateCamera()
+    {
+        Entity &camera = CreateEntity();
+        camera.AddComponent<Camera>();
+
+        return camera;
+    }
+
+    Entity& Scene::CreateLight(Light::eType type, Material *material, Mesh *mesh)
+    {
+        Entity &entity = CreateEntity();
+        Light &light = entity.AddComponent<Light>();
+        light.SetType(type);
+
+        SScene::AddLightGizmoRenderer(light, material, mesh);
+
+        renderSystem->AddLight(&light);
+        renderSystem->AddRenderer(entity.GetComponent<MeshRenderer>());
+        return entity;
+    }
+
+    Entity& Scene::CreateMesh(Material *material, Mesh *mesh)
+    {
+        Entity &entity = CreateEntity();
+        MeshRenderer& renderer = entity.AddComponent<MeshRenderer>();
+        renderer.SetMesh(mesh);
+        renderer.SetMaterial(material);
+
+        renderSystem->AddRenderer(&renderer);
+        return entity;
+    }
+
+    Entity& Scene::CreateSkybox(Material *material)
+    {
+        SScene::skyboxMesh = std::make_unique<Mesh>(
+                                            SScene::skyboxCube,
+                                            eVertexAtributes::Position,
+                                            ePrimitiveType::Triangles);
+
+        Entity &skybox = CreateMesh(material, SScene::skyboxMesh.get());
+
+        renderSystem->RemoveRenderer(skybox.GetComponent<MeshRenderer>()); // TODO: m.aleksee this is bad.
+        renderSystem->SetSkybox(skybox.GetComponent<MeshRenderer>());
+
+        return skybox;
+    }
+
+    void Scene::Update(float deltaTime)
+    {
+    }
+
+    void Scene::Draw()
+    {
+
+    }
+
+//    void Scene::SetSkybox(Renderer *skybox)
+//    {
+//        if (m_skybox != skybox)
+//        {
+//            m_skybox = skybox;
+//            m_renderSystem->SetSkybox(m_skybox);
+//        }
+//    }
 //
-//feng::Scene::Scene(RenderSystem *renderSystem) :
-//	m_renderSystem(renderSystem),
-//	m_settings(new SceneSettings(this))
-//{
-//}
+//    void Scene::RemoveSkybox()
+//    {
+//        if (m_skybox)
+//        {
+//            m_renderSystem->RemoveSkybox(m_skybox);
 //
-//feng::Scene::~Scene()
-//{
-//	if (m_skybox)
-//	{
-//		m_renderSystem->RemoveSkybox(m_skybox);
-//	}
-//
-//	if (m_gameObjects.GetSize() > 0)
-//	{
-//		auto iterator = m_gameObjects.GetIterator();
-//		do
-//		{
-//			GameObject *go = iterator.GetCurrent();
-//			if (go)
-//			{
-//				delete go;
-//			}
-//
-//		} while (iterator.MoveNext());
-//
-//		m_gameObjects.Clear();
-//	}
-//
-//	delete[] m_settings;
-//}
-//
-//feng::GameObject * feng::Scene::CreateGameObject()
-//{
-//	feng::GameObject *go = new GameObject(this, m_renderSystem);
-//	AddGameObject(go);
-//
-//	return go;
-//}
-//
-//void feng::Scene::DestroyGameObject(GameObject *go)
-//{
-//	RemoveGameObject(go);
-//	delete go;
-//}
-//
-//feng::GameObject * feng::Scene::GetGameObject(obj_id id) const
-//{
-//	if (m_gameObjects.GetSize() > 0)
-//	{
-//		auto gameObjectsIterator = m_gameObjects.GetIterator();
-//		do
-//		{
-//			GameObject *go = gameObjectsIterator.GetCurrent();
-//			if (go->GetId() == id)
-//			{
-//				return go;
-//			}
-//
-//		} while (gameObjectsIterator.MoveNext());
-//	}
-//
-//	return nullptr;
-//}
-//
-//void feng::Scene::Update(float deltaTime)
-//{
-//	if (m_gameObjects.GetSize() > 0)
-//	{
-//		auto gameObjectsIterator = m_gameObjects.GetIterator();
-//		do
-//		{
-//			GameObject *go = gameObjectsIterator.GetCurrent();
-//			if (go->IsEnabled())
-//			{
-//				go->Update(deltaTime);
-//			}
-//
-//		} while (gameObjectsIterator.MoveNext());
-//	}
-//}
-//
-//void feng::Scene::AddGameObject(feng::GameObject *go)
-//{
-//	Renderer *renderer = go->GetRenderer();
-//	if (renderer)
-//	{
-//		m_renderSystem->AddRenderer(renderer);
-//	}
-//
-//	m_gameObjects.Add(go);
-//}
-//
-//void feng::Scene::RemoveGameObject(feng::GameObject *go)
-//{
-//	Renderer *renderer = go->GetRenderer();
-//	if (renderer)
-//	{
-//		m_renderSystem->RemoveRenderer(renderer);
-//	}
-//
-//	m_gameObjects.Remove(go);
-//}
-//
-//void feng::Scene::SetSkybox(Renderer *skybox)
-//{
-//	if (m_skybox != skybox)
-//	{
-//		m_skybox = skybox;
-//		m_renderSystem->SetSkybox(m_skybox);
-//	}
-//}
-//
-//void feng::Scene::RemoveSkybox()
-//{
-//	if (m_skybox)
-//	{
-//		m_renderSystem->RemoveSkybox(m_skybox);
-//
-//		delete m_skybox;
-//		m_skybox = nullptr;
-//	}
-//}
+//            delete m_skybox;
+//            m_skybox = nullptr;
+//        }
+//    }
+}

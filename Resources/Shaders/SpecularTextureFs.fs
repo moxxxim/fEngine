@@ -33,9 +33,12 @@ uniform SpotLight uSpotLight;
 
 uniform vec3 uCamPos;
 
-in vec3 varFragPos;
-in vec3 varNorm;
-in vec2 varUv0;
+in VsOut
+{
+    vec3 FragPos;
+    vec3 Norm;
+    vec2 Uv0;
+} vsOut;
 
 out vec4 FragColor;
 
@@ -45,13 +48,13 @@ vec3 CalculateSpotLight(SpotLight light, vec3 norm, vec3 viewDir);
 
 void main()
 {
-    vec4 outColor = texture(uTexture0, varUv0);
+    vec4 outColor = texture(uTexture0, vsOut.Uv0);
 
     // Calculate ambient component.
     vec3 ambientColor = uAmbientColor.w * uAmbientColor.rgb;
 
-    vec3 norm = normalize(varNorm);
-    vec3 viewDir = normalize(uCamPos - varFragPos);
+    vec3 norm = normalize(vsOut.Norm);
+    vec3 viewDir = normalize(uCamPos - vsOut.FragPos);
 
     vec3 lightColor = CalculateDirLight(uDirectLight, norm, viewDir);
     lightColor += CalculatePointLight(uPointLight, norm, viewDir);    
@@ -82,7 +85,7 @@ vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir)
 
 vec3 CalculatePointLight(PointLight light, vec3 norm, vec3 viewDir)
 {
-    vec3 lightDir = varFragPos - light.PositionAndRange.xyz;
+    vec3 lightDir = vsOut.FragPos - light.PositionAndRange.xyz;
     vec3 lightDirNorm = normalize(lightDir);
     float lightDistance = length(lightDir);
     float distanceAttenuation = pow(clamp(1.f - lightDistance / light.PositionAndRange.w, 0.f, 1.f), 2.f);
@@ -104,7 +107,7 @@ vec3 CalculatePointLight(PointLight light, vec3 norm, vec3 viewDir)
 
 vec3 CalculateSpotLight(SpotLight light, vec3 norm, vec3 viewDir)
 {
-    vec3 rayDir = varFragPos - light.PositionAndRange.xyz;
+    vec3 rayDir = vsOut.FragPos - light.PositionAndRange.xyz;
     vec3 rayDirNorm = normalize(rayDir);
     float lightDistance = length(rayDir);
 
