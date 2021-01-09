@@ -112,6 +112,7 @@ namespace feng
         Entity &camera = CreateEntity();
         camera.AddComponent<Camera>();
 
+        renderSystem->SetCamera(camera.GetComponent<Camera>());
         return camera;
     }
 
@@ -154,13 +155,28 @@ namespace feng
         return skybox;
     }
 
+    void Scene::SetAmbientLight(Vector4 color, float intensity)
+    {
+        renderSystem->SetAmbientLight(color, intensity);
+    }
+
+    void Scene::SetPostEffect(PostEffectDefinition *postEffect)
+    {
+        renderSystem->SetPostEffect(postEffect);
+    }
+
+    void Scene::RemovePostEffect()
+    {
+        renderSystem->RemovePostEffect();
+    }
+
     void Scene::Update(float deltaTime)
     {
     }
 
     void Scene::Draw()
     {
-
+        renderSystem->Draw();
     }
 
 //    void Scene::SetSkybox(Renderer *skybox)

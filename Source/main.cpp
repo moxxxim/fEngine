@@ -18,9 +18,7 @@
 #include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/MeshRenderer.h>
 #include <Feng/ScenesManager/Transform.h>
-#include <Feng/ScenesManager/RenderProperties.h>
 #include <Feng/ScenesManager/Scene.h>
-#include <Feng/Render/PostEffects/RenderPostProcessing.h>
 #include <Feng/Render/PostEffects/PostEffectDefinition.h>
 #include <Feng/Utils/Debug.h>
 
@@ -323,15 +321,9 @@ namespace SCamController
 
 namespace SObjects
 {
-    std::unique_ptr<feng::Scene> myScene;
+    std::unique_ptr<feng::Scene> scene;
     std::map<feng::Light *, std::unique_ptr<feng::Material>> lightMaterials;
-
-    feng::Entity *directLightEntity;
-    feng::Entity *pointLightEntity;
-    feng::Entity *spotLightEntity;
-    feng::Entity *camEntity;
-    feng::Entity *skybox = nullptr;
-    feng::Entity *reflectiveCube = nullptr;
+    feng::Entity *camEntity = nullptr;
 
     std::array<feng::Vector3, 10> cubePositions =
     {
@@ -376,9 +368,6 @@ namespace SObjects
     feng::Vector3 planePos{0.f, -6.f, 0.f};
 
     std::vector<feng::Entity*> dynamicObjects;
-    std::vector<feng::Entity*> staticObjects;
-    std::vector<feng::Entity *> scene;
-    feng::RenderProperties renderProperties;
     bool showDepth = false;
 
     std::unique_ptr<feng::Material> CreateGizmoMaterial()
@@ -393,7 +382,7 @@ namespace SObjects
 
     feng::Entity* CreateCamera()
     {
-        feng::Entity &camEntity = myScene->CreateCamera();
+        feng::Entity &camEntity = scene->CreateCamera();
 
         feng::Camera *camera = camEntity.GetComponent<feng::Camera>();
         camera->SetFovY(SCamController::Zoom);
@@ -404,11 +393,6 @@ namespace SObjects
         feng::Transform *camTransform = camEntity.GetComponent<feng::Transform>();
         camTransform->SetPosition(0.f, 3.5f, 3.f);
         camTransform->SetEuler(SCamController::camPitch, SCamController::camYaw, 0.f);
-
-        SCamController::lastX = SApp::InitialWidth / 2.f;
-        SCamController::lastY = SApp::InitialHeight / 2.f;
-        feng::screen::ScreenWidth = SApp::InitialWidth;
-        feng::screen::ScreenHeight = SApp::InitialHeight;
 
         return &camEntity;
     }
@@ -426,7 +410,7 @@ namespace SObjects
         feng::Vector4 color {1.f, 0.95f, 0.8f, 1.f};
 
         std::unique_ptr<feng::Material> material = CreateLightMaterial(color);
-        feng::Entity& lightEntity = myScene->CreateLight(
+        feng::Entity& lightEntity = scene->CreateLight(
                                                          feng::Light::eType::Directional,
                                                          material.get(),
                                                          SRes::cubeMesh.get());
@@ -434,7 +418,6 @@ namespace SObjects
         feng::Light* light = lightEntity.GetComponent<feng::Light>();
         lightMaterials[light] = std::move(material);
 
-        light->SetType(feng::Light::eType::Directional);
         light->SetColor(color);
         light->SetIntensity(1.f);
 
@@ -450,15 +433,14 @@ namespace SObjects
         feng::Vector4 color {1.f, 0.f, 0.f, 1.f};
 
         std::unique_ptr<feng::Material> material = CreateLightMaterial(color);
-        feng::Entity& lightEntity = myScene->CreateLight(
-                                                        feng::Light::eType::Directional,
+        feng::Entity& lightEntity = scene->CreateLight(
+                                                        feng::Light::eType::Point,
                                                         material.get(),
                                                         SRes::cubeMesh.get());
 
         feng::Light* light = lightEntity.GetComponent<feng::Light>();
         lightMaterials[light] = std::move(material);
 
-        light->SetType(feng::Light::eType::Point);
         light->SetRange(8.f);
         light->SetColor(color);
         light->SetIntensity(1.5f);
@@ -483,8 +465,8 @@ namespace SObjects
         feng::Vector4 color {0.f, 0.f, 1.f, 1.f};
 
         std::unique_ptr<feng::Material> material = CreateLightMaterial(color);
-        feng::Entity& lightEntity = myScene->CreateLight(
-                                                         feng::Light::eType::Directional,
+        feng::Entity& lightEntity = scene->CreateLight(
+                                                         feng::Light::eType::Spot,
                                                          material.get(),
                                                          SRes::cubeMesh.get());
 
@@ -502,14 +484,12 @@ namespace SObjects
         if(isUp)
         {
             lightTransform->SetPosition(5.f, 4.f, -2.f);
-
             lightTransform->SetRotation(feng::mat3::MakeRotationY(90), feng::eSpace::World);
             lightTransform->SetRotation(feng::mat3::MakeRotationX(20), feng::eSpace::Self);
         }
         else
         {
             lightTransform->SetPosition(0.f, -8.f, 2.f);
-
             lightTransform->SetRotation(feng::mat3::MakeRotationX(-90), feng::eSpace::Self);
         }
 
@@ -523,7 +503,7 @@ namespace SObjects
                             feng::Material& material)
     {
         feng::Material *finalMaterial = showDepth ? SRes::showDepthMaterial.get() : &material;
-        feng::Entity& obj = myScene->CreateMesh(finalMaterial, &mesh);
+        feng::Entity& obj = scene->CreateMesh(finalMaterial, &mesh);
 
         feng::Transform *transform = obj.GetComponent<feng::Transform>();
         transform->SetPosition(position);
@@ -533,12 +513,11 @@ namespace SObjects
 
     void CreateObjects()
     {
-        skybox = &myScene->CreateSkybox(SRes::skyboxMaterial.get());
-
+        std::ignore = scene->CreateSkybox(SRes::skyboxMaterial.get());
         SObjects::camEntity = SObjects::CreateCamera();
-        SObjects::directLightEntity = SObjects::CreateDirectLight();
-        SObjects::pointLightEntity = SObjects::CreatePointLight();
-        SObjects::spotLightEntity = SObjects::CreateSpotLight();
+        std::ignore = SObjects::CreateDirectLight();
+        std::ignore = SObjects::CreatePointLight();
+        std::ignore = SObjects::CreateSpotLight();
 
         // Cubes.
         for(int32_t i = 0; i < cubePositions.size(); ++i)
@@ -557,8 +536,7 @@ namespace SObjects
         {
             const feng::Vector3& position = vegetationPositions[i];
             std::string name = "grass " + std::to_string(i);
-            feng::Entity *entity = CreateObject(position, name, *SRes::quadMesh, *SRes::grassMaterial);
-            staticObjects.push_back(entity);
+            std::ignore = CreateObject(position, name, *SRes::quadMesh, *SRes::grassMaterial);
         }
 
         // Grass.
@@ -566,11 +544,10 @@ namespace SObjects
         {
             const feng::Vector3& position = windowPositions[i];
             std::string name = "window " + std::to_string(i);
-            feng::Entity *entity = CreateObject(position, name, *SRes::quadMesh, *SRes::windowMaterial);
-            staticObjects.push_back(entity);
+            std::ignore = CreateObject(position, name, *SRes::quadMesh, *SRes::windowMaterial);
         }
 
-        reflectiveCube = CreateObject(
+        std::ignore = CreateObject(
                                 feng::Vector3(0.f, 2.f, -2.5f),
                                 "Reflective",
                                 *SRes::cubeMesh,
@@ -579,42 +556,18 @@ namespace SObjects
         feng::Entity *planeEntity = CreateObject(planePos, "Plane", *SRes::cubeMesh, *SRes::diffuseTexMaterial);
         feng::Transform *planeTransform = planeEntity->GetComponent<feng::Transform>();
         planeTransform->SetScale(40.f, 0.2f, 40.f);
-        staticObjects.push_back(planeEntity);
-    }
-
-    void AddObjectsToScene()
-    {
-        for(feng::Entity *object : dynamicObjects)
-        {
-            scene.push_back(object);
-        }
-
-        for(feng::Entity *object : staticObjects)
-        {
-            scene.push_back(object);
-        }
-
-        scene.push_back(directLightEntity);
-        scene.push_back(pointLightEntity);
-        scene.push_back(spotLightEntity);
-        scene.push_back(reflectiveCube);
-    }
-
-    void InitRenderProperties()
-    {
-        renderProperties.cam = camEntity->GetComponent<feng::Camera>();
-        renderProperties.ambientColorAndIntencity = feng::Vector4{1.f, 1.f, 1.f, 0.2f};
-        renderProperties.directLight = directLightEntity->GetComponent<feng::Light>();
-        renderProperties.pointLight = pointLightEntity->GetComponent<feng::Light>();
-        renderProperties.spotLight = spotLightEntity->GetComponent<feng::Light>();
     }
 
     void CreateScene()
     {
-        myScene = std::make_unique<feng::Scene>();
+        SCamController::lastX = SApp::InitialWidth / 2.f;
+        SCamController::lastY = SApp::InitialHeight / 2.f;
+        feng::screen::ScreenWidth = SApp::InitialWidth;
+        feng::screen::ScreenHeight = SApp::InitialHeight;
+
+        scene = std::make_unique<feng::Scene>();
+        scene->SetAmbientLight(feng::Vector4{1.f, 1.f, 1.f, 1.f}, 0.2f);
         CreateObjects();
-        AddObjectsToScene();
-        InitRenderProperties();
     }
 
     void UpdateCamera()
@@ -625,17 +578,6 @@ namespace SObjects
         camera->SetAspectRatio(static_cast<float>(feng::screen::ScreenWidth)/feng::screen::ScreenHeight);
         camera->SetNearClipPlane(0.1f);
         camera->SetFarClipPlane(100.f);
-
-        std::vector<feng::Entity*> outlined;
-        for(feng::Entity *entity : SObjects::scene)
-        {
-            if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
-            {
-                feng::Material *material = renderer->GetMaterial();
-                material->SetFloat(feng::ShaderParams::NearClipPlane.data(), 0.1f);
-                material->SetFloat(feng::ShaderParams::FarClipPlane.data(), 100.f);
-            }
-        }
     }
 
     void UpdateObjects()
@@ -833,10 +775,6 @@ namespace SWindow
 
 namespace SRender
 {
-    feng::RenderPostProcessing postProcessing;
-    feng::FrameBuffersPool buffersPool;
-    feng::FrameBuffer frameBuffer;
-
     std::unique_ptr<feng::PostEffectDefinition> grayscaleEffect;
     std::unique_ptr<feng::PostEffectDefinition> invertColorsEffect;
     std::unique_ptr<feng::PostEffectDefinition> sharpColorEffect;
@@ -882,36 +820,6 @@ namespace SRender
         SWindow::effectsCount = effects.size();
     }
 
-    void PreparePostEffects()
-    {
-        if(SWindow::appliedEffectIndex >= 0)
-        {
-            feng::PostEffectDefinition *postEffect = effects[SWindow::appliedEffectIndex];
-            postProcessing.SetPostEffect(*postEffect);
-        }
-        else
-        {
-            postProcessing.RemoveEffects();
-        }
-
-        if(postProcessing.HasPostEffects())
-        {
-            glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.Frame);
-        }
-        else
-        {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        }
-    }
-
-    void ApplyPostEffects()
-    {
-        if(postProcessing.HasPostEffects())
-        {
-            postProcessing.ApplyPostEffects(frameBuffer);
-        }
-    }
-
     void InitRender()
     {
         feng::Debug::LogRenderInfoOpenGL();
@@ -922,11 +830,6 @@ namespace SRender
 
         SObjects::CreateScene();
         CreatePostEffectDefinitions();
-#ifdef __APPLE__
-        frameBuffer = buffersPool.CreateBuffer(2 * feng::screen::ScreenWidth, 2 * feng::screen::ScreenHeight, true);
-#else
-        frameBuffer = buffersPool.CreateBuffer(feng::screen::ScreenWidth, feng::screen::ScreenHeight, true);
-#endif
         Print_Errors_OpengGL();
 
         if(SObjects::showDepth)
@@ -959,6 +862,8 @@ namespace SRender
 
     void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
     {
+        return;
+
         // Put 1s (ones) into stencil buffer for all drawn fragments.
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -968,7 +873,7 @@ namespace SRender
         {
             if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
             {
-                renderer->Draw(SObjects::renderProperties);
+                //renderer->Draw(<render properties>);
             }
         }
 
@@ -989,7 +894,7 @@ namespace SRender
 
                 renderer->SetMaterial(outlineMaterial.get());
                 transform->SetScale(1.05 * scale);
-                renderer->Draw(SObjects::renderProperties);
+                //renderer->Draw(<render properties>);
 
                 transform->SetScale(scale);
                 renderer->SetMaterial(material);
@@ -1000,55 +905,19 @@ namespace SRender
         glStencilMask(0xFF);
     }
 
-    void SortSceneByDistance()
-    {
-        feng::Transform *camTransform = SObjects::camEntity->GetComponent<feng::Transform>();
-        const feng::Vector3 &camPosition = camTransform->GetPosition();
-        auto compare = [&camPosition] (const feng::Entity* e1, const feng::Entity* e2)
-        {
-            const feng::Transform *transform1 = e1->GetComponent<feng::Transform>();
-            const feng::Vector3 &position1 = transform1->GetPosition();
-            float distanceSqr1 = feng::Vector3::DistanceSqr(camPosition, position1);
-
-            const feng::Transform *transform2 = e2->GetComponent<feng::Transform>();
-            const feng::Vector3 &position2 = transform2->GetPosition();
-            float distanceSqr2 = feng::Vector3::DistanceSqr(camPosition, position2);
-
-            return distanceSqr2 < distanceSqr1;
-        };
-
-        std::sort(SObjects::scene.begin(), SObjects::scene.end(), compare);
-    }
-
-    void RenderSkybox()
-    {
-        glDepthFunc(GL_LEQUAL);
-        SObjects::skybox->GetComponent<feng::MeshRenderer>()->Draw(SObjects::renderProperties);
-        glDepthFunc(GL_LESS); // Default.
-    }
-
     void Render()
     {
-        PreparePostEffects();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        SortSceneByDistance();
-
-        for(feng::Entity* entity : SObjects::scene)
+        if(SWindow::appliedEffectIndex >= 0)
         {
-            if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
-            {
-                renderer->Draw(SObjects::renderProperties);
-            }
+            feng::PostEffectDefinition *postEffect = effects[SWindow::appliedEffectIndex];
+            SObjects::scene->SetPostEffect(postEffect);
+        }
+        else
+        {
+            SObjects::scene->RemovePostEffect();
         }
 
-        RenderWithOutline({});
-        Print_Errors_OpengGL();
-
-        RenderSkybox();
-
-        ApplyPostEffects();
-        Print_Errors_OpengGL();
+        SObjects::scene->Draw();
     }
 }
 

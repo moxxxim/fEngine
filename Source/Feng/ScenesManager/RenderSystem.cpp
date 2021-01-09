@@ -2,10 +2,42 @@
 
 #include <Feng/App/Globals.h>
 #include <Feng/ScenesManager/Camera.h>
+#include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/Light.h>
+#include <Feng/ScenesManager/MeshRenderer.h>
+#include <Feng/ScenesManager/Transform.h>
+#include <Feng/Utils/Debug.h>
+
+#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 
 namespace feng
 {
+    namespace SRenderSystem
+    {
+        void SortSceneByDistance(const Camera& cam, std::vector<MeshRenderer*> &renderers)
+        {
+            Transform *camTransform = cam.GetEntity()->GetComponent<Transform>();
+            const Vector3 &camPosition = camTransform->GetPosition();
+            auto compare = [&camPosition] (const MeshRenderer* r1, const MeshRenderer* r2)
+            {
+                const Entity *e1 = r1->GetEntity();
+                const Entity *e2 = r2->GetEntity();
+                const Transform *transform1 = e1->GetComponent<Transform>();
+                const Vector3 &position1 = transform1->GetPosition();
+                float distanceSqr1 = Vector3::DistanceSqr(camPosition, position1);
+
+                const Transform *transform2 = e2->GetComponent<Transform>();
+                const Vector3 &position2 = transform2->GetPosition();
+                float distanceSqr2 = Vector3::DistanceSqr(camPosition, position2);
+
+                return distanceSqr2 < distanceSqr1;
+            };
+
+            std::sort(renderers.begin(), renderers.end(), compare);
+        }
+    }
+
     RenderSystem::RenderSystem()
     {
 #ifdef __APPLE__
@@ -18,6 +50,16 @@ namespace feng
     RenderSystem::~RenderSystem()
     {
         buffersPool.DeleteBuffer(frameBuffer);
+    }
+
+    void RenderSystem::SetAmbientLight(Vector4 color, float intensity)
+    {
+        renderProperties.ambientColorAndIntencity = Vector4{color.GetXyz(), intensity };
+    }
+
+    void RenderSystem::SetCamera(Camera *camera)
+    {
+        renderProperties.cam = camera;
     }
 
     void RenderSystem::AddRenderer(MeshRenderer *renderer)
@@ -49,76 +91,55 @@ namespace feng
         }
     }
 
-    void RenderSystem::Reset()
+    void RenderSystem::SetPostEffect(PostEffectDefinition *postEffect)
     {
-//        m_renderers.Clear();
-//        m_lights.Clear();
-//        m_postProcessing->RemoveEffects();
-//        m_camera = nullptr;
+        postProcessing.SetPostEffect(*postEffect);
+        Print_Errors_OpengGL();
+    }
+
+    void RenderSystem::RemovePostEffect()
+    {
+        postProcessing.RemoveEffects();
     }
 
     void RenderSystem::Draw()
     {
-//        SetupDraw();
-//        DrawRenderers(esContext);
-//        ApplyPostProcessing();
-//
-//        eglSwapBuffers(esContext->eglDisplay, esContext->eglSurface);
-    }
+        Print_Errors_OpengGL();
 
-    void RenderSystem::SetupDraw()
-    {
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        m_renderProperties.Update();
-//
-//        if (m_postProcessing->HasPostEffects())
-//        {
-//            BindFrameBuffer();
-//        }
-    }
+        if(postProcessing.HasPostEffects())
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.Frame);
+            Print_Errors_OpengGL();
+        }
+        else
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
 
-    void RenderSystem::DrawRenderers()
-    {
-//        if (m_skybox)
-//        {
-//            m_skybox->Draw(&m_renderProperties);
-//        }
-//
-//        if (m_camera && m_renderers.GetSize() > 0)
-//        {
-//            auto renderersIterator = m_renderers.GetIterator();
-//            do
-//            {
-//                Renderer *renderer = renderersIterator.GetCurrent();
-//                bool isSkybox = renderer == m_skybox;
-//                if (!isSkybox && renderer->IsGameObjectEnabled())
-//                {
-//                    renderer->Draw(&m_renderProperties);
-//                }
-//
-//            } while (renderersIterator.MoveNext());
-//        }
-    }
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    void RenderSystem::ApplyPostProcessing()
-    {
-//        if (m_frameBuffer.Frame)
-//        {
-//            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//            m_postProcessing->ApplyPostEffects(m_frameBuffer);
-//        }
-    }
+        Print_Errors_OpengGL();
 
-    void RenderSystem::BindFrameBuffer()
-    {
-//        if (!m_frameBuffer.Frame)
-//        {
-//            m_frameBuffer = m_buffersPool.GetBuffer(true);
-//        }
-//        else
-//        {
-//            glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer.Frame);
-//            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        }
+        SRenderSystem::SortSceneByDistance(*renderProperties.cam, renderers);
+
+        for(MeshRenderer *renderer : renderers)
+        {
+            renderer->Draw(renderProperties);
+        }
+        Print_Errors_OpengGL();
+
+        if(skybox != nullptr)
+        {
+            glDepthFunc(GL_LEQUAL);
+            skybox->Draw(renderProperties);
+            glDepthFunc(GL_LESS); // Default.
+        }
+        Print_Errors_OpengGL();
+
+        if(postProcessing.HasPostEffects())
+        {
+            postProcessing.ApplyPostEffects(frameBuffer);
+        }
+        Print_Errors_OpengGL();
     }
 }

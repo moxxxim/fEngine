@@ -10,6 +10,7 @@ namespace feng
     class Entity;
     class Material;
     class Mesh;
+    class PostEffectDefinition;
     class RenderSystem;
     struct SceneSettings;
 
@@ -24,6 +25,10 @@ namespace feng
         Entity& CreateLight(Light::eType type, Material *material, Mesh *mesh);
         Entity& CreateMesh(Material *material, Mesh *mesh);
         Entity& CreateSkybox(Material *material);
+
+        void SetAmbientLight(Vector4 color, float intensity);
+        void SetPostEffect(PostEffectDefinition *postEffect);
+        void RemovePostEffect();
 
         void Update(float deltaTime);
         void Draw();

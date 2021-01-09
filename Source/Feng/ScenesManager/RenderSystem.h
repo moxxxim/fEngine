@@ -13,6 +13,7 @@ namespace feng
     class Entity;
     class Light;
     class MeshRenderer;
+    class PostEffectDefinition;
 
     class RenderSystem final
     {
@@ -20,7 +21,9 @@ namespace feng
         RenderSystem();
         ~RenderSystem();
 
-        void SetCamera(Camera *aCamera);
+        void SetAmbientLight(Vector4 color, float intensity);
+
+        void SetCamera(Camera *camera);
         void SetSkybox(MeshRenderer *aSkybox);
 
         void AddRenderer(MeshRenderer *renderer);
@@ -28,29 +31,19 @@ namespace feng
 
         void AddLight(Light *light);
 
-        void Reset();
+        void SetPostEffect(PostEffectDefinition *postEffect);
+        void RemovePostEffect();
         void Draw();
 
     private:
-        void SetupDraw();
-        void DrawRenderers();
-        void ApplyPostProcessing();
-        void BindFrameBuffer();
-
         std::vector<MeshRenderer*> renderers;
         std::vector<Light*> lights;
         FrameBuffersPool buffersPool;
         RenderPostProcessing postProcessing;
         RenderProperties renderProperties;
         FrameBuffer frameBuffer;
-        Camera *camera = nullptr;
         MeshRenderer *skybox = nullptr;
     };
-
-    inline void RenderSystem::SetCamera(Camera *aCamera)
-    {
-        camera = aCamera;
-    }
 
     inline void RenderSystem::SetSkybox(MeshRenderer *aSkybox)
     {

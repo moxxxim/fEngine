@@ -204,6 +204,8 @@ namespace feng
         shader->SetUniformVector3(feng::ShaderParams::CameraDir.data(), camTransform->GetForward());
         shader->SetUniformMatrix3(feng::ShaderParams::CameraRotation.data(), camTransform->GetRotation());
         shader->SetUniformMatrix4(feng::ShaderParams::ProjMatrix.data(), cam->GetProjectionMatrix());
+        shader->SetUniformFloat(feng::ShaderParams::NearClipPlane.data(), cam->GetNearClipPlane());
+        shader->SetUniformFloat(feng::ShaderParams::FarClipPlane.data(), cam->GetFarClipPlane());
     }
 
     void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties)
