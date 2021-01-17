@@ -3,295 +3,25 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
+#include <Classes/TempResouces.h>
+
 #include <Feng/App/Globals.h>
 #include <Feng/Math/MathUtils.h>
 #include <Feng/Math/MatrixUtils.h>
 #include <Feng/Math/Vector3.h>
-#include <Feng/ResourcesManager/Shader.h>
-#include <Feng/Utils/Render/ShaderParams.h>
-#include <Feng/ResourcesManager/TextureData.h>
 #include <Feng/ResourcesManager/Material.h>
-#include <Feng/ResourcesManager/Mesh.h>
-#include <Feng/ResourcesManager/Texture.h>
+#include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Light.h>
 #include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/MeshRenderer.h>
 #include <Feng/ScenesManager/Transform.h>
 #include <Feng/ScenesManager/Scene.h>
-#include <Feng/Render/PostEffects/PostEffectDefinition.h>
 #include <Feng/Utils/Debug.h>
 
 #include <cmath>
 #include <sstream>
 #include <array>
-
-namespace SRes
-{
-    std::string BaseResourcesDir = "../../../Resources/";
-    std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
-    std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
-
-    const char *FlatColorFsName = "Unlit/UnlitFlatColorFs.fs";
-    const char *FlatColorVsName = "Unlit/UnlitFlatColorVs.vs";
-    const char *UnlitTextureFsName = "Unlit/UnlitTextureFs.fs";
-    const char *UnlitTextureVsName = "Unlit/UnlitTextureVs.vs";
-
-    const char *DiffuseTextureFsName = "DiffuseTextureFs.fs";
-    const char *DiffuseTextureVsName = "DiffuseTextureVs.vs";
-    const char *SpecularTextureFsName = "SpecularTextureFs.fs";
-    const char *SpecularTextureVsName = "SpecularTextureVs.vs";
-    const char *DiffTex1SpecTex2FsName = "DiffuseTex1SpecTex2Fs.fs";
-    const char *DiffTex1SpecTex2VsName = "DiffuseTex1SpecTex2Vs.vs";
-    const char *ShowDepthFsName = "Utils/ShowDepthFs.fs";
-    const char *ShowDepthVsName = "Utils/ShowDepthVs.vs";
-    const char *SkyboxFsName = "SkyboxFs.fs";
-    const char *SkyboxVsName = "SkyboxVs.vs";
-    const char *CubemapReflectiveFsName = "Unlit/CubemapReflectiveColorFs.fs";
-    const char *CubemapReflectiveVsName = "Unlit/CubemapReflectiveColorVs.vs";
-
-    const char *PostEffectVsName = "PostEffects/PostEffectVs.vs";
-    const char *GrayscalePostEffectFsName = "PostEffects/PostEffectGrayscaleFs.fs";
-    const char *InvertColorsPostEffectFsName = "PostEffects/PostEffectInvertColorsFs.fs";
-    const char *SharpColorPostEffectFsName = "PostEffects/PostEffectSharpColorFs.fs";
-    const char *BlurPostEffectFsName = "PostEffects/PostEffectBlurFs.fs";
-    const char *EdgeDetectionPostEffectFsName = "PostEffects/PostEffectEdgeDetectionFs.fs";
-
-    const char *woodenContainerJpg = "wood_container.jpg";
-    const char *brickWallJpg = "brick_wall.jpg";
-    const char *awesomeFacePng = "awesomeface.png";
-    const char *steeledWoodPng = "steeled_wood.png";
-    const char *steeledBorderPng = "steel_border.png";
-    const char *grassPng = "grass.png";
-    const char *windowPng = "window.png";
-
-    std::array<std::string, 6> skyboxJpg =
-    {
-        "SkyboxBay/Bay_XPos.jpg",
-        "SkyboxBay/Bay_XNeg.jpg",
-        "SkyboxBay/Bay_YPos.jpg",
-        "SkyboxBay/Bay_YNeg.jpg",
-        "SkyboxBay/Bay_ZPos.jpg",
-        "SkyboxBay/Bay_ZNeg.jpg"
-    };
-
-    std::vector<float> cube
-    {
-             // position            // normal          // uv
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-
-        0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
-
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f
-    };
-
-    std::vector<float> quadVertices
-    {
-             // position          // uv
-         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f,    1.0f, 0.0f,
-         0.5f,  0.5f, 0.0f,    1.0f, 1.0f,
-         -0.5f,  0.5f, 0.0f,   0.0f, 1.0f,
-    };
-
-    std::vector<uint32_t> quadIndices
-    {
-        0, 3, 1,
-        1, 3, 2
-    };
-
-    std::unique_ptr<feng::TextureData> woodContainerTextureData;
-    std::unique_ptr<feng::Texture> woodContainerTexture;
-
-    std::unique_ptr<feng::TextureData> brickWallTextureData;
-    std::unique_ptr<feng::Texture> brickWallTexture;
-
-    std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
-    std::unique_ptr<feng::Texture> awesomeFaceTexture;
-
-    std::unique_ptr<feng::TextureData> steeledWoodTextureData;
-    std::unique_ptr<feng::Texture> steeledWoodTexture;
-
-    std::unique_ptr<feng::TextureData> steelBorderTextureData;
-    std::unique_ptr<feng::Texture> steelBorderTexture;
-
-    std::unique_ptr<feng::TextureData> grassTextureData;
-    std::unique_ptr<feng::Texture> grassTexture;
-
-    std::unique_ptr<feng::TextureData> windowTextureData;
-    std::unique_ptr<feng::Texture> windowTexture;
-
-    std::array<std::unique_ptr<feng::TextureData>, 6> skyboxData;
-    std::unique_ptr<feng::Texture> skyboxTexture;
-
-    std::unique_ptr<feng::Material> diffuseTexMaterial;
-    std::unique_ptr<feng::Material> specularTexMaterial;
-    std::unique_ptr<feng::Material> diffTex1SpecTex2Material;
-    std::unique_ptr<feng::Material> showDepthMaterial;
-    std::unique_ptr<feng::Material> grassMaterial;
-    std::unique_ptr<feng::Material> windowMaterial;
-    std::unique_ptr<feng::Material> skyboxMaterial;
-    std::unique_ptr<feng::Material> cubemapReflectiveMaterial;
-
-    std::unique_ptr<feng::Mesh> cubeMesh;
-    std::unique_ptr<feng::Mesh> quadMesh;
-
-    std::unique_ptr<feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
-    {
-        std::string vsFilePath = BaseShadersDir + vsFileName;
-        std::string fsFilePath = BaseShadersDir + fsFileName;
-        return feng::LoadShader(vsFilePath, fsFilePath);
-    }
-
-    std::unique_ptr<feng::TextureData> LoadTexture(std::string name, bool flip)
-    {
-        std::string texturePath = SRes::BaseTexturesDir + name;
-        return feng::TextureData::Load(texturePath, flip);
-    }
-
-    std::array<std::unique_ptr<feng::TextureData>, 6> LoadCubemapTexture(std::array<std::string, 6> relativePaths, bool flip)
-    {
-        std::array<std::string, 6> absolutePaths;
-        std::transform(
-                relativePaths.begin(),
-                relativePaths.end(),
-                absolutePaths.begin(),
-                [](const std::string& relativePath) { return SRes::BaseTexturesDir + relativePath; });
-
-        return feng::TextureData::LoadCubemap(absolutePaths, { flip, flip, flip, flip, flip, flip });
-    }
-
-    void LoadTextures()
-    {
-        woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
-        woodContainerTexture = std::make_unique<feng::Texture>(*woodContainerTextureData);
-        woodContainerTexture->SetFilters(feng::eTextureMinFilter::Linear, feng::eTextureMagFilter::Linear);
-
-        brickWallTextureData = LoadTexture(brickWallJpg, false);
-        brickWallTexture = std::make_unique<feng::Texture>(*brickWallTextureData);
-
-        awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
-        awesomeFaceTexture = std::make_unique<feng::Texture>(*awesomeFaceTextureData);
-
-        steeledWoodTextureData = LoadTexture(steeledWoodPng, true);
-        steeledWoodTexture = std::make_unique<feng::Texture>(*steeledWoodTextureData);
-
-        steelBorderTextureData = LoadTexture(steeledBorderPng, true);
-        steelBorderTexture = std::make_unique<feng::Texture>(*steelBorderTextureData);
-
-        grassTextureData = LoadTexture(grassPng, true);
-        grassTexture = std::make_unique<feng::Texture>(*grassTextureData);
-        grassTexture->SetWrapping(feng::eTextureWrapping::ClampToEdge, feng::eTextureWrapping::ClampToEdge);
-
-        windowTextureData = LoadTexture(windowPng, true);
-        windowTexture = std::make_unique<feng::Texture>(*windowTextureData);
-        windowTexture->SetWrapping(feng::eTextureWrapping::ClampToEdge, feng::eTextureWrapping::ClampToEdge);
-
-        skyboxData = LoadCubemapTexture(skyboxJpg, false);
-        std::array<const feng::TextureData*, 6> skyboxFaces;
-        for(uint8_t i = 0; i < 6; ++i)
-        {
-            skyboxFaces[i] = skyboxData[i].get();
-        }
-
-        skyboxTexture = std::make_unique<feng::Texture>(skyboxFaces);
-    }
-
-    std::unique_ptr<feng::Material> CreateFlatColorMaterial()
-    {
-        std::unique_ptr<feng::Shader> flatColorShader = SRes::LoadShader(SRes::FlatColorVsName, SRes::FlatColorFsName);
-        return std::make_unique<feng::Material>(std::move(flatColorShader));
-    }
-
-    void LoadMaterials()
-    {
-        LoadTextures();
-
-        std::unique_ptr<feng::Shader> diffuseTextureShader = LoadShader(DiffuseTextureVsName, DiffuseTextureFsName);
-        diffuseTexMaterial = std::make_unique<feng::Material>(std::move(diffuseTextureShader));
-        diffuseTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), woodContainerTexture.get());
-
-        std::unique_ptr<feng::Shader> specularTextureShader = LoadShader(SpecularTextureVsName, SpecularTextureFsName);
-        specularTexMaterial = std::make_unique<feng::Material>(std::move(specularTextureShader));
-        specularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), brickWallTexture.get());
-        specularTexMaterial->SetFloat("uSpecularity", 1.0f);
-        specularTexMaterial->SetFloat("uShininess", 32.0f);
-
-        std::unique_ptr<feng::Shader> diff1Spec2Shader = LoadShader(DiffTex1SpecTex2VsName, DiffTex1SpecTex2FsName);
-        diffTex1SpecTex2Material = std::make_unique<feng::Material>(std::move(diff1Spec2Shader));
-        diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture0.data(), steeledWoodTexture.get());
-        diffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), steelBorderTexture.get());
-        diffTex1SpecTex2Material->SetFloat("uSpecularity", 5.f);
-        diffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
-
-        showDepthMaterial = std::make_unique<feng::Material>(LoadShader(ShowDepthVsName, ShowDepthFsName));
-
-        grassMaterial = std::make_unique<feng::Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
-        grassMaterial->SetTexture(feng::ShaderParams::Texture0.data(), grassTexture.get());
-
-        windowMaterial = std::make_unique<feng::Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
-        windowMaterial->SetTexture(feng::ShaderParams::Texture0.data(), windowTexture.get());
-
-        skyboxMaterial = std::make_unique<feng::Material>(LoadShader(SkyboxVsName, SkyboxFsName));
-        skyboxMaterial->SetTexture(feng::ShaderParams::Texture0.data(), skyboxTexture.get());
-
-        cubemapReflectiveMaterial = std::make_unique<feng::Material>(LoadShader(CubemapReflectiveVsName, CubemapReflectiveFsName));
-        cubemapReflectiveMaterial->SetTexture(feng::ShaderParams::Texture0.data(), skyboxTexture.get());
-    }
-
-    void LoadMeshes()
-    {
-        uint32_t cubeAttributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Normal | feng::eVertexAtributes::Uv0;
-        feng::eVertexAtributes cubeAttributes = static_cast<feng::eVertexAtributes>(cubeAttributesValue);
-        cubeMesh = std::make_unique<feng::Mesh>(cube, cubeAttributes, feng::ePrimitiveType::Triangles);
-
-        uint32_t quadAttributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Uv0;
-        feng::eVertexAtributes quadAttributes = static_cast<feng::eVertexAtributes>(quadAttributesValue);
-        quadMesh = std::make_unique<feng::Mesh>(quadVertices, quadIndices, quadAttributes,  feng::ePrimitiveType::Triangles);
-    }
-
-    void LoadResources()
-    {
-        LoadMaterials();
-        LoadMeshes();
-    }
-}
 
 namespace SApp
 {
@@ -370,16 +100,6 @@ namespace SObjects
     std::vector<feng::Entity*> dynamicObjects;
     bool showDepth = false;
 
-    std::unique_ptr<feng::Material> CreateGizmoMaterial()
-    {
-        if(showDepth)
-        {
-            return std::make_unique<feng::Material>(SRes::LoadShader(SRes::ShowDepthVsName, SRes::ShowDepthFsName));
-        }
-
-        return SRes::CreateFlatColorMaterial();
-    }
-
     feng::Entity* CreateCamera()
     {
         feng::Entity &camEntity = scene->CreateCamera();
@@ -399,7 +119,7 @@ namespace SObjects
 
     std::unique_ptr<feng::Material> CreateLightMaterial(const feng::Vector4& color)
     {
-        std::unique_ptr<feng::Material> material = CreateGizmoMaterial();
+        std::unique_ptr<feng::Material> material = CreateGizmoMaterial(showDepth);
         material->SetVector3(feng::ShaderParams::MainColor.data(), color.GetXyz());
 
         return material;
@@ -411,9 +131,9 @@ namespace SObjects
 
         std::unique_ptr<feng::Material> material = CreateLightMaterial(color);
         feng::Entity& lightEntity = scene->CreateLight(
-                                                         feng::Light::eType::Directional,
-                                                         material.get(),
-                                                         SRes::cubeMesh.get());
+                                                    feng::Light::eType::Directional,
+                                                    material.get(),
+                                                    res.CubeMesh.get());
 
         feng::Light* light = lightEntity.GetComponent<feng::Light>();
         lightMaterials[light] = std::move(material);
@@ -436,7 +156,7 @@ namespace SObjects
         feng::Entity& lightEntity = scene->CreateLight(
                                                         feng::Light::eType::Point,
                                                         material.get(),
-                                                        SRes::cubeMesh.get());
+                                                        res.CubeMesh.get());
 
         feng::Light* light = lightEntity.GetComponent<feng::Light>();
         lightMaterials[light] = std::move(material);
@@ -468,7 +188,7 @@ namespace SObjects
         feng::Entity& lightEntity = scene->CreateLight(
                                                          feng::Light::eType::Spot,
                                                          material.get(),
-                                                         SRes::cubeMesh.get());
+                                                         res.CubeMesh.get());
 
         feng::Light* light = lightEntity.GetComponent<feng::Light>();
         lightMaterials[light] = std::move(material);
@@ -502,7 +222,7 @@ namespace SObjects
                             feng::Mesh &mesh,
                             feng::Material& material)
     {
-        feng::Material *finalMaterial = showDepth ? SRes::showDepthMaterial.get() : &material;
+        feng::Material *finalMaterial = showDepth ? res.ShowDepthMaterial.get() : &material;
         feng::Entity& obj = scene->CreateMesh(finalMaterial, &mesh);
 
         feng::Transform *transform = obj.GetComponent<feng::Transform>();
@@ -513,7 +233,7 @@ namespace SObjects
 
     void CreateObjects()
     {
-        std::ignore = scene->CreateSkybox(SRes::skyboxMaterial.get());
+        std::ignore = scene->CreateSkybox(res.SkyboxMaterial.get());
         SObjects::camEntity = SObjects::CreateCamera();
         std::ignore = SObjects::CreateDirectLight();
         std::ignore = SObjects::CreatePointLight();
@@ -525,9 +245,9 @@ namespace SObjects
             const feng::Vector3& position = cubePositions[i];
             std::string name = "cube " + std::to_string(i);
             feng::Material *material = ((i % 2) == 0)
-                ? SRes::diffTex1SpecTex2Material.get()
-                : SRes::specularTexMaterial.get();
-            feng::Entity *entity = CreateObject(position, name, *SRes::cubeMesh, *material);
+                ? res.DiffTex1SpecTex2Material.get()
+                : res.SpecularTexMaterial.get();
+            feng::Entity *entity = CreateObject(position, name, *res.CubeMesh, *material);
             dynamicObjects.push_back(entity);
         }
 
@@ -536,7 +256,7 @@ namespace SObjects
         {
             const feng::Vector3& position = vegetationPositions[i];
             std::string name = "grass " + std::to_string(i);
-            std::ignore = CreateObject(position, name, *SRes::quadMesh, *SRes::grassMaterial);
+            std::ignore = CreateObject(position, name, *res.QuadMesh, *res.GrassMaterial);
         }
 
         // Grass.
@@ -544,16 +264,16 @@ namespace SObjects
         {
             const feng::Vector3& position = windowPositions[i];
             std::string name = "window " + std::to_string(i);
-            std::ignore = CreateObject(position, name, *SRes::quadMesh, *SRes::windowMaterial);
+            std::ignore = CreateObject(position, name, *res.QuadMesh, *res.WindowMaterial);
         }
 
         std::ignore = CreateObject(
                                 feng::Vector3(0.f, 2.f, -2.5f),
                                 "Reflective",
-                                *SRes::cubeMesh,
-                                *SRes::cubemapReflectiveMaterial);
+                                *res.CubeMesh,
+                                *res.CubemapReflectiveMaterial);
 
-        feng::Entity *planeEntity = CreateObject(planePos, "Plane", *SRes::cubeMesh, *SRes::diffuseTexMaterial);
+        feng::Entity *planeEntity = CreateObject(planePos, "Plane", *res.CubeMesh, *res.DiffuseTexMaterial);
         feng::Transform *planeTransform = planeEntity->GetComponent<feng::Transform>();
         planeTransform->SetScale(40.f, 0.2f, 40.f);
     }
@@ -775,61 +495,16 @@ namespace SWindow
 
 namespace SRender
 {
-    std::unique_ptr<feng::PostEffectDefinition> grayscaleEffect;
-    std::unique_ptr<feng::PostEffectDefinition> invertColorsEffect;
-    std::unique_ptr<feng::PostEffectDefinition> sharpColorEffect;
-    std::unique_ptr<feng::PostEffectDefinition> blurEffect;
-    std::unique_ptr<feng::PostEffectDefinition> edgeDetectionEffect;
-    std::vector<feng::PostEffectDefinition*> effects;
-
-    void CreatePostEffectDefinitions()
-    {
-        std::unique_ptr<feng::Shader> grayscaleShader = SRes::LoadShader(
-                                                                    SRes::PostEffectVsName,
-                                                                    SRes::GrayscalePostEffectFsName);
-        std::unique_ptr<feng::Material> grayscaleEffectMaterial = std::make_unique<feng::Material>(std::move(grayscaleShader));
-        grayscaleEffect = std::make_unique<feng::PostEffectDefinition>(std::move(grayscaleEffectMaterial));
-
-        std::unique_ptr<feng::Shader> invertColorsShader = SRes::LoadShader(
-                                                                    SRes::PostEffectVsName,
-                                                                    SRes::InvertColorsPostEffectFsName);
-        std::unique_ptr<feng::Material> invertColorsEffectMaterial = std::make_unique<feng::Material>(std::move(invertColorsShader));
-        invertColorsEffect = std::make_unique<feng::PostEffectDefinition>(std::move(invertColorsEffectMaterial));
-
-        std::unique_ptr<feng::Shader> sharpColorShader = SRes::LoadShader(
-                                                                    SRes::PostEffectVsName,
-                                                                    SRes::SharpColorPostEffectFsName);
-        std::unique_ptr<feng::Material> sharpColorEffectMaterial = std::make_unique<feng::Material>(std::move(sharpColorShader));
-        sharpColorEffect = std::make_unique<feng::PostEffectDefinition>(std::move(sharpColorEffectMaterial));
-
-        std::unique_ptr<feng::Shader> blurShader = SRes::LoadShader(SRes::PostEffectVsName, SRes::BlurPostEffectFsName);
-        std::unique_ptr<feng::Material> blurEffectMaterial = std::make_unique<feng::Material>(std::move(blurShader));
-        blurEffect = std::make_unique<feng::PostEffectDefinition>(std::move(blurEffectMaterial));
-
-        std::unique_ptr<feng::Shader> edgeDetectionShader = SRes::LoadShader(
-                                                                    SRes::PostEffectVsName,
-                                                                    SRes::EdgeDetectionPostEffectFsName);
-        std::unique_ptr<feng::Material> edgeDetectionEffectMaterial = std::make_unique<feng::Material>(std::move(edgeDetectionShader));
-        edgeDetectionEffect = std::make_unique<feng::PostEffectDefinition>(std::move(edgeDetectionEffectMaterial));
-
-        effects.push_back(blurEffect.get());
-        effects.push_back(grayscaleEffect.get());
-        effects.push_back(invertColorsEffect.get());
-        effects.push_back(sharpColorEffect.get());
-        effects.push_back(edgeDetectionEffect.get());
-        SWindow::effectsCount = effects.size();
-    }
-
     void InitRender()
     {
         feng::Debug::LogRenderInfoOpenGL();
         feng::Debug::LogMessage("Initialize render.");
 
-        SRes::LoadResources();
+        LoadResources();
+        SWindow::effectsCount = res.Effects.size();
         Print_Errors_OpengGL();
 
         SObjects::CreateScene();
-        CreatePostEffectDefinitions();
         Print_Errors_OpengGL();
 
         if(SObjects::showDepth)
@@ -881,7 +556,7 @@ namespace SRender
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
 
-        std::unique_ptr<feng::Material> outlineMaterial = SRes::CreateFlatColorMaterial();
+        std::unique_ptr<feng::Material> outlineMaterial = CreateFlatColorMaterial();
         outlineMaterial->SetVector3(feng::ShaderParams::MainColor.data(), feng::Vector3::OneY);
 
         for(feng::Entity *entity : outlined)
@@ -909,7 +584,7 @@ namespace SRender
     {
         if(SWindow::appliedEffectIndex >= 0)
         {
-            feng::PostEffectDefinition *postEffect = effects[SWindow::appliedEffectIndex];
+            feng::PostEffectDefinition *postEffect = res.Effects[SWindow::appliedEffectIndex];
             SObjects::scene->SetPostEffect(postEffect);
         }
         else

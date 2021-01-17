@@ -41,7 +41,7 @@
 40. <OpenGL/gl.h> vs./and <OpenGL/gl3.h>
 41. glVertexAttribPointer/glEnableVertexAttribArray why every call without VAO.
 42. glViewport and renderbuffer different sizes: what result?
-43. PostEffects: under water; bag on head; draw depth as posteffect.
+43. PostEffects: under water; bag on head; draw depth as posteffect; monochromacity (white-blue);
 44. Shader: glass, bottle, surface curvature.
 45. Why does image kernels work the way they do? What is empiric? What is the maths?
 46. Is frustum culling made automatically by OpenGL?
