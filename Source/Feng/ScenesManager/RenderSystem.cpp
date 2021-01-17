@@ -45,11 +45,14 @@ namespace feng
 #else
         frameBuffer = buffersPool.CreateBuffer(screen::ScreenWidth, screen::ScreenHeight, true);
 #endif
+        CreateCamUniformBuffer();
+        renderProperties.camBufferIndex = camBufferIndex;
     }
 
     RenderSystem::~RenderSystem()
     {
         buffersPool.DeleteBuffer(frameBuffer);
+        glDeleteBuffers(1, &camUbo);
     }
 
     void RenderSystem::SetAmbientLight(Vector4 color, float intensity)
@@ -104,8 +107,6 @@ namespace feng
 
     void RenderSystem::Draw()
     {
-        Print_Errors_OpengGL();
-
         if(postProcessing.HasPostEffects())
         {
             glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.Frame);
@@ -118,8 +119,53 @@ namespace feng
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        Print_Errors_OpengGL();
+        BindCamUniformBuffer();
+        DrawRenderers();
+        DrawSkybox();
 
+        if(postProcessing.HasPostEffects())
+        {
+            postProcessing.ApplyPostEffects(frameBuffer);
+        }
+        Print_Errors_OpengGL();
+    }
+
+    void RenderSystem::CreateCamUniformBuffer()
+    {
+        constexpr uint32_t camUniformsSize = 208;
+        glGenBuffers(1, &camUbo);
+        glBindBuffer(GL_UNIFORM_BUFFER, camUbo);
+        glBufferData(GL_UNIFORM_BUFFER, camUniformsSize, nullptr, GL_STATIC_DRAW);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
+
+    void RenderSystem::BindCamUniformBuffer()
+    {
+        const Entity *camEntity = renderProperties.cam->GetEntity();
+        const Transform *camTransform = camEntity->GetComponent<Transform>();
+
+        const Matrix4 viewProjMatrix = renderProperties.cam->GetViewProjectionMatrix();
+        const Matrix4 projMatrix = renderProperties.cam->GetProjectionMatrix();
+        const Matrix3& camRotation = camTransform->GetRotation();
+        const Vector3& camPos = camTransform->GetPosition();
+        const Vector3 camDir = camTransform->GetForward();
+
+        glBindBuffer(GL_UNIFORM_BUFFER, camUbo);
+        glBindBufferBase(GL_UNIFORM_BUFFER, renderProperties.camBufferIndex, camUbo);
+        // Offsets are specified in shader's uniform block layout.
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4), viewProjMatrix.data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(Matrix4), projMatrix.data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(Vector3), camRotation.rows[0].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 144, sizeof(Vector3), camRotation.rows[1].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 160, sizeof(Vector3), camRotation.rows[2].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 176, sizeof(Vector3), camPos.data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 192, sizeof(Vector3), camDir.data);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
+
+    void RenderSystem::DrawRenderers()
+    {
         SRenderSystem::SortSceneByDistance(*renderProperties.cam, renderers);
 
         for(MeshRenderer *renderer : renderers)
@@ -127,19 +173,17 @@ namespace feng
             renderer->Draw(renderProperties);
         }
         Print_Errors_OpengGL();
+    }
 
+    void RenderSystem::DrawSkybox()
+    {
         if(skybox != nullptr)
         {
             glDepthFunc(GL_LEQUAL);
             skybox->Draw(renderProperties);
             glDepthFunc(GL_LESS); // Default.
         }
-        Print_Errors_OpengGL();
 
-        if(postProcessing.HasPostEffects())
-        {
-            postProcessing.ApplyPostEffects(frameBuffer);
-        }
         Print_Errors_OpengGL();
     }
 }

@@ -5,6 +5,7 @@
 #include <Feng/Render/PostEffects/RenderPostProcessing.h>
 #include <Feng/ScenesManager/RenderProperties.h>
 
+#include <cstdint>
 #include <vector>
 
 namespace feng
@@ -36,6 +37,13 @@ namespace feng
         void Draw();
 
     private:
+        void CreateCamUniformBuffer();
+        void BindCamUniformBuffer();
+        void DrawRenderers();
+        void DrawSkybox();
+
+        static constexpr uint32_t camBufferIndex = 0;
+
         std::vector<MeshRenderer*> renderers;
         std::vector<Light*> lights;
         FrameBuffersPool buffersPool;
@@ -43,6 +51,7 @@ namespace feng
         RenderProperties renderProperties;
         FrameBuffer frameBuffer;
         MeshRenderer *skybox = nullptr;
+        uint32_t camUbo = 0;
     };
 
     inline void RenderSystem::SetSkybox(MeshRenderer *aSkybox)

@@ -205,6 +205,18 @@ namespace feng
         return false;
     }
 
+    bool Shader::SetUniformBuffer(const char *name, uint32_t index) const
+    {
+        uint32_t location = glGetUniformBlockIndex(program, name);
+        if(location != UndefinedParamLocation)
+        {
+            glUniformBlockBinding(program, location, index);
+            return true;
+        }
+
+        return false;
+    }
+
     bool Shader::SetUniformFloatArray(const char *name, const float *value, int size) const
     {
         uint32_t location = UndefinedParamLocation;

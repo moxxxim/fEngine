@@ -44,6 +44,7 @@ namespace feng
         bool SetUniformVector4(const char *name, const Vector4& value) const;
         bool SetUniformMatrix3(const char *name, const Matrix3& matrix) const;
         bool SetUniformMatrix4(const char *name, const Matrix4& matrix) const;
+        bool SetUniformBuffer(const char *name, uint32_t index) const;
 
     private:
         bool SetUniformFloatArray(const char *name, const float *value, int size) const;

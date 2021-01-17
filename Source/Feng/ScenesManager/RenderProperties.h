@@ -15,5 +15,6 @@ namespace feng
         const Light *pointLight = nullptr;
         const Light *spotLight = nullptr;
         Vector4 ambientColorAndIntencity = Vector4{1.f, 1.f, 1.f, 1.f};
+        uint32_t camBufferIndex = 0;
     };
 }

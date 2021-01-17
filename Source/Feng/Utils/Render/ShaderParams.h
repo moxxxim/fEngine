@@ -9,12 +9,14 @@ namespace feng
     class ShaderParams final
     {
     public:
-        static constexpr std::string_view ModelMatrix {"uModelMatrix"};
+        static constexpr std::string_view CamUniformBlock {"ubCamera"};
         static constexpr std::string_view ViewProjMatrix {"uViewProjMatrix"};
         static constexpr std::string_view ProjMatrix {"uProjMatrix"};
         static constexpr std::string_view CameraPos {"uCamPos"};
         static constexpr std::string_view CameraDir {"uCamDir"};
         static constexpr std::string_view CameraRotation {"uCamRotation"};
+
+        static constexpr std::string_view ModelMatrix {"uModelMatrix"};
         static constexpr std::string_view MainColor {"uMainColor"};
         static constexpr std::string_view Texture0 {"uTexture0"};
         static constexpr std::string_view Texture1 {"uTexture1"};

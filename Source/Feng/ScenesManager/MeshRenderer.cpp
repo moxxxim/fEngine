@@ -193,19 +193,12 @@ namespace feng
     void MeshRenderer::SetCameraUniforms(const RenderProperties &renderProperties)
     {
         const Shader *shader = material->GetShader();
-        const Entity *camEntity = renderProperties.cam->GetEntity();
-        const Transform *camTransform = camEntity->GetComponent<Transform>();
         const Transform *myTransform = GetEntity()->GetComponent<Transform>();
-        const Camera *cam = camEntity->GetComponent<Camera>();
 
         shader->SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
-        shader->SetUniformMatrix4(feng::ShaderParams::ViewProjMatrix.data(), renderProperties.cam->GetViewProjectionMatrix());
-        shader->SetUniformVector3(feng::ShaderParams::CameraPos.data(), camTransform->GetPosition());
-        shader->SetUniformVector3(feng::ShaderParams::CameraDir.data(), camTransform->GetForward());
-        shader->SetUniformMatrix3(feng::ShaderParams::CameraRotation.data(), camTransform->GetRotation());
-        shader->SetUniformMatrix4(feng::ShaderParams::ProjMatrix.data(), cam->GetProjectionMatrix());
-        shader->SetUniformFloat(feng::ShaderParams::NearClipPlane.data(), cam->GetNearClipPlane());
-        shader->SetUniformFloat(feng::ShaderParams::FarClipPlane.data(), cam->GetFarClipPlane());
+        shader->SetUniformFloat(feng::ShaderParams::NearClipPlane.data(), renderProperties.cam->GetNearClipPlane());
+        shader->SetUniformFloat(feng::ShaderParams::FarClipPlane.data(), renderProperties.cam->GetFarClipPlane());
+        shader->SetUniformBuffer(feng::ShaderParams::CamUniformBlock.data(), renderProperties.camBufferIndex);
     }
 
     void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties)
