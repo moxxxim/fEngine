@@ -1,6 +1,7 @@
 #include <Feng/ResourcesManager/Shader.h>
 
 #include <Feng/ResourcesManager/ResourcesManager.h>
+#include <Feng/Utils/Render/RenderUtils.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/Utils/Debug.h>
 
@@ -34,11 +35,9 @@ namespace feng
             return shaderStream.str();
         }
 
-        uint32_t CompileShader(Shader::eType type, const std::string& sourceCode)
+        uint32_t CompileShader(eShaderType type, const std::string& sourceCode)
         {
-            int glShaderType = (type == Shader::eType::Vertex)
-                ? GL_VERTEX_SHADER
-                : GL_FRAGMENT_SHADER;
+            GLenum glShaderType = ToOpenGLValue(type);
             GLuint shader = glCreateShader(glShaderType);
             if(shader != 0)
             {
@@ -308,13 +307,13 @@ namespace feng
 
     void Shader::Load(const std::string& vs, const std::string& fs)
     {
-        uint32_t vertexShader = SShader::CompileShader(Shader::eType::Vertex, vs);
+        uint32_t vertexShader = SShader::CompileShader(eShaderType::Vertex, vs);
         if (vertexShader == UndefinedProgram)
         {
             return;
         }
 
-        uint32_t fragmentShader = SShader::CompileShader(Shader::eType::Fragment, fs);
+        uint32_t fragmentShader = SShader::CompileShader(eShaderType::Fragment, fs);
         if (fragmentShader == UndefinedProgram)
         {
             glDeleteShader(vertexShader);

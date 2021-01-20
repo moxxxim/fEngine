@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 option(USE_GLM_LIB "Add GLM lib to project" OFF)
 
 # set the project name
-set(PROJECT_NAME "OpenGL_Tutorial")
+set(PROJECT_NAME "Feng")
 set(THIRDPARTY_SRC_DIR_NAME "Thirdparty")
 set(GLM_DIR_NAME "Glm")
 project(${PROJECT_NAME})

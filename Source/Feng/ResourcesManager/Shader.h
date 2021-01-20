@@ -6,22 +6,24 @@
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
 
+#include <cstdint>
 #include <map>
 #include <string>
 
 namespace feng
 {
-    enum class ShaderStates : int;
+    enum class eShaderStates : uint8_t;
+
+    enum class eShaderType : uint8_t
+    {
+        Vertex = 0,
+        Fragment = 1,
+        Geometry = 2,
+    };
 
     class Shader final
     {
     public:
-        enum class eType : uint8_t
-        {
-            Vertex = 0,
-            Fragment = 1,
-        };
-
         Shader(const std::string& vs, const std::string& fs);
         ~Shader();
 

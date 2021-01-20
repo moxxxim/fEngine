@@ -2,7 +2,7 @@
 
 namespace feng
 {
-    enum class ShaderStates : int
+    enum class eShaderStates : int
     {
         None = 0,
         Culling = 1 << 0,

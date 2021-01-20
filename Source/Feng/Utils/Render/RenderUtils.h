@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Feng/Utils/Render/MeshParams.h>
+#include <OpenGL/gl.h>
 
 #include <cstdint>
 #include <map>
@@ -10,6 +11,7 @@ namespace feng
 {
     class Material;
     class Texture;
+    enum class eShaderType : uint8_t;
 
     void EnableVertexAttributes(eVertexAtributes attributesMask);
     void BindMaterialUniforms(
@@ -20,4 +22,5 @@ namespace feng
     std::map<std::string, uint32_t> CreateTextureBuffers(const Material &material);
     uint32_t CreateTextureBuffer(const Texture& texture);
     void LoadTextureData(const Texture& texture);
+    GLenum ToOpenGLValue(eShaderType shaderType);
 }

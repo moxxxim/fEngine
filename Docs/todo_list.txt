@@ -47,3 +47,5 @@
 46. Is frustum culling made automatically by OpenGL?
 47. Array textures: what for? usage scenario.
 48. Buffer texture what for?
+49. Use "shared" uniform block: fetch offsets and total size. 
+50. Extra vaiables in uniform block for several shaders. Is it bad?
