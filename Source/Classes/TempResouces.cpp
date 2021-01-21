@@ -164,7 +164,8 @@ void LoadTextures()
 {
     woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
     res.WoodContainerTexture = std::make_unique<feng::Texture>(*woodContainerTextureData);
-    res.WoodContainerTexture->SetFilters(feng::eTextureMinFilter::Linear, feng::eTextureMagFilter::Linear);
+    res.WoodContainerTexture->SetFilters(feng::eTextureMinFilter::LinearMipLinear, feng::eTextureMagFilter::Linear);
+    res.WoodContainerTexture->SetUseMipmaps(true);
 
     brickWallTextureData = LoadTexture(brickWallJpg, false);
     res.BrickWallTexture = std::make_unique<feng::Texture>(*brickWallTextureData);
