@@ -12,6 +12,7 @@
 #include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/Utils/Render/TextureParams.h>
 #include <Feng/Utils/Render/RenderUtils.h>
+#include <Feng/Utils/Debug.h>
 
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
@@ -48,6 +49,22 @@ namespace feng
                 CreateGeometryBuffers();
             }
         }
+    }
+
+    void MeshRenderer::SetInstanceTransforms(const std::vector<feng::Matrix4>& instances)
+    {
+        if(static_cast<uint32_t>(instances.size()) > instancesCount)
+        {
+            DeleteInstanceBuffer();
+            CreateInstanceBuffer();
+        }
+
+        Print_Errors_OpengGL();
+        
+        UpdateInstanceBuffer(instances);
+        Print_Errors_OpengGL();
+
+        instancesCount = static_cast<uint32_t>(instances.size());
     }
 
     bool MeshRenderer::CanDraw() const
@@ -89,6 +106,13 @@ namespace feng
 
     void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties)
     {
+        if(instancesCount == 0)
+        {
+            const Shader *shader = material->GetShader();
+            const Transform *myTransform = GetEntity()->GetComponent<Transform>();
+            shader->SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
+        }
+
         SetCameraUniforms(renderProperties);
         SetLightUniforms(renderProperties);
         SetFogUniforms(renderProperties);
@@ -100,17 +124,40 @@ namespace feng
 
         ePrimitiveType primitiveType = mesh->GetPrimitiveType();
 
+        // No need to call 'glBindBuffer' because it was bound while VAO was still bound.
+
         if(ibo != MeshRenderer::UndefinedBuffer)
         {
             const std::vector<uint32_t>& indices = mesh->GetIndices();
-
-            // No need to call 'glBindBuffer' because it was bound while VAO was still bound.
-            glDrawElements(ToOpenGLValue(primitiveType), indices.size(), GL_UNSIGNED_INT, 0);
+            if(instancesCount > 0)
+            {
+                glDrawElementsInstanced(
+                               ToOpenGLValue(primitiveType),
+                               indices.size(),
+                               GL_UNSIGNED_INT,
+                               reinterpret_cast<void*>(0),
+                               instancesCount);
+            }
+            else
+            {
+                glDrawElements(
+                               ToOpenGLValue(primitiveType),
+                               indices.size(),
+                               GL_UNSIGNED_INT,
+                               reinterpret_cast<void*>(0));
+            }
         }
         else
         {
             int32_t verticesCount = mesh->GetVerticesCount();
-            glDrawArrays(ToOpenGLValue(primitiveType), 0, verticesCount);
+            if(instancesCount > 0)
+            {
+                glDrawArraysInstanced(ToOpenGLValue(primitiveType), 0, verticesCount, instancesCount);
+            }
+            else
+            {
+                glDrawArrays(ToOpenGLValue(primitiveType), 0, verticesCount);
+            }
         }
 
         glBindVertexArray(UndefinedBuffer);
@@ -148,8 +195,9 @@ namespace feng
         glDeleteBuffers(1, &vbo);
         glDeleteBuffers(1, &ibo);
         glDeleteBuffers(1, &vao);
+        glDeleteBuffers(1, &instancesBuffer);
 
-        vao = vbo = ibo = MeshRenderer::UndefinedBuffer;
+        vao = vbo = ibo = instancesBuffer = MeshRenderer::UndefinedBuffer;
     }
 
     void MeshRenderer::CreateTexturesBuffers()
@@ -163,6 +211,47 @@ namespace feng
         {
             glDeleteTextures(1, &tbo);
         }
+    }
+
+    void MeshRenderer::CreateInstanceBuffer()
+    {
+        glGenBuffers(1, &instancesBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, instancesBuffer);
+        glBindVertexArray(vao);
+
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, sizeof(float), GL_FLOAT, GL_FALSE, sizeof(Matrix4), reinterpret_cast<void*>(0));
+
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, sizeof(float), GL_FLOAT, GL_FALSE, sizeof(Matrix4), reinterpret_cast<void*>(sizeof(Vector4)));
+
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, sizeof(float), GL_FLOAT, GL_FALSE, sizeof(Matrix4), reinterpret_cast<void*>(2 * sizeof(Vector4)));
+
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, sizeof(float), GL_FLOAT, GL_FALSE, sizeof(Matrix4), reinterpret_cast<void*>(3 * sizeof(Vector4)));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(UndefinedBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, UndefinedBuffer);
+    }
+
+    void MeshRenderer::UpdateInstanceBuffer(const std::vector<feng::Matrix4>& instances)
+    {
+        if(!instances.empty())
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, instancesBuffer);
+            glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(Matrix4), instances.data(), GL_STATIC_DRAW);
+        }
+    }
+
+    void MeshRenderer::DeleteInstanceBuffer()
+    {
+        glDeleteBuffers(1, &instancesBuffer);
     }
 
     uint32_t MeshRenderer::CreateVertexBuffer()
@@ -193,9 +282,7 @@ namespace feng
     void MeshRenderer::SetCameraUniforms(const RenderProperties &renderProperties)
     {
         const Shader *shader = material->GetShader();
-        const Transform *myTransform = GetEntity()->GetComponent<Transform>();
-
-        shader->SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
+        
         shader->SetUniformFloat(feng::ShaderParams::NearClipPlane.data(), renderProperties.cam->GetNearClipPlane());
         shader->SetUniformFloat(feng::ShaderParams::FarClipPlane.data(), renderProperties.cam->GetFarClipPlane());
         shader->SetUniformBuffer(feng::ShaderParams::CamUniformBlock.data(), renderProperties.camBufferIndex);

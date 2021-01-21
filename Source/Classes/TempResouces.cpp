@@ -20,6 +20,7 @@ constexpr const char *UnlitTextureVsName = "Unlit/UnlitTextureVs.vs";
 
 constexpr const char *DiffuseTextureFsName = "DiffuseTextureFs.fs";
 constexpr const char *DiffuseTextureVsName = "DiffuseTextureVs.vs";
+constexpr const char *DiffuseTextureInstancedVsName = "DiffuseTextureInstancedVs.vs";
 constexpr const char *SpecularTextureFsName = "SpecularTextureFs.fs";
 constexpr const char *SpecularTextureVsName = "SpecularTextureVs.vs";
 constexpr const char *DiffTex1SpecTex2FsName = "DiffuseTex1SpecTex2Fs.fs";
@@ -202,6 +203,10 @@ void LoadMaterials()
     std::unique_ptr<feng::Shader> diffuseTextureShader = LoadShader(DiffuseTextureVsName, DiffuseTextureFsName);
     res.DiffuseTexMaterial = std::make_unique<feng::Material>(std::move(diffuseTextureShader));
     res.DiffuseTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), res.WoodContainerTexture.get());
+
+    std::unique_ptr<feng::Shader> diffuseTextureInstancedShader = LoadShader(DiffuseTextureInstancedVsName, DiffuseTextureFsName);
+    res.DiffuseTexInstancedMaterial = std::make_unique<feng::Material>(std::move(diffuseTextureInstancedShader));
+    res.DiffuseTexInstancedMaterial->SetTexture(feng::ShaderParams::Texture0.data(), res.WoodContainerTexture.get());
 
     std::unique_ptr<feng::Shader> specularTextureShader = LoadShader(SpecularTextureVsName, SpecularTextureFsName);
     res.SpecularTexMaterial = std::make_unique<feng::Material>(std::move(specularTextureShader));

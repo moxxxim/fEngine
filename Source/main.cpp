@@ -19,9 +19,10 @@
 #include <Feng/ScenesManager/Scene.h>
 #include <Feng/Utils/Debug.h>
 
-#include <cmath>
-#include <sstream>
 #include <array>
+#include <cmath>
+#include <random>
+#include <sstream>
 
 namespace SApp
 {
@@ -54,6 +55,8 @@ namespace SObjects
     std::unique_ptr<feng::Scene> scene;
     std::map<feng::Light *, std::unique_ptr<feng::Material>> lightMaterials;
     feng::Entity *camEntity = nullptr;
+    feng::MeshRenderer *instancedObject = nullptr;
+    std::vector<feng::Matrix4> instances;
 
     std::array<feng::Vector3, 10> cubePositions =
     {
@@ -231,6 +234,47 @@ namespace SObjects
         return &obj;
     }
 
+    feng::MeshRenderer* CreateInstancedObject(feng::Mesh &mesh, const std::vector<feng::Matrix4> &transforms)
+    {
+        feng::Entity& obj = scene->CreateMesh(res.DiffuseTexInstancedMaterial.get(), &mesh);
+
+        feng::MeshRenderer *renderer = obj.GetComponent<feng::MeshRenderer>();
+        renderer->SetInstanceTransforms(transforms);
+
+        return renderer;
+    }
+
+    std::vector<feng::Matrix4> InitializeInstances()
+    {
+        constexpr uint32_t instancesCount = 10'000;
+
+        std::random_device randomDevice;
+        std::mt19937 generator(randomDevice());
+        std::uniform_real_distribution<float> angleDistribution(0.f, 359.9f);
+        std::uniform_real_distribution<float> scaleDistribution(0.2f, 0.5f);
+        std::uniform_real_distribution<float> radiusDistribution(20.f, 35.f);
+        std::uniform_real_distribution<float> heightDistribution(1.5f, -1.5f);
+
+        std::vector<feng::Matrix4> objects;
+        objects.resize(instancesCount);
+
+        for(uint32_t i = 0; i < instancesCount; ++i)
+        {
+            float scaleValue = scaleDistribution(generator);
+            feng::Vector3 scale { scaleValue, scaleValue, scaleValue };
+
+            float angle = angleDistribution(generator);
+            float radius = radiusDistribution(generator);
+            float height = heightDistribution(generator);
+            feng::Vector3 translation = radius * (feng::Vector3::OneX * std::sin(angle) + feng::Vector3::OneZ * std::cos(angle))
+                                        + height * feng::Vector3::OneY;
+
+            objects[i] = feng::mat4::MakeTransformation(scale, feng::Matrix3::Identity, translation);
+        }
+
+        return objects;
+    }
+
     void CreateObjects()
     {
         std::ignore = scene->CreateSkybox(res.SkyboxMaterial.get());
@@ -238,6 +282,9 @@ namespace SObjects
         std::ignore = SObjects::CreateDirectLight();
         std::ignore = SObjects::CreatePointLight();
         std::ignore = SObjects::CreateSpotLight();
+
+        instances = InitializeInstances();
+        instancedObject = CreateInstancedObject(*res.CubeMesh, instances);
 
         // Cubes.
         for(int32_t i = 0; i < cubePositions.size(); ++i)
@@ -311,10 +358,23 @@ namespace SObjects
         }
     }
 
+    void UpdateInstances()
+    {
+        constexpr float offsetFactor = 0.1f;
+
+        for(feng::Matrix4& transform : instances)
+        {
+            transform.rows[3].z += offsetFactor * std::sin(SApp::time);
+        }
+
+        instancedObject->SetInstanceTransforms(instances);
+    }
+
     void Update()
     {
         UpdateCamera();
         UpdateObjects();
+        UpdateInstances();
     }
 }
 
