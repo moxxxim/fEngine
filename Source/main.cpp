@@ -361,10 +361,9 @@ namespace SObjects
     void UpdateInstances()
     {
         constexpr float offsetFactor = 0.1f;
-
-        for(feng::Matrix4& transform : instances)
+        for(size_t i = 0; i < instances.size(); i+=2)
         {
-            transform.rows[3].z += offsetFactor * std::sin(SApp::time);
+            instances[i].rows[3].z += offsetFactor * std::sin(SApp::time);
         }
 
         instancedObject->SetInstanceTransforms(instances);
@@ -533,6 +532,7 @@ namespace SWindow
 
     GLFWwindow* CreateWindow()
     {
+        glfwWindowHint(GLFW_SAMPLES, 4);
         GLFWwindow* window = glfwCreateWindow(SApp::InitialWidth, SApp::InitialHeight, "Sweet OpenGL Window", nullptr, nullptr);
         if (window != nullptr)
         {
@@ -592,6 +592,9 @@ namespace SRender
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_FILL is default.
         //glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); glPointSize(10); // GL_FILL is default.
+
+        glEnable(GL_MULTISAMPLE);
+
         Print_Errors_OpengGL();
     }
 
