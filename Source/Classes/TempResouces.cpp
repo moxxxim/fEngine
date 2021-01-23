@@ -213,14 +213,14 @@ void LoadMaterials()
     res.SpecularTexMaterial = std::make_unique<feng::Material>(std::move(specularTextureShader));
     res.SpecularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), res.BrickWallTexture.get());
     res.SpecularTexMaterial->SetFloat("uSpecularity", 1.0f);
-    res.SpecularTexMaterial->SetFloat("uShininess", 32.0f);
+    res.SpecularTexMaterial->SetFloat("uShininess", 64.0f);
 
     std::unique_ptr<feng::Shader> diff1Spec2Shader = LoadShader(DiffTex1SpecTex2VsName, DiffTex1SpecTex2FsName);
     res.DiffTex1SpecTex2Material = std::make_unique<feng::Material>(std::move(diff1Spec2Shader));
     res.DiffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture0.data(), res.SteeledWoodTexture.get());
     res.DiffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), res.SteelBorderTexture.get());
     res.DiffTex1SpecTex2Material->SetFloat("uSpecularity", 5.f);
-    res.DiffTex1SpecTex2Material->SetFloat("uShininess", 32.0f);
+    res.DiffTex1SpecTex2Material->SetFloat("uShininess", 64.0f);
 
     res.ShowDepthMaterial = std::make_unique<feng::Material>(LoadShader(ShowDepthVsName, ShowDepthFsName));
 

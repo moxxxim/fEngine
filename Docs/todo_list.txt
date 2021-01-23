@@ -49,3 +49,4 @@
 48. Buffer texture what for?
 49. Use "shared" uniform block: fetch offsets and total size. 
 50. Extra vaiables in uniform block for several shaders. Is it bad?
+51. Multisampling in-depth. 

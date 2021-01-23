@@ -44,7 +44,9 @@ vec3 CalculateSpotLight(SpotLight light, vec3 norm);
 
 void main()
 {
-    vec4 outColor = texture(uTexture0, vsOut.Uv0);
+    const float gamma = 2.2f;
+    vec4 srgbColor = texture(uTexture0, vsOut.Uv0);
+    vec4 linearColor = vec4(pow(srgbColor.rgb, vec3(gamma)), srgbColor.a);
 
     // Calculate ambient component.
     vec3 ambientColor = uAmbientColor.w * uAmbientColor.rgb;
@@ -55,9 +57,9 @@ void main()
     lightColor += CalculatePointLight(uPointLight, norm);    
     lightColor += CalculateSpotLight(uSpotLight, norm);
 
-    outColor.rgb *= (ambientColor + lightColor);
+    linearColor.rgb *= (ambientColor + lightColor);
 
-    FragColor = outColor;
+    FragColor = vec4(pow(linearColor.rgb, vec3(1.f / gamma)), linearColor.a);
 }
 
 vec3 CalculateDirLight(DirectLight light, vec3 norm)
