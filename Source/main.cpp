@@ -534,7 +534,7 @@ namespace SWindow
     {
         glfwWindowHint(GLFW_SAMPLES, 4);
         GLFWwindow* window = glfwCreateWindow(SApp::InitialWidth, SApp::InitialHeight, "Sweet OpenGL Window", nullptr, nullptr);
-        if (window != nullptr)
+        if (window)
         {
             glfwMakeContextCurrent(window);
             glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
@@ -556,47 +556,45 @@ namespace SWindow
 namespace SRender
 {
     void InitRender()
+{
+    feng::Debug::LogRenderInfoOpenGL();
+    feng::Debug::LogMessage("Initialize render.");
+
+    LoadResources();
+    SWindow::effectsCount = res.Effects.size();
+    Print_Errors_OpengGL();
+
+    SObjects::CreateScene();
+    Print_Errors_OpengGL();
+
+    if(SObjects::showDepth)
     {
-        feng::Debug::LogRenderInfoOpenGL();
-        feng::Debug::LogMessage("Initialize render.");
-
-        LoadResources();
-        SWindow::effectsCount = res.Effects.size();
-        Print_Errors_OpengGL();
-
-        SObjects::CreateScene();
-        Print_Errors_OpengGL();
-
-        if(SObjects::showDepth)
-        {
-            glClearColor(0.f, 0.5f, 0.f, 1.0f);
-        }
-        else
-        {
-            glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        }
-
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS); // Default.
-        glDepthMask(GL_TRUE); // Default.
-
-        glEnable(GL_STENCIL_TEST);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBlendEquation(GL_FUNC_ADD);
-
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK); // Default.
-        glFrontFace(GL_CW);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_FILL is default.
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); glPointSize(10); // GL_FILL is default.
-
-        glEnable(GL_MULTISAMPLE);
-
-        Print_Errors_OpengGL();
+        glClearColor(0.f, 0.5f, 0.f, 1.0f);
     }
+    else
+    {
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS); // Default.
+    glDepthMask(GL_TRUE); // Default.
+
+    glEnable(GL_STENCIL_TEST);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK); // Default.
+    glFrontFace(GL_CW);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Default
+
+    glEnable(GL_MULTISAMPLE);
+
+    Print_Errors_OpengGL();
+}
 
     void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
     {

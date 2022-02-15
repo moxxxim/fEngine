@@ -84,6 +84,7 @@ namespace feng
         const GLubyte *vendor = glGetString(GL_VENDOR);
         const GLubyte *renderer = glGetString(GL_RENDERER);
 
+        std::cout << "------------------ Open GL Info ----------------------";
         std::cout << "OpenGL Version: " << version << "\n";
         std::cout << "OpenGL Vendor: " << vendor << "\n";
         std::cout << "OpenGL Renderer: " << renderer << "\n";
@@ -94,6 +95,7 @@ namespace feng
             std::cout << extension << "\n";
         }
 
+        std::cout << "------------------------------------------------------";
         std::cout << "\n";
     }
 }
