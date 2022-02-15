@@ -8,6 +8,8 @@
 #include <Feng/ScenesManager/Transform.h>
 #include <Feng/ResourcesManager/Mesh.h>
 
+#include <algorithm>
+
 namespace feng
 {
     namespace SScene
@@ -101,10 +103,8 @@ namespace feng
     Entity& Scene::CreateEntity()
     {
         std::unique_ptr<Entity> entity = std::make_unique<Entity>();
-        Entity& entityRef = *entity;
-
         entities.push_back(std::move(entity));
-        return entityRef;
+        return *entities.back();
     }
 
     Entity& Scene::CreateCamera()
@@ -172,30 +172,14 @@ namespace feng
 
     void Scene::Update(float deltaTime)
     {
+        std::for_each(
+                      entities.begin(),
+                      entities.end(),
+                      [deltaTime](const std::unique_ptr<Entity>& entity) { entity->Update(deltaTime); });
     }
 
     void Scene::Draw()
     {
         renderSystem->Draw();
     }
-
-//    void Scene::SetSkybox(Renderer *skybox)
-//    {
-//        if (m_skybox != skybox)
-//        {
-//            m_skybox = skybox;
-//            m_renderSystem->SetSkybox(m_skybox);
-//        }
-//    }
-//
-//    void Scene::RemoveSkybox()
-//    {
-//        if (m_skybox)
-//        {
-//            m_renderSystem->RemoveSkybox(m_skybox);
-//
-//            delete m_skybox;
-//            m_skybox = nullptr;
-//        }
-//    }
 }

@@ -14,10 +14,15 @@ namespace feng
         explicit Entity(const std::string& aName);
         explicit Entity(std::string&& aName);
         ~Entity();
+        
+        void Update(float deltaTime);
 
-        template <class TComponent> TComponent* GetComponent() const;
-        template <class TComponent> TComponent& AddComponent();
-        template <class TComponent> void RemoveComponent();
+        template <class TComponent>
+        TComponent* GetComponent() const;
+        template <class TComponent>
+        TComponent& AddComponent();
+        template <class TComponent>
+        void RemoveComponent();
 
     private:
         std::vector<std::unique_ptr<Component>> components;

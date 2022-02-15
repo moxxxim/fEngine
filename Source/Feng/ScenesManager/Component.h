@@ -15,6 +15,8 @@ namespace feng
 
     protected:
         Component() = default;
+        
+        virtual void Update(float deltaTime);
 
         void SetOwner(Entity *aOwner);
 
@@ -31,6 +33,9 @@ namespace feng
         return owner;
     }
 
+    inline void Component::Update(float)
+    { }
+    
     inline void Component::SetOwner(Entity *aOwner)
     {
         owner = aOwner;

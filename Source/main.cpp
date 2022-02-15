@@ -122,7 +122,7 @@ namespace SObjects
 
     std::unique_ptr<feng::Material> CreateLightMaterial(const feng::Vector4& color)
     {
-        std::unique_ptr<feng::Material> material = CreateGizmoMaterial(showDepth);
+        std::unique_ptr<feng::Material> material = test::CreateGizmoMaterial(showDepth);
         material->SetVector3(feng::ShaderParams::MainColor.data(), color.GetXyz());
 
         return material;
@@ -136,7 +136,7 @@ namespace SObjects
         feng::Entity& lightEntity = scene->CreateLight(
                                                     feng::Light::eType::Directional,
                                                     material.get(),
-                                                    res.CubeMesh.get());
+                                                    test::res.CubeMesh.get());
 
         feng::Light* light = lightEntity.GetComponent<feng::Light>();
         lightMaterials[light] = std::move(material);
@@ -159,7 +159,7 @@ namespace SObjects
         feng::Entity& lightEntity = scene->CreateLight(
                                                         feng::Light::eType::Point,
                                                         material.get(),
-                                                        res.CubeMesh.get());
+                                                        test::res.CubeMesh.get());
 
         feng::Light* light = lightEntity.GetComponent<feng::Light>();
         lightMaterials[light] = std::move(material);
@@ -189,9 +189,9 @@ namespace SObjects
 
         std::unique_ptr<feng::Material> material = CreateLightMaterial(color);
         feng::Entity& lightEntity = scene->CreateLight(
-                                                         feng::Light::eType::Spot,
-                                                         material.get(),
-                                                         res.CubeMesh.get());
+                                                        feng::Light::eType::Spot,
+                                                        material.get(),
+                                                        test::res.CubeMesh.get());
 
         feng::Light* light = lightEntity.GetComponent<feng::Light>();
         lightMaterials[light] = std::move(material);
@@ -225,7 +225,7 @@ namespace SObjects
                             feng::Mesh &mesh,
                             feng::Material& material)
     {
-        feng::Material *finalMaterial = showDepth ? res.ShowDepthMaterial.get() : &material;
+        feng::Material *finalMaterial = showDepth ? test::res.ShowDepthMaterial.get() : &material;
         feng::Entity& obj = scene->CreateMesh(finalMaterial, &mesh);
 
         feng::Transform *transform = obj.GetComponent<feng::Transform>();
@@ -236,7 +236,7 @@ namespace SObjects
 
     feng::MeshRenderer* CreateInstancedObject(feng::Mesh &mesh, const std::vector<feng::Matrix4> &transforms)
     {
-        feng::Entity& obj = scene->CreateMesh(res.DiffuseTexInstancedMaterial.get(), &mesh);
+        feng::Entity& obj = scene->CreateMesh(test::res.DiffuseTexInstancedMaterial.get(), &mesh);
 
         feng::MeshRenderer *renderer = obj.GetComponent<feng::MeshRenderer>();
         renderer->SetInstanceTransforms(transforms);
@@ -277,14 +277,14 @@ namespace SObjects
 
     void CreateObjects()
     {
-        std::ignore = scene->CreateSkybox(res.SkyboxMaterial.get());
+        std::ignore = scene->CreateSkybox(test::res.SkyboxMaterial.get());
         SObjects::camEntity = SObjects::CreateCamera();
         std::ignore = SObjects::CreateDirectLight();
         std::ignore = SObjects::CreatePointLight();
         std::ignore = SObjects::CreateSpotLight();
 
         instances = InitializeInstances();
-        instancedObject = CreateInstancedObject(*res.CubeMesh, instances);
+        instancedObject = CreateInstancedObject(*test::res.CubeMesh, instances);
 
         // Cubes.
         for(int32_t i = 0; i < cubePositions.size(); ++i)
@@ -292,9 +292,9 @@ namespace SObjects
             const feng::Vector3& position = cubePositions[i];
             std::string name = "cube " + std::to_string(i);
             feng::Material *material = ((i % 2) == 0)
-                ? res.DiffTex1SpecTex2Material.get()
-                : res.SpecularTexMaterial.get();
-            feng::Entity *entity = CreateObject(position, name, *res.CubeMesh, *material);
+                ? test::res.DiffTex1SpecTex2Material.get()
+                : test::res.SpecularTexMaterial.get();
+            feng::Entity *entity = CreateObject(position, name, *test::res.CubeMesh, *material);
             dynamicObjects.push_back(entity);
         }
 
@@ -303,7 +303,7 @@ namespace SObjects
         {
             const feng::Vector3& position = vegetationPositions[i];
             std::string name = "grass " + std::to_string(i);
-            std::ignore = CreateObject(position, name, *res.QuadMesh, *res.GrassMaterial);
+            std::ignore = CreateObject(position, name, *test::res.QuadMesh, *test::res.GrassMaterial);
         }
 
         // Grass.
@@ -311,16 +311,16 @@ namespace SObjects
         {
             const feng::Vector3& position = windowPositions[i];
             std::string name = "window " + std::to_string(i);
-            std::ignore = CreateObject(position, name, *res.QuadMesh, *res.WindowMaterial);
+            std::ignore = CreateObject(position, name, *test::res.QuadMesh, *test::res.WindowMaterial);
         }
 
         std::ignore = CreateObject(
                                 feng::Vector3(0.f, 2.f, -2.5f),
                                 "Reflective",
-                                *res.CubeMesh,
-                                *res.CubemapReflectiveMaterial);
+                                *test::res.CubeMesh,
+                                *test::res.CubemapReflectiveMaterial);
 
-        feng::Entity *planeEntity = CreateObject(planePos, "Plane", *res.CubeMesh, *res.DiffuseTexMaterial);
+        feng::Entity *planeEntity = CreateObject(planePos, "Plane", *test::res.CubeMesh, *test::res.DiffuseTexMaterial);
         feng::Transform *planeTransform = planeEntity->GetComponent<feng::Transform>();
         planeTransform->SetScale(40.f, 0.2f, 40.f);
     }
@@ -560,8 +560,8 @@ namespace SRender
     feng::Debug::LogRenderInfoOpenGL();
     feng::Debug::LogMessage("Initialize render.");
 
-    LoadResources();
-    SWindow::effectsCount = res.Effects.size();
+    test::LoadResources();
+    SWindow::effectsCount = test::res.Effects.size();
     Print_Errors_OpengGL();
 
     SObjects::CreateScene();
@@ -594,7 +594,7 @@ namespace SRender
     glEnable(GL_MULTISAMPLE);
 
     Print_Errors_OpengGL();
-}
+    }
 
     void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
     {
@@ -617,7 +617,7 @@ namespace SRender
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
 
-        std::unique_ptr<feng::Material> outlineMaterial = CreateFlatColorMaterial();
+        std::unique_ptr<feng::Material> outlineMaterial = test::CreateFlatColorMaterial();
         outlineMaterial->SetVector3(feng::ShaderParams::MainColor.data(), feng::Vector3::OneY);
 
         for(feng::Entity *entity : outlined)
@@ -645,7 +645,7 @@ namespace SRender
     {
         if(SWindow::appliedEffectIndex >= 0)
         {
-            feng::PostEffectDefinition *postEffect = res.Effects[SWindow::appliedEffectIndex];
+            feng::PostEffectDefinition *postEffect = test::res.Effects[SWindow::appliedEffectIndex];
             SObjects::scene->SetPostEffect(postEffect);
         }
         else

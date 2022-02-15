@@ -121,6 +121,7 @@ namespace feng
     std::array<eKeyStatus, InputKey::eKey::Count> Engine::inputKeys {eKeyStatus::Pressed};
     float Engine::deltaTime = 0.f;
     float Engine::time = 0.f;
+    bool Engine::showDepth = false;
     
     int32_t Engine::Run()
     {
@@ -135,8 +136,8 @@ namespace feng
             {
                 UpdateTime();
                 UpdateInputKeys();
-//                SObjects::Update();
-//                SRender::Render();
+                Update();
+                Render();
                 glfwSwapBuffers(window);
                 glfwPollEvents();
 
@@ -159,6 +160,16 @@ namespace feng
         }
         
         return 1;
+    }
+    
+    Vector2 Engine::GetMousePos()
+    {
+        return mousePos;
+    }
+    
+    Vector2 Engine::GetMouseScroll()
+    {
+        return mouseScroll;
     }
     
     void Engine::UpdateTime()
@@ -203,13 +214,19 @@ namespace feng
                     : eKeyStatus::Released;
     }
     
-    Vector2 Engine::GetMousePos()
+    void Engine::Update()
     {
-        return mousePos;
+        if(scene)
+        {
+            scene->Update(deltaTime);
+        }
     }
     
-    Vector2 Engine::GetMouseScroll()
+    void Engine::Render()
     {
-        return mouseScroll;
+        if(scene)
+        {
+            scene->Draw();
+        }
     }
 }
