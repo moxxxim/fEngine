@@ -1,21 +1,20 @@
-//#pragma once
-//
-//#include <Feng/ScenesManager/GameObjectScript.h>
-//
-//class GameObjectRotation final : public feng::GameObjectScript
-//{
-//public:
-//	GameObjectRotation() = default;
-//	~GameObjectRotation() = default;
-//
-//	void Start() override;
-//	void Update(float deltaTime) override;
-//
-//	void Serialize(feng::SerializationNode& node) const override;
-//	void Deserialize(const feng::SerializationNode& node) override;
-//
-//private:
-//	float m_fullTurnDuration = 8;
-//	float m_oneTurnTimePassed = 0;
-//	feng::Transform *m_transform = nullptr;
-//};
+#pragma once
+
+#include <Feng/ScenesManager/Component.h>
+
+namespace feng
+{
+    class Transform;
+}
+
+class GameObjectRotation final : public feng::Component
+{
+public:
+	GameObjectRotation() = default;
+
+private:
+    void Update(float deltaTime) override;
+    
+    feng::Transform *myTransform = nullptr;
+	float fullTurnPeriod = 4.f;
+};

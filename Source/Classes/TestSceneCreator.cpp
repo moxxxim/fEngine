@@ -1,6 +1,8 @@
 #include <Classes/TestSceneCreator.hpp>
 
+#include <Classes/Scripts/CameraStabilizer.hpp>
 #include <Classes/Scripts/CameraWasdController.h>
+#include <Classes/Scripts/GameObjectRotation.h>
 #include <Classes/TempResouces.h>
 
 #include <Feng/App/Globals.h>
@@ -79,6 +81,7 @@ namespace test
             camTransform->SetPosition(0.f, 3.5f, 3.f);
 
             std::ignore = camEntity.AddComponent<CameraWasdController>();
+            std::ignore = camEntity.AddComponent<CameraStabilizer>();
 
             return &camEntity;
         }
@@ -252,12 +255,8 @@ namespace test
                 feng::Material *material = ((i % 2) == 0)
                     ? test::res.DiffTex1SpecTex2Material.get()
                     : test::res.SpecularTexMaterial.get();
-                std::ignore = CreateObject(scene, position, name, *test::res.CubeMesh, *material);
-                
-                
-                
-                
-                //dynamicObjects.push_back(entity);
+                feng::Entity* object = CreateObject(scene, position, name, *test::res.CubeMesh, *material);
+                object->AddComponent<GameObjectRotation>();
             }
 
             // Grass.

@@ -1,32 +1,18 @@
-//#include <Classes/Scripts/GameObjectRotation.h>
-//
-//#include <Feng/ScenesManager/Transform.h>
-//
-//void GameObjectRotation::Start()
-//{
-//	m_transform = GetTransform();
-//}
-//
-//void GameObjectRotation::Update(float deltaTime)
-//{
-////	if (m_transform)
-////	{
-////		m_oneTurnTimePassed += deltaTime;
-////		if (m_oneTurnTimePassed > m_fullTurnDuration)
-////		{
-////			m_oneTurnTimePassed -= m_fullTurnDuration;
-////		}
-////
-////		m_transform->SetRotation(0, 2 * 3.14 * m_oneTurnTimePassed / m_fullTurnDuration, 0);
-////	}
-//}
-//
-//void GameObjectRotation::Serialize(feng::SerializationNode& node) const
-//{
-//	node.SetFloat("FullTurnDuration", m_fullTurnDuration);
-//}
-//
-//void GameObjectRotation::Deserialize(const feng::SerializationNode& node)
-//{
-//	node.TryGetFloat("FullTurnDuration", m_fullTurnDuration);
-//}
+#include <Classes/Scripts/GameObjectRotation.h>
+
+#include <Feng/Core/Engine.hpp>
+#include <Feng/Math/MathUtils.h>
+#include <Feng/Math/MatrixUtils.h>
+#include <Feng/ScenesManager/Entity.h>
+#include <Feng/ScenesManager/Transform.h>
+
+void GameObjectRotation::Update(float deltaTime)
+{
+    if(!myTransform)
+    {
+        feng::Entity *myEntity = GetEntity();
+        myTransform = myEntity->GetComponent<feng::Transform>();
+    }
+
+    myTransform->Rotate(0.f, 0.f, (2.f * feng::Pi) * deltaTime / fullTurnPeriod);
+}

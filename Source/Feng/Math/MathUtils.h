@@ -4,13 +4,15 @@
 
 namespace feng
 {
+    constexpr const float Pi = M_PI;
+    
     constexpr float DegToRad(float degrees)
     {
-        return degrees * M_PI / 180.f;
+        return degrees * Pi / 180.f;
     }
 
     constexpr float RadToDeg(float rad)
     {
-        return rad * 180.f / M_PI;
+        return rad * 180.f / Pi;
     }
 }

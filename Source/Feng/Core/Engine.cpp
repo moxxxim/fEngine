@@ -153,6 +153,11 @@ namespace feng
                 }
     #endif
                 Print_Errors_OpengGL();
+                
+                if(Engine::IsKeyPressed(InputKey::Kb_Escape))
+                {
+                    glfwSetWindowShouldClose(window, true);
+                }
             }
 
             glfwTerminate();

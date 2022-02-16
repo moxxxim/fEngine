@@ -24,6 +24,7 @@
 #include <random>
 #include <sstream>
 
+// Completely in Engine.
 namespace SApp
 {
     constexpr uint32_t InitialWidth = 800;
@@ -40,6 +41,7 @@ namespace SApp
     }
 }
 
+// Completely in CameraWasdController and CamerStabilizer.
 namespace SCamController
 {
     float lastX = 0;
@@ -56,8 +58,11 @@ namespace SObjects
     std::map<feng::Light *, std::unique_ptr<feng::Material>> lightMaterials;
     feng::Entity *camEntity = nullptr;
     feng::MeshRenderer *instancedObject = nullptr;
-    std::vector<feng::Matrix4> instances;
 
+    // Completely in TestSceneCreator.
+    std::vector<feng::Matrix4> instances;
+    
+    // Completely in TestSceneCreator.
     std::array<feng::Vector3, 10> cubePositions =
     {
         feng::Vector3(-2.0f, 0.0f, 0.0f),
@@ -72,6 +77,7 @@ namespace SObjects
         feng::Vector3( 0.0f, -3.0f, -2.0f),
     };
 
+    // Completely in TestSceneCreator.
     std::array<feng::Vector3, 10> vegetationPositions
     {
         feng::Vector3(10.0f, -5.4f, 10.0f),
@@ -86,6 +92,7 @@ namespace SObjects
         feng::Vector3(1.0f, -5.4f, 10.0f),
     };
 
+    // Completely in TestSceneCreator.
     std::array<feng::Vector3, 8> windowPositions
     {
         feng::Vector3(10.0f, -5.4f, 20.0f),
@@ -98,6 +105,7 @@ namespace SObjects
         feng::Vector3(0.5f, 0.5f, 2.5f)
     };
 
+    // Completely in TestSceneCreator.
     feng::Vector3 planePos{0.f, -6.f, 0.f};
 
     std::vector<feng::Entity*> dynamicObjects;
@@ -325,6 +333,7 @@ namespace SObjects
         planeTransform->SetScale(40.f, 0.2f, 40.f);
     }
 
+    // Completely in TestSceneCreator
     void CreateScene()
     {
         SCamController::lastX = SApp::InitialWidth / 2.f;
@@ -337,6 +346,7 @@ namespace SObjects
         CreateObjects();
     }
 
+    // Completely in cam stabilizer.
     void UpdateCamera()
     {
         feng::Camera *camera = SObjects::camEntity->GetComponent<feng::Camera>();
@@ -347,6 +357,7 @@ namespace SObjects
         camera->SetFarClipPlane(100.f);
     }
 
+    // Completely in GameObjectRotation.
     void UpdateObjects()
     {
         for(feng::Entity *entity : dynamicObjects)
@@ -400,6 +411,7 @@ namespace SWindow
         }
     }
 
+    // Completely inside Engine.
     bool TryInitGlfw()
     {
         int initResult = glfwInit();
@@ -421,6 +433,7 @@ namespace SWindow
         return false;
     }
 
+    // Completely inside Engine.
     void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
     {
         feng::screen::ScreenWidth = width;
@@ -428,6 +441,7 @@ namespace SWindow
         glViewport(0, 0, width, height);
     }
 
+    // Completely inside CamerWasdController.
     void MouseCallback(GLFWwindow* window, double x, double y)
     {
         static bool firstMouse = true;
@@ -465,6 +479,7 @@ namespace SWindow
         camTransform->SetRotation(feng::mat3::MakeRotationX(SCamController::camPitch), feng::eSpace::Self);
     }
 
+    // Completely inside CamerWasdController.
     void ScrollCallback(GLFWwindow* window, double x, double y)
     {
         SCamController::Zoom -= static_cast<float>(y);
@@ -479,6 +494,7 @@ namespace SWindow
         }
     }
 
+    // CameraWasdController, Engine, GameController
     void ProcessWindowInput(GLFWwindow &window)
     {
         float speedMultiplier = 1;
@@ -530,6 +546,7 @@ namespace SWindow
         }
     }
 
+    // Completely inside Engine.
     GLFWwindow* CreateWindow()
     {
         glfwWindowHint(GLFW_SAMPLES, 4);

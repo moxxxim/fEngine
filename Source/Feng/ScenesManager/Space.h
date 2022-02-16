@@ -1,5 +1,4 @@
-#ifndef eSpace_h
-#define eSpace_h
+#pragma once
 
 namespace feng
 {
@@ -9,5 +8,3 @@ namespace feng
         World = 1,
     };
 }
-
-#endif
