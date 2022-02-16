@@ -3,8 +3,7 @@
 namespace feng
 {
     class Entity;
-    class Transform;
-
+    
     class Component
     {
         friend Entity;
@@ -15,7 +14,6 @@ namespace feng
 
     protected:
         Component() = default;
-        
         virtual void Update(float deltaTime);
 
         void SetOwner(Entity *aOwner);
@@ -32,9 +30,9 @@ namespace feng
     {
         return owner;
     }
-
-    inline void Component::Update(float)
-    { }
+    
+    inline void Component::Update(float deltaTime)
+    {}
     
     inline void Component::SetOwner(Entity *aOwner)
     {

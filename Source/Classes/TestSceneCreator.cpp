@@ -1,5 +1,6 @@
 #include <Classes/TestSceneCreator.hpp>
 
+#include <Classes/Scripts/CameraWasdController.h>
 #include <Classes/TempResouces.h>
 
 #include <Feng/App/Globals.h>
@@ -76,6 +77,8 @@ namespace test
 
             feng::Transform *camTransform = camEntity.GetComponent<feng::Transform>();
             camTransform->SetPosition(0.f, 3.5f, 3.f);
+
+            std::ignore = camEntity.AddComponent<CameraWasdController>();
 
             return &camEntity;
         }
