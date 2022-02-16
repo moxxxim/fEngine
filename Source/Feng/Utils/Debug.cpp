@@ -14,12 +14,12 @@ namespace feng
 
     void Debug::LogWarning(const std::string &message)
     {
-        Debug::LogMessage(message);
+        Debug::LogMessage("[warning] - " + message);
     }
 
     void Debug::LogError(const std::string &message)
     {
-        Debug::LogMessage(message);
+        Debug::LogMessage("[error] - " + message);
     }
 
     void Debug::PrintErrorOpenGL(const char *file, int line)
@@ -84,7 +84,7 @@ namespace feng
         const GLubyte *vendor = glGetString(GL_VENDOR);
         const GLubyte *renderer = glGetString(GL_RENDERER);
 
-        std::cout << "------------------ Open GL Info ----------------------";
+        std::cout << "------------------ Open GL Info ----------------------\n";
         std::cout << "OpenGL Version: " << version << "\n";
         std::cout << "OpenGL Vendor: " << vendor << "\n";
         std::cout << "OpenGL Renderer: " << renderer << "\n";
@@ -92,7 +92,7 @@ namespace feng
         std::cout << "OpenGL Supported Extensions:\n";
         for(const GLubyte* extension : extensions)
         {
-            std::cout << extension << "\n";
+            std::cout << " -- " << extension << "\n";
         }
 
         std::cout << "------------------------------------------------------";

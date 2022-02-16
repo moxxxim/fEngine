@@ -9,7 +9,7 @@ void PostEffectSwitcher::Update(float deltaTime)
     {
         ApplyNextPostEffect();
     }
-    
+
     if(appliedEffectIndex >= 0)
     {
         feng::PostEffectDefinition *postEffect = test::res.Effects[appliedEffectIndex];
@@ -27,7 +27,7 @@ void PostEffectSwitcher::ApplyNextPostEffect()
     if(feng::Engine::Time() - lastEffectChangeTime > effectChangeInputDelay)
     {
         lastEffectChangeTime = time;
-        if(appliedEffectIndex + 1 < effectsCount)
+        if(appliedEffectIndex + 1 < test::res.Effects.size())
         {
             ++appliedEffectIndex;
         }

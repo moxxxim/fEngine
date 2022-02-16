@@ -19,6 +19,9 @@
 #include <Feng/ScenesManager/Scene.h>
 #include <Feng/Utils/Debug.h>
 
+#include <Feng/Core/Engine.hpp>
+#include <Classes/TestSceneCreator.hpp>
+
 #include <array>
 #include <cmath>
 #include <random>
@@ -663,40 +666,46 @@ namespace SRender
 
 int main(int argc, const char * argv[])
 {
-    // Inside Engine.
-    if(SWindow::TryInitGlfw())
-    {
-        GLFWwindow *window = SWindow::CreateWindow();
-
-        SRender::InitRender();
-        feng::Debug::LogMessage("Start loop.");
-
-        while(!glfwWindowShouldClose(window))
-        {
-            SApp::UpdateTime();
-            SWindow::ProcessWindowInput(*window);
-            SObjects::Update();
-            SRender::Render();
-            glfwSwapBuffers(window);
-            glfwPollEvents();
-
-#ifdef __APPLE__
-            static bool macMoved = false;
-
-            if(!macMoved)
-            {
-                int x, y;
-                glfwGetWindowPos(window, &x, &y);
-                glfwSetWindowPos(window, ++x, y);
-                macMoved = true;
-            }
-#endif
-            Print_Errors_OpengGL();
-        }
-
-        glfwTerminate();
-        return 0;
-    }
-
-    return 1;
+//    // Inside Engine.
+//    if(SWindow::TryInitGlfw())
+//    {
+//        GLFWwindow *window = SWindow::CreateWindow();
+//
+//        SRender::InitRender();
+//        feng::Debug::LogMessage("Start loop.");
+//
+//        while(!glfwWindowShouldClose(window))
+//        {
+//            SApp::UpdateTime();
+//            SWindow::ProcessWindowInput(*window);
+//            SObjects::Update();
+//            SRender::Render();
+//            glfwSwapBuffers(window);
+//            glfwPollEvents();
+//
+//#ifdef __APPLE__
+//            static bool macMoved = false;
+//
+//            if(!macMoved)
+//            {
+//                int x, y;
+//                glfwGetWindowPos(window, &x, &y);
+//                glfwSetWindowPos(window, ++x, y);
+//                macMoved = true;
+//            }
+//#endif
+//            Print_Errors_OpengGL();
+//        }
+//
+//        glfwTerminate();
+//        return 0;
+//    }
+//
+//    return 1;
+    
+    feng::Engine engine;
+    std::unique_ptr<feng::Scene> scene = test::CreateTestScene();
+    engine.SetScene(std::move(scene));
+    
+    return engine.Run();
 }

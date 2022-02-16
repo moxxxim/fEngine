@@ -97,6 +97,8 @@ namespace feng
         
         GLFWwindow* CreateWindow()
         {
+            feng::screen::ScreenWidth = InitialWidth;
+            feng::screen::ScreenHeight = InitialHeight;
             glfwWindowHint(GLFW_SAMPLES, 4);
             GLFWwindow* window = glfwCreateWindow(InitialWidth, InitialHeight, "Sweet Window", nullptr, nullptr);
             if (window)
@@ -172,17 +174,19 @@ namespace feng
     Engine::Engine()
     {
         instance = this;
+        
+        if(TryInitGlfw())
+        {
+            window = CreateWindow();
+            InitRender(showDepth);
+        }
     }
 
     int32_t Engine::Run()
     {
-        if(TryInitGlfw())
+        if(window)
         {
-            window = CreateWindow();
-
-            InitRender(showDepth);
             feng::Debug::LogMessage("Start loop.");
-            
             while(!glfwWindowShouldClose(window))
             {
                 UpdateTime();

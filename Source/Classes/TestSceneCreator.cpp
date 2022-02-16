@@ -267,7 +267,6 @@ namespace test
     std::unique_ptr<feng::Scene> CreateTestScene()
     {
         LoadResources();
-        
-        return nullptr;
+        return CreateScene();
     }
 }

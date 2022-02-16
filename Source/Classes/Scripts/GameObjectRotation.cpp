@@ -14,5 +14,5 @@ void GameObjectRotation::Update(float deltaTime)
         myTransform = myEntity->GetComponent<feng::Transform>();
     }
 
-    myTransform->Rotate(0.f, 0.f, (2.f * feng::Pi) * deltaTime / fullTurnPeriod);
+    myTransform->Rotate(0.f, 0.f, feng::RadToDeg(2.f * feng::Pi) * deltaTime / fullTurnPeriod);
 }

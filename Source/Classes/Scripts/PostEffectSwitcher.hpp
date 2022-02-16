@@ -15,6 +15,5 @@ private:
     
     float effectChangeInputDelay = 0.3f;
     float lastEffectChangeTime = 0.f;
-    int32_t effectsCount = 0;
     int32_t appliedEffectIndex = -1;
 };

@@ -57,7 +57,7 @@ namespace feng
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if(status != GL_FRAMEBUFFER_COMPLETE)
         {
-            Debug::LogError("Cannot crate frame buffer.");
+            Debug::LogError("Cannot create frame buffer.");
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
