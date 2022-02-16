@@ -8,9 +8,12 @@
 
 namespace feng
 {
+    class PostEffectDefinition;
+    
     class Engine final
     {
     public:
+        static Engine* Instance();
         static float DeltaTime();
         static float Time();
         static bool IsKeyPressed(InputKey::eKey key);
@@ -22,6 +25,8 @@ namespace feng
         Engine();
         int32_t Run();
         void SetScene(std::unique_ptr<Scene>&& aScene);
+        void SetPostEffect(PostEffectDefinition *postEffect);
+        void RemovePostEffect();
         
     private:
         static void UpdateTime();
@@ -31,12 +36,18 @@ namespace feng
         void Render();
 
         static std::array<eKeyStatus, InputKey::eKey::Count> inputKeys;
+        static Engine *instance;
         static float deltaTime;
         static float time;
         static bool showDepth;
         
         std::unique_ptr<feng::Scene> scene;
     };
+    
+    inline Engine* Engine::Instance()
+    {
+        return instance;
+    }
 
     inline float Engine::DeltaTime()
     {

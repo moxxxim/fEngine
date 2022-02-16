@@ -3,6 +3,8 @@
 #include <Classes/Scripts/CameraStabilizer.hpp>
 #include <Classes/Scripts/CameraWasdController.h>
 #include <Classes/Scripts/GameObjectRotation.h>
+#include <Classes/Scripts/InstancedObjectTransformController.hpp>
+#include <Classes/Scripts/PostEffectSwitcher.hpp>
 #include <Classes/TempResouces.h>
 
 #include <Feng/App/Globals.h>
@@ -15,8 +17,6 @@
 #include <Feng/ScenesManager/MeshRenderer.h>
 #include <Feng/ScenesManager/Transform.h>
 #include <Feng/Utils/Render/ShaderParams.h>
-
-#include <random>
 
 namespace test
 {
@@ -65,7 +65,6 @@ namespace test
         };
 
         feng::Vector3 planePos{0.f, -6.f, 0.f};
-        std::vector<feng::Matrix4> instances;
         
         feng::Entity* CreateCamera(feng::Scene& scene)
         {
@@ -195,45 +194,11 @@ namespace test
             return &obj;
         }
         
-        feng::MeshRenderer* CreateInstancedObject(feng::Scene& scene, feng::Mesh &mesh, const std::vector<feng::Matrix4> &transforms)
+        void CreateInstancedObject(feng::Scene& scene, feng::Mesh &mesh)
         {
             feng::Entity& obj = scene.CreateMesh(test::res.DiffuseTexInstancedMaterial.get(), &mesh);
-
-            feng::MeshRenderer *renderer = obj.GetComponent<feng::MeshRenderer>();
-            renderer->SetInstanceTransforms(transforms);
-
-            return renderer;
-        }
-
-        std::vector<feng::Matrix4> InitializeInstances()
-        {
-            constexpr uint32_t instancesCount = 10'000;
-
-            std::random_device randomDevice;
-            std::mt19937 generator(randomDevice());
-            std::uniform_real_distribution<float> angleDistribution(0.f, 359.9f);
-            std::uniform_real_distribution<float> scaleDistribution(0.2f, 0.5f);
-            std::uniform_real_distribution<float> radiusDistribution(20.f, 35.f);
-            std::uniform_real_distribution<float> heightDistribution(1.5f, -1.5f);
-
-            std::vector<feng::Matrix4> objects;
-            objects.resize(instancesCount);
-
-            for(uint32_t i = 0; i < instancesCount; ++i)
-            {
-                float scaleValue = scaleDistribution(generator);
-                feng::Vector3 scale { scaleValue, scaleValue, scaleValue };
-
-                float angle = angleDistribution(generator);
-                float radius = radiusDistribution(generator);
-                float height = heightDistribution(generator);
-                feng::Vector3 translation = radius * (feng::Vector3::OneX * std::sin(angle) + feng::Vector3::OneZ * std::cos(angle))
-                                            + height * feng::Vector3::OneY;
-
-                objects[i] = feng::mat4::MakeTransformation(scale, feng::Matrix3::Identity, translation);
-            }
-
-            return objects;
+            InstancedObjectTransformController &instances = obj.AddComponent<InstancedObjectTransformController>();
+            instances.SetCount(10'000);
         }
         
         void CreateObjects(feng::Scene& scene)
@@ -243,9 +208,7 @@ namespace test
             CreateDirectLight(scene);
             CreatePointLight(scene);
             CreateSpotLight(scene);
-
-            instances = InitializeInstances();
-            std::ignore = CreateInstancedObject(scene, *test::res.CubeMesh, instances);
+            CreateInstancedObject(scene, *test::res.CubeMesh);
 
             // Cubes.
             for(int32_t i = 0; i < cubePositions.size(); ++i)
@@ -285,6 +248,10 @@ namespace test
             feng::Entity *planeEntity = CreateObject(scene, planePos, "Plane", *test::res.CubeMesh, *test::res.DiffuseTexMaterial);
             feng::Transform *planeTransform = planeEntity->GetComponent<feng::Transform>();
             planeTransform->SetScale(40.f, 0.2f, 40.f);
+            
+            // Game manager.
+            feng::Entity &gameManger = scene.CreateEntity();
+            gameManger.AddComponent<PostEffectSwitcher>();
         }
         
         std::unique_ptr<feng::Scene> CreateScene()

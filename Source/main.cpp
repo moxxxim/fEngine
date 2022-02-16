@@ -52,14 +52,22 @@ namespace SCamController
     float camYaw = 0.f;
 }
 
+// Splitted.
 namespace SObjects
 {
+    // Completely in TestSceneCreator
     std::unique_ptr<feng::Scene> scene;
+    
+    // Completely in TestSceneCreator
     std::map<feng::Light *, std::unique_ptr<feng::Material>> lightMaterials;
+    
+    // Completely in cam stabilizer.
     feng::Entity *camEntity = nullptr;
+    
+    // Completely in InstancedObjectTransformController.
     feng::MeshRenderer *instancedObject = nullptr;
 
-    // Completely in TestSceneCreator.
+    // Completely in InstancedObjectTransformController.
     std::vector<feng::Matrix4> instances;
     
     // Completely in TestSceneCreator.
@@ -108,9 +116,13 @@ namespace SObjects
     // Completely in TestSceneCreator.
     feng::Vector3 planePos{0.f, -6.f, 0.f};
 
+    // Completely in TestSceneCreator and GameObjectRotation
     std::vector<feng::Entity*> dynamicObjects;
+    
+    // insice Engine.h
     bool showDepth = false;
 
+    // Completely in TestSceneCreator
     feng::Entity* CreateCamera()
     {
         feng::Entity &camEntity = scene->CreateCamera();
@@ -128,6 +140,7 @@ namespace SObjects
         return &camEntity;
     }
 
+    // Completely in TestSceneCreator
     std::unique_ptr<feng::Material> CreateLightMaterial(const feng::Vector4& color)
     {
         std::unique_ptr<feng::Material> material = test::CreateGizmoMaterial(showDepth);
@@ -136,6 +149,7 @@ namespace SObjects
         return material;
     }
 
+    // Completely in TestSceneCreator
     feng::Entity* CreateDirectLight()
     {
         feng::Vector4 color {1.f, 0.95f, 0.8f, 1.f};
@@ -159,6 +173,7 @@ namespace SObjects
         return &lightEntity;
     }
 
+    // Completely in TestSceneCreator
     feng::Entity* CreatePointLight()
     {
         feng::Vector4 color {1.f, 0.f, 0.f, 1.f};
@@ -191,6 +206,7 @@ namespace SObjects
         return &lightEntity;
     }
 
+    // Completely in TestSceneCreator
     feng::Entity* CreateSpotLight()
     {
         feng::Vector4 color {0.f, 0.f, 1.f, 1.f};
@@ -227,6 +243,7 @@ namespace SObjects
         return &lightEntity;
     }
 
+    // Completely in TestSceneCreator
     feng::Entity* CreateObject(
                             const feng::Vector3& position,
                             const std::string& name,
@@ -242,6 +259,7 @@ namespace SObjects
         return &obj;
     }
 
+    // Completely in InstancedObjectTransformController and TestSceneCreatore.
     feng::MeshRenderer* CreateInstancedObject(feng::Mesh &mesh, const std::vector<feng::Matrix4> &transforms)
     {
         feng::Entity& obj = scene->CreateMesh(test::res.DiffuseTexInstancedMaterial.get(), &mesh);
@@ -252,6 +270,7 @@ namespace SObjects
         return renderer;
     }
 
+    // Completely in InstancedObjectTransformController.
     std::vector<feng::Matrix4> InitializeInstances()
     {
         constexpr uint32_t instancesCount = 10'000;
@@ -283,6 +302,7 @@ namespace SObjects
         return objects;
     }
 
+    // Completely in TestSceneCreator.
     void CreateObjects()
     {
         std::ignore = scene->CreateSkybox(test::res.SkyboxMaterial.get());
@@ -369,6 +389,7 @@ namespace SObjects
         }
     }
 
+    // Completely in InstancedObjectTransformController.
     void UpdateInstances()
     {
         constexpr float offsetFactor = 0.1f;
@@ -380,6 +401,7 @@ namespace SObjects
         instancedObject->SetInstanceTransforms(instances);
     }
 
+    // Completely in camera controller, InstancedObjectTransformController, and GameObjectRotation.
     void Update()
     {
         UpdateCamera();
@@ -388,13 +410,22 @@ namespace SObjects
     }
 }
 
+// Splitted
 namespace SWindow
 {
+    // Completely in PostEffectSwitcher
     constexpr float effectChangeInputDelay = 0.3f;
+    
+    // Completely in PostEffectSwitcher
     float lastEffectChangeTime = 0.f;
+    
+    // Completely in PostEffectSwitcher
     int32_t effectsCount = 0;
+    
+    // Completely in PostEffectSwitcher
     int32_t appliedEffectIndex = -1;
 
+    // Completely in PostEffectSwitcher
     void ApplyNextPostEffect()
     {
         if(SApp::time - lastEffectChangeTime > effectChangeInputDelay)
@@ -494,7 +525,7 @@ namespace SWindow
         }
     }
 
-    // CameraWasdController, Engine, GameController
+    // CameraWasdController, Engine and PostEffectSwitcher
     void ProcessWindowInput(GLFWwindow &window)
     {
         float speedMultiplier = 1;
@@ -613,51 +644,7 @@ namespace SRender
     Print_Errors_OpengGL();
     }
 
-    void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
-    {
-        return;
-
-        // Put 1s (ones) into stencil buffer for all drawn fragments.
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-
-        for(feng::Entity *entity : outlined)
-        {
-            if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
-            {
-                //renderer->Draw(<render properties>);
-            }
-        }
-
-        // Make the stencil test fail for all 1s in stencil buffer (for all previously rendered fragments).
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-
-        std::unique_ptr<feng::Material> outlineMaterial = test::CreateFlatColorMaterial();
-        outlineMaterial->SetVector3(feng::ShaderParams::MainColor.data(), feng::Vector3::OneY);
-
-        for(feng::Entity *entity : outlined)
-        {
-            if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
-            {
-                feng::Transform *transform = entity->GetComponent<feng::Transform>();
-                feng::Material *material = renderer->GetMaterial();
-                feng::Vector3 scale = transform->GetScale();
-
-                renderer->SetMaterial(outlineMaterial.get());
-                transform->SetScale(1.05 * scale);
-                //renderer->Draw(<render properties>);
-
-                transform->SetScale(scale);
-                renderer->SetMaterial(material);
-            }
-        }
-
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-    }
-
+    // Completely in PostEffectSwitcher and inside Engine.
     void Render()
     {
         if(SWindow::appliedEffectIndex >= 0)
@@ -676,6 +663,7 @@ namespace SRender
 
 int main(int argc, const char * argv[])
 {
+    // Inside Engine.
     if(SWindow::TryInitGlfw())
     {
         GLFWwindow *window = SWindow::CreateWindow();

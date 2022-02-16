@@ -116,13 +116,64 @@ namespace feng
 
             return window;
         }
+        
+        void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
+        {
+            /*
+            // Put 1s (ones) into stencil buffer for all drawn fragments.
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glStencilFunc(GL_ALWAYS, 1, 0xFF);
+            glStencilMask(0xFF);
+
+            for(feng::Entity *entity : outlined)
+            {
+                if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
+                {
+                    //renderer->Draw(<render properties>);
+                }
+            }
+
+            // Make the stencil test fail for all 1s in stencil buffer (for all previously rendered fragments).
+            glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+            glStencilMask(0x00);
+
+            std::unique_ptr<feng::Material> outlineMaterial = test::CreateFlatColorMaterial();
+            outlineMaterial->SetVector3(feng::ShaderParams::MainColor.data(), feng::Vector3::OneY);
+
+            for(feng::Entity *entity : outlined)
+            {
+                if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
+                {
+                    feng::Transform *transform = entity->GetComponent<feng::Transform>();
+                    feng::Material *material = renderer->GetMaterial();
+                    feng::Vector3 scale = transform->GetScale();
+
+                    renderer->SetMaterial(outlineMaterial.get());
+                    transform->SetScale(1.05 * scale);
+                    //renderer->Draw(<render properties>);
+
+                    transform->SetScale(scale);
+                    renderer->SetMaterial(material);
+                }
+            }
+
+            glStencilFunc(GL_ALWAYS, 1, 0xFF);
+            glStencilMask(0xFF);
+            */
+        }
     }
 
     std::array<eKeyStatus, InputKey::eKey::Count> Engine::inputKeys {eKeyStatus::Pressed};
+    Engine *Engine::instance = nullptr;
     float Engine::deltaTime = 0.f;
     float Engine::time = 0.f;
     bool Engine::showDepth = false;
     
+    Engine::Engine()
+    {
+        instance = this;
+    }
+
     int32_t Engine::Run()
     {
         if(TryInitGlfw())
@@ -165,6 +216,16 @@ namespace feng
         }
         
         return 1;
+    }
+    
+    void Engine::SetPostEffect(PostEffectDefinition *postEffect)
+    {
+        scene->SetPostEffect(postEffect);
+    }
+    
+    void Engine::RemovePostEffect()
+    {
+        scene->RemovePostEffect();
     }
     
     Vector2 Engine::GetMousePos()

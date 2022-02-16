@@ -14,7 +14,7 @@ namespace feng
         explicit Entity(const std::string& aName);
         explicit Entity(std::string&& aName);
         ~Entity();
-        
+
         void Update(float deltaTime);
 
         template <class TComponent>
