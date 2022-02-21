@@ -60,6 +60,7 @@ namespace feng
                                     static_cast<GLsizei>(stride),
                                     reinterpret_cast<const GLvoid *>(offset));
                 Print_Errors_OpengGL();
+                
                 glEnableVertexAttribArray(attributeIndex);
                 Print_Errors_OpengGL();
                 offset += size;
