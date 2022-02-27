@@ -146,7 +146,8 @@ namespace feng
 
         const Matrix4 viewProjMatrix = renderProperties.cam->GetViewProjectionMatrix();
         const Matrix4 projMatrix = renderProperties.cam->GetProjectionMatrix();
-        const Matrix3& camRotation = camTransform->GetRotation();
+        const Quaternion& camRotation = camTransform->GetRotation();
+        const Matrix3 camRotationMat = camRotation.ToMatrix3();
         const Vector3& camPos = camTransform->GetPosition();
         const Vector3 camDir = camTransform->GetForward();
 
@@ -155,9 +156,9 @@ namespace feng
         // Offsets are specified in shader's uniform block layout.
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4), viewProjMatrix.data);
         glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(Matrix4), projMatrix.data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(Vector3), camRotation.rows[0].data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 144, sizeof(Vector3), camRotation.rows[1].data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 160, sizeof(Vector3), camRotation.rows[2].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(Vector3), camRotationMat.rows[0].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 144, sizeof(Vector3), camRotationMat.rows[1].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 160, sizeof(Vector3), camRotationMat.rows[2].data);
         glBufferSubData(GL_UNIFORM_BUFFER, 176, sizeof(Vector3), camPos.data);
         glBufferSubData(GL_UNIFORM_BUFFER, 192, sizeof(Vector3), camDir.data);
 

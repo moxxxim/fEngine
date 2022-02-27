@@ -282,8 +282,32 @@ namespace feng
         inputKeys[InputKey::Kb_O] = (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
+        
+        inputKeys[InputKey::Kb_Up] = (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        
+        inputKeys[InputKey::Kb_Down] = (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        
+        inputKeys[InputKey::Kb_Left] = (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        
+        inputKeys[InputKey::Kb_Right] = (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        
+        inputKeys[InputKey::Kb_Q] = (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        
+        inputKeys[InputKey::Kb_E] = (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
     }
-    
+
     void Engine::Update()
     {
         if(scene)

@@ -34,7 +34,7 @@ namespace
                                         * (feng::Vector3::OneX * std::sin(angle) + feng::Vector3::OneZ * std::cos(angle))
                                         + height * feng::Vector3::OneY;
 
-            objects[i] = feng::mat4::MakeTransformation(scale, feng::Matrix3::Identity(), translation);
+            objects[i] = feng::mat4::MakeTransformation(scale, translation, feng::Quaternion::Identity());
         }
 
         return objects;

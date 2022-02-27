@@ -95,37 +95,31 @@ namespace feng
             const Vector3 vRhs = rhs.AxisScaled();
             const float wRhs = rhs.xyzw[3];
 
-            const Vector3 outAxisScaled = Vector3::Cross(vLhs, vRhs) + wLhs * vRhs + wRhs * vLhs;
-            const float outW = wLhs * wRhs - Vector3::Dot(vLhs, vRhs);
+            // We need actually multiply int order "right" * "left" becaus we apply quaternion to vector from left.
+            const Vector3 outAxisScaled = Vector3::Cross(vRhs, vLhs) + wLhs * vRhs + wRhs * vLhs;
+            const float outW = wLhs * wRhs - Vector3::Dot(vRhs, vLhs);
 
             return Quaternion{outAxisScaled.x, outAxisScaled.y, outAxisScaled.z, outW};
         }
         
         friend constexpr Vector3 operator * (const Vector3& point, const Quaternion& rotation)
         {
-            // Full wormula:
+            // Conjugate: p' = q * p * (p^-1)).
+
             const Quaternion pointAsQuaternion {point.x, point.y, point.z, 0};
-            const Quaternion multAsQuaternion = rotation * pointAsQuaternion * rotation.Inverse();
+            const Quaternion multAsQuaternion = rotation.Inverse() * (pointAsQuaternion * rotation);
             return multAsQuaternion.AxisScaled();
-
-            const Vector3 axis = rotation.AxisScaled();
-            const float cosHalfAngle = rotation.xyzw[3];
-
-            return 2 * (cosHalfAngle * Vector3::Cross(axis, point))
-                 + (cosHalfAngle * cosHalfAngle) * point
-                 + axis * Vector3::Dot(axis, point);
         }
         
         Quaternion operator *= (const Quaternion& other);
 
     private:
-
         std::array<float, 4> xyzw;
     };
     
     inline Quaternion Quaternion::operator *= (const Quaternion& other)
     {
-        *this = *this * other;
+        *this = other * (*this);
         return *this;
     }
 }

@@ -19,8 +19,8 @@ namespace feng
         void SetPosition(const Vector3& aPosition, eSpace space = eSpace::World);
         void SetPosition(float x, float y, float z, eSpace space = eSpace::World);
 
-        const Matrix3& GetRotation(eSpace space = eSpace::World) const;
-        void SetRotation(const Matrix3& aRotation, eSpace space = eSpace::World);
+        const Quaternion& GetRotation(eSpace space = eSpace::World) const;
+        void SetRotation(const Quaternion& aRotation, eSpace space = eSpace::World);
         Vector3 GetEuler(eSpace space = eSpace::World) const;
         void SetEuler(const Vector3& euler, eSpace space = eSpace::World);
         void SetEuler(float x, float y, float z, eSpace space = eSpace::World);
@@ -41,7 +41,7 @@ namespace feng
         void Rotate(float x, float y, float z);
 
     private:
-        Matrix3 rotation;
+        Quaternion rotation;
         Vector3 position;
         Vector3 scale;
     };
@@ -66,7 +66,7 @@ namespace feng
         position.z = z;
     }
 
-    inline const Matrix3& Transform::GetRotation(eSpace space /*= eSpace::World*/) const
+    inline const Quaternion& Transform::GetRotation(eSpace space /*= eSpace::World*/) const
     {
         return rotation;
     }

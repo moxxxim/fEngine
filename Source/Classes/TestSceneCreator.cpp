@@ -111,7 +111,7 @@ namespace test
 
             feng::Transform *lightTransform = lightEntity.GetComponent<feng::Transform>();
             lightTransform->SetPosition(0.f, 0.f, 4.f);
-            lightTransform->SetRotation(feng::mat3::MakeRotationY(180), feng::eSpace::World);
+            lightTransform->SetRotation(feng::Quaternion{feng::Vector3::OneY, 180}, feng::eSpace::World);
         }
 
         void CreatePointLight(feng::Scene& scene)
@@ -168,13 +168,13 @@ namespace test
             if(isUp)
             {
                 lightTransform->SetPosition(5.f, 4.f, -2.f);
-                lightTransform->SetRotation(feng::mat3::MakeRotationY(90), feng::eSpace::World);
-                lightTransform->SetRotation(feng::mat3::MakeRotationX(20), feng::eSpace::Self);
+                lightTransform->SetRotation(feng::Quaternion(feng::Vector3::OneY, 90), feng::eSpace::World);
+                lightTransform->SetRotation(feng::Quaternion(feng::Vector3::OneX, 20), feng::eSpace::Self);
             }
             else
             {
                 lightTransform->SetPosition(0.f, -8.f, 2.f);
-                lightTransform->SetRotation(feng::mat3::MakeRotationX(-90), feng::eSpace::Self);
+                lightTransform->SetRotation(feng::Quaternion(feng::Vector3::OneX, -90), feng::eSpace::Self);
             }
         }
 

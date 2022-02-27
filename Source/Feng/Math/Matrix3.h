@@ -63,7 +63,15 @@ namespace feng
         }
 
         bool TryInvert(Matrix3& inverted) const;
-        Matrix3 Transposed() const;
+        
+        constexpr Matrix3 Transposed() const
+        {
+            return Matrix3 {
+                m00, m10, m20,
+                m01, m11, m21,
+                m02, m12, m22
+            };
+        }
 
         void Transpose();
 
@@ -119,14 +127,6 @@ namespace feng
         }
 
         return true;
-    }
-
-    inline Matrix3 Matrix3::Transposed() const
-    {
-        Matrix3 inverted = *this;
-        inverted.Transpose();
-
-        return inverted;
     }
 
     inline void Matrix3::Transpose()

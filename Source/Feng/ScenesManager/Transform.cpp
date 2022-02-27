@@ -5,12 +5,12 @@
 namespace feng
 {
     Transform::Transform()
-        : rotation { Matrix3::Identity() }
+        : rotation { Quaternion::Identity() }
         , position { Vector3::Zero }
         , scale { Vector3::One }
     { }
 
-    void Transform::SetRotation(const Matrix3& aRotation, eSpace space /*= eSpace::World*/)
+    void Transform::SetRotation(const Quaternion& aRotation, eSpace space /*= eSpace::World*/)
     {
         rotation = (space == eSpace::World) ? aRotation : aRotation * rotation;
     }
@@ -22,7 +22,7 @@ namespace feng
 
     void Transform::SetEuler(float x, float y, float z, eSpace space /*= eSpace::World*/)
     {
-        rotation = (space == eSpace::World) ? mat3::MakeRotation(x, y, z) : mat3::MakeRotation(x, y, z) * rotation;
+        rotation = (space == eSpace::World) ? quat::MakeRotation(x, y, z) : quat::MakeRotation(x, y, z) * rotation;
     }
 
     void Transform::SetEuler(const Vector3& euler, eSpace space /*= eSpace::World*/)
@@ -32,31 +32,32 @@ namespace feng
 
     Vector3 Transform::GetForward() const
     {
-        return -Vector3::OneZ * mat3::MakeScale(scale) * rotation;
+        return -Vector3::OneZ * rotation;
     }
 
     Vector3 Transform::GetUp() const
     {
-        return Vector3::OneY * mat3::MakeScale(scale) * rotation;
+        return Vector3::OneY * rotation;
     }
 
     Vector3 Transform::GetRight() const
     {
-        return Vector3::OneX * mat3::MakeScale(scale) * rotation;
+        return Vector3::OneX * rotation;
     }
 
     Matrix4 Transform::GetGlobalMatrix() const
     {
-        return mat4::MakeTransformation(scale, rotation, position);
+        return mat4::MakeTransformation(scale, position, rotation);
     }
 
     void Transform::Rotate(const Vector3& euler)
     {
-        rotation *= mat3::MakeRotation(euler);
+        rotation *= quat::MakeRotation(euler);
     }
 
     void Transform::Rotate(float x, float y, float z)
     {
-        rotation *= mat3::MakeRotation(x, y, z);
+        Quaternion change = quat::MakeRotation(x, y, z);
+        rotation *= change;
     }
 }

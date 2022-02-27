@@ -16,7 +16,8 @@ private:
     void Update(float deltaTime) override;
     
     void UpdatePosition(float deltaTime);
-    void UpdateRotation();
+    void UpdateRotationArrows(float deltaTime);
+    void UpdateRotationMouse();
 
 	feng::Transform *myTransform = nullptr;
     float speed = 3.f;
