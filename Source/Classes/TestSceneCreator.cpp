@@ -266,6 +266,10 @@ namespace test
     
     std::unique_ptr<feng::Scene> CreateTestScene()
     {
+        static_assert(feng::Quaternion::Identity().AxisScaled().x == 0);
+        static_assert((feng::Quaternion::Identity() * feng::Quaternion::Identity()).AxisScaled().x == 0);
+        static_assert((feng::Vector3{0, 0, 1} * feng::Quaternion::Identity()).x == 0);
+        
         LoadResources();
         return CreateScene();
     }
