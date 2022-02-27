@@ -5,7 +5,7 @@
 namespace feng
 {
     Transform::Transform()
-        : rotation { Matrix3::Identity }
+        : rotation { Matrix3::Identity() }
         , position { Vector3::Zero }
         , scale { Vector3::One }
     { }

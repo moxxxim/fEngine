@@ -8,16 +8,26 @@ namespace feng
     {
     public:
         Vector4() = default;
-        Vector4(float aX, float aY, float aZ, float aW);
-        Vector4(const Vector3& aXyz, float aW);
-        Vector4(const Vector3& aXyz);
-        Vector4(const Vector4&) = default;
-        Vector4(Vector4&&) = default;
+        constexpr Vector4(float aX, float aY, float aZ, float aW)
+            : data {aX, aY, aZ, aW}
+        { }
+        constexpr Vector4(const Vector3& aXyz, float aW)
+            : data {aXyz.x, aXyz.y, aXyz.z, aW}
+        { }
+        constexpr Vector4(const Vector3& aXyz)
+            : Vector4(aXyz, 0.f)
+        { }
+        
+        constexpr Vector4(const Vector4&) = default;
+        constexpr Vector4(Vector4&&) = default;
 
-        Vector3 GetXyz() const;
+        constexpr Vector3 GetXyz() const
+        {
+            return Vector3{x, y, z};
+        }
 
-        Vector4& operator = (const Vector4& other) = default;
-        Vector4& operator = (Vector4&& other) = default;
+        constexpr Vector4& operator = (const Vector4& other) = default;
+        constexpr Vector4& operator = (Vector4&& other) = default;
 
         union
         {
@@ -31,24 +41,4 @@ namespace feng
             };
         };
     };
-}
-
-namespace feng
-{
-    inline Vector4::Vector4(float aX, float aY, float aZ, float aW)
-        : data {aX, aY, aZ, aW}
-    { }
-
-    inline Vector4::Vector4(const Vector3& aXyz, float aW)
-        : data {aXyz.x, aXyz.y, aXyz.z, aW}
-    { }
-
-    inline Vector4::Vector4(const Vector3& aXyz)
-        : Vector4(aXyz, 0.f)
-    { }
-
-    inline Vector3 Vector4::GetXyz() const
-    {
-        return Vector3 {x, y, z};
-    }
 }

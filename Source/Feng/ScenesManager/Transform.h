@@ -3,6 +3,7 @@
 #include <Feng/Math/Matrix3.h>
 #include <Feng/Math/Matrix4.h>
 #include <Feng/Math/Vector3.h>
+#include <Feng/Math/Quaternion.h>
 #include <Feng/ScenesManager/Component.h>
 #include <Feng/ScenesManager/Space.h>
 

@@ -94,7 +94,7 @@ namespace feng
 
         Matrix3 MakeRotationX(float degrees)
         {
-            Matrix3 rotation = Matrix3::Identity;
+            Matrix3 rotation = Matrix3::Identity();
 
             float rad = DegToRad(degrees);
             float rotationCos = std::cos(rad);
@@ -110,7 +110,7 @@ namespace feng
 
         Matrix3 MakeRotationY(float degrees)
         {
-            Matrix3 rotation = Matrix3::Identity;
+            Matrix3 rotation = Matrix3::Identity();
 
             float rad = DegToRad(degrees);
             float rotationCos = std::cos(rad);
@@ -126,7 +126,7 @@ namespace feng
 
         Matrix3 MakeRotationZ(float degrees)
         {
-            Matrix3 rotation = Matrix3::Identity;
+            Matrix3 rotation = Matrix3::Identity();
 
             float rad = DegToRad(degrees);
             float rotationCos = std::cos(rad);

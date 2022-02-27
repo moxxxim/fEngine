@@ -15,9 +15,9 @@ namespace feng
 
         constexpr static Vector3 Cross(const Vector3& a, const Vector3& b)
         {
-            float x = (a.y * b.z) - (a.z * b.y);
-            float y = (a.z * b.x) - (a.x * b.z);
-            float z = (a.x * b.y) - (a.y * b.x);
+            const float x = (a.y * b.z) - (a.z * b.y);
+            const float y = (a.z * b.x) - (a.x * b.z);
+            const float z = (a.x * b.y) - (a.y * b.x);
 
             return Vector3 {x, y, z};
         }
