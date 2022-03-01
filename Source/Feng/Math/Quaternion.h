@@ -132,11 +132,18 @@ namespace feng
     constexpr Vector3 operator * (const Vector3& point, const Quaternion& rotation)
     {
         // NOTE: Conjugate: p' = q * p * (p^-1)).
-        
-        const Quaternion pointAsQuaternion {point.x, point.y, point.z, 0};
-        
-        // NOTE: The actual order is inverted because operator * multiplying quaternions is inverted. See implementat
-        const Quaternion multAsQuaternion = rotation.Inverse() * (pointAsQuaternion * rotation);
-        return multAsQuaternion.AxisScaled();
+        /*
+         // NOTE: The actual order is inverted because operator * multiplying quaternions is inverted.
+         
+         const Quaternion pointAsQuaternion {point.x, point.y, point.z, 0};
+         const Quaternion multAsQuaternion = rotation.Inverse() * pointAsQuaternion * rotation;
+         return multAsQuaternion.AxisScaled();
+         */
+
+        const float w = rotation.xyzw[3];
+        const Vector3& axis = rotation.AxisScaled();
+        return (2 * w * Vector3::Cross(axis, point))
+             + (w * w - Vector3::Dot(axis, axis)) * point
+             + (2 * Vector3::Dot(axis, point) * axis);
     }
 }
