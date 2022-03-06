@@ -196,7 +196,7 @@ namespace test
         
         void CreateInstancedObject(feng::Scene& scene, feng::Mesh &mesh)
         {
-            feng::Entity& obj = scene.CreateMesh(test::res.DiffuseTexInstancedMaterial.get(), &mesh);
+            feng::Entity& obj = scene.CreateMesh(test::res.PhongTexInstancedMaterial.get(), &mesh);
             InstancedObjectTransformController &instances = obj.AddComponent<InstancedObjectTransformController>();
             instances.SetCount(10'000);
         }
@@ -245,7 +245,7 @@ namespace test
                                     *test::res.CubeMesh,
                                     *test::res.CubemapReflectiveMaterial);
 
-            feng::Entity *planeEntity = CreateObject(scene, planePos, "Plane", *test::res.CubeMesh, *test::res.DiffuseTexMaterial);
+            feng::Entity *planeEntity = CreateObject(scene, planePos, "Plane", *test::res.CubeMesh, *test::res.PhongTexMaterial);
             feng::Transform *planeTransform = planeEntity->GetComponent<feng::Transform>();
             planeTransform->SetScale(40.f, 0.2f, 40.f);
             

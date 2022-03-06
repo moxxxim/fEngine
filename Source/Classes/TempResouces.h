@@ -29,8 +29,8 @@ namespace test
         std::unique_ptr<feng::Texture> WindowTexture;
         std::unique_ptr<feng::Texture> SkyboxTexture;
 
-        std::unique_ptr<feng::Material> DiffuseTexMaterial;
-        std::unique_ptr<feng::Material> DiffuseTexInstancedMaterial;
+        std::unique_ptr<feng::Material> PhongTexMaterial;
+        std::unique_ptr<feng::Material> PhongTexInstancedMaterial;
         std::unique_ptr<feng::Material> SpecularTexMaterial;
         std::unique_ptr<feng::Material> DiffTex1SpecTex2Material;
         std::unique_ptr<feng::Material> ShowDepthMaterial;
