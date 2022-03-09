@@ -1,4 +1,4 @@
-#include <Feng/Render/PostEffects/CompositePostEffect.h>
+#include <Feng/Render/PostEffects/Core/CompositePostEffect.h>
 
 #include <Feng/Render/FrameBuffersPool.h>
 #include <cstdint>

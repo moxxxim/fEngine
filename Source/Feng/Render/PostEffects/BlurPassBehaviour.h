@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Feng/Render/PostEffects/PostEffectPassBehaviour.h>
+#include <Feng/Render/PostEffects/Core/PostEffectPassBehaviour.h>
 
 namespace Feng
 {

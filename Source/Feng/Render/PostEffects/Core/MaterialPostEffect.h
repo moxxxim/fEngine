@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Feng/Render/PostEffects/PostEffect.h>
+#include <Feng/Render/PostEffects/Core/PostEffect.h>
 
 #include <cstdint>
 #include <map>

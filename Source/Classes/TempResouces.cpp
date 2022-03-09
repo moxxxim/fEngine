@@ -1,7 +1,7 @@
 #include <Classes/TempResouces.h>
 
 #include <Feng/Render/RenderBase.h>
-#include <Feng/Render/PostEffects/PostEffectDefinition.h>
+#include <Feng/Render/PostEffects/Core/PostEffectDefinition.h>
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/ResourcesManager/TextureData.h>
 #include <Feng/Utils/Render/ShaderParams.h>

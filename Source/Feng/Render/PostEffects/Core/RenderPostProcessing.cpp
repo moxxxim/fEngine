@@ -1,10 +1,10 @@
-#include <Feng/Render/PostEffects/RenderPostProcessing.h>
+#include <Feng/Render/PostEffects/Core/RenderPostProcessing.h>
 
-#include <Feng/Render/PostEffects/CompositePostEffect.h>
-#include <Feng/Render/PostEffects/MaterialPostEffect.h>
-#include <Feng/Render/PostEffects/PostEffect.h>
-#include <Feng/Render/PostEffects/PostEffectContext.h>
-#include <Feng/Render/PostEffects/PostEffectDefinition.h>
+#include <Feng/Render/PostEffects/Core/CompositePostEffect.h>
+#include <Feng/Render/PostEffects/Core/MaterialPostEffect.h>
+#include <Feng/Render/PostEffects/Core/PostEffect.h>
+#include <Feng/Render/PostEffects/Core/PostEffectContext.h>
+#include <Feng/Render/PostEffects/Core/PostEffectDefinition.h>
 #include <Feng/Utils/Debug.h>
 #include <Feng/Utils/Render/MeshParams.h>
 #include <Feng/Utils/Render/RenderUtils.h>

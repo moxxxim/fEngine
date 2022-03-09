@@ -2,7 +2,7 @@
 
 #include <Feng/Render/FrameBuffersPool.h>
 #include <Feng/Render/FrameBuffer.h>
-#include <Feng/Render/PostEffects/RenderPostProcessing.h>
+#include <Feng/Render/PostEffects/Core/RenderPostProcessing.h>
 #include <Feng/ScenesManager/RenderProperties.h>
 
 #include <cstdint>

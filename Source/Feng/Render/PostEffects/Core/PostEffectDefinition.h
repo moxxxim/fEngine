@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Feng/Render/PostEffects/PostEffectType.h>
+#include <Feng/Render/PostEffects/Core/PostEffectType.h>
 
 #include <vector>
 

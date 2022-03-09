@@ -1,4 +1,4 @@
-#include <Feng/Render/PostEffects/PostEffectPass.h>
+#include <Feng/Render/PostEffects/Core/PostEffectPass.h>
 
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/ResourcesManager/Shader.h>

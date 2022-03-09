@@ -1,8 +1,8 @@
 #include <Feng/Render/PostEffects/BlurPassBehaviour.h>
 
 #include <Feng/App/Globals.h>
-#include <Feng/Render/PostEffects/PostEffectPass.h>
-#include <Feng/Render/PostEffects/PostEffectPrePass.h>
+#include <Feng/Render/PostEffects/Core/PostEffectPass.h>
+#include <Feng/Render/PostEffects/Core/PostEffectPrePass.h>
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 

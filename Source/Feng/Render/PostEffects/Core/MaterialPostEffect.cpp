@@ -1,10 +1,9 @@
+#include <Feng/Render/PostEffects/Core/MaterialPostEffect.h>
 
-#include <Feng/Render/PostEffects/MaterialPostEffect.h>
-
-#include <Feng/Render/PostEffects/PostEffectPass.h>
-#include <Feng/Render/PostEffects/PostEffectPassBehaviour.h>
-#include <Feng/Render/PostEffects/PostEffectPrePass.h>
-#include <Feng/Render/PostEffects/PostEffectRenderer.h>
+#include <Feng/Render/PostEffects/Core/PostEffectPass.h>
+#include <Feng/Render/PostEffects/Core/PostEffectPassBehaviour.h>
+#include <Feng/Render/PostEffects/Core/PostEffectPrePass.h>
+#include <Feng/Render/PostEffects/Core/PostEffectRenderer.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 
 namespace Feng

@@ -1,7 +1,7 @@
-#include <Feng/Render/PostEffects/PostEffectDefinition.h>
+#include <Feng/Render/PostEffects/Core/PostEffectDefinition.h>
 
 #include <Feng/ResourcesManager/Material.h>
-#include <Feng/Render/PostEffects/PostEffectPassBehaviour.h>
+#include <Feng/Render/PostEffects/Core/PostEffectPassBehaviour.h>
 
 namespace Feng
 {
