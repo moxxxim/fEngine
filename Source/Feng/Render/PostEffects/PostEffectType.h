@@ -1,6 +1,6 @@
 #pragma once
 
-namespace feng
+namespace Feng
 {
     enum class PostEffectType : int
     {

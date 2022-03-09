@@ -14,7 +14,7 @@
 
 #include <array>
 
-namespace feng
+namespace Feng
 {
     RenderPostProcessing::RenderPostProcessing() = default;
 
@@ -105,7 +105,8 @@ namespace feng
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * quadVertices.size(), quadVertices.data(), GL_STATIC_DRAW);
 
-        EnableVertexAttributes(static_cast<eVertexAtributes>(eVertexAtributes::Position | eVertexAtributes::Uv0));
+        uint32_t attributes = eVertexAtributes::Position | eVertexAtributes::Uv0;
+        Render::EnableVertexAttributes(static_cast<eVertexAtributes>(attributes));
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);

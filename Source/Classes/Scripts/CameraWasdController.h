@@ -2,12 +2,12 @@
 
 #include <Feng/ScenesManager/Component.h>
 
-namespace feng
+namespace Feng
 {
     class Transform;
 }
 
-class CameraWasdController final : public feng::Component
+class CameraWasdController final : public Feng::Component
 {
 public:
     CameraWasdController() = default;
@@ -19,7 +19,7 @@ private:
     void UpdateRotationArrows(float deltaTime);
     void UpdateRotationMouse();
 
-	feng::Transform *myTransform = nullptr;
+	Feng::Transform *myTransform = nullptr;
     float speed = 3.f;
     float speedMultiplier = 1;
     float camSensitivity = 0.1f;

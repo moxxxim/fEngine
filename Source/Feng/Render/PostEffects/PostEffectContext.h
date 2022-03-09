@@ -2,7 +2,7 @@
 
 #include <Feng/Render/FrameBuffer.h>
 
-namespace feng
+namespace Feng
 {
     struct PostEffectContext final
     {

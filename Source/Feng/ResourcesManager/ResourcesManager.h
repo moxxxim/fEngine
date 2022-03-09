@@ -1,6 +1,6 @@
 #pragma once
 
-namespace feng
+namespace Feng
 {
     typedef unsigned long int obj_id;
     class Texture;

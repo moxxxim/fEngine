@@ -9,8 +9,8 @@ void CameraWasdController::Update(float deltaTime)
 {
     if(!myTransform)
     {
-        feng::Entity *myEntity = GetEntity();
-        myTransform = myEntity->GetComponent<feng::Transform>();
+        Feng::Entity *myEntity = GetEntity();
+        myTransform = myEntity->GetComponent<Feng::Transform>();
     }
 
     UpdatePosition(deltaTime);
@@ -21,48 +21,48 @@ void CameraWasdController::Update(float deltaTime)
 void CameraWasdController::UpdatePosition(float deltaTime)
 {
     float speedMultiplier = 1;
-    if(feng::Engine::IsKeyPressed(feng::InputKey::Kb_Left_Shift))
+    if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_Left_Shift))
     {
         speedMultiplier = 2;
     }
-    else if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_Left_Control))
+    else if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_Left_Control))
     {
         speedMultiplier = 0.5f;
     }
 
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_W))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_W))
     {
-        const feng::Vector3 forward = myTransform->GetForward();
+        const Feng::Vector3 forward = myTransform->GetForward();
         myTransform->Move(speed * deltaTime * speedMultiplier * forward);
     }
 
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_S))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_S))
     {
-        const feng::Vector3 forward = myTransform->GetForward();
+        const Feng::Vector3 forward = myTransform->GetForward();
         myTransform->Move(-speed * deltaTime * speedMultiplier * forward);
     }
 
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_A))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_A))
     {
-        const feng::Vector3 right = myTransform->GetRight();
+        const Feng::Vector3 right = myTransform->GetRight();
         myTransform->Move(-speed * deltaTime * speedMultiplier * right);
     }
 
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_D))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_D))
     {
-        const feng::Vector3 right = myTransform->GetRight();
+        const Feng::Vector3 right = myTransform->GetRight();
         myTransform->Move(speed * deltaTime * speedMultiplier * right);
     }
     
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_Q))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_Q))
     {
-        const feng::Vector3 up = feng::Vector3::OneY;
+        const Feng::Vector3 up = Feng::Vector3::OneY;
         myTransform->Move(-speed * deltaTime * speedMultiplier * up);
     }
 
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_E))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_E))
     {
-        const feng::Vector3 up = feng::Vector3::OneY;
+        const Feng::Vector3 up = Feng::Vector3::OneY;
         myTransform->Move(speed * deltaTime * speedMultiplier * up);
     }
 }
@@ -74,22 +74,22 @@ void CameraWasdController::UpdateRotationArrows(float deltaTime)
     float xoffset = 0;
     float yoffset = 0;
     
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_Up))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_Up))
     {
         yoffset = deltaTime;
     }
 
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_Down))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_Down))
     {
         yoffset = -deltaTime;
     }
     
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_Right))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_Right))
     {
         xoffset = -deltaTime;
     }
     
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_Left))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_Left))
     {
         xoffset = deltaTime;
     }
@@ -107,15 +107,15 @@ void CameraWasdController::UpdateRotationArrows(float deltaTime)
         pitch = -89.0f;
     }
 
-    myTransform->SetRotation(feng::Quaternion{feng::Vector3::OneY, yaw}, feng::eSpace::World);
-    myTransform->SetRotation(feng::Quaternion{feng::Vector3::OneX, pitch}, feng::eSpace::Self);
+    myTransform->SetRotation(Feng::Quaternion{Feng::Vector3::OneY, yaw}, Feng::eSpace::World);
+    myTransform->SetRotation(Feng::Quaternion{Feng::Vector3::OneX, pitch}, Feng::eSpace::Self);
 }
 
 void CameraWasdController::UpdateRotationMouse()
 {
     static bool firstMouse = true;
     
-    feng::Vector2 mousePos = feng::Engine::GetMousePos();
+    Feng::Vector2 mousePos = Feng::Engine::GetMousePos();
     
     if (firstMouse)
     {
@@ -145,6 +145,6 @@ void CameraWasdController::UpdateRotationMouse()
         pitch = -89.0f;
     }
 
-    myTransform->SetRotation(feng::Quaternion{feng::Vector3::OneY, yaw}, feng::eSpace::World);
-    myTransform->SetRotation(feng::Quaternion{feng::Vector3::OneX, pitch}, feng::eSpace::Self);
+    myTransform->SetRotation(Feng::Quaternion{Feng::Vector3::OneY, yaw}, Feng::eSpace::World);
+    myTransform->SetRotation(Feng::Quaternion{Feng::Vector3::OneX, pitch}, Feng::eSpace::Self);
 }

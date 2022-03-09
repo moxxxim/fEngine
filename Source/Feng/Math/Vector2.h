@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstring>
 
-namespace feng
+namespace Feng
 {
     class Vector2 final
     {
@@ -55,7 +55,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline Vector2::Vector2(float aX, float aY)
         : data {aX, aY}

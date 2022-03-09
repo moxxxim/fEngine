@@ -6,9 +6,9 @@
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
 
-namespace feng
+namespace Feng
 {
-    namespace mat4
+    namespace Mat4
     {
         Matrix4 MakeScale(const Vector3& scale);
         Matrix4 MakeRotation(const Matrix3& rotation);
@@ -20,7 +20,7 @@ namespace feng
         Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far);
     }
 
-    namespace mat3
+    namespace Mat3
     {
         Matrix3 MakeScale(const Vector3& scale);
         Matrix3 MakeRotationX(float dAngle);
@@ -30,7 +30,7 @@ namespace feng
         Matrix3 MakeRotation(float dAngleX, float dAngleY, float dAngleZ);
     }
     
-    namespace quat
+    namespace Quat
     {
         Quaternion MakeRotation(const Vector3 &dAngles);
         Quaternion MakeRotation(float dAngleX, float dAngleY, float dAngleZ);

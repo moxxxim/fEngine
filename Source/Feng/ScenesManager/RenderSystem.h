@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     class Camera;
     class Entity;

@@ -5,7 +5,7 @@
 #include <array>
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     class TextureData;
 
@@ -52,7 +52,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline eTextureType Texture::GetType() const
     {

@@ -5,26 +5,26 @@
 
 void PostEffectSwitcher::Update(float deltaTime)
 {
-    if (feng::Engine::IsKeyPressed(feng::InputKey::Kb_O))
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_O))
     {
         ApplyNextPostEffect();
     }
 
     if(appliedEffectIndex >= 0)
     {
-        feng::PostEffectDefinition *postEffect = test::res.Effects[appliedEffectIndex];
-        feng::Engine::Instance()->SetPostEffect(postEffect);
+        Feng::PostEffectDefinition *postEffect = test::res.Effects[appliedEffectIndex];
+        Feng::Engine::Instance()->SetPostEffect(postEffect);
     }
     else
     {
-        feng::Engine::Instance()->RemovePostEffect();
+        Feng::Engine::Instance()->RemovePostEffect();
     }
 }
 
 void PostEffectSwitcher::ApplyNextPostEffect()
 {
-    float time = feng::Engine::Time();
-    if(feng::Engine::Time() - lastEffectChangeTime > effectChangeInputDelay)
+    float time = Feng::Engine::Time();
+    if(Feng::Engine::Time() - lastEffectChangeTime > effectChangeInputDelay)
     {
         lastEffectChangeTime = time;
         if(appliedEffectIndex + 1 < test::res.Effects.size())

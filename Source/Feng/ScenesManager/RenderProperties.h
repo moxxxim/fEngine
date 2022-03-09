@@ -3,7 +3,7 @@
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
 
-namespace feng
+namespace Feng
 {
     class Light;
     class Camera;

@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     class Material;
     class PostEffectPassBehaviour;
@@ -32,7 +32,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline PostEffectType PostEffectDefinition::GetType() const
     {

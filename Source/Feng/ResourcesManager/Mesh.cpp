@@ -2,7 +2,7 @@
 
 #include <Feng/ResourcesManager/ResourceManager.h>
 
-namespace feng
+namespace Feng
 {
     Mesh::Mesh(
                const std::vector<float>& aVertices,

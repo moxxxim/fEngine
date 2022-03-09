@@ -7,23 +7,23 @@
 #include <Feng/Render/PostEffects/PostEffectRenderer.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 
-namespace feng
+namespace Feng
 {
-    MaterialPostEffect::MaterialPostEffect(feng::Material *aMaterial, FrameBuffersPool *aBuffersPool) :
+    MaterialPostEffect::MaterialPostEffect(Material *aMaterial, FrameBuffersPool *aBuffersPool) :
         MaterialPostEffect(aMaterial, aBuffersPool, nullptr)
     { }
 
     MaterialPostEffect::MaterialPostEffect(
-                                           feng::Material *aMaterial,
+                                           Material *aMaterial,
                                            FrameBuffersPool *aBuffersPool,
-                                           feng::PostEffectPassBehaviour *aPassBehaviour)
+                                           PostEffectPassBehaviour *aPassBehaviour)
         : passBehaviour { aPassBehaviour }
         , renderer { std::make_unique<PostEffectRenderer>(aMaterial, shaderInputTextures)}
     {
         int32_t customBuffersCount = 0;
         if (passBehaviour != nullptr)
         {
-            feng::PostEffectPrePass prePass;
+            PostEffectPrePass prePass;
             passBehaviour->Initialize(prePass);
             customBuffersCount = prePass.GetCustomBuffersCount();
         }
@@ -33,7 +33,7 @@ namespace feng
 
     MaterialPostEffect::~MaterialPostEffect() = default;
 
-    void feng::MaterialPostEffect::Apply(const PostEffectContext& context)
+    void MaterialPostEffect::Apply(const PostEffectContext& context)
     {
         pass->Setup(context);
 
@@ -49,7 +49,7 @@ namespace feng
         pass->Reset();
     }
 
-    void feng::MaterialPostEffect::ApplyCustomBehaviour()
+    void MaterialPostEffect::ApplyCustomBehaviour()
     {
         int32_t passesCount = passBehaviour->GetPassesCount();
         for (int32_t i = 0; i < passesCount; ++i)

@@ -3,7 +3,7 @@
 #include <Feng/Math/Matrix4.h>
 #include <Feng/ScenesManager/Component.h>
 
-namespace feng
+namespace Feng
 {
     class Camera final : public Component
     {

@@ -6,7 +6,7 @@
 #include <Feng/Math/Vector4.h>
 #include <array>
 
-namespace feng
+namespace Feng
 {
     class Quaternion final
     {

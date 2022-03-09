@@ -5,7 +5,7 @@
 #include "CachedTexture.h"
 #include "../Utils/Vector.h"
 
-namespace feng
+namespace Feng
 {	
 
 class ResourceManagerTextures final: public ResourceManager<Texture, CachedTexture>

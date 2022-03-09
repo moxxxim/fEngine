@@ -1,6 +1,6 @@
 #pragma once
 
-namespace feng
+namespace Feng
 {
     enum class eSpace : uint8_t
     {

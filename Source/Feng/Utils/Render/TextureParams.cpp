@@ -3,7 +3,7 @@
 #include <Feng/ResourcesManager/Texture.h>
 #include <OpenGL/gl.h>
 
-namespace feng
+namespace Feng
 {
     GLenum ToOpenGLValue(eTextureType type)
     {

@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     class Camera;
     class Material;
@@ -29,7 +29,7 @@ namespace feng
         const Mesh *GetMesh() const;
         Mesh *GetMesh();
         void SetMesh(Mesh *aMesh);
-        void SetInstanceTransforms(const std::vector<feng::Matrix4>& instances);
+        void SetInstanceTransforms(const std::vector<Matrix4>& instances);
 
         bool CanDraw() const;
         void Draw(const RenderProperties &renderProperties);
@@ -49,7 +49,7 @@ namespace feng
         void DeleteTextureBuffers();
 
         void CreateInstanceBuffer();
-        void UpdateInstanceBuffer(const std::vector<feng::Matrix4>& instances);
+        void UpdateInstanceBuffer(const std::vector<Matrix4>& instances);
         void DeleteInstanceBuffer();
 
         uint32_t CreateVertexBuffer();
@@ -74,7 +74,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline const Material *MeshRenderer::GetMaterial() const
     {

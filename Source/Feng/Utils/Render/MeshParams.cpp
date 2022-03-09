@@ -3,7 +3,7 @@
 #include <Feng/Math/Vector2.h>
 #include <Feng/Math/Vector3.h>
 
-namespace feng
+namespace Feng
 {
     const std::array<eVertexAtributes, 5> AttributesParser::Order
     {

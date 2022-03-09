@@ -4,7 +4,7 @@
 #include <array>
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     enum eVertexAtributes : uint32_t
     {
@@ -47,7 +47,7 @@ namespace feng
     GLenum ToOpenGLValue(ePrimitiveType primitiveType);
 }
 
-namespace feng
+namespace Feng
 {
     inline AttributesParser::AttributesParser(eVertexAtributes aAttributes)
         : attributes { aAttributes }

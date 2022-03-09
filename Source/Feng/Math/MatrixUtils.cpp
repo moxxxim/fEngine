@@ -2,7 +2,7 @@
 
 #include <Feng/Math/MathUtils.h>
 
-namespace feng::mat4
+namespace Feng::Mat4
 {
     Matrix4 MakeScale(const Vector3& scale)
     {
@@ -94,7 +94,7 @@ namespace feng::mat4
     }
 }
 
-namespace feng::mat3
+namespace Feng::Mat3
 {
     Matrix3 MakeScale(const Vector3& scale)
     {
@@ -161,7 +161,7 @@ namespace feng::mat3
     }
 }
 
-namespace feng::quat
+namespace Feng::Quat
 {
     Quaternion MakeRotation(const Vector3 &dAngles)
     {

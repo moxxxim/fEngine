@@ -3,12 +3,13 @@
 #include <Feng/Math/Vector2.h>
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
+#include <Feng/Render/RenderBase.h>
 #include <Feng/ResourcesManager/Shader.h>
 
 #include <map>
 #include <utility>
 
-namespace feng
+namespace Feng
 {
     class Texture;
 
@@ -51,10 +52,14 @@ namespace feng
         const Texture* GetTexture(const std::string& name) const;
         void SetTexture(const std::string& name, const Texture *texture);
 
+        void SetDrawFace(eDrawFace face);
+        void Apply();
+
     private:
         template <typename T>
         static bool TryGetValue(const std::map<std::string, T>& values, const std::string& name, T& value);
 
+        void ApplyStates();
         std::unique_ptr<Shader> shader;
         std::map<std::string, float> floats;
         std::map<std::string, int> ints;
@@ -62,6 +67,7 @@ namespace feng
         std::map<std::string, Vector3> vectors3;
         std::map<std::string, Vector4> vectors4;
         std::map<std::string, const Texture*> textures;
+        eDrawFace drawFace = eDrawFace::Cw;
     };
 
     inline const Shader* Material::GetShader() const

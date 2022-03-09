@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-namespace feng
+namespace Feng
 {
     Entity::Entity()
         : Entity {""}

@@ -3,7 +3,7 @@
 #include <Feng/Render/FrameBuffersPool.h>
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     CompositePostEffect::CompositePostEffect(std::vector<std::unique_ptr<PostEffect>> &&aEffects, FrameBuffersPool *aBuffersPool)
         : effects {std::move(aEffects)}

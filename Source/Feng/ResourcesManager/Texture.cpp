@@ -2,7 +2,7 @@
 
 #include <Feng/ResourcesManager/TextureData.h>
 
-namespace feng
+namespace Feng
 {
     Texture::Texture(const TextureData& aData)
         : type { eTextureType::Tex2d }

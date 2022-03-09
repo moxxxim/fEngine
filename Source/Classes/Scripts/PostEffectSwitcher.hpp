@@ -3,7 +3,7 @@
 #include <Feng/ScenesManager/Component.h>
 #include <cstdint>
 
-class PostEffectSwitcher final : public feng::Component
+class PostEffectSwitcher final : public Feng::Component
 {
 public:
     PostEffectSwitcher() = default;

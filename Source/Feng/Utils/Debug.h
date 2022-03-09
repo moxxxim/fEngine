@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace feng
+namespace Feng
 {
     class Debug final
     {
@@ -15,7 +15,7 @@ namespace feng
     };
 }
 
-#define Print_Errors_OpengGL() feng::Debug::PrintErrorOpenGL(__FILE__, __LINE__)
+#define Print_Errors_OpengGL() Feng::Debug::PrintErrorOpenGL(__FILE__, __LINE__)
 
 #define ASSERTIONS_ENABLED
 #if defined ASSERTIONS_ENABLED
@@ -30,7 +30,7 @@ namespace feng
 if (expr) { }                                               \
 else                                                        \
 {                                                           \
-    feng::Debug::LogLogError(#expr + __FILE__ + __LINE__)   \
+    Feng::Debug::LogLogError(#expr + __FILE__ + __LINE__)   \
     debugBreak();                                           \
 }                                                           
 #else

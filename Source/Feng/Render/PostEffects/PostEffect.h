@@ -2,7 +2,7 @@
 
 #include <Feng/Render/PostEffects/PostEffectContext.h>
 
-namespace feng
+namespace Feng
 {
     class PostEffect
     {

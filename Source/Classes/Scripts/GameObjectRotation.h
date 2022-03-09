@@ -2,12 +2,12 @@
 
 #include <Feng/ScenesManager/Component.h>
 
-namespace feng
+namespace Feng
 {
     class Transform;
 }
 
-class GameObjectRotation final : public feng::Component
+class GameObjectRotation final : public Feng::Component
 {
 public:
 	GameObjectRotation() = default;
@@ -15,6 +15,6 @@ public:
 private:
     void Update(float deltaTime) override;
     
-    feng::Transform *myTransform = nullptr;
+    Feng::Transform *myTransform = nullptr;
 	float fullTurnPeriod = 4.f;
 };

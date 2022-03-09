@@ -5,12 +5,12 @@
 
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     class MeshRenderer;
 }
 
-class InstancedObjectTransformController final : public feng::Component
+class InstancedObjectTransformController final : public Feng::Component
 {
 public:
     InstancedObjectTransformController() = default;
@@ -20,6 +20,6 @@ public:
 private:
     void Update(float deltaTime) override;
     
-    std::vector<feng::Matrix4> instances;
-    feng::MeshRenderer *renderer = nullptr;
+    std::vector<Feng::Matrix4> instances;
+    Feng::MeshRenderer *renderer = nullptr;
 };

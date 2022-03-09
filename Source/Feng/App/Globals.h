@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
-    namespace screen
+    namespace Screen
     {
         extern uint32_t ScreenWidth;
         extern uint32_t ScreenHeight;

@@ -9,16 +9,16 @@ void CameraStabilizer::Update(float deltaTime)
 {
     if(!myCam)
     {
-        feng::Entity *myEntity = GetEntity();
-        myCam = myEntity->GetComponent<feng::Camera>();
+        Feng::Entity *myEntity = GetEntity();
+        myCam = myEntity->GetComponent<Feng::Camera>();
     }
     
-    fovY -= static_cast<float>(feng::Engine::GetMouseScroll().y);
+    fovY -= static_cast<float>(Feng::Engine::GetMouseScroll().y);
     fovY = std::max(fovY, 1.0f);
     fovY = std::min(fovY, 45.0f);
 
     myCam->SetFovY(fovY);
-    myCam->SetAspectRatio(static_cast<float>(feng::screen::ScreenWidth)/feng::screen::ScreenHeight);
+    myCam->SetAspectRatio(static_cast<float>(Feng::Screen::ScreenWidth)/Feng::Screen::ScreenHeight);
     myCam->SetNearClipPlane(0.1f);
     myCam->SetFarClipPlane(100.f);
 }

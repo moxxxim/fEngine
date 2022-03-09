@@ -4,7 +4,7 @@
 #include <Feng/Math/Vector4.h>
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     class Matrix4 final
     {
@@ -64,7 +64,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline bool Matrix4::HasInverse() const
     {

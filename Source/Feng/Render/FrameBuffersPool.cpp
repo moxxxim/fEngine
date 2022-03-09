@@ -6,7 +6,7 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 
-namespace feng
+namespace Feng
 {
     FrameBuffer FrameBuffersPool::CreateBuffer(uint32_t width, uint32_t height, bool depthStencil)
     {

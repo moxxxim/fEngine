@@ -2,7 +2,7 @@
 
 #include <Feng/Math/MatrixUtils.h>
 
-namespace feng
+namespace Feng
 {
     Transform::Transform()
         : rotation { Quaternion::Identity() }
@@ -22,7 +22,7 @@ namespace feng
 
     void Transform::SetEuler(float x, float y, float z, eSpace space /*= eSpace::World*/)
     {
-        rotation = (space == eSpace::World) ? quat::MakeRotation(x, y, z) : quat::MakeRotation(x, y, z) * rotation;
+        rotation = (space == eSpace::World) ? Quat::MakeRotation(x, y, z) : Quat::MakeRotation(x, y, z) * rotation;
     }
 
     void Transform::SetEuler(const Vector3& euler, eSpace space /*= eSpace::World*/)
@@ -47,17 +47,17 @@ namespace feng
 
     Matrix4 Transform::GetGlobalMatrix() const
     {
-        return mat4::MakeTransformation(scale, position, rotation);
+        return Mat4::MakeTransformation(scale, position, rotation);
     }
 
     void Transform::Rotate(const Vector3& euler)
     {
-        rotation *= quat::MakeRotation(euler);
+        rotation *= Quat::MakeRotation(euler);
     }
 
     void Transform::Rotate(float x, float y, float z)
     {
-        Quaternion change = quat::MakeRotation(x, y, z);
+        Quaternion change = Quat::MakeRotation(x, y, z);
         rotation *= change;
     }
 }

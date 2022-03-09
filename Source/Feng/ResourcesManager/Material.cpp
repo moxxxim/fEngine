@@ -3,7 +3,7 @@
 #include <Feng/ResourcesManager/ResourceManager.h>
 #include <Feng/ResourcesManager/Shader.h>
 
-namespace feng
+namespace Feng
 {
     Material::Material(std::unique_ptr<Shader>&& aShader)
         : shader {std::move(aShader)}
@@ -46,11 +46,6 @@ namespace feng
         ints[name] = value;
     }
 
-    void Material::SetTexture(const std::string& name, const Texture *texture)
-    {
-        textures[name] = texture;
-    }
-
     void Material::SetVector2(const std::string& name, Vector2 value)
     {
         vectors2[name] = value;
@@ -80,5 +75,29 @@ namespace feng
         }
 
         return nullptr;
+    }
+    
+    void Material::SetTexture(const std::string& name, const Texture *texture)
+    {
+        textures[name] = texture;
+    }
+    
+    void Material::SetDrawFace(eDrawFace face)
+    {
+        drawFace = face;
+    }
+    
+    void Material::Apply()
+    {
+        if(shader)
+        {
+            shader->StartUse();
+            ApplyStates();
+        }
+    }
+    
+    void Material::ApplyStates()
+    {
+        Render::SetDrawFace(drawFace);
     }
 }

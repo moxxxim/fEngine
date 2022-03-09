@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-namespace feng
+namespace Feng
 {
     constexpr const float Pi = M_PI;
     

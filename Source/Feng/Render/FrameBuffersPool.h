@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     class FrameBuffersPool final
     {

@@ -10,10 +10,8 @@
 #include <map>
 #include <string>
 
-namespace feng
+namespace Feng
 {
-    enum class eShaderStates : uint8_t;
-
     enum class eShaderType : uint8_t
     {
         Vertex = 0,
@@ -50,8 +48,6 @@ namespace feng
 
     private:
         bool SetUniformFloatArray(const char *name, const float *value, int size) const;
-        void EnableState() const;
-        void DisableStates() const;
         void FetchActiveAttributes();
         void FetchActiveUniforms();
         void Load(const std::string& vs, const std::string& fs);
@@ -68,7 +64,7 @@ namespace feng
     std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath);
 }
 
-namespace feng
+namespace Feng
 {
     inline bool Shader::IsLoaded() const
     {

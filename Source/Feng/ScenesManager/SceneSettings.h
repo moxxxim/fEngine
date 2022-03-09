@@ -3,7 +3,7 @@
 #include <Feng/ScenesManager/Fog.h>
 #include <Feng/Math/Vector4.h>
 
-namespace feng
+namespace Feng
 {
     struct SceneSettings final
     {

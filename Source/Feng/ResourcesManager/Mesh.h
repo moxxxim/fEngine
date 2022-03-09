@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     class Mesh
     {

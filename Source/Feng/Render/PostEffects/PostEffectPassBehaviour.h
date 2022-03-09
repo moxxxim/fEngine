@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     class PostEffectPass;
     class PostEffectPrePass;
@@ -22,10 +22,7 @@ namespace feng
     private:
         int32_t passesCount = 1;
     };
-}
-
-namespace feng
-{
+    
     inline int32_t PostEffectPassBehaviour::GetPassesCount() const
     {
         return passesCount;

@@ -5,5 +5,5 @@
 
 namespace test
 {
-    std::unique_ptr<feng::Scene> CreateTestScene();
+    std::unique_ptr<Feng::Scene> CreateTestScene();
 }

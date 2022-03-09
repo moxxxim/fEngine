@@ -8,7 +8,7 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 
-namespace feng
+namespace Feng
 {
     PostEffectRenderer::PostEffectRenderer(
                                     Material *aMaterial,
@@ -23,7 +23,7 @@ namespace feng
         shader->StartUse();
 
         SetupBufferedTextures();
-        BindMaterialUniforms(*material, materialTextures, frameBufferTextures.size());
+        Render::BindMaterialUniforms(*material, materialTextures, frameBufferTextures.size());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         shader->StopUse();
@@ -44,7 +44,7 @@ namespace feng
 
     void PostEffectRenderer::SetupTexturesBuffers()
     {
-        materialTextures = CreateTextureBuffers(*material);
+        materialTextures = Render::CreateTextureBuffers(*material);
     }
 
     void PostEffectRenderer::ClearTexturesBuffers()

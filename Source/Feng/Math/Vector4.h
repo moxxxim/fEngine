@@ -2,7 +2,7 @@
 
 #include <Feng/Math/Vector3.h>
 
-namespace feng
+namespace Feng
 {
     class Vector4 final
     {

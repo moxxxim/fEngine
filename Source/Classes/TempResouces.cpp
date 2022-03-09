@@ -1,5 +1,6 @@
 #include <Classes/TempResouces.h>
 
+#include <Feng/Render/RenderBase.h>
 #include <Feng/Render/PostEffects/PostEffectDefinition.h>
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/ResourcesManager/TextureData.h>
@@ -118,35 +119,35 @@ namespace
         1, 3, 2
     };
     
-    std::unique_ptr<feng::TextureData> woodContainerTextureData;
-    std::unique_ptr<feng::TextureData> brickWallTextureData;
-    std::unique_ptr<feng::TextureData> awesomeFaceTextureData;
-    std::unique_ptr<feng::TextureData> steeledWoodTextureData;
-    std::unique_ptr<feng::TextureData> steelBorderTextureData;
-    std::unique_ptr<feng::TextureData> grassTextureData;
-    std::unique_ptr<feng::TextureData> windowTextureData;
-    std::array<std::unique_ptr<feng::TextureData>, 6> skyboxData;
+    std::unique_ptr<Feng::TextureData> woodContainerTextureData;
+    std::unique_ptr<Feng::TextureData> brickWallTextureData;
+    std::unique_ptr<Feng::TextureData> awesomeFaceTextureData;
+    std::unique_ptr<Feng::TextureData> steeledWoodTextureData;
+    std::unique_ptr<Feng::TextureData> steelBorderTextureData;
+    std::unique_ptr<Feng::TextureData> grassTextureData;
+    std::unique_ptr<Feng::TextureData> windowTextureData;
+    std::array<std::unique_ptr<Feng::TextureData>, 6> skyboxData;
 
-    std::unique_ptr<feng::PostEffectDefinition> grayscaleFx;
-    std::unique_ptr<feng::PostEffectDefinition> invertColorsFx;
-    std::unique_ptr<feng::PostEffectDefinition> sharpColorFx;
-    std::unique_ptr<feng::PostEffectDefinition> blurFx;
-    std::unique_ptr<feng::PostEffectDefinition> edgeDetectionFx;
+    std::unique_ptr<Feng::PostEffectDefinition> grayscaleFx;
+    std::unique_ptr<Feng::PostEffectDefinition> invertColorsFx;
+    std::unique_ptr<Feng::PostEffectDefinition> sharpColorFx;
+    std::unique_ptr<Feng::PostEffectDefinition> blurFx;
+    std::unique_ptr<Feng::PostEffectDefinition> edgeDetectionFx;
     
-    std::unique_ptr<feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
+    std::unique_ptr<Feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
     {
         std::string vsFilePath = BaseShadersDir + vsFileName;
         std::string fsFilePath = BaseShadersDir + fsFileName;
-        return feng::LoadShader(vsFilePath, fsFilePath);
+        return Feng::LoadShader(vsFilePath, fsFilePath);
     }
 
-    std::unique_ptr<feng::TextureData> LoadTexture(std::string name, bool flip)
+    std::unique_ptr<Feng::TextureData> LoadTexture(std::string name, bool flip)
     {
         std::string texturePath = BaseTexturesDir + name;
-        return feng::TextureData::Load(texturePath, flip);
+        return Feng::TextureData::Load(texturePath, flip);
     }
 
-    std::array<std::unique_ptr<feng::TextureData>, 6> LoadCubemapTexture(std::array<std::string, 6> relativePaths, bool flip)
+    std::array<std::unique_ptr<Feng::TextureData>, 6> LoadCubemapTexture(std::array<std::string, 6> relativePaths, bool flip)
     {
         std::array<std::string, 6> absolutePaths;
         std::transform(
@@ -155,107 +156,114 @@ namespace
                 absolutePaths.begin(),
                 [](const std::string& relativePath) { return BaseTexturesDir + relativePath; });
 
-        return feng::TextureData::LoadCubemap(absolutePaths, { flip, flip, flip, flip, flip, flip });
+        return Feng::TextureData::LoadCubemap(absolutePaths, { flip, flip, flip, flip, flip, flip });
     }
 
     void LoadTextures()
     {
+        using namespace Feng;
+        
         woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
-        test::res.WoodContainerTexture = std::make_unique<feng::Texture>(*woodContainerTextureData);
-        test::res.WoodContainerTexture->SetFilters(feng::eTextureMinFilter::LinearMipLinear, feng::eTextureMagFilter::Linear);
+        test::res.WoodContainerTexture = std::make_unique<Texture>(*woodContainerTextureData);
+        test::res.WoodContainerTexture->SetFilters(eTextureMinFilter::LinearMipLinear, eTextureMagFilter::Linear);
         test::res.WoodContainerTexture->SetUseMipmaps(true);
 
         brickWallTextureData = LoadTexture(brickWallJpg, false);
-        test::res.BrickWallTexture = std::make_unique<feng::Texture>(*brickWallTextureData);
+        test::res.BrickWallTexture = std::make_unique<Texture>(*brickWallTextureData);
 
         awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
-        test::res.AwesomeFaceTexture = std::make_unique<feng::Texture>(*awesomeFaceTextureData);
+        test::res.AwesomeFaceTexture = std::make_unique<Texture>(*awesomeFaceTextureData);
 
         steeledWoodTextureData = LoadTexture(steeledWoodPng, true);
-        test::res.SteeledWoodTexture = std::make_unique<feng::Texture>(*steeledWoodTextureData);
+        test::res.SteeledWoodTexture = std::make_unique<Texture>(*steeledWoodTextureData);
 
         steelBorderTextureData = LoadTexture(steeledBorderPng, true);
-        test::res.SteelBorderTexture = std::make_unique<feng::Texture>(*steelBorderTextureData);
+        test::res.SteelBorderTexture = std::make_unique<Texture>(*steelBorderTextureData);
 
         grassTextureData = LoadTexture(grassPng, true);
-        test::res.GrassTexture = std::make_unique<feng::Texture>(*grassTextureData);
-        test::res.GrassTexture->SetWrapping(feng::eTextureWrapping::ClampToEdge, feng::eTextureWrapping::ClampToEdge);
+        test::res.GrassTexture = std::make_unique<Texture>(*grassTextureData);
+        test::res.GrassTexture->SetWrapping(eTextureWrapping::ClampToEdge, Feng::eTextureWrapping::ClampToEdge);
 
         windowTextureData = LoadTexture(windowPng, true);
-        test::res.WindowTexture = std::make_unique<feng::Texture>(*windowTextureData);
-        test::res.WindowTexture->SetWrapping(feng::eTextureWrapping::ClampToEdge, feng::eTextureWrapping::ClampToEdge);
+        test::res.WindowTexture = std::make_unique<Texture>(*windowTextureData);
+        test::res.WindowTexture->SetWrapping(eTextureWrapping::ClampToEdge, Feng::eTextureWrapping::ClampToEdge);
 
         skyboxData = LoadCubemapTexture(skyboxJpg, false);
-        std::array<const feng::TextureData*, 6> skyboxFaces;
+        std::array<const TextureData*, 6> skyboxFaces;
         for(uint8_t i = 0; i < 6; ++i)
         {
             skyboxFaces[i] = skyboxData[i].get();
         }
 
-        test::res.SkyboxTexture = std::make_unique<feng::Texture>(skyboxFaces);
+        test::res.SkyboxTexture = std::make_unique<Texture>(skyboxFaces);
     }
 
     void LoadMaterials()
     {
+        using namespace Feng;
         LoadTextures();
 
-        std::unique_ptr<feng::Shader> phongTexShader = LoadShader(PhongTexVs, PhongTexFs);
-        test::res.PhongTexMaterial = std::make_unique<feng::Material>(std::move(phongTexShader));
-        test::res.PhongTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
+        std::unique_ptr<Shader> phongTexShader = LoadShader(PhongTexVs, PhongTexFs);
+        test::res.PhongTexMaterial = std::make_unique<Material>(std::move(phongTexShader));
+        test::res.PhongTexMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
 
-        std::unique_ptr<feng::Shader> phongTexInstancedShader = LoadShader(PhongTexInstancedVs, PhongTexFs);
-        test::res.PhongTexInstancedMaterial = std::make_unique<feng::Material>(std::move(phongTexInstancedShader));
-        test::res.PhongTexInstancedMaterial->SetTexture(feng::ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
+        std::unique_ptr<Shader> phongTexInstancedShader = LoadShader(PhongTexInstancedVs, PhongTexFs);
+        test::res.PhongTexInstancedMaterial = std::make_unique<Material>(std::move(phongTexInstancedShader));
+        test::res.PhongTexInstancedMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
 
-        std::unique_ptr<feng::Shader> specularTextureShader = LoadShader(PhongTexVs, PhongSpecularTextureFs);
-        test::res.SpecularTexMaterial = std::make_unique<feng::Material>(std::move(specularTextureShader));
-        test::res.SpecularTexMaterial->SetTexture(feng::ShaderParams::Texture0.data(), test::res.BrickWallTexture.get());
+        std::unique_ptr<Shader> specularTextureShader = LoadShader(PhongTexVs, PhongSpecularTextureFs);
+        test::res.SpecularTexMaterial = std::make_unique<Material>(std::move(specularTextureShader));
+        test::res.SpecularTexMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.BrickWallTexture.get());
         test::res.SpecularTexMaterial->SetFloat("uSpecularity", 1.0f);
         test::res.SpecularTexMaterial->SetFloat("uShininess", 64.0f);
 
-        std::unique_ptr<feng::Shader> diff1Spec2Shader = LoadShader(PhongTexVs, DiffTex1SpecTex2Fs);
-        test::res.DiffTex1SpecTex2Material = std::make_unique<feng::Material>(std::move(diff1Spec2Shader));
-        test::res.DiffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture0.data(), test::res.SteeledWoodTexture.get());
-        test::res.DiffTex1SpecTex2Material->SetTexture(feng::ShaderParams::Texture1.data(), test::res.SteelBorderTexture.get());
+        std::unique_ptr<Shader> diff1Spec2Shader = LoadShader(PhongTexVs, DiffTex1SpecTex2Fs);
+        test::res.DiffTex1SpecTex2Material = std::make_unique<Material>(std::move(diff1Spec2Shader));
+        test::res.DiffTex1SpecTex2Material->SetTexture(ShaderParams::Texture0.data(), test::res.SteeledWoodTexture.get());
+        test::res.DiffTex1SpecTex2Material->SetTexture(ShaderParams::Texture1.data(), test::res.SteelBorderTexture.get());
         test::res.DiffTex1SpecTex2Material->SetFloat("uSpecularity", 5.f);
         test::res.DiffTex1SpecTex2Material->SetFloat("uShininess", 64.0f);
 
-        test::res.ShowDepthMaterial = std::make_unique<feng::Material>(LoadShader(ShowDepthVs, ShowDepthFs));
+        test::res.ShowDepthMaterial = std::make_unique<Material>(LoadShader(ShowDepthVs, ShowDepthFs));
 
-        test::res.GrassMaterial = std::make_unique<feng::Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
-        test::res.GrassMaterial->SetTexture(feng::ShaderParams::Texture0.data(), test::res.GrassTexture.get());
+        test::res.GrassMaterial = std::make_unique<Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
+        test::res.GrassMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.GrassTexture.get());
+        test::res.GrassMaterial->SetDrawFace(eDrawFace::Both);
 
-        test::res.WindowMaterial = std::make_unique<feng::Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
-        test::res.WindowMaterial->SetTexture(feng::ShaderParams::Texture0.data(), test::res.WindowTexture.get());
+        test::res.WindowMaterial = std::make_unique<Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
+        test::res.WindowMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.WindowTexture.get());
+        test::res.WindowMaterial->SetDrawFace(eDrawFace::Both);
 
-        test::res.SkyboxMaterial = std::make_unique<feng::Material>(LoadShader(SkyboxVs, SkyboxFs));
-        test::res.SkyboxMaterial->SetTexture(feng::ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
+        test::res.SkyboxMaterial = std::make_unique<Material>(LoadShader(SkyboxVs, SkyboxFs));
+        test::res.SkyboxMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
 
-        test::res.CubemapReflectiveMaterial = std::make_unique<feng::Material>(LoadShader(CubemapReflectiveVs, CubemapReflectiveFs));
-        test::res.CubemapReflectiveMaterial->SetTexture(feng::ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
+        test::res.CubemapReflectiveMaterial = std::make_unique<Material>(LoadShader(CubemapReflectiveVs, CubemapReflectiveFs));
+        test::res.CubemapReflectiveMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
     }
     
     void CreatePostEffectDefinitions()
     {
-        std::unique_ptr<feng::Shader> grayscaleShader = LoadShader(PostEffectVs, GrayscalePostEffectFs);
-        std::unique_ptr<feng::Material> grayscaleFxMaterial = std::make_unique<feng::Material>(std::move(grayscaleShader));
-        grayscaleFx = std::make_unique<feng::PostEffectDefinition>(std::move(grayscaleFxMaterial));
+        using namespace Feng;
+        
+        std::unique_ptr<Shader> grayscaleShader = LoadShader(PostEffectVs, GrayscalePostEffectFs);
+        std::unique_ptr<Material> grayscaleFxMaterial = std::make_unique<Material>(std::move(grayscaleShader));
+        grayscaleFx = std::make_unique<PostEffectDefinition>(std::move(grayscaleFxMaterial));
 
-        std::unique_ptr<feng::Shader> invertColorsShader = LoadShader(PostEffectVs, InvertColorsPostEffectFs);
-        std::unique_ptr<feng::Material> invertColorsFxMaterial = std::make_unique<feng::Material>(std::move(invertColorsShader));
-        invertColorsFx = std::make_unique<feng::PostEffectDefinition>(std::move(invertColorsFxMaterial));
+        std::unique_ptr<Shader> invertColorsShader = LoadShader(PostEffectVs, InvertColorsPostEffectFs);
+        std::unique_ptr<Material> invertColorsFxMaterial = std::make_unique<Material>(std::move(invertColorsShader));
+        invertColorsFx = std::make_unique<PostEffectDefinition>(std::move(invertColorsFxMaterial));
 
-        std::unique_ptr<feng::Shader> sharpColorShader = LoadShader(PostEffectVs, SharpColorPostEffectFs);
-        std::unique_ptr<feng::Material> sharpColorFxMaterial = std::make_unique<feng::Material>(std::move(sharpColorShader));
-        sharpColorFx = std::make_unique<feng::PostEffectDefinition>(std::move(sharpColorFxMaterial));
+        std::unique_ptr<Shader> sharpColorShader = LoadShader(PostEffectVs, SharpColorPostEffectFs);
+        std::unique_ptr<Material> sharpColorFxMaterial = std::make_unique<Material>(std::move(sharpColorShader));
+        sharpColorFx = std::make_unique<PostEffectDefinition>(std::move(sharpColorFxMaterial));
 
-        std::unique_ptr<feng::Shader> blurShader = LoadShader(PostEffectVs, BlurPostEffectFs);
-        std::unique_ptr<feng::Material> blurFxMaterial = std::make_unique<feng::Material>(std::move(blurShader));
-        blurFx = std::make_unique<feng::PostEffectDefinition>(std::move(blurFxMaterial));
+        std::unique_ptr<Shader> blurShader = LoadShader(PostEffectVs, BlurPostEffectFs);
+        std::unique_ptr<Material> blurFxMaterial = std::make_unique<Material>(std::move(blurShader));
+        blurFx = std::make_unique<PostEffectDefinition>(std::move(blurFxMaterial));
 
-        std::unique_ptr<feng::Shader> edgeDetectionShader = LoadShader(PostEffectVs, EdgeDetectionPostEffectFs);
-        std::unique_ptr<feng::Material> edgeDetectionFxMaterial = std::make_unique<feng::Material>(std::move(edgeDetectionShader));
-        edgeDetectionFx = std::make_unique<feng::PostEffectDefinition>(std::move(edgeDetectionFxMaterial));
+        std::unique_ptr<Shader> edgeDetectionShader = LoadShader(PostEffectVs, EdgeDetectionPostEffectFs);
+        std::unique_ptr<Material> edgeDetectionFxMaterial = std::make_unique<Material>(std::move(edgeDetectionShader));
+        edgeDetectionFx = std::make_unique<PostEffectDefinition>(std::move(edgeDetectionFxMaterial));
 
         test::res.Effects.push_back(blurFx.get());
         test::res.Effects.push_back(grayscaleFx.get());
@@ -266,13 +274,15 @@ namespace
 
     void LoadMeshes()
     {
-        uint32_t cubeAttributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Normal | feng::eVertexAtributes::Uv0;
-        feng::eVertexAtributes cubeAttributes = static_cast<feng::eVertexAtributes>(cubeAttributesValue);
-        test::res.CubeMesh = std::make_unique<feng::Mesh>(cube, cubeAttributes, feng::ePrimitiveType::Triangles);
+        using namespace Feng;
+        
+        uint32_t cubeAttributesValue = eVertexAtributes::Position | eVertexAtributes::Normal | eVertexAtributes::Uv0;
+        eVertexAtributes cubeAttributes = static_cast<eVertexAtributes>(cubeAttributesValue);
+        test::res.CubeMesh = std::make_unique<Mesh>(cube, cubeAttributes, ePrimitiveType::Triangles);
 
-        uint32_t quadAttributesValue = feng::eVertexAtributes::Position | feng::eVertexAtributes::Uv0;
-        feng::eVertexAtributes quadAttributes = static_cast<feng::eVertexAtributes>(quadAttributesValue);
-        test::res.QuadMesh = std::make_unique<feng::Mesh>(quadVertices, quadIndices, quadAttributes,  feng::ePrimitiveType::Triangles);
+        uint32_t quadAttributesValue = eVertexAtributes::Position | eVertexAtributes::Uv0;
+        eVertexAtributes quadAttributes = static_cast<eVertexAtributes>(quadAttributesValue);
+        test::res.QuadMesh = std::make_unique<Mesh>(quadVertices, quadIndices, quadAttributes,  ePrimitiveType::Triangles);
     }
 }
 
@@ -280,17 +290,17 @@ namespace test
 {
     TempRes res{};
     
-    std::unique_ptr<feng::Material> CreateFlatColorMaterial()
+    std::unique_ptr<Feng::Material> CreateFlatColorMaterial()
     {
-        std::unique_ptr<feng::Shader> flatColorShader = LoadShader(FlatColorVsName, FlatColorFsName);
-        return std::make_unique<feng::Material>(std::move(flatColorShader));
+        std::unique_ptr<Feng::Shader> flatColorShader = LoadShader(FlatColorVsName, FlatColorFsName);
+        return std::make_unique<Feng::Material>(std::move(flatColorShader));
     }
 
-    std::unique_ptr<feng::Material> CreateGizmoMaterial(bool showDepth)
+    std::unique_ptr<Feng::Material> CreateGizmoMaterial(bool showDepth)
     {
         if(showDepth)
         {
-            return std::make_unique<feng::Material>(LoadShader(ShowDepthVs, ShowDepthFs));
+            return std::make_unique<Feng::Material>(LoadShader(ShowDepthVs, ShowDepthFs));
         }
 
         return CreateFlatColorMaterial();

@@ -11,7 +11,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace feng
+namespace Feng
 {
     namespace SShader
     {
@@ -37,7 +37,7 @@ namespace feng
 
         uint32_t CompileShader(eShaderType type, const std::string& sourceCode)
         {
-            GLenum glShaderType = ToOpenGLValue(type);
+            GLenum glShaderType = Render::ToOpenGLValue(type);
             GLuint shader = glCreateShader(glShaderType);
             if(shader != 0)
             {
@@ -79,13 +79,12 @@ namespace feng
 
     void Shader::StartUse() const
     {
-        EnableState();
         glUseProgram(program);
     }
 
     void Shader::StopUse() const
     {
-        DisableStates();
+
     }
 
     bool Shader::TryGetAttributeLocation(const char *name, uint32_t& location) const
@@ -226,43 +225,6 @@ namespace feng
         }
 
         return false;
-    }
-
-    void Shader::EnableState() const
-    {
-//        if ((int)m_cachedInfo.States & (int)ShaderStates::Culling)
-//        {
-//            glEnable(GL_CULL_FACE);
-//        }
-//
-//        if ((int)m_cachedInfo.States & (int)ShaderStates::AlphaTest)
-//        {
-//            glEnable(GL_BLEND);
-//            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//        }
-//
-//        if ((int)m_cachedInfo.States & (int)ShaderStates::DepthTest)
-//        {
-//            glEnable(GL_DEPTH_TEST);
-//        }
-    }
-
-    void Shader::DisableStates() const
-    {
-//        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::Culling)
-//        {
-//            glDisable(GL_CULL_FACE);
-//        }
-//
-//        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::AlphaTest)
-//        {
-//            glDisable(GL_BLEND);
-//        }
-//
-//        if ((int)m_cachedInfo.States & (int)feng::ShaderStates::DepthTest)
-//        {
-//            glDisable(GL_DEPTH_TEST);
-//        }
     }
 
     void Shader::FetchActiveAttributes()

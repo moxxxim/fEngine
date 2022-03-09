@@ -3,7 +3,7 @@
 #include <OpenGL/gl.h>
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     class Texture;
 

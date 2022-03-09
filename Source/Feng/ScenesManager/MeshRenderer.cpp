@@ -17,7 +17,7 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 
-namespace feng
+namespace Feng
 {
     MeshRenderer::~MeshRenderer()
     {
@@ -31,7 +31,7 @@ namespace feng
         {
             material = aMaterial;
             DeleteTextureBuffers();
-            if(material != nullptr)
+            if(material)
             {
                 CreateTexturesBuffers();
             }
@@ -44,14 +44,14 @@ namespace feng
         {
             mesh = aMesh;
             DeleteGeomertyBuffers();
-            if(mesh != nullptr)
+            if(mesh)
             {
                 CreateGeometryBuffers();
             }
         }
     }
 
-    void MeshRenderer::SetInstanceTransforms(const std::vector<feng::Matrix4>& instances)
+    void MeshRenderer::SetInstanceTransforms(const std::vector<Matrix4>& instances)
     {
         if(static_cast<uint32_t>(instances.size()) > instancesCount)
         {
@@ -83,7 +83,7 @@ namespace feng
         {
             StartDraw();
             SetGlobalUniforms(renderProperties);
-            BindMaterialUniforms(*material, textureBuffers);
+            Render::BindMaterialUniforms(*material, textureBuffers);
             ExecuteDraw();
             FinishDraw();
         }
@@ -91,17 +91,13 @@ namespace feng
 
     void MeshRenderer::StartDraw()
     {
-        const Shader *shader = material->GetShader();
-        shader->StartUse();
+        material->Apply();
     }
 
     void MeshRenderer::FinishDraw()
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
-
-        const Shader *shader = material->GetShader();
-        shader->StopUse();
     }
 
     void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties)
@@ -110,7 +106,7 @@ namespace feng
         {
             const Shader *shader = material->GetShader();
             const Transform *myTransform = GetEntity()->GetComponent<Transform>();
-            shader->SetUniformMatrix4(feng::ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
+            shader->SetUniformMatrix4(ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
         }
 
         SetCameraUniforms(renderProperties);
@@ -202,7 +198,7 @@ namespace feng
 
     void MeshRenderer::CreateTexturesBuffers()
     {
-        textureBuffers = CreateTextureBuffers(*material);
+        textureBuffers = Render::CreateTextureBuffers(*material);
     }
 
     void MeshRenderer::DeleteTextureBuffers()
@@ -240,7 +236,7 @@ namespace feng
         glBindBuffer(GL_ARRAY_BUFFER, UndefinedBuffer);
     }
 
-    void MeshRenderer::UpdateInstanceBuffer(const std::vector<feng::Matrix4>& instances)
+    void MeshRenderer::UpdateInstanceBuffer(const std::vector<Matrix4>& instances)
     {
         if(!instances.empty())
         {
@@ -261,7 +257,7 @@ namespace feng
         glBindBuffer(GL_ARRAY_BUFFER, bufferObject);
         glBufferData(GL_ARRAY_BUFFER, mesh->GetDataSize(), mesh->GetData(), GL_STATIC_DRAW);
 
-        EnableVertexAttributes(mesh->GetAttributes());
+        Render::EnableVertexAttributes(mesh->GetAttributes());
 
         return bufferObject;
     }
@@ -283,9 +279,9 @@ namespace feng
     {
         const Shader *shader = material->GetShader();
         
-        shader->SetUniformFloat(feng::ShaderParams::NearClipPlane.data(), renderProperties.cam->GetNearClipPlane());
-        shader->SetUniformFloat(feng::ShaderParams::FarClipPlane.data(), renderProperties.cam->GetFarClipPlane());
-        shader->SetUniformBuffer(feng::ShaderParams::CamUniformBlock.data(), renderProperties.camBufferIndex);
+        shader->SetUniformFloat(ShaderParams::NearClipPlane.data(), renderProperties.cam->GetNearClipPlane());
+        shader->SetUniformFloat(ShaderParams::FarClipPlane.data(), renderProperties.cam->GetFarClipPlane());
+        shader->SetUniformBuffer(ShaderParams::CamUniformBlock.data(), renderProperties.camBufferIndex);
     }
 
     void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties)

@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstring>
 
-namespace feng
+namespace Feng
 {
     class Vector3 final
     {
@@ -124,7 +124,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline float Vector3::Length() const
     {

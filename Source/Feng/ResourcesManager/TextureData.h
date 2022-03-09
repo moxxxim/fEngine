@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-namespace feng
+namespace Feng
 {
     class TextureData final
     {
@@ -31,7 +31,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline bool TextureData::IsValid() const
     {

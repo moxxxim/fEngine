@@ -6,7 +6,7 @@
 #include <Feng/Utils/Render/TextureParams.h>
 #include <Feng/Utils/Debug.h>
 
-namespace feng
+namespace Feng::Render
 {
     namespace SRenderUtils
     {
@@ -22,7 +22,7 @@ namespace feng
 
         void LoadTextureDataCube(const Texture& texture)
         {
-            const GLint format = feng::GetTextureFormat(texture);
+            const GLint format = GetTextureFormat(texture);
             GLsizei faceWidth = static_cast<GLsizei>(texture.GetWidth());
             GLsizei faceHeight = static_cast<GLsizei>(texture.GetHeight());
             for (int32_t i = 0; i < 6; ++i)

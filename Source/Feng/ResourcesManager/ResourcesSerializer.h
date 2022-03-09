@@ -1,6 +1,6 @@
 #pragma once
 
-namespace feng
+namespace Feng
 {
     class ResourcesManager;
     class ResourceManagerTextures;

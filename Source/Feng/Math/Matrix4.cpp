@@ -1,6 +1,6 @@
 #include <Feng/Math/Matrix4.h>
 
-namespace feng
+namespace Feng
 {
     const Matrix4 Matrix4::Zero
     {

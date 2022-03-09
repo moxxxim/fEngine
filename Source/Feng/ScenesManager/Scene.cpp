@@ -10,7 +10,7 @@
 
 #include <algorithm>
 
-namespace feng
+namespace Feng
 {
     namespace SScene
     {

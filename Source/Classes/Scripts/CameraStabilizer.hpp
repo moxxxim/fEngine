@@ -2,12 +2,12 @@
 
 #include <Feng/ScenesManager/Component.h>
 
-namespace feng
+namespace Feng
 {
     class Camera;
 }
 
-class CameraStabilizer final : public feng::Component
+class CameraStabilizer final : public Feng::Component
 {
 public:
     CameraStabilizer() = default;
@@ -15,6 +15,6 @@ public:
 private:
     void Update(float deltaTime) override;
     
-    feng::Camera *myCam = nullptr;
+    Feng::Camera *myCam = nullptr;
     float fovY = 45;
 };

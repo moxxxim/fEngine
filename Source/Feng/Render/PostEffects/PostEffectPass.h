@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     class Material;
     class FrameBuffersPool;
@@ -48,7 +48,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline Material* PostEffectPass::GetMaterial() const
     {

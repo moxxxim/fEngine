@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-namespace feng
+namespace Feng
 {
     namespace
     {
@@ -33,8 +33,8 @@ namespace feng
         
         static void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
         {
-            feng::screen::ScreenWidth = width;
-            feng::screen::ScreenHeight = height;
+            Screen::ScreenWidth = width;
+            Screen::ScreenHeight = height;
             glViewport(0, 0, width, height);
         }
         
@@ -61,8 +61,8 @@ namespace feng
         
         static void InitRender(bool showDepth)
         {
-            feng::Debug::LogRenderInfoOpenGL();
-            feng::Debug::LogMessage("Initialize render.");
+            Debug::LogRenderInfoOpenGL();
+            Debug::LogMessage("Initialize render.");
 
             Print_Errors_OpengGL();
 
@@ -75,19 +75,19 @@ namespace feng
                 glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             }
 
+            // Depth testing.
             glEnable(GL_DEPTH_TEST);
             glDepthFunc(GL_LESS); // Default.
             glDepthMask(GL_TRUE); // Default.
 
+            // Stencil testing.
             glEnable(GL_STENCIL_TEST);
 
+            // Blending.
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glBlendEquation(GL_FUNC_ADD);
-
-            glEnable(GL_CULL_FACE);
-            glCullFace(GL_BACK); // Default.
-            glFrontFace(GL_CW);
+            
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Default
 
             glEnable(GL_MULTISAMPLE);
@@ -97,8 +97,8 @@ namespace feng
         
         GLFWwindow* CreateWindow()
         {
-            feng::screen::ScreenWidth = InitialWidth;
-            feng::screen::ScreenHeight = InitialHeight;
+            Screen::ScreenWidth = InitialWidth;
+            Screen::ScreenHeight = InitialHeight;
             glfwWindowHint(GLFW_SAMPLES, 4);
             GLFWwindow* window = glfwCreateWindow(InitialWidth, InitialHeight, "Sweet Window", nullptr, nullptr);
             if (window)
@@ -119,7 +119,7 @@ namespace feng
             return window;
         }
         
-        void RenderWithOutline(const std::vector<feng::Entity*>& outlined)
+        void RenderWithOutline(const std::vector<Entity*>& outlined)
         {
             /*
             // Put 1s (ones) into stencil buffer for all drawn fragments.
@@ -186,7 +186,7 @@ namespace feng
     {
         if(window)
         {
-            feng::Debug::LogMessage("Start loop.");
+            Debug::LogMessage("Start loop.");
             while(!glfwWindowShouldClose(window))
             {
                 UpdateTime();

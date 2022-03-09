@@ -5,7 +5,7 @@
 
 #include <map>
 
-namespace feng
+namespace Feng
 {
     std::array<std::unique_ptr<TextureData>, 6> TextureData::LoadCubemap(
                                                         const std::array<std::string, 6>& paths,

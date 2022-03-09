@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-namespace feng
+namespace Feng
 {
     class Entity final
     {

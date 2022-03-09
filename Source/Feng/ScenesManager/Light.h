@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     class Light final : public Component
     {
@@ -44,7 +44,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline Light::eType Light::GetType() const
     {

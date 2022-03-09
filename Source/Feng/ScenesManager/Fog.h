@@ -2,7 +2,7 @@
 
 #include <Feng/Math/Vector4.h>
 
-namespace feng
+namespace Feng
 {
     struct Fog final
     {

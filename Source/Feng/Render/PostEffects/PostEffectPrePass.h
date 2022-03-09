@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     class FrameBuffer;
 
@@ -17,10 +17,7 @@ namespace feng
     private:
         int32_t customBuffersCount = 0;
     };
-}
-
-namespace feng
-{
+    
     inline int32_t PostEffectPrePass::GetCustomBuffersCount() const
     {
         return customBuffersCount;

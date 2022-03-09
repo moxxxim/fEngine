@@ -3,7 +3,7 @@
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/Render/PostEffects/PostEffectPassBehaviour.h>
 
-namespace feng
+namespace Feng
 {
     PostEffectDefinition::PostEffectDefinition(std::unique_ptr<Material>&& aMaterial)
         : type(PostEffectType::Material)

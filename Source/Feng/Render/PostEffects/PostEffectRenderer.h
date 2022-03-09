@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-namespace feng
+namespace Feng
 {
     class Material;
     class Shader;

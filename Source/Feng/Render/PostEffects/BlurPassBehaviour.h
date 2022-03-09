@@ -2,7 +2,7 @@
 
 #include <Feng/Render/PostEffects/PostEffectPassBehaviour.h>
 
-namespace feng
+namespace Feng
 {
     class Material;
 

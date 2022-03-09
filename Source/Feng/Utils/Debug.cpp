@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     void Debug::LogMessage(const std::string &message)
     {

@@ -11,7 +11,7 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 
-namespace feng
+namespace Feng
 {
     namespace SRenderSystem
     {
@@ -41,9 +41,9 @@ namespace feng
     RenderSystem::RenderSystem()
     {
 #ifdef __APPLE__
-        frameBuffer = buffersPool.CreateBuffer(2 * screen::ScreenWidth, 2 * screen::ScreenHeight, true);
+        frameBuffer = buffersPool.CreateBuffer(2 * Screen::ScreenWidth, 2 * Screen::ScreenHeight, true);
 #else
-        frameBuffer = buffersPool.CreateBuffer(screen::ScreenWidth, screen::ScreenHeight, true);
+        frameBuffer = buffersPool.CreateBuffer(Screen::ScreenWidth, Screen::ScreenHeight, true);
 #endif
         CreateCamUniformBuffer();
         renderProperties.camBufferIndex = camBufferIndex;

@@ -4,7 +4,7 @@
 #include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/Transform.h>
 
-namespace feng
+namespace Feng
 {
     void Camera::SetFovY(float fov)
     {
@@ -32,7 +32,7 @@ namespace feng
 
     Matrix4 Camera::GetProjectionMatrix() const
     {
-        return mat4::MakePerspectiveProjection(fovY, aspectRatio, near, far);
+        return Mat4::MakePerspectiveProjection(fovY, aspectRatio, near, far);
     }
 
     Matrix4 Camera::GetViewProjectionMatrix() const

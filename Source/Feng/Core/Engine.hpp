@@ -6,7 +6,7 @@
 #include <array>
 #include <cstdint>
 
-namespace feng
+namespace Feng
 {
     class PostEffectDefinition;
     
@@ -41,7 +41,7 @@ namespace feng
         static float time;
         static bool showDepth;
         
-        std::unique_ptr<feng::Scene> scene;
+        std::unique_ptr<Feng::Scene> scene;
     };
     
     inline Engine* Engine::Instance()

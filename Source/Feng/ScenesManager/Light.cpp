@@ -1,6 +1,6 @@
 #include <Feng/ScenesManager/Light.h>
 
-namespace feng
+namespace Feng
 {
     Light::Light()
         : color(Vector4 {1.f, 1.f, 1.f, 1.f})

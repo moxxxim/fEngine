@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-namespace feng
+namespace Feng
 {
     class PostEffect;
     class PostEffectDefinition;

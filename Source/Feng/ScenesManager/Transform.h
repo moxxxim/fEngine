@@ -7,7 +7,7 @@
 #include <Feng/ScenesManager/Component.h>
 #include <Feng/ScenesManager/Space.h>
 
-namespace feng
+namespace Feng
 {
     class Transform final : public Component
     {
@@ -47,7 +47,7 @@ namespace feng
     };
 }
 
-namespace feng
+namespace Feng
 {
     inline const Vector3& Transform::GetPosition(eSpace space /*= eSpace::World*/) const
     {

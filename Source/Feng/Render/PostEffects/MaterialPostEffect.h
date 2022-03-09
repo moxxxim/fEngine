@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-namespace feng
+namespace Feng
 {
     class FrameBuffersPool;
     class PostEffectRenderer;

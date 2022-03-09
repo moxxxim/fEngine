@@ -7,7 +7,7 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 
-namespace feng
+namespace Feng
 {
     PostEffectPass::PostEffectPass(
         Material *aMaterial,
@@ -27,7 +27,7 @@ namespace feng
 
     void PostEffectPass::SetTextureFromOriginal(InputTextureType type, const char *textureName)
     {
-        uint32_t textureBuffer = (type == feng::PostEffectPass::InputTextureType::Color)
+        uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
                 ? context.Original.Color
                 : context.Original.DepthStencil;
         SetShaderInput(textureName, textureBuffer);
@@ -35,7 +35,7 @@ namespace feng
 
     void PostEffectPass::SetTextureFromInput(InputTextureType type, const char *textureName)
     {
-        uint32_t textureBuffer = (type == feng::PostEffectPass::InputTextureType::Color)
+        uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
                 ? context.Input.Color
                 : context.Input.DepthStencil;
         SetShaderInput(textureName, textureBuffer);
@@ -46,7 +46,9 @@ namespace feng
         if ((0 <= textureBufferIndex) && (textureBufferIndex < customBuffersCount))
         {
             const FrameBuffer& buffer = buffers[textureBufferIndex];
-            uint32_t textureBuffer = (type == feng::PostEffectPass::InputTextureType::Color) ? buffer.Color : buffer.DepthStencil;
+            uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
+                                    ? buffer.Color
+                                    : buffer.DepthStencil;
             SetShaderInput(textureName, textureBuffer);
         }
     }
