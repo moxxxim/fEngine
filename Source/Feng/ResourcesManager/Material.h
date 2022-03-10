@@ -52,6 +52,8 @@ namespace Feng
         const Texture* GetTexture(const std::string& name) const;
         void SetTexture(const std::string& name, const Texture *texture);
 
+        bool IsTransparent() const;
+        void SetTransparent(bool aTransparent);
         void SetDrawFace(eDrawFace face);
         void Apply();
 
@@ -68,6 +70,7 @@ namespace Feng
         std::map<std::string, Vector4> vectors4;
         std::map<std::string, const Texture*> textures;
         eDrawFace drawFace = eDrawFace::Cw;
+        bool transparent = false;
     };
 
     inline const Shader* Material::GetShader() const

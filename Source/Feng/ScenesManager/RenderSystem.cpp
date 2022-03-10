@@ -6,6 +6,7 @@
 #include <Feng/ScenesManager/Light.h>
 #include <Feng/ScenesManager/MeshRenderer.h>
 #include <Feng/ScenesManager/Transform.h>
+#include <Feng/ResourcesManager/Material.h>
 #include <Feng/Utils/Debug.h>
 
 #include <OpenGL/gl.h>
@@ -15,26 +16,22 @@ namespace Feng
 {
     namespace SRenderSystem
     {
-        void SortSceneByDistance(const Camera& cam, std::vector<MeshRenderer*> &renderers)
+        float GetDistanceToCamSqr(const MeshRenderer& renderer, const Camera& cam)
         {
             Transform *camTransform = cam.GetEntity()->GetComponent<Transform>();
             const Vector3 &camPosition = camTransform->GetPosition();
-            auto compare = [&camPosition] (const MeshRenderer* r1, const MeshRenderer* r2)
-            {
-                const Entity *e1 = r1->GetEntity();
-                const Entity *e2 = r2->GetEntity();
-                const Transform *transform1 = e1->GetComponent<Transform>();
-                const Vector3 &position1 = transform1->GetPosition();
-                float distanceSqr1 = Vector3::DistanceSqr(camPosition, position1);
-
-                const Transform *transform2 = e2->GetComponent<Transform>();
-                const Vector3 &position2 = transform2->GetPosition();
-                float distanceSqr2 = Vector3::DistanceSqr(camPosition, position2);
-
-                return distanceSqr2 < distanceSqr1;
-            };
-
-            std::sort(renderers.begin(), renderers.end(), compare);
+            
+            const Entity *entity = renderer.GetEntity();
+            const Transform *transform = entity->GetComponent<Transform>();
+            const Vector3 &rendererPosition = transform->GetPosition();
+            
+            return Vector3::DistanceSqr(camPosition, rendererPosition);
+        }
+        
+        bool IsFartherFromCam(const MeshRenderer& renderer, const Camera& cam, float distanceSqr)
+        {
+            float sqrDistanceToCam = GetDistanceToCamSqr(renderer, cam);
+            return sqrDistanceToCam >= distanceSqr;
         }
     }
 
@@ -67,12 +64,40 @@ namespace Feng
 
     void RenderSystem::AddRenderer(MeshRenderer *renderer)
     {
-        renderers.push_back(renderer);
+        const Material* material = renderer->GetMaterial();
+        if(material->IsTransparent())
+        {
+            float distanceSqr = SRenderSystem::GetDistanceToCamSqr(*renderer, *renderProperties.cam);
+            auto isFarther = [this, distanceSqr](const MeshRenderer* renderer)
+            {
+                return SRenderSystem::IsFartherFromCam(*renderer, *renderProperties.cam, distanceSqr);
+            };
+            
+            auto it = std::find_if(renderersTransparent.cbegin(), renderersTransparent.cend(), isFarther);
+            renderersTransparent.insert(it, renderer);
+        }
+        else
+        {
+            renderersOpaque.push_back(renderer);
+        }
     }
 
     void RenderSystem::RemoveRenderer(MeshRenderer *renderer)
     {
-        renderers.erase(std::remove(renderers.begin(), renderers.end(), renderer), renderers.end());
+        const Material* material = renderer->GetMaterial();
+        if(material->IsTransparent())
+        {
+            renderersTransparent.remove(renderer);
+        }
+        else
+        {
+            auto it = std::find(renderersOpaque.begin(), renderersOpaque.end(), renderer);
+            if(it != renderersOpaque.end())
+            {
+                std::swap(*it, renderersOpaque.back());
+                renderersOpaque.pop_back();
+            }
+        }
     }
 
     void RenderSystem::AddLight(Light *light)
@@ -167,12 +192,16 @@ namespace Feng
 
     void RenderSystem::DrawRenderers()
     {
-        SRenderSystem::SortSceneByDistance(*renderProperties.cam, renderers);
-
-        for(MeshRenderer *renderer : renderers)
+        for(MeshRenderer *renderer : renderersOpaque)
         {
             renderer->Draw(renderProperties);
         }
+        
+        for(MeshRenderer *renderer : renderersTransparent)
+        {
+            renderer->Draw(renderProperties);
+        }
+        
         Print_Errors_OpengGL();
     }
 

@@ -14,5 +14,6 @@ namespace Feng
     namespace Render
     {
         void SetDrawFace(eDrawFace face);
+        void SetBlending(bool transparent);
     }
 }

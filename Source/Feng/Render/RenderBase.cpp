@@ -25,4 +25,9 @@ namespace Feng::Render
                 break;
         }
     }
+    
+    void SetBlending(bool transparent)
+    {
+        
+    }
 }

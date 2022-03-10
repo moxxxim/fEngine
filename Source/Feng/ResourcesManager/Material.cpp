@@ -82,6 +82,16 @@ namespace Feng
         textures[name] = texture;
     }
     
+    bool Material::IsTransparent() const
+    {
+        return transparent;
+    }
+    
+    void Material::SetTransparent(bool aTransparent)
+    {
+        transparent = aTransparent;
+    }
+    
     void Material::SetDrawFace(eDrawFace face)
     {
         drawFace = face;

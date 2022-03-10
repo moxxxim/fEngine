@@ -206,16 +206,19 @@ namespace
         std::unique_ptr<Shader> phongTexShader = LoadShader(PhongTexVs, PhongTexFs);
         test::res.PhongTexMaterial = std::make_unique<Material>(std::move(phongTexShader));
         test::res.PhongTexMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
+        test::res.PhongTexMaterial->SetTransparent(false);
 
         std::unique_ptr<Shader> phongTexInstancedShader = LoadShader(PhongTexInstancedVs, PhongTexFs);
         test::res.PhongTexInstancedMaterial = std::make_unique<Material>(std::move(phongTexInstancedShader));
         test::res.PhongTexInstancedMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
+        test::res.PhongTexInstancedMaterial->SetTransparent(false);
 
         std::unique_ptr<Shader> specularTextureShader = LoadShader(PhongTexVs, PhongSpecularTextureFs);
         test::res.SpecularTexMaterial = std::make_unique<Material>(std::move(specularTextureShader));
         test::res.SpecularTexMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.BrickWallTexture.get());
         test::res.SpecularTexMaterial->SetFloat("uSpecularity", 1.0f);
         test::res.SpecularTexMaterial->SetFloat("uShininess", 64.0f);
+        test::res.SpecularTexMaterial->SetTransparent(false);
 
         std::unique_ptr<Shader> diff1Spec2Shader = LoadShader(PhongTexVs, DiffTex1SpecTex2Fs);
         test::res.DiffTex1SpecTex2Material = std::make_unique<Material>(std::move(diff1Spec2Shader));
@@ -223,22 +226,27 @@ namespace
         test::res.DiffTex1SpecTex2Material->SetTexture(ShaderParams::Texture1.data(), test::res.SteelBorderTexture.get());
         test::res.DiffTex1SpecTex2Material->SetFloat("uSpecularity", 5.f);
         test::res.DiffTex1SpecTex2Material->SetFloat("uShininess", 64.0f);
+        test::res.DiffTex1SpecTex2Material->SetTransparent(false);
 
         test::res.ShowDepthMaterial = std::make_unique<Material>(LoadShader(ShowDepthVs, ShowDepthFs));
 
         test::res.GrassMaterial = std::make_unique<Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
         test::res.GrassMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.GrassTexture.get());
         test::res.GrassMaterial->SetDrawFace(eDrawFace::Both);
+        test::res.GrassMaterial->SetTransparent(true);
 
         test::res.WindowMaterial = std::make_unique<Material>(LoadShader(UnlitTextureVsName, UnlitTextureFsName));
         test::res.WindowMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.WindowTexture.get());
         test::res.WindowMaterial->SetDrawFace(eDrawFace::Both);
+        test::res.WindowMaterial->SetTransparent(true);
 
         test::res.SkyboxMaterial = std::make_unique<Material>(LoadShader(SkyboxVs, SkyboxFs));
         test::res.SkyboxMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
-
+        test::res.SkyboxMaterial->SetTransparent(false);
+        
         test::res.CubemapReflectiveMaterial = std::make_unique<Material>(LoadShader(CubemapReflectiveVs, CubemapReflectiveFs));
         test::res.CubemapReflectiveMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
+        test::res.CubemapReflectiveMaterial->SetTransparent(false);
     }
     
     void CreatePostEffectDefinitions()
