@@ -7,7 +7,6 @@
 
 #include <cstdint>
 #include <vector>
-#include <list>
 
 namespace Feng
 {
@@ -45,7 +44,7 @@ namespace Feng
 
         static constexpr uint32_t camBufferIndex = 0;
 
-        std::list<MeshRenderer*> renderersTransparent;
+        std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;
         std::vector<Light*> lights;
         FrameBuffersPool buffersPool;

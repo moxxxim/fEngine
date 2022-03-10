@@ -16,22 +16,29 @@ namespace Feng
 {
     namespace SRenderSystem
     {
-        float GetDistanceToCamSqr(const MeshRenderer& renderer, const Camera& cam)
+        float GetDistanceToCamSqr(const MeshRenderer& renderer, const Vector3& camPos, const Vector3& camDir)
         {
-            Transform *camTransform = cam.GetEntity()->GetComponent<Transform>();
-            const Vector3 &camPosition = camTransform->GetPosition();
-            
             const Entity *entity = renderer.GetEntity();
             const Transform *transform = entity->GetComponent<Transform>();
             const Vector3 &rendererPosition = transform->GetPosition();
             
-            return Vector3::DistanceSqr(camPosition, rendererPosition);
+            return Vector3::DistanceSqr(camPos, rendererPosition);
         }
-        
-        bool IsFartherFromCam(const MeshRenderer& renderer, const Camera& cam, float distanceSqr)
+
+        void SortSceneByDistance(const Camera& cam, std::vector<MeshRenderer*> &renderers)
         {
-            float sqrDistanceToCam = GetDistanceToCamSqr(renderer, cam);
-            return sqrDistanceToCam >= distanceSqr;
+            Transform *camTransform = cam.GetEntity()->GetComponent<Transform>();
+            const Vector3 &camPosition = camTransform->GetPosition();
+            const Vector3 &camDir = camTransform->GetForward();
+            auto compare = [&camPosition, &camDir] (const MeshRenderer* r1, const MeshRenderer* r2)
+            {
+                float distanceSqr1 = GetDistanceToCamSqr(*r1, camPosition, camDir);
+                float distanceSqr2 = GetDistanceToCamSqr(*r2, camPosition, camDir);
+
+                return distanceSqr2 < distanceSqr1;
+            };
+
+            std::sort(renderers.begin(), renderers.end(), compare);
         }
     }
 
@@ -67,14 +74,7 @@ namespace Feng
         const Material* material = renderer->GetMaterial();
         if(material->IsTransparent())
         {
-            float distanceSqr = SRenderSystem::GetDistanceToCamSqr(*renderer, *renderProperties.cam);
-            auto isFarther = [this, distanceSqr](const MeshRenderer* renderer)
-            {
-                return SRenderSystem::IsFartherFromCam(*renderer, *renderProperties.cam, distanceSqr);
-            };
-            
-            auto it = std::find_if(renderersTransparent.cbegin(), renderersTransparent.cend(), isFarther);
-            renderersTransparent.insert(it, renderer);
+            renderersTransparent.push_back(renderer);
         }
         else
         {
@@ -85,18 +85,15 @@ namespace Feng
     void RenderSystem::RemoveRenderer(MeshRenderer *renderer)
     {
         const Material* material = renderer->GetMaterial();
-        if(material->IsTransparent())
+        std::vector<MeshRenderer*> renderers = material->IsTransparent()
+                                                ? renderersTransparent
+                                                : renderersOpaque;
+        
+        auto it = std::find(renderers.begin(), renderers.end(), renderer);
+        if(it != renderers.end())
         {
-            renderersTransparent.remove(renderer);
-        }
-        else
-        {
-            auto it = std::find(renderersOpaque.begin(), renderersOpaque.end(), renderer);
-            if(it != renderersOpaque.end())
-            {
-                std::swap(*it, renderersOpaque.back());
-                renderersOpaque.pop_back();
-            }
+            std::swap(*it, renderers.back());
+            renderers.pop_back();
         }
     }
 
@@ -196,7 +193,8 @@ namespace Feng
         {
             renderer->Draw(renderProperties);
         }
-        
+     
+        SRenderSystem::SortSceneByDistance(*renderProperties.cam, renderersTransparent);
         for(MeshRenderer *renderer : renderersTransparent)
         {
             renderer->Draw(renderProperties);
