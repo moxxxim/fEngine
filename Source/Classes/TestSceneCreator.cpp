@@ -194,7 +194,7 @@ namespace test
                                 Feng::Material& material)
         {
             Feng::Material *finalMaterial = Feng::Engine::IsShowDepth() ? test::res.ShowDepthMaterial.get() : &material;
-            Feng::Entity& obj = scene.CreateMesh(finalMaterial, &mesh);
+            Feng::Entity& obj = scene.CreateMesh(finalMaterial, &mesh, name);
 
             Feng::Transform *transform = obj.GetComponent<Feng::Transform>();
             transform->SetPosition(position);
@@ -204,7 +204,7 @@ namespace test
         
         void CreateInstancedObject(Feng::Scene& scene, Feng::Mesh &mesh)
         {
-            Feng::Entity& obj = scene.CreateMesh(test::res.PhongTexInstancedMaterial.get(), &mesh);
+            Feng::Entity& obj = scene.CreateMesh(test::res.PhongTexInstancedMaterial.get(), &mesh, "Instanced");
             InstancedObjectTransformController &instances = obj.AddComponent<InstancedObjectTransformController>();
             instances.SetCount(10'000);
         }
@@ -260,7 +260,7 @@ namespace test
             planeTransform->SetScale(40.f, 0.2f, 40.f);
             
             // Game manager.
-            Entity &gameManger = scene.CreateEntity();
+            Entity &gameManger = scene.CreateEntity("Game Manger");
             gameManger.AddComponent<PostEffectSwitcher>();
         }
         

@@ -100,16 +100,16 @@ namespace Feng
 
     Scene::~Scene() = default;
 
-    Entity& Scene::CreateEntity()
+    Entity& Scene::CreateEntity(const std::string& name)
     {
-        std::unique_ptr<Entity> entity = std::make_unique<Entity>();
+        std::unique_ptr<Entity> entity = std::make_unique<Entity>(name);
         entities.push_back(std::move(entity));
         return *entities.back();
     }
 
     Entity& Scene::CreateCamera()
     {
-        Entity &camera = CreateEntity();
+        Entity &camera = CreateEntity("Camera");
         camera.AddComponent<Camera>();
 
         renderSystem->SetCamera(camera.GetComponent<Camera>());
@@ -118,7 +118,7 @@ namespace Feng
 
     Entity& Scene::CreateLight(Light::eType type, Material *material, Mesh *mesh)
     {
-        Entity &entity = CreateEntity();
+        Entity &entity = CreateEntity("Light");
         Light &light = entity.AddComponent<Light>();
         light.SetType(type);
 
@@ -129,9 +129,9 @@ namespace Feng
         return entity;
     }
 
-    Entity& Scene::CreateMesh(Material *material, Mesh *mesh)
+    Entity& Scene::CreateMesh(Material *material, Mesh *mesh, const std::string& name)
     {
-        Entity &entity = CreateEntity();
+        Entity &entity = CreateEntity(name);
         MeshRenderer& renderer = entity.AddComponent<MeshRenderer>();
         renderer.SetMesh(mesh);
         renderer.SetMaterial(material);

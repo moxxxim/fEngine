@@ -3,6 +3,7 @@
 #include <Feng/ScenesManager/Light.h>
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace Feng
@@ -20,10 +21,10 @@ namespace Feng
         Scene();
         ~Scene();
 
-        Entity& CreateEntity();
+        Entity& CreateEntity(const std::string& name = "");
         Entity& CreateCamera();
         Entity& CreateLight(Light::eType type, Material *material, Mesh *mesh);
-        Entity& CreateMesh(Material *material, Mesh *mesh);
+        Entity& CreateMesh(Material *material, Mesh *mesh, const std::string& name = "");
         Entity& CreateSkybox(Material *material);
 
         void SetAmbientLight(Vector4 color, float intensity);
