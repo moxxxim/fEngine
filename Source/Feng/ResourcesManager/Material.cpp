@@ -109,5 +109,6 @@ namespace Feng
     void Material::ApplyStates()
     {
         Render::SetDrawFace(drawFace);
+        Render::SetBlending(transparent);
     }
 }

@@ -83,13 +83,7 @@ namespace Feng
             // Stencil testing.
             glEnable(GL_STENCIL_TEST);
 
-            // Blending.
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glBlendEquation(GL_FUNC_ADD);
-            
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Default
-
             glEnable(GL_MULTISAMPLE);
 
             Print_Errors_OpengGL();

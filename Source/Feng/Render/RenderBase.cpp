@@ -28,6 +28,15 @@ namespace Feng::Render
     
     void SetBlending(bool transparent)
     {
-        
+        if(transparent)
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glBlendEquation(GL_FUNC_ADD);
+        }
+        else
+        {
+            glDisable(GL_BLEND);
+        }
     }
 }

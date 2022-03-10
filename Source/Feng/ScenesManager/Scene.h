@@ -35,11 +35,6 @@ namespace Feng
         void Draw();
 
     private:
-//        void AddGameObject(GameObject *go);
-//        void RemoveGameObject(GameObject *go);
-//        void SetSkybox(Renderer *renderer);
-//        void RemoveSkybox();
-
         std::unique_ptr<RenderSystem> renderSystem;
         std::unique_ptr<SceneSettings> settings;
         std::vector<std::unique_ptr<Entity>> entities;
