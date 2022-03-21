@@ -39,7 +39,8 @@ namespace Feng
     private:
         void CreateCamUniformBuffer();
         void BindCamUniformBuffer();
-        void DrawRenderers();
+        void DrawOpaque();
+        void DrawTransparent();
         void DrawSkybox();
 
         static constexpr uint32_t camBufferIndex = 0;

@@ -29,5 +29,10 @@ void main()
 {
     varPos = aPos;
 	vec4 pos = uProjMatrix * (vec4(aPos, 1.0) * mat4(uCamRotation));
-	gl_Position = pos.xyww;
+
+    // By setting z-coordinate equal to 'w' we ensure,
+    // that after perspecitve division ( (x, y, z) / w) the depth of resulting fragment will be 1 (maximal value).
+    // Thus we ensure, that the skybox will not be rendered on top of the whole scene 
+    // and will not affect depth testing for objects renderd afterwards.
+    gl_Position = pos.xyww;
 }

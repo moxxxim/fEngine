@@ -140,9 +140,13 @@ namespace Feng
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        DrawSkybox();
         BindCamUniformBuffer();
-        DrawRenderers();
+        DrawOpaque();
+
+        // Draw skybox after opaque objects for good use of a depth buffer.
+        // Draw skybox before transparent object for correct visual effect.
+        DrawSkybox();
+        DrawTransparent();
 
         if(postProcessing.HasPostEffects())
         {
@@ -185,14 +189,19 @@ namespace Feng
 
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
-
-    void RenderSystem::DrawRenderers()
+    
+    void RenderSystem::DrawOpaque()
     {
         for(MeshRenderer *renderer : renderersOpaque)
         {
             renderer->Draw(renderProperties);
         }
-     
+        
+        Print_Errors_OpengGL();
+    }
+    
+    void RenderSystem::DrawTransparent()
+    {
         SRenderSystem::SortSceneByDistance(*renderProperties.cam, renderersTransparent);
         for(MeshRenderer *renderer : renderersTransparent)
         {
@@ -206,9 +215,11 @@ namespace Feng
     {
         if(skybox != nullptr)
         {
-            glDisable(GL_DEPTH_TEST);
+            // We need less-or-equal function for skybox to pass depth testing,
+            // as its depth will be 1 (initial depth value of a fragment in depth buffer).
+            glDepthFunc(GL_LEQUAL);
             skybox->Draw(renderProperties);
-            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LESS);
         }
 
         Print_Errors_OpengGL();
