@@ -22,7 +22,7 @@ namespace Feng
 
     void Transform::SetEuler(float x, float y, float z, eSpace space /*= eSpace::World*/)
     {
-        rotation = (space == eSpace::World) ? Quat::MakeRotation(x, y, z) : Quat::MakeRotation(x, y, z) * rotation;
+        SetRotation(Quat::MakeRotation(x, y, z), space);
     }
 
     void Transform::SetEuler(const Vector3& euler, eSpace space /*= eSpace::World*/)
@@ -50,14 +50,20 @@ namespace Feng
         return Mat4::MakeTransformation(scale, position, rotation);
     }
 
-    void Transform::Rotate(const Vector3& euler)
-    {
-        rotation *= Quat::MakeRotation(euler);
-    }
-
-    void Transform::Rotate(float x, float y, float z)
+    void Transform::Rotate(float x, float y, float z, eSpace space /*= eSpace::World*/)
     {
         Quaternion change = Quat::MakeRotation(x, y, z);
-        rotation *= change;
+        rotation = (space == eSpace::World) ? rotation * change : change * rotation;
+    }
+    
+    void Transform::Rotate(const Vector3& euler, eSpace space /*= eSpace::World*/)
+    {
+        Rotate(euler.x, euler.y, euler.z);
+    }
+    
+    void Transform::Rotate(const Vector3& axisNormalized, float dAngle, eSpace space /*= eSpace::World*/)
+    {
+        Quaternion change {axisNormalized, dAngle};
+        rotation = (space == eSpace::World) ? rotation * change : change * rotation;
     }
 }

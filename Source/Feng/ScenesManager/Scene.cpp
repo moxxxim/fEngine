@@ -147,7 +147,7 @@ namespace Feng
                                             eVertexAtributes::Position,
                                             ePrimitiveType::Triangles);
 
-        Entity &skybox = CreateMesh(material, SScene::skyboxMesh.get());
+        Entity &skybox = CreateMesh(material, SScene::skyboxMesh.get(), "skybox");
 
         renderSystem->RemoveRenderer(skybox.GetComponent<MeshRenderer>()); // TODO: m.aleksee this is bad.
         renderSystem->SetSkybox(skybox.GetComponent<MeshRenderer>());

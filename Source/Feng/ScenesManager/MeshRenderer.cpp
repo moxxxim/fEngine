@@ -96,8 +96,8 @@ namespace Feng
 
     void MeshRenderer::FinishDraw()
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
-        glBindBuffer(GL_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Render::UndefinedBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, Render::UndefinedBuffer);
     }
 
     void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties)
@@ -122,7 +122,7 @@ namespace Feng
 
         // No need to call 'glBindBuffer' because it was bound while VAO was still bound.
 
-        if(ibo != MeshRenderer::UndefinedBuffer)
+        if(ibo != Render::UndefinedBuffer)
         {
             const std::vector<uint32_t>& indices = mesh->GetIndices();
             if(instancesCount > 0)
@@ -156,7 +156,7 @@ namespace Feng
             }
         }
 
-        glBindVertexArray(UndefinedBuffer);
+        glBindVertexArray(Render::UndefinedBuffer);
     }
 
     void MeshRenderer::ActivateTexture(const std::string& name, const Texture &texture, uint32_t unit)
@@ -181,9 +181,9 @@ namespace Feng
             ibo = CreateIndexBuffer();
         }
 
-        glBindVertexArray(MeshRenderer::UndefinedBuffer);
-        glBindBuffer(GL_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshRenderer::UndefinedBuffer);
+        glBindVertexArray(Render::UndefinedBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, Render::UndefinedBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Render::UndefinedBuffer);
     }
 
     void MeshRenderer::DeleteGeomertyBuffers()
@@ -193,7 +193,7 @@ namespace Feng
         glDeleteBuffers(1, &vao);
         glDeleteBuffers(1, &instancesBuffer);
 
-        vao = vbo = ibo = instancesBuffer = MeshRenderer::UndefinedBuffer;
+        vao = vbo = ibo = instancesBuffer = Render::UndefinedBuffer;
     }
 
     void MeshRenderer::CreateTexturesBuffers()
@@ -232,8 +232,8 @@ namespace Feng
         glVertexAttribDivisor(5, 1);
         glVertexAttribDivisor(6, 1);
 
-        glBindVertexArray(UndefinedBuffer);
-        glBindBuffer(GL_ARRAY_BUFFER, UndefinedBuffer);
+        glBindVertexArray(Render::UndefinedBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, Render::UndefinedBuffer);
     }
 
     void MeshRenderer::UpdateInstanceBuffer(const std::vector<Matrix4>& instances)

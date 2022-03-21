@@ -13,6 +13,8 @@ namespace Feng
     
     namespace Render
     {
+        static constexpr uint32_t UndefinedBuffer = 0;
+        
         void SetDrawFace(eDrawFace face);
         void SetBlending(bool transparent);
     }

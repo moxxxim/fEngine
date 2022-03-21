@@ -6,9 +6,11 @@ namespace Feng
 {
     struct FrameBuffer final
     {
-        uint32_t Frame = 0; // Zero - is default buffer (render to screen).
-        uint32_t Color = 0; // Texture
-        uint32_t DepthStencil = 0; // Renderbuffer.
+        static constexpr uint32_t Default = 0;
+        
+        uint32_t Frame = Default; // Zero - is default buffer (render to screen).
+        uint32_t Color = Default; // Texture
+        uint32_t DepthStencil = Default; // Renderbuffer.
 
         uint32_t Width = 0;
         uint32_t Height = 0;

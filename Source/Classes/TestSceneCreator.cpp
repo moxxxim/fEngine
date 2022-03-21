@@ -168,22 +168,15 @@ namespace test
             light->SetRange(12.f);
             light->SetColor(color);
             light->SetIntensity(10.f);
-            light->SetSpotAngle(DegToRad(45));
+            light->SetSpotAngle(Math::DegToRad(45));
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
-            constexpr bool isUp = true;
+            lightTransform->SetPosition(5.f, 4.f, -2.f);
+            lightTransform->SetRotation(Quaternion{Vector3::OneY, 90});
 
-            if(isUp)
-            {
-                lightTransform->SetPosition(5.f, 4.f, -2.f);
-                lightTransform->SetRotation(Quaternion(Vector3::OneY, 90), eSpace::World);
-                lightTransform->SetRotation(Quaternion(Vector3::OneX, 20), eSpace::Self);
-            }
-            else
-            {
-                lightTransform->SetPosition(0.f, -8.f, 2.f);
-                lightTransform->SetRotation(Quaternion(Vector3::OneX, -90), eSpace::Self);
-            }
+            GameObjectRotation& lightRotation = lightEntity.AddComponent<GameObjectRotation>();
+            lightRotation.SetAxis(Feng::Vector3::OneX);
+            lightRotation.SetPeriod(4.f);
         }
 
         Feng::Entity* CreateObject(
@@ -229,7 +222,9 @@ namespace test
                     ? test::res.DiffTex1SpecTex2Material.get()
                     : test::res.SpecularTexMaterial.get();
                 Entity* object = CreateObject(scene, position, name, *test::res.CubeMesh, *material);
-                object->AddComponent<GameObjectRotation>();
+                GameObjectRotation& objectRotation = object->AddComponent<GameObjectRotation>();
+                objectRotation.SetAxis(Vector3::OneZ);
+                objectRotation.SetPeriod(4.f);
             }
 
             // Grass.

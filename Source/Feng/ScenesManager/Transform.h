@@ -22,12 +22,12 @@ namespace Feng
         const Quaternion& GetRotation(eSpace space = eSpace::World) const;
         void SetRotation(const Quaternion& aRotation, eSpace space = eSpace::World);
         Vector3 GetEuler(eSpace space = eSpace::World) const;
-        void SetEuler(const Vector3& euler, eSpace space = eSpace::World);
         void SetEuler(float x, float y, float z, eSpace space = eSpace::World);
+        void SetEuler(const Vector3& euler, eSpace space = eSpace::World);
 
         const Vector3& GetScale() const;
-        void SetScale(const Vector3& aScale);
         void SetScale(float x, float y, float z);
+        void SetScale(const Vector3& aScale);
         void SetScale(float uniformScale);
 
         Vector3 GetForward() const;
@@ -37,8 +37,9 @@ namespace Feng
 
         void Move(const Vector3& translation);
         void Move(float x, float y, float z);
-        void Rotate(const Vector3& euler);
-        void Rotate(float x, float y, float z);
+        void Rotate(float x, float y, float z, eSpace space = eSpace::World);
+        void Rotate(const Vector3& euler, eSpace space = eSpace::World);
+        void Rotate(const Vector3& axisNormalized, float dAngle, eSpace space = eSpace::World);
 
     private:
         Quaternion rotation;
@@ -76,16 +77,16 @@ namespace Feng
         return scale;
     }
 
-    inline void Transform::SetScale(const Vector3& aScale)
-    {
-        scale = aScale;
-    }
-
     inline void Transform::SetScale(float x, float y, float z)
     {
         scale.x = x;
         scale.y = y;
         scale.z = z;
+    }
+    
+    inline void Transform::SetScale(const Vector3& aScale)
+    {
+        scale = aScale;
     }
 
     inline void Transform::SetScale(float uniformScale)

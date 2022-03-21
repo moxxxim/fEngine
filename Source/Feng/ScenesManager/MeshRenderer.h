@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Feng/ScenesManager/Component.h>
 #include <Feng/Math/Matrix4.h>
+#include <Feng/Render/RenderBase.h>
+#include <Feng/ScenesManager/Component.h>
 
 #include <cstdint>
 #include <map>
@@ -59,12 +60,10 @@ namespace Feng
         void SetLightUniforms(const RenderProperties &renderProperties);
         void SetFogUniforms(const RenderProperties &renderProperties);
 
-        static constexpr uint32_t UndefinedBuffer = 0;
-
-        uint32_t vao = UndefinedBuffer;
-        uint32_t vbo = UndefinedBuffer;
-        uint32_t ibo = UndefinedBuffer;
-        uint32_t instancesBuffer = UndefinedBuffer;
+        uint32_t vao = Render::UndefinedBuffer;
+        uint32_t vbo = Render::UndefinedBuffer;
+        uint32_t ibo = Render::UndefinedBuffer;
+        uint32_t instancesBuffer = Render::UndefinedBuffer;
 
         std::map<std::string, uint32_t> textureBuffers;
 

@@ -16,7 +16,7 @@ namespace Feng
 {
     namespace SRenderSystem
     {
-        float GetDistanceToCamSqr(const MeshRenderer& renderer, const Vector3& camPos, const Vector3& camDir)
+        float GetDistanceToCamSqr(const MeshRenderer& renderer, const Vector3& camPos)
         {
             const Entity *entity = renderer.GetEntity();
             const Transform *transform = entity->GetComponent<Transform>();
@@ -29,11 +29,10 @@ namespace Feng
         {
             Transform *camTransform = cam.GetEntity()->GetComponent<Transform>();
             const Vector3 &camPosition = camTransform->GetPosition();
-            const Vector3 &camDir = camTransform->GetForward();
-            auto compare = [&camPosition, &camDir] (const MeshRenderer* r1, const MeshRenderer* r2)
+            auto compare = [&camPosition] (const MeshRenderer* r1, const MeshRenderer* r2)
             {
-                float distanceSqr1 = GetDistanceToCamSqr(*r1, camPosition, camDir);
-                float distanceSqr2 = GetDistanceToCamSqr(*r2, camPosition, camDir);
+                float distanceSqr1 = GetDistanceToCamSqr(*r1, camPosition);
+                float distanceSqr2 = GetDistanceToCamSqr(*r2, camPosition);
 
                 return distanceSqr2 < distanceSqr1;
             };
@@ -45,7 +44,7 @@ namespace Feng
     RenderSystem::RenderSystem()
     {
 #ifdef __APPLE__
-        frameBuffer = buffersPool.CreateBuffer(2 * Screen::ScreenWidth, 2 * Screen::ScreenHeight, true);
+        frameBuffer = fboPool.CreateBuffer(2 * Screen::ScreenWidth, 2 * Screen::ScreenHeight, true);
 #else
         frameBuffer = buffersPool.CreateBuffer(Screen::ScreenWidth, Screen::ScreenHeight, true);
 #endif
@@ -55,7 +54,7 @@ namespace Feng
 
     RenderSystem::~RenderSystem()
     {
-        buffersPool.DeleteBuffer(frameBuffer);
+        fboPool.DeleteBuffer(frameBuffer);
         glDeleteBuffers(1, &camUbo);
     }
 
@@ -136,14 +135,14 @@ namespace Feng
         }
         else
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer::Default);
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+        DrawSkybox();
         BindCamUniformBuffer();
         DrawRenderers();
-        DrawSkybox();
 
         if(postProcessing.HasPostEffects())
         {
@@ -207,9 +206,9 @@ namespace Feng
     {
         if(skybox != nullptr)
         {
-            glDepthFunc(GL_LEQUAL);
+            glDisable(GL_DEPTH_TEST);
             skybox->Draw(renderProperties);
-            glDepthFunc(GL_LESS); // Default.
+            glEnable(GL_DEPTH_TEST);
         }
 
         Print_Errors_OpengGL();

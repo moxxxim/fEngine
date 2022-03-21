@@ -47,7 +47,7 @@ namespace Feng
         std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;
         std::vector<Light*> lights;
-        FrameBuffersPool buffersPool;
+        FrameBuffersPool fboPool;
         RenderPostProcessing postProcessing;
         RenderProperties renderProperties;
         FrameBuffer frameBuffer;

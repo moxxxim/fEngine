@@ -5,6 +5,7 @@
 #include <Feng/Render/PostEffects/Core/PostEffect.h>
 #include <Feng/Render/PostEffects/Core/PostEffectContext.h>
 #include <Feng/Render/PostEffects/Core/PostEffectDefinition.h>
+#include <Feng/Render/RenderBase.h>
 #include <Feng/Utils/Debug.h>
 #include <Feng/Utils/Render/MeshParams.h>
 #include <Feng/Utils/Render/RenderUtils.h>
@@ -55,7 +56,7 @@ namespace Feng
 
         glBindVertexArray(vao);
         ApplyPostEffectsSequence(screenBuffer);
-        glBindVertexArray(0);
+        glBindVertexArray(Render::UndefinedBuffer);
     }
 
     void RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer)
@@ -109,7 +110,7 @@ namespace Feng
         Render::EnableVertexAttributes(static_cast<eVertexAtributes>(attributes));
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        glBindVertexArray(Render::UndefinedBuffer);
     }
 
     std::unique_ptr<PostEffect> RenderPostProcessing::CreatePostEffect(PostEffectDefinition &effectDefinition)

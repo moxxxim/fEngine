@@ -68,7 +68,7 @@ namespace Feng::Mat4
     {
         Matrix4 projection = Matrix4::Zero;
 
-        float rad = DegToRad(fovDegY);
+        float rad = Math::DegToRad(fovDegY);
         float fovHalfTan = std::tan(rad / 2.f);
 
         projection.m00 = 1.f / (aspect * fovHalfTan);
@@ -105,7 +105,7 @@ namespace Feng::Mat3
     {
         Matrix3 rotation = Matrix3::Identity();
 
-        float rad = DegToRad(dAngle);
+        float rad = Math::DegToRad(dAngle);
         float rotationCos = std::cos(rad);
         float rotationSin = std::sin(rad);
 
@@ -121,7 +121,7 @@ namespace Feng::Mat3
     {
         Matrix3 rotation = Matrix3::Identity();
 
-        float rad = DegToRad(dAngle);
+        float rad = Math::DegToRad(dAngle);
         float rotationCos = std::cos(rad);
         float rotationSin = std::sin(rad);
 
@@ -137,7 +137,7 @@ namespace Feng::Mat3
     {
         Matrix3 rotation = Matrix3::Identity();
 
-        float rad = DegToRad(dAngle);
+        float rad = Math::DegToRad(dAngle);
         float rotationCos = std::cos(rad);
         float rotationSin = std::sin(rad);
 

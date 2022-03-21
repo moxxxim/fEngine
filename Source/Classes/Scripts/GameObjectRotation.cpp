@@ -8,11 +8,15 @@
 
 void GameObjectRotation::Update(float deltaTime)
 {
-    if(!myTransform)
+    if(std::abs(period) > GameObjectRotation::ThresholdPeriod)
     {
-        Feng::Entity *myEntity = GetEntity();
-        myTransform = myEntity->GetComponent<Feng::Transform>();
-    }
+        if(!myTransform)
+        {
+            Feng::Entity *myEntity = GetEntity();
+            myTransform = myEntity->GetComponent<Feng::Transform>();
+        }
 
-    myTransform->Rotate(0.f, 0.f, Feng::RadToDeg(2.f * Feng::Pi) * deltaTime / fullTurnPeriod);
+        float dAngle = Feng::Math::RadToDeg(2.f * Feng::Math::Pi) * deltaTime / period;
+        myTransform->Rotate(axis, dAngle, space);
+    }
 }

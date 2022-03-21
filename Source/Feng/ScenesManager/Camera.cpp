@@ -48,10 +48,9 @@ namespace Feng
         const Entity *myEntity = GetEntity();
         const Transform *myTransform = myEntity->GetComponent<Transform>();
         const Matrix4 myTransformMatrix = myTransform->GetGlobalMatrix();
-        const Vector3 myScale = myTransform->GetScale();
 
         Matrix4 transformInverted;
-        myTransformMatrix.TryInvert(transformInverted);
+        std::ignore = myTransformMatrix.TryInvert(transformInverted);
 
         // TODO: m.alekseev Ignore scale.
         return transformInverted;

@@ -44,7 +44,7 @@ namespace Feng
     
     inline Quaternion::Quaternion(const Vector3& normAxis, float dAngle)
     {
-        float radHalfAngle = DegToRad(dAngle / 2);
+        float radHalfAngle = Math::DegToRad(dAngle / 2);
         float sine = std::sin(radHalfAngle);
         xyzw[0] = sine * normAxis.x;
         xyzw[1] = sine * normAxis.y;
@@ -110,7 +110,7 @@ namespace Feng
     
     inline Quaternion Quaternion::operator *= (const Quaternion& other)
     {
-        *this = other * (*this);
+        *this = (*this) * other;
         return *this;
     }
     
