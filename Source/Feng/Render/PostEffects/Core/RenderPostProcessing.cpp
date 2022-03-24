@@ -107,7 +107,7 @@ namespace Feng
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * quadVertices.size(), quadVertices.data(), GL_STATIC_DRAW);
 
         uint32_t attributes = eVertexAtributes::Position | eVertexAtributes::Uv0;
-        Render::EnableVertexAttributes(static_cast<eVertexAtributes>(attributes));
+        std::ignore = Render::EnableVertexAttributes(static_cast<eVertexAtributes>(attributes));
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(Render::UndefinedBuffer);

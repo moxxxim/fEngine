@@ -215,22 +215,23 @@ namespace Feng
         glBindBuffer(GL_ARRAY_BUFFER, instancesBuffer);
         glBindVertexArray(vao);
 
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, sizeof(float), GL_FLOAT, GL_FALSE, sizeof(Matrix4), reinterpret_cast<void*>(0));
+        glEnableVertexAttribArray(firstInstanceAttributeIndex);
+        glVertexAttribPointer(firstInstanceAttributeIndex, sizeof(float), GL_FLOAT, GL_FALSE,
+                              sizeof(Matrix4), reinterpret_cast<void*>(0));
+        glEnableVertexAttribArray(firstInstanceAttributeIndex + 1);
+        glVertexAttribPointer(firstInstanceAttributeIndex + 1, sizeof(float), GL_FLOAT, GL_FALSE,
+                              sizeof(Matrix4), reinterpret_cast<void*>(sizeof(Vector4)));
+        glEnableVertexAttribArray(firstInstanceAttributeIndex + 2);
+        glVertexAttribPointer(firstInstanceAttributeIndex + 2, sizeof(float), GL_FLOAT, GL_FALSE,
+                              sizeof(Matrix4), reinterpret_cast<void*>(2 * sizeof(Vector4)));
+        glEnableVertexAttribArray(firstInstanceAttributeIndex + 3);
+        glVertexAttribPointer(firstInstanceAttributeIndex + 3, sizeof(float), GL_FLOAT, GL_FALSE,
+                              sizeof(Matrix4), reinterpret_cast<void*>(3 * sizeof(Vector4)));
 
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, sizeof(float), GL_FLOAT, GL_FALSE, sizeof(Matrix4), reinterpret_cast<void*>(sizeof(Vector4)));
-
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, sizeof(float), GL_FLOAT, GL_FALSE, sizeof(Matrix4), reinterpret_cast<void*>(2 * sizeof(Vector4)));
-
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, sizeof(float), GL_FLOAT, GL_FALSE, sizeof(Matrix4), reinterpret_cast<void*>(3 * sizeof(Vector4)));
-
-        glVertexAttribDivisor(3, 1);
-        glVertexAttribDivisor(4, 1);
-        glVertexAttribDivisor(5, 1);
-        glVertexAttribDivisor(6, 1);
+        glVertexAttribDivisor(firstInstanceAttributeIndex, 1);
+        glVertexAttribDivisor(firstInstanceAttributeIndex + 1, 1);
+        glVertexAttribDivisor(firstInstanceAttributeIndex + 2, 1);
+        glVertexAttribDivisor(firstInstanceAttributeIndex + 3, 1);
 
         glBindVertexArray(Render::UndefinedBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, Render::UndefinedBuffer);
@@ -257,7 +258,7 @@ namespace Feng
         glBindBuffer(GL_ARRAY_BUFFER, bufferObject);
         glBufferData(GL_ARRAY_BUFFER, mesh->GetDataSize(), mesh->GetData(), GL_STATIC_DRAW);
 
-        Render::EnableVertexAttributes(mesh->GetAttributes());
+        firstInstanceAttributeIndex = Render::EnableVertexAttributes(mesh->GetAttributes());
 
         return bufferObject;
     }
@@ -281,7 +282,7 @@ namespace Feng
         
         shader->SetUniformFloat(ShaderParams::NearClipPlane.data(), renderProperties.cam->GetNearClipPlane());
         shader->SetUniformFloat(ShaderParams::FarClipPlane.data(), renderProperties.cam->GetFarClipPlane());
-        shader->SetUniformBuffer(ShaderParams::CamUniformBlock.data(), renderProperties.camBufferIndex);
+        shader->SetUniformBuffer(ShaderParams::CamUniformBlock.data(), RenderProperties::CamBufferBinding);
     }
 
     void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties)

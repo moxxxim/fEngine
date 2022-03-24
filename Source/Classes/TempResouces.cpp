@@ -32,6 +32,8 @@ namespace
     constexpr const char *SkyboxVs = "SkyboxVs.vs";
     constexpr const char *CubemapReflectiveFs = "Unlit/CubemapReflectiveColorFs.fs";
     constexpr const char *CubemapReflectiveVs = "Unlit/CubemapReflectiveColorVs.vs";
+    constexpr const char *CubemapRefractionFs = "Unlit/CubemapRefractionColorFs.fs";
+    constexpr const char *CubemapRefractionVs = "Unlit/CubemapRefractionColorVs.vs";
 
     constexpr const char *PostEffectVs = "PostEffects/PostEffectVs.vs";
     constexpr const char *GrayscalePostEffectFs = "PostEffects/PostEffectGrayscaleFs.fs";
@@ -247,6 +249,10 @@ namespace
         test::res.CubemapReflectiveMaterial = std::make_unique<Material>(LoadShader(CubemapReflectiveVs, CubemapReflectiveFs));
         test::res.CubemapReflectiveMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
         test::res.CubemapReflectiveMaterial->SetTransparent(false);
+        
+        test::res.CubemapRefractionMaterial = std::make_unique<Material>(LoadShader(CubemapRefractionVs, CubemapRefractionFs));
+        test::res.CubemapRefractionMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
+        test::res.CubemapRefractionMaterial->SetTransparent(false);
     }
     
     void CreatePostEffectDefinitions()

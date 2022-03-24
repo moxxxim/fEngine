@@ -70,6 +70,7 @@ namespace Feng
         Material *material = nullptr;
         Mesh *mesh = nullptr;
         uint32_t instancesCount = 0;
+        uint32_t firstInstanceAttributeIndex = 0;
     };
 }
 

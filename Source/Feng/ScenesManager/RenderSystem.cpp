@@ -49,7 +49,6 @@ namespace Feng
         frameBuffer = buffersPool.CreateBuffer(Screen::ScreenWidth, Screen::ScreenHeight, true);
 #endif
         CreateCamUniformBuffer();
-        renderProperties.camBufferIndex = camBufferIndex;
     }
 
     RenderSystem::~RenderSystem()
@@ -177,7 +176,7 @@ namespace Feng
         const Vector3 camDir = camTransform->GetForward();
 
         glBindBuffer(GL_UNIFORM_BUFFER, camUbo);
-        glBindBufferBase(GL_UNIFORM_BUFFER, renderProperties.camBufferIndex, camUbo);
+        glBindBufferBase(GL_UNIFORM_BUFFER, RenderProperties::CamBufferBinding, camUbo);
         // Offsets are specified in shader's uniform block layout.
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4), viewProjMatrix.data);
         glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(Matrix4), projMatrix.data);

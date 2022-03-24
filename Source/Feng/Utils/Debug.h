@@ -26,12 +26,12 @@ namespace Feng
 #define debugBreak() asm { int 3 }
 
 // check the expression and fail if it is false
-#define FASSERT(expr)                                       \
-if (expr) { }                                               \
-else                                                        \
-{                                                           \
-    Feng::Debug::LogLogError(#expr + __FILE__ + __LINE__)   \
-    debugBreak();                                           \
+#define FASSERT(expr)                                        \
+if (expr) { }                                                \
+else                                                         \
+{                                                            \
+    Feng::Debug::LogError(#expr + __FILE__ + __LINE__);      \
+    debugBreak();                                            \
 }                                                           
 #else
 #define ASSERT(expr) // evaluates to nothing

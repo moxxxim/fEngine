@@ -243,12 +243,14 @@ namespace test
                 std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.WindowMaterial);
             }
 
-            std::ignore = CreateObject(
-                                    scene,
-                                    Vector3(0.f, 2.f, -2.5f),
-                                    "Reflective",
-                                    *test::res.CubeMesh,
-                                    *test::res.CubemapReflectiveMaterial);
+            Feng::Entity *reflectiveObject = CreateObject(
+                                                          scene,
+                                                          Vector3(0.f, 2.f, -2.5f),
+                                                          "Reflective",
+                                                          *test::res.CubeMesh,
+                                                          *test::res.CubemapRefractionMaterial);
+            Feng::Transform *reflectiveObjectTransform = reflectiveObject->GetComponent<Feng::Transform>();
+            //reflectiveObjectTransform->Rotate(Feng::Vector3::One.ToNormalized(), 45.f);
 
             Entity *planeEntity = CreateObject(scene, planePos, "Plane", *test::res.CubeMesh, *test::res.PhongTexMaterial);
             Transform *planeTransform = planeEntity->GetComponent<Transform>();

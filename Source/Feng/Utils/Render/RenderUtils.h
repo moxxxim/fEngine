@@ -15,7 +15,7 @@ namespace Feng
     
     namespace Render
     {
-        void EnableVertexAttributes(eVertexAtributes attributesMask);
+        uint32_t EnableVertexAttributes(eVertexAtributes attributesMask);
         void BindMaterialUniforms(
                                 const Material &material,
                                 const std::map<std::string, uint32_t>& textureBuffers,

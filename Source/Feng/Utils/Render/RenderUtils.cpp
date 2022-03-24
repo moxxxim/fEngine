@@ -35,7 +35,7 @@ namespace Feng::Render
         }
     }
 
-    void EnableVertexAttributes(eVertexAtributes attributesMask)
+    uint32_t EnableVertexAttributes(eVertexAtributes attributesMask)
     {
         uint32_t stride = AttributesParser::GetStride(attributesMask);
         AttributesParser attributes { attributesMask };
@@ -69,6 +69,8 @@ namespace Feng::Render
 
             attributes.Next();
         }
+        
+        return attributeIndex;
     }
 
     void BindMaterialUniforms(

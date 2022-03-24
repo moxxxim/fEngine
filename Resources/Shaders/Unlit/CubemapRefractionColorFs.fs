@@ -1,8 +1,5 @@
 #version 330 core
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNorm;
-
 layout (std140) uniform ubCamera
 {
                             // base alignment (size occupied)       // aligned offset (multiple of a base alignment)
@@ -24,16 +21,19 @@ layout (std140) uniform ubCamera
                             // Total            208
 };
 
-uniform mat4 uModelMatrix;
+uniform samplerCube uTexture0;
 
-out vec3 varFragPos;
-out vec3 varNorm;
+in vec3 varFragPos;
+in vec3 varNorm;
+
+out vec4 FragColor;
 
 void main()
 {
-    vec4 worldPos = uModelMatrix * vec4(aPos, 1.f);
+    float ratio = 1.00 / 1.52; // Glass
+    vec3 viewDir = normalize(varFragPos - uCamPos);
+    vec3 norm = normalize(varNorm);
+    vec3 sampleDir = refract(viewDir, normalize(norm), ratio);
 
-    varFragPos = worldPos.xyz;
-    varNorm = transpose(inverse(mat3(uModelMatrix))) * aNorm;
-    gl_Position = uViewProjMatrix * worldPos;
+    FragColor = texture(uTexture0, sampleDir);
 }

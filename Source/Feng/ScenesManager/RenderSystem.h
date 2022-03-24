@@ -43,8 +43,6 @@ namespace Feng
         void DrawTransparent();
         void DrawSkybox();
 
-        static constexpr uint32_t camBufferIndex = 0;
-
         std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;
         std::vector<Light*> lights;
