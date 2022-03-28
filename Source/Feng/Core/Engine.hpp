@@ -21,6 +21,8 @@ namespace Feng
         static Vector2 GetMouseScroll();
         static bool IsShowDepth();
         static void ShowDepth(bool show);
+        static bool IsMultisampleEnabled();
+        static void SetMultisampleEnabled(bool enabled);
 
         Engine();
         int32_t Run();

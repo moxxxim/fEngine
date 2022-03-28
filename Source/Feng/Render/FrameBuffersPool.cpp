@@ -8,6 +8,34 @@
 
 namespace Feng
 {
+    FrameBuffersPool::~FrameBuffersPool()
+    {
+        for(const FrameBuffer& buffer : buffers)
+        {
+            DeleteBuffer(buffer);
+        }
+    }
+    
+    FrameBuffer FrameBuffersPool::Pop(uint32_t width, uint32_t height, bool depthStencil, bool multisample)
+    {
+        auto isSuitable = [width,height, depthStencil, multisample](const FrameBuffer& buffer)
+        {
+            return buffer.Suits(width, height, depthStencil, multisample);
+        };
+        
+        auto it = std::find_if(buffers.begin(), buffers.end(), isSuitable);
+        if(it != buffers.end())
+        {
+            FrameBuffer outBuffer = *it;
+            std::swap(*it, buffers.back());
+            buffers.pop_back();
+            
+            return outBuffer;
+        }
+        
+        return CreateBuffer(width, height, depthStencil, multisample);
+    }
+
     FrameBuffer FrameBuffersPool::CreateBuffer(uint32_t width, uint32_t height, bool depthStencil, bool multisample)
     {
         GLenum target = multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
@@ -68,12 +96,17 @@ namespace Feng
         frameBuffer.DepthStencil = depthStencilBuffer;
         frameBuffer.Width = width;
         frameBuffer.Height = height;
-        frameBuffer.isMultisample = multisample;
+        frameBuffer.IsMultisample = multisample;
 
         Print_Errors_OpengGL();
         return frameBuffer;
     }
-
+    
+    void FrameBuffersPool::Push(const FrameBuffer& buffer)
+    {
+        buffers.push_back(buffer);
+    }
+    
     void FrameBuffersPool::DeleteBuffer(const FrameBuffer& buffer)
     {
         glDeleteFramebuffers(1, &buffer.Frame);

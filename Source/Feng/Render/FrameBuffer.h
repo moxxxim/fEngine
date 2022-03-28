@@ -4,8 +4,9 @@
 
 namespace Feng
 {
-    struct FrameBuffer final
+    class FrameBuffer final
     {
+    public:
         static constexpr uint32_t Default = 0;
         
         uint32_t Frame = Default; // Zero - is default buffer (render to screen).
@@ -14,6 +15,8 @@ namespace Feng
 
         uint32_t Width = 0;
         uint32_t Height = 0;
-        bool isMultisample = false;
+        bool IsMultisample = false;
+        
+        bool Suits(uint32_t width, uint32_t height, bool depthStencil, bool multisample) const;
     };
 }

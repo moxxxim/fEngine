@@ -24,16 +24,7 @@ void PostEffectSwitcher::Update(float deltaTime)
     {
         if(!isDelayActive)
         {
-            if(isMultisample)
-            {
-                glDisable(GL_MULTISAMPLE);
-            }
-            else
-            {
-                glEnable(GL_MULTISAMPLE);
-            }
-
-            isMultisample = !isMultisample;
+            Feng::Engine::SetMultisampleEnabled(!Feng::Engine::IsMultisampleEnabled());
             isDelayActive = true;
         }
     }

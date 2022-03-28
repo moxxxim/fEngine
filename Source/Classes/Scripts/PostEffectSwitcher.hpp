@@ -18,7 +18,6 @@ private:
     float effectChangeInputDelay = 0.3f;
     float lastEffectChangeTime = 0.f;
     int32_t appliedEffectIndex = -1;
-    bool isMultisample = false;
     float delay = 0.25;
     bool isDelayActive = false;
 };

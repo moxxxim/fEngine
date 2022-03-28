@@ -165,6 +165,23 @@ namespace Feng
     float Engine::time = 0.f;
     bool Engine::showDepth = false;
     
+    bool Engine::IsMultisampleEnabled()
+    {
+        return glIsEnabled(GL_MULTISAMPLE);
+    }
+    
+    void Engine::SetMultisampleEnabled(bool enabled)
+    {
+        if(enabled)
+        {
+            glEnable(GL_MULTISAMPLE);
+        }
+        else
+        {
+            glDisable(GL_MULTISAMPLE);
+        }
+    }
+    
     Engine::Engine()
     {
         instance = this;

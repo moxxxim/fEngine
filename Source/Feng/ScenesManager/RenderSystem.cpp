@@ -1,6 +1,7 @@
 #include <Feng/ScenesManager/RenderSystem.h>
 
 #include <Feng/App/Globals.h>
+#include <Feng/Core/Engine.hpp>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/Light.h>
@@ -48,7 +49,6 @@ namespace Feng
 
     RenderSystem::~RenderSystem()
     {
-        fboPool.DeleteBuffer(frameBuffer);
         glDeleteBuffers(1, &camUbo);
     }
 
@@ -122,20 +122,12 @@ namespace Feng
 
     void RenderSystem::Draw()
     {
-        if(postProcessing.HasPostEffects())
-        {
-            if(frameBuffer.Frame == FrameBuffer::Default)
-            {
-                frameBuffer = CreateFrameBuffer();
-            }
-            
-            glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.Frame);
-            Print_Errors_OpengGL();
-        }
-        else
-        {
-            glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer::Default);
-        }
+        FrameBuffer renderBuffer = postProcessing.HasPostEffects()
+                    ? GetFrameBuffer(Engine::IsMultisampleEnabled())
+                    : FrameBuffer{};
+
+        glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer.Frame);
+        Print_Errors_OpengGL();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -149,8 +141,22 @@ namespace Feng
 
         if(postProcessing.HasPostEffects())
         {
-            postProcessing.ApplyPostEffects(frameBuffer);
+            FrameBuffer postEffectInput = renderBuffer;
+            if (renderBuffer.IsMultisample)
+            {
+                postEffectInput = GetFrameBuffer(false);
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, renderBuffer.Frame);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, postEffectInput.Frame);
+                glBlitFramebuffer(0, 0, renderBuffer.Width, renderBuffer.Height,
+                                  0, 0, postEffectInput.Width, postEffectInput.Height,
+                                  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+                fboPool.Push(renderBuffer);
+            }
+
+            postProcessing.ApplyPostEffects(postEffectInput);
+            fboPool.Push(postEffectInput);
         }
+        
         Print_Errors_OpengGL();
     }
 
@@ -224,13 +230,13 @@ namespace Feng
         Print_Errors_OpengGL();
     }
     
-    FrameBuffer RenderSystem::CreateFrameBuffer()
+    FrameBuffer RenderSystem::GetFrameBuffer(bool multisample)
     {
         #ifdef __APPLE__
             // m.alekseev Hack-fix for GLFW problev with hight dpi screens.
-            return fboPool.CreateBuffer(2 * Screen::ScreenWidth, 2 * Screen::ScreenHeight, true, false);
+            return fboPool.Pop(2 * Screen::ScreenWidth, 2 * Screen::ScreenHeight, true, multisample);
         #else
-            return fboPool.CreateBuffer(Screen::ScreenWidth, Screen::ScreenHeight, true, false);
+            return fboPool.Pop(Screen::ScreenWidth, Screen::ScreenHeight, true, multisample);
         #endif
     }
 }

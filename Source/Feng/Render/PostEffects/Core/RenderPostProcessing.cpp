@@ -63,7 +63,7 @@ namespace Feng
     {
         size_t effectsCount = effects.size();
         FrameBuffer intermediateBuffer = (effectsCount > 1)
-            ? buffersPool.CreateBuffer(screenBuffer.Width, screenBuffer.Height, false, false)
+            ? buffersPool.Pop(screenBuffer.Width, screenBuffer.Height, false, false)
             : FrameBuffer{};
 
         PostEffectContext context;
@@ -82,7 +82,7 @@ namespace Feng
 
         if (effectsCount > 1)
         {
-            buffersPool.DeleteBuffer(intermediateBuffer);
+            buffersPool.Push(intermediateBuffer);
         }
     }
 

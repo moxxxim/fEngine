@@ -42,7 +42,7 @@ namespace Feng
         void DrawOpaque();
         void DrawTransparent();
         void DrawSkybox();
-        FrameBuffer CreateFrameBuffer();
+        FrameBuffer GetFrameBuffer(bool multisample);
 
         std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;
@@ -50,7 +50,7 @@ namespace Feng
         FrameBuffersPool fboPool;
         RenderPostProcessing postProcessing;
         RenderProperties renderProperties;
-        FrameBuffer frameBuffer;
+        //FrameBuffer frameBuffer;
         MeshRenderer *skybox = nullptr;
         uint32_t camUbo = 0;
     };
