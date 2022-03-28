@@ -6,6 +6,7 @@ option(USE_GLM_LIB "Add GLM lib to project" OFF)
 set(PROJECT_NAME "Feng")
 set(THIRDPARTY_SRC_DIR_NAME "Thirdparty")
 set(GLM_DIR_NAME "Glm")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum OS X deployment version")
 project(${PROJECT_NAME})
 
 message(${PROJECT_SOURCE_DIR})
