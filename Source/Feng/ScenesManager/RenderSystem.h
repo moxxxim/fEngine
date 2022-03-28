@@ -42,6 +42,7 @@ namespace Feng
         void DrawOpaque();
         void DrawTransparent();
         void DrawSkybox();
+        FrameBuffer CreateFrameBuffer();
 
         std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;

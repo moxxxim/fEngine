@@ -31,6 +31,7 @@ namespace Feng
     private:
         static void UpdateTime();
         static void UpdateInputKeys();
+        static void ResetFrameTemporary();
         
         void Update();
         void Render();

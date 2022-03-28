@@ -74,7 +74,7 @@ namespace Feng
         context = aContext;
         for (int i = 0; i < customBuffersCount; ++i)
         {
-            buffers[i] = buffersPool->CreateBuffer(context.Input.Width, context.Input.Height, false);
+            buffers[i] = buffersPool->CreateBuffer(context.Input.Width, context.Input.Height, false, false);
         }
     }
 

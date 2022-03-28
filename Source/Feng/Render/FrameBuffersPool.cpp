@@ -8,9 +8,9 @@
 
 namespace Feng
 {
-    FrameBuffer FrameBuffersPool::CreateBuffer(uint32_t width, uint32_t height, bool depthStencil)
+    FrameBuffer FrameBuffersPool::CreateBuffer(uint32_t width, uint32_t height, bool depthStencil, bool multisample)
     {
-        GLenum target = GL_TEXTURE_2D;
+        GLenum target = multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
         GLuint fbo;
         glGenFramebuffers(1, &fbo);
@@ -68,7 +68,9 @@ namespace Feng
         frameBuffer.DepthStencil = depthStencilBuffer;
         frameBuffer.Width = width;
         frameBuffer.Height = height;
+        frameBuffer.isMultisample = multisample;
 
+        Print_Errors_OpengGL();
         return frameBuffer;
     }
 

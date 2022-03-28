@@ -9,7 +9,7 @@ namespace Feng
     public:
         FrameBuffersPool() = default;
 
-        FrameBuffer CreateBuffer(uint32_t width, uint32_t height, bool depthStencil);
+        FrameBuffer CreateBuffer(uint32_t width, uint32_t height, bool depthStencil, bool multisample);
         void DeleteBuffer(const FrameBuffer& buffer);
     };
 }

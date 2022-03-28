@@ -43,11 +43,6 @@ namespace Feng
 
     RenderSystem::RenderSystem()
     {
-#ifdef __APPLE__
-        frameBuffer = fboPool.CreateBuffer(2 * Screen::ScreenWidth, 2 * Screen::ScreenHeight, true);
-#else
-        frameBuffer = buffersPool.CreateBuffer(Screen::ScreenWidth, Screen::ScreenHeight, true);
-#endif
         CreateCamUniformBuffer();
     }
 
@@ -129,6 +124,11 @@ namespace Feng
     {
         if(postProcessing.HasPostEffects())
         {
+            if(frameBuffer.Frame == FrameBuffer::Default)
+            {
+                frameBuffer = CreateFrameBuffer();
+            }
+            
             glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.Frame);
             Print_Errors_OpengGL();
         }
@@ -222,5 +222,15 @@ namespace Feng
         }
 
         Print_Errors_OpengGL();
+    }
+    
+    FrameBuffer RenderSystem::CreateFrameBuffer()
+    {
+        #ifdef __APPLE__
+            // m.alekseev Hack-fix for GLFW problev with hight dpi screens.
+            return fboPool.CreateBuffer(2 * Screen::ScreenWidth, 2 * Screen::ScreenHeight, true, false);
+        #else
+            return fboPool.CreateBuffer(Screen::ScreenWidth, Screen::ScreenHeight, true, false);
+        #endif
     }
 }

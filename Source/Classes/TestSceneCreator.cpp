@@ -222,9 +222,12 @@ namespace test
                     ? test::res.DiffTex1SpecTex2Material.get()
                     : test::res.SpecularTexMaterial.get();
                 Entity* object = CreateObject(scene, position, name, *test::res.CubeMesh, *material);
-                GameObjectRotation& objectRotation = object->AddComponent<GameObjectRotation>();
-                objectRotation.SetAxis(Vector3::OneZ);
-                objectRotation.SetPeriod(4.f);
+                if ((i % 2) == 0)
+                {
+                    GameObjectRotation& objectRotation = object->AddComponent<GameObjectRotation>();
+                    objectRotation.SetAxis(Vector3::OneZ);
+                    objectRotation.SetPeriod(4.f);
+                }
             }
 
             // Grass.

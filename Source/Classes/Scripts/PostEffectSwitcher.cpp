@@ -19,6 +19,34 @@ void PostEffectSwitcher::Update(float deltaTime)
     {
         Feng::Engine::Instance()->RemovePostEffect();
     }
+    
+    if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_I))
+    {
+        if(!isDelayActive)
+        {
+            if(isMultisample)
+            {
+                glDisable(GL_MULTISAMPLE);
+            }
+            else
+            {
+                glEnable(GL_MULTISAMPLE);
+            }
+
+            isMultisample = !isMultisample;
+            isDelayActive = true;
+        }
+    }
+    
+    if(isDelayActive)
+    {
+        delay += deltaTime;
+        if(delay > MultisampleSwitchTimeOut)
+        {
+            delay = 0.f;
+            isDelayActive = false;
+        }
+    }
 }
 
 void PostEffectSwitcher::ApplyNextPostEffect()

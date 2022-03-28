@@ -54,10 +54,11 @@ void InstancedObjectTransformController::Update(float deltaTime)
         renderer = entity->GetComponent<Feng::MeshRenderer>();
     }
 
-    constexpr float offsetFactor = 0.1f;
+    constexpr float offsetFactor = 0.01f;
+    constexpr float speedFactor = 0.1f;
     for(size_t i = 0; i < instances.size(); i+=2)
     {
-        instances[i].rows[3].z += offsetFactor * std::sin(Feng::Engine::Time());
+        instances[i].rows[3].z += offsetFactor * std::sin(speedFactor * Feng::Engine::Time());
     }
 
     renderer->SetInstanceTransforms(instances);
