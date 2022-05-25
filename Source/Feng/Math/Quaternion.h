@@ -91,19 +91,19 @@ namespace Feng
         const float w = xyzw[3];
 
         const Vector3 row1 {
-            1.f - 2.f * (y*y + z*z),
-            2.f * (x*y + z*w),
-            2.f * (x*z - y*w) };
+            1.f - 2.f * (y * y + z * z),
+            2.f * (x * y + z * w),
+            2.f * (x * z - y * w) };
 
         const Vector3 row2 {
-            2.f * (x*y - z*w),
-            1.f - 2.f * (x*x + z*z),
-            2 * (y*z + x*w)};
+            2.f * (x * y - z * w),
+            1.f - 2.f * (x * x + z * z),
+            2 * (y * z + x * w)};
 
         const Vector3 row3 {
-            2.f * (x*z + y*w),
-            2.f * (y*z - x*w),
-            1.f - 2.f * (x*x + y*y)};
+            2.f * (x * z + y * w),
+            2.f * (y * z - x * w),
+            1.f - 2.f * (x * x + y * y)};
 
         return Matrix3::Rows(row1, row2, row3);
     }
@@ -133,7 +133,7 @@ namespace Feng
     {
         // NOTE: Conjugate: p' = q * p * (p^-1)).
         /*
-         // NOTE: The actual order is inverted because operator * multiplying quaternions is inverted.
+         // NOTE: The actual order is inverted because operator '*' multiplying quaternions is inverted.
          
          const Quaternion pointAsQuaternion {point.x, point.y, point.z, 0};
          const Quaternion multAsQuaternion = rotation.Inverse() * pointAsQuaternion * rotation;
