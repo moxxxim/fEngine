@@ -16,13 +16,16 @@ namespace Feng
     {
         if (effects.size() > 1)
         {
-            FrameBuffer intermediateBuffer = buffersPool->Pop(context.Input.Width, context.Input.Height, false, false);
+            FrameBuffer::Settings bufferSettings;
+            bufferSettings.width = context.input.settings.width;
+            bufferSettings.height = context.input.settings.height;
+            FrameBuffer intermediateBuffer = buffersPool->Pop(bufferSettings);
 
             for (uint32_t i = 0; i < effects.size(); ++i)
             {
-                FrameBuffer input = (i == 0) ? context.Input : intermediateBuffer;
-                FrameBuffer output = (effects.size() - 1) ? context.Output : intermediateBuffer;
-                PostEffectContext innerContext(context.Original, input, output);
+                FrameBuffer input = (i == 0) ? context.input : intermediateBuffer;
+                FrameBuffer output = (effects.size() - 1) ? context.output : intermediateBuffer;
+                PostEffectContext innerContext(context.original, input, output);
                 std::unique_ptr<PostEffect>& effect = effects[i];
                 effect->Apply(innerContext);
             }

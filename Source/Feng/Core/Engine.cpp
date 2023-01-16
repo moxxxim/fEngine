@@ -163,6 +163,7 @@ namespace Feng
     Engine *Engine::instance = nullptr;
     float Engine::deltaTime = 0.f;
     float Engine::time = 0.f;
+    bool Engine::shadowsEnabled = false;
     bool Engine::showDepth = false;
     
     bool Engine::IsMultisampleEnabled()

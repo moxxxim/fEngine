@@ -1,6 +1,8 @@
 #include <Feng/Core/Engine.hpp>
 #include <Classes/TestSceneCreator.hpp>
 
+#include <iostream>
+
 int main(int argc, const char * argv[])
 {
     Feng::Engine engine;
@@ -9,3 +11,4 @@ int main(int argc, const char * argv[])
 
     return engine.Run();
 }
+

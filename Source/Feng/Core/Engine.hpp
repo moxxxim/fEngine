@@ -19,6 +19,8 @@ namespace Feng
         static bool IsKeyPressed(InputKey::eKey key);
         static Vector2 GetMousePos();
         static Vector2 GetMouseScroll();
+        static bool IsShadowsEnabled();
+        static void SetShadowsEnabled(bool aShadowsEnabled);
         static bool IsShowDepth();
         static void ShowDepth(bool show);
         static bool IsMultisampleEnabled();
@@ -42,6 +44,7 @@ namespace Feng
         static Engine *instance;
         static float deltaTime;
         static float time;
+        static bool shadowsEnabled;
         static bool showDepth;
         
         std::unique_ptr<Feng::Scene> scene;
@@ -65,6 +68,16 @@ namespace Feng
     inline bool Engine::IsKeyPressed(InputKey::eKey key)
     {
         return inputKeys[static_cast<uint32_t>(key)] == eKeyStatus::Pressed;
+    }
+    
+    inline bool Engine::IsShadowsEnabled()
+    {
+        return Engine::shadowsEnabled;
+    }
+    
+    inline void Engine::SetShadowsEnabled(bool aShadowsEnabled)
+    {
+        Engine::shadowsEnabled = aShadowsEnabled;
     }
     
     inline bool Engine::IsShowDepth()

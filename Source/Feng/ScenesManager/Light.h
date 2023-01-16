@@ -34,6 +34,9 @@ namespace Feng
 
         float GetSpotAngle() const;
         void SetSpotAngle(float aSpotAngle);
+        
+        bool IsShadowCaster() const;
+        bool SetShadowCaster(bool aCastShadows);
 
     private:
         Vector4 color;
@@ -41,6 +44,7 @@ namespace Feng
         float range = 1.f;
         float spotAngle = 20.f;
         eType type = eType::Directional;
+        bool shadowCaster = false;
     };
 }
 
@@ -94,5 +98,15 @@ namespace Feng
     inline void Light::SetSpotAngle(float aSpotAngle)
     {
         spotAngle = aSpotAngle;
+    }
+    
+    inline bool Light::IsShadowCaster() const
+    {
+        return shadowCaster;
+    }
+
+    inline bool Light::SetShadowCaster(bool aCastShadows)
+    {
+        shadowCaster = aCastShadows;
     }
 }

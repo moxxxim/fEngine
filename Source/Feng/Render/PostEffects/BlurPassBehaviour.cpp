@@ -20,7 +20,7 @@ namespace Feng
     void BlurPassBehaviour::SetupPass(int passIndex, PostEffectPass& pass)
     {
         pass.SetTextureFromOriginal(PostEffectPass::InputTextureType::Color, ShaderParams::ScreenColorOriginal.data());
-        pass.SetTextureFromOriginal(PostEffectPass::InputTextureType::DepthStencil, ShaderParams::ScreenDepthOriginal.data());
+        pass.SetTextureFromOriginal(PostEffectPass::InputTextureType::Depth, ShaderParams::ScreenDepthOriginal.data());
 
         if (passIndex == GetPassesCount() - 1)
         {

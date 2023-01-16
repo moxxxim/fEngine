@@ -61,19 +61,24 @@ namespace Feng
 
     void RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer)
     {
+        FrameBuffer::Settings intermediateSettings = screenBuffer.settings;
+        intermediateSettings.color = FrameBuffer::eAttachementState::Texture;
+        intermediateSettings.depth = FrameBuffer::eAttachementState::None;
+        intermediateSettings.stencil = FrameBuffer::eAttachementState::None;
+        intermediateSettings.multisample = false;
+        intermediateSettings.combinedDepthStencil = false;
+        
         size_t effectsCount = effects.size();
-        FrameBuffer intermediateBuffer = (effectsCount > 1)
-            ? buffersPool.Pop(screenBuffer.Width, screenBuffer.Height, false, false)
-            : FrameBuffer{};
+        FrameBuffer intermediateBuffer = (effectsCount > 1) ? buffersPool.Pop(intermediateSettings) : FrameBuffer{};
 
         PostEffectContext context;
-        context.Original = screenBuffer;
+        context.original = screenBuffer;
 
         for (size_t i = 0; i < effectsCount; ++i)
         {
             // TODO: m.alekseev Seems like it doesn't work correctly for multiple effects.
-            context.Input = (i == 0) ? screenBuffer : intermediateBuffer;
-            context.Output = (i == (effectsCount - 1)) ? FrameBuffer{} : intermediateBuffer;
+            context.input = (i == 0) ? screenBuffer : intermediateBuffer;
+            context.output = (i == (effectsCount - 1)) ? FrameBuffer{} : intermediateBuffer;
 
             std::unique_ptr<PostEffect> &effect = effects[i];
             effect->Apply(context);

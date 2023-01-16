@@ -29,8 +29,8 @@ namespace Feng
         void StartUse() const;
         void StopUse() const;
 
-        const std::map<std::string, int32_t> &GetAttributes() const;
-        const std::map<std::string, int32_t> &GetUniforms() const;
+        const std::map<std::string, int32_t>& GetAttributes() const;
+        const std::map<std::string, int32_t>& GetUniforms() const;
 
         bool TryGetAttributeLocation(const char *name, uint32_t& location) const;
         bool TryGetUniformLocation(const char *name, uint32_t& location) const;

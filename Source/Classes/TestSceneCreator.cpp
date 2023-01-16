@@ -95,7 +95,7 @@ namespace test
             return material;
         }
 
-        void CreateDirectLight(Feng::Scene& scene)
+        void CreateDirectLight(Feng::Scene& scene, bool isShadowCaster)
         {
             using namespace Feng;
             
@@ -112,6 +112,7 @@ namespace test
 
             light->SetColor(color);
             light->SetIntensity(1.f);
+            light->SetShadowCaster(isShadowCaster);
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
             lightTransform->SetPosition(0.f, 0.f, 4.f);
@@ -208,7 +209,7 @@ namespace test
             
             std::ignore = scene.CreateSkybox(test::res.SkyboxMaterial.get());
             Entity* camEntity = CreateCamera(scene);
-            CreateDirectLight(scene);
+            CreateDirectLight(scene, true);
             CreatePointLight(scene);
             CreateSpotLight(scene);
             CreateInstancedObject(scene, *test::res.CubeMesh);

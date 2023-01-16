@@ -19,9 +19,17 @@ namespace Feng
     class RenderSystem final
     {
     public:
+        struct ShadowSetup final
+        {
+            Entity *light = nullptr;
+            int32_t width = 0;
+            int32_t height = 0;
+        };
+        
         RenderSystem();
         ~RenderSystem();
 
+        void SetShadowSetup(const ShadowSetup& aShadowSetup);
         void SetAmbientLight(Vector4 color, float intensity);
 
         void SetCamera(Camera *camera);
@@ -39,18 +47,23 @@ namespace Feng
     private:
         void CreateCamUniformBuffer();
         void BindCamUniformBuffer();
+        void DrawShadowMap();
         void DrawOpaque();
         void DrawTransparent();
         void DrawSkybox();
+        void ApplyPostEffects(const FrameBuffer& renderBuffer);
         FrameBuffer GetFrameBuffer(bool multisample);
 
+        static constexpr int32_t DefaultShadowMapSize = 1024;
+        
         std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;
         std::vector<Light*> lights;
+        ShadowSetup shadowSetup;
         FrameBuffersPool fboPool;
         RenderPostProcessing postProcessing;
         RenderProperties renderProperties;
-        //FrameBuffer frameBuffer;
+        FrameBuffer shadowMap;
         MeshRenderer *skybox = nullptr;
         uint32_t camUbo = 0;
     };

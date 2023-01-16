@@ -28,16 +28,16 @@ namespace Feng
     void PostEffectPass::SetTextureFromOriginal(InputTextureType type, const char *textureName)
     {
         uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
-                ? context.Original.Color
-                : context.Original.DepthStencil;
+                ? context.original.color
+                : context.original.depth;
         SetShaderInput(textureName, textureBuffer);
     }
 
     void PostEffectPass::SetTextureFromInput(InputTextureType type, const char *textureName)
     {
         uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
-                ? context.Input.Color
-                : context.Input.DepthStencil;
+                ? context.input.color
+                : context.input.depth;
         SetShaderInput(textureName, textureBuffer);
     }
 
@@ -47,8 +47,8 @@ namespace Feng
         {
             const FrameBuffer& buffer = buffers[textureBufferIndex];
             uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
-                                    ? buffer.Color
-                                    : buffer.DepthStencil;
+                                    ? buffer.color
+                                    : buffer.depth;
             SetShaderInput(textureName, textureBuffer);
         }
     }
@@ -58,14 +58,14 @@ namespace Feng
         if ((0 <= textureBufferIndex) && (textureBufferIndex < customBuffersCount))
         {
             const FrameBuffer& buffer = buffers[textureBufferIndex];
-            glBindFramebuffer(GL_FRAMEBUFFER, buffer.Frame);
+            glBindFramebuffer(GL_FRAMEBUFFER, buffer.frame);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
     }
 
     void PostEffectPass::SetRenderBufferOutput()
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, context.Output.Frame);
+        glBindFramebuffer(GL_FRAMEBUFFER, context.output.frame);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -74,7 +74,13 @@ namespace Feng
         context = aContext;
         for (int i = 0; i < customBuffersCount; ++i)
         {
-            buffers[i] = buffersPool->Pop(context.Input.Width, context.Input.Height, false, false);
+            FrameBuffer::Settings bufferSettings = context.input.settings;
+            bufferSettings.color = FrameBuffer::eAttachementState::Texture;
+            bufferSettings.depth = FrameBuffer::eAttachementState::None;
+            bufferSettings.stencil = FrameBuffer::eAttachementState::None;
+            bufferSettings.multisample = false;
+            bufferSettings.combinedDepthStencil = false;
+            buffers[i] = buffersPool->Pop(bufferSettings);
         }
     }
 

@@ -16,11 +16,11 @@ namespace Feng
         }
     }
     
-    FrameBuffer FrameBuffersPool::Pop(uint32_t width, uint32_t height, bool depthStencil, bool multisample)
+    FrameBuffer FrameBuffersPool::Pop(const FrameBuffer::Settings& settings)
     {
-        auto isSuitable = [width,height, depthStencil, multisample](const FrameBuffer& buffer)
+        auto isSuitable = [&settings](const FrameBuffer& buffer)
         {
-            return buffer.Suits(width, height, depthStencil, multisample);
+            return buffer.settings == settings;
         };
         
         auto it = std::find_if(buffers.begin(), buffers.end(), isSuitable);
@@ -29,57 +29,82 @@ namespace Feng
             FrameBuffer outBuffer = *it;
             std::swap(*it, buffers.back());
             buffers.pop_back();
-            
             return outBuffer;
         }
         
-        return CreateBuffer(width, height, depthStencil, multisample);
+        return CreateBuffer(settings);
     }
 
-    FrameBuffer FrameBuffersPool::CreateBuffer(uint32_t width, uint32_t height, bool depthStencil, bool multisample)
+    FrameBuffer FrameBuffersPool::CreateBuffer(const FrameBuffer::Settings& settings)
     {
-        GLenum target = multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+        GLsizei samplesCount = 4;
+        GLenum target = settings.multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
         GLuint fbo;
         glGenFramebuffers(1, &fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-        GLuint colorBuffer;
-        glGenTextures(1, &colorBuffer);
-        glBindTexture(target, colorBuffer);
-
-        if(target == GL_TEXTURE_2D)
+        GLuint colorBuffer = 0;
+        if(settings.color != FrameBuffer::eAttachementState::None)
         {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-        }
-        else if (target == GL_TEXTURE_2D_MULTISAMPLE)
-        {
-            GLsizei samplesCount = 4;
-            glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samplesCount, GL_RGB, width, height, GL_TRUE);
-        }
+            glGenTextures(1, &colorBuffer);
+            glBindTexture(target, colorBuffer);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, colorBuffer, 0);
-
-        GLuint depthStencilBuffer = 0;
-        if (depthStencil)
-        {
-            glGenRenderbuffers(1, &depthStencilBuffer);
-            glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
             if(target == GL_TEXTURE_2D)
             {
-                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexImage2D(
+                             GL_TEXTURE_2D,
+                             0,
+                             GL_RGB,
+                             settings.width,
+                             settings.height,
+                             0,
+                             GL_RGB,
+                             GL_UNSIGNED_BYTE,
+                             nullptr);
             }
             else if (target == GL_TEXTURE_2D_MULTISAMPLE)
             {
-                GLsizei samplesCount = 4;
-                glRenderbufferStorageMultisample(GL_RENDERBUFFER, samplesCount, GL_DEPTH24_STENCIL8, width, height);
+                glTexImage2DMultisample(
+                                        GL_TEXTURE_2D_MULTISAMPLE,
+                                        samplesCount,
+                                        GL_RGB,
+                                        settings.width,
+                                        settings.height,
+                                        GL_TRUE);
             }
 
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, colorBuffer, 0);
+        }
+
+        GLuint depth = 0;
+        if (settings.depth != FrameBuffer::eAttachementState::None)
+        {
+            glGenRenderbuffers(1, &depth);
+            glBindRenderbuffer(GL_RENDERBUFFER, depth);
+            
+            GLenum format = settings.combinedDepthStencil ? GL_DEPTH24_STENCIL8 : GL_DEPTH_COMPONENT;
+            if(target == GL_TEXTURE_2D)
+            {
+                glRenderbufferStorage(GL_RENDERBUFFER, format, settings.width, settings.height);
+            }
+            else if (target == GL_TEXTURE_2D_MULTISAMPLE)
+            {
+                glRenderbufferStorageMultisample(GL_RENDERBUFFER, samplesCount, format, settings.width, settings.height);
+            }
+
+            GLenum attachment = settings.combinedDepthStencil ? GL_DEPTH_STENCIL_ATTACHMENT : GL_DEPTH_ATTACHMENT;
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depth);
+        }
+        
+        GLuint stencil = 0;
+        if ((settings.stencil != FrameBuffer::eAttachementState::None) && !settings.combinedDepthStencil)
+        {
+            Debug::LogError("Not implemented yet.");
         }
 
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -91,12 +116,11 @@ namespace Feng
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         FrameBuffer frameBuffer;
-        frameBuffer.Frame = fbo;
-        frameBuffer.Color = colorBuffer;
-        frameBuffer.DepthStencil = depthStencilBuffer;
-        frameBuffer.Width = width;
-        frameBuffer.Height = height;
-        frameBuffer.IsMultisample = multisample;
+        frameBuffer.frame = fbo;
+        frameBuffer.color = colorBuffer;
+        frameBuffer.depth = depth;
+        frameBuffer.stencil = stencil;
+        frameBuffer.settings = settings;
 
         Print_Errors_OpengGL();
         return frameBuffer;
@@ -109,8 +133,9 @@ namespace Feng
     
     void FrameBuffersPool::DeleteBuffer(const FrameBuffer& buffer)
     {
-        glDeleteFramebuffers(1, &buffer.Frame);
-        glDeleteTextures(1, &buffer.Color);
-        glDeleteRenderbuffers(1, &buffer.DepthStencil);
+        glDeleteFramebuffers(1, &buffer.frame);
+        glDeleteTextures(1, &buffer.color);
+        glDeleteRenderbuffers(1, &buffer.depth);
+        glDeleteRenderbuffers(1, &buffer.stencil);
     }
 }

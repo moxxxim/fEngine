@@ -22,7 +22,7 @@ namespace Feng
             const Entity *entity = renderer.GetEntity();
             const Transform *transform = entity->GetComponent<Transform>();
             const Vector3 &rendererPosition = transform->GetPosition();
-            
+
             return Vector3::DistanceSqr(camPos, rendererPosition);
         }
 
@@ -50,6 +50,11 @@ namespace Feng
     RenderSystem::~RenderSystem()
     {
         glDeleteBuffers(1, &camUbo);
+    }
+    
+    void RenderSystem::SetShadowSetup(const ShadowSetup& aShadowSetup)
+    {
+        shadowSetup = aShadowSetup;
     }
 
     void RenderSystem::SetAmbientLight(Vector4 color, float intensity)
@@ -122,11 +127,13 @@ namespace Feng
 
     void RenderSystem::Draw()
     {
+        DrawShadowMap();
+
         FrameBuffer renderBuffer = postProcessing.HasPostEffects()
                     ? GetFrameBuffer(Engine::IsMultisampleEnabled())
                     : FrameBuffer{};
 
-        glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer.Frame);
+        glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer.frame);
         Print_Errors_OpengGL();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -138,24 +145,7 @@ namespace Feng
         // Draw skybox before transparent object for correct visual effect.
         DrawSkybox();
         DrawTransparent();
-
-        if(postProcessing.HasPostEffects())
-        {
-            FrameBuffer postEffectInput = renderBuffer;
-            if (renderBuffer.IsMultisample)
-            {
-                postEffectInput = GetFrameBuffer(false);
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, renderBuffer.Frame);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, postEffectInput.Frame);
-                glBlitFramebuffer(0, 0, renderBuffer.Width, renderBuffer.Height,
-                                  0, 0, postEffectInput.Width, postEffectInput.Height,
-                                  GL_COLOR_BUFFER_BIT, GL_NEAREST);
-                fboPool.Push(renderBuffer);
-            }
-
-            postProcessing.ApplyPostEffects(postEffectInput);
-            fboPool.Push(postEffectInput);
-        }
+        ApplyPostEffects(renderBuffer);
         
         Print_Errors_OpengGL();
     }
@@ -195,6 +185,11 @@ namespace Feng
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
     
+    void RenderSystem::DrawShadowMap()
+    {
+        
+    }
+    
     void RenderSystem::DrawOpaque()
     {
         for(MeshRenderer *renderer : renderersOpaque)
@@ -230,13 +225,45 @@ namespace Feng
         Print_Errors_OpengGL();
     }
     
+    void RenderSystem::ApplyPostEffects(const FrameBuffer& renderBuffer)
+    {
+        if(postProcessing.HasPostEffects())
+        {
+            FrameBuffer postEffectInput = renderBuffer;
+            if (renderBuffer.settings.multisample)
+            {
+                postEffectInput = GetFrameBuffer(false);
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, renderBuffer.frame);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, postEffectInput.frame);
+                glBlitFramebuffer(0, 0, renderBuffer.settings.width, renderBuffer.settings.height,
+                                  0, 0, postEffectInput.settings.width, postEffectInput.settings.height,
+                                  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+                fboPool.Push(renderBuffer);
+            }
+
+            postProcessing.ApplyPostEffects(postEffectInput);
+            fboPool.Push(postEffectInput);
+        }
+    }
+    
     FrameBuffer RenderSystem::GetFrameBuffer(bool multisample)
     {
+        FrameBuffer::Settings bufferSettings;
+        bufferSettings.color = FrameBuffer::eAttachementState::Texture;
+        bufferSettings.depth = FrameBuffer::eAttachementState::Buffer;
+        bufferSettings.stencil = FrameBuffer::eAttachementState::Buffer;
+        bufferSettings.multisample = multisample;
+        bufferSettings.combinedDepthStencil = true;
+
         #ifdef __APPLE__
-            // m.alekseev Hack-fix for GLFW problev with hight dpi screens.
-            return fboPool.Pop(2 * Screen::ScreenWidth, 2 * Screen::ScreenHeight, true, multisample);
+            // m.alekseev Hack-fix for GLFW problem with hight dpi screens.
+            bufferSettings.width = 2 * Screen::ScreenWidth;
+            bufferSettings.height = 2 * Screen::ScreenHeight;
         #else
-            return fboPool.Pop(Screen::ScreenWidth, Screen::ScreenHeight, true, multisample);
+            bufferSettings.width = Screen::ScreenWidth;
+            bufferSettings.height = Screen::ScreenHeight;
         #endif
+        
+        return fboPool.Pop(bufferSettings);
     }
 }

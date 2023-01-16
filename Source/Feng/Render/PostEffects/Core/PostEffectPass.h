@@ -18,7 +18,7 @@ namespace Feng
         enum class InputTextureType : uint32_t
         {
             Color = 0,
-            DepthStencil = 1
+            Depth = 1
         };
 
         PostEffectPass(
