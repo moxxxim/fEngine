@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Feng/Math/Size.h>
 #include <cstdint>
 
 namespace Feng
@@ -18,8 +19,7 @@ namespace Feng
         
         struct Settings final
         {
-            uint32_t width = 0;
-            uint32_t height = 0;
+            Size2ui size {};
             eAttachementState color = eAttachementState::None;
             eAttachementState depth = eAttachementState::None;
             eAttachementState stencil = eAttachementState::None;
@@ -37,8 +37,7 @@ namespace Feng
     
     inline bool operator==(const FrameBuffer::Settings& lhs, const FrameBuffer::Settings& rhs)
     {
-        return (lhs.width == rhs.width)
-            && (lhs.height == rhs.height)
+        return (lhs.size == rhs.size)
             && (lhs.color == rhs.color)
             && (lhs.depth == rhs.depth)
             && (lhs.stencil == rhs.stencil)

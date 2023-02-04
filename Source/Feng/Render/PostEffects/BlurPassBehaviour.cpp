@@ -50,8 +50,8 @@ namespace Feng
 
     void BlurPassBehaviour::SetupMaterial(int passIndex, Material *material)
     {
-        float x = 1.0 / Screen::ScreenWidth;
-        float y = 1.0 / Screen::ScreenHeight;
+        float x = 1.0 / Screen::ScreenSize.width;
+        float y = 1.0 / Screen::ScreenSize.height;
         float z = sqrt(2.0) / 2.0 * x;
         float w = sqrt(2.0) / 2.0 * y;
         float pixelSize = m_blurStrength[passIndex];

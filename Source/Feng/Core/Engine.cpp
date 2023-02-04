@@ -4,17 +4,19 @@
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
 
-#include <Feng/Utils/Debug.h>
 #include <Feng/App/Globals.h>
+#include <Feng/Math/Size.h>
+#include <Feng/Utils/Debug.h>
 
 #include <iostream>
+#include <sstream>
 
 namespace Feng
 {
     namespace SEngine
     {
-        static constexpr uint32_t InitialWidth = 1200;
-        static constexpr uint32_t InitialHeight = 800;
+        constexpr const char* WindowName = "Sweet Window";
+        static constexpr Size2ui InitiaScreenSize {1200u, 800u};
         static GLFWwindow* window = nullptr;
         static Vector2 mousePos;
         static Vector2 mouseScroll;
@@ -33,8 +35,13 @@ namespace Feng
         
         static void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
         {
-            Screen::ScreenWidth = width;
-            Screen::ScreenHeight = height;
+            Screen::ScreenSize = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+            
+            std::stringstream sstream;
+            sstream << WindowName << " ";
+            sstream << width << " x " << height;
+            
+            glfwSetWindowTitle(window, sstream.str().c_str());
             glViewport(0, 0, width, height);
         }
         
@@ -91,10 +98,9 @@ namespace Feng
         
         GLFWwindow* CreateWindow()
         {
-            Screen::ScreenWidth = InitialWidth;
-            Screen::ScreenHeight = InitialHeight;
+            Screen::ScreenSize = InitiaScreenSize;
             glfwWindowHint(GLFW_SAMPLES, 4);
-            GLFWwindow* window = glfwCreateWindow(InitialWidth, InitialHeight, "Sweet Window", nullptr, nullptr);
+            GLFWwindow* window = glfwCreateWindow(Screen::ScreenSize.width, Screen::ScreenSize.height, WindowName, nullptr, nullptr);
             if (window)
             {
                 glfwMakeContextCurrent(window);
@@ -102,7 +108,7 @@ namespace Feng
                 glfwSetCursorPosCallback(window, MouseCallback);
                 glfwSetScrollCallback(window, ScrollCallback);
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                glViewport(0, 0, InitialWidth, InitialHeight);
+                glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
             }
             else
             {
@@ -165,6 +171,7 @@ namespace Feng
     float Engine::time = 0.f;
     bool Engine::shadowsEnabled = false;
     bool Engine::showDepth = false;
+    bool Engine::cursorVisible = false;
     
     bool Engine::IsMultisampleEnabled()
     {
@@ -264,62 +271,54 @@ namespace Feng
 
     void Engine::UpdateInputKeys()
     {
-        inputKeys[InputKey::Kb_Left_Shift] = (glfwGetKey(SEngine::window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-        
-        inputKeys[InputKey::Kb_Left_Control] = (glfwGetKey(SEngine::window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-
-        inputKeys[InputKey::Kb_Escape] = (glfwGetKey(SEngine::window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-
-        inputKeys[InputKey::Kb_W] = (glfwGetKey(SEngine::window, GLFW_KEY_W) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-
-        inputKeys[InputKey::Kb_S] = (glfwGetKey(SEngine::window, GLFW_KEY_S) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-
         inputKeys[InputKey::Kb_A] = (glfwGetKey(SEngine::window, GLFW_KEY_A) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-
+        inputKeys[InputKey::Kb_B] = (glfwGetKey(SEngine::window, GLFW_KEY_B) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_C] = (glfwGetKey(SEngine::window, GLFW_KEY_C) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_Left_Shift] = (glfwGetKey(SEngine::window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_Left_Control] = (glfwGetKey(SEngine::window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_Escape] = (glfwGetKey(SEngine::window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_W] = (glfwGetKey(SEngine::window, GLFW_KEY_W) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_S] = (glfwGetKey(SEngine::window, GLFW_KEY_S) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
         inputKeys[InputKey::Kb_D] = (glfwGetKey(SEngine::window, GLFW_KEY_D) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-
         inputKeys[InputKey::Kb_O] = (glfwGetKey(SEngine::window, GLFW_KEY_O) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        
         inputKeys[InputKey::Kb_Up] = (glfwGetKey(SEngine::window, GLFW_KEY_UP) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        
         inputKeys[InputKey::Kb_Down] = (glfwGetKey(SEngine::window, GLFW_KEY_DOWN) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        
         inputKeys[InputKey::Kb_Left] = (glfwGetKey(SEngine::window, GLFW_KEY_LEFT) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        
         inputKeys[InputKey::Kb_Right] = (glfwGetKey(SEngine::window, GLFW_KEY_RIGHT) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        
         inputKeys[InputKey::Kb_Q] = (glfwGetKey(SEngine::window, GLFW_KEY_Q) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        
         inputKeys[InputKey::Kb_E] = (glfwGetKey(SEngine::window, GLFW_KEY_E) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        
         inputKeys[InputKey::Kb_I] = (glfwGetKey(SEngine::window, GLFW_KEY_I) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
@@ -344,5 +343,18 @@ namespace Feng
         {
             scene->Draw();
         }
+    }
+    
+    bool Engine::IsCursorVisible()
+    {
+        return cursorVisible;
+    }
+    
+    void Engine::SetCursorVisible(bool visible)
+    {
+        cursorVisible = visible;
+
+        int visibilityValue = cursorVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED;
+        glfwSetInputMode(SEngine::window, GLFW_CURSOR, visibilityValue);
     }
 }

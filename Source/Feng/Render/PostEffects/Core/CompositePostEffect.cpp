@@ -17,8 +17,7 @@ namespace Feng
         if (effects.size() > 1)
         {
             FrameBuffer::Settings bufferSettings;
-            bufferSettings.width = context.input.settings.width;
-            bufferSettings.height = context.input.settings.height;
+            bufferSettings.size = context.input.settings.size;
             FrameBuffer intermediateBuffer = buffersPool->Pop(bufferSettings);
 
             for (uint32_t i = 0; i < effects.size(); ++i)

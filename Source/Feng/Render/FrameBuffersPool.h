@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Feng/Math/Size.h>
 #include <Feng/Render/FrameBuffer.h>
 #include <vector>
 

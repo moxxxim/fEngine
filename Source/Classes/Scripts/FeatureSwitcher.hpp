@@ -3,10 +3,10 @@
 #include <Feng/ScenesManager/Component.h>
 #include <cstdint>
 
-class PostEffectSwitcher final : public Feng::Component
+class FeatureSwitcher final : public Feng::Component
 {
 public:
-    PostEffectSwitcher() = default;
+    FeatureSwitcher() = default;
     
 private:
     void Update(float deltaTime) override;

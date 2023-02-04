@@ -4,7 +4,7 @@
 #include <Classes/Scripts/CameraWasdController.h>
 #include <Classes/Scripts/GameObjectRotation.h>
 #include <Classes/Scripts/InstancedObjectTransformController.hpp>
-#include <Classes/Scripts/PostEffectSwitcher.hpp>
+#include <Classes/Scripts/FeatureSwitcher.hpp>
 #include <Classes/TempResouces.h>
 
 #include <Feng/App/Globals.h>
@@ -65,7 +65,7 @@ namespace test
         };
 
         Feng::Vector3 planePos{0.f, -6.f, 0.f};
-        
+
         Feng::Entity* CreateCamera(Feng::Scene& scene)
         {
             using namespace Feng;
@@ -74,7 +74,7 @@ namespace test
 
             Camera *camera = camEntity.GetComponent<Camera>();
             camera->SetFovY(45.f);
-            camera->SetAspectRatio(static_cast<float>(Screen::ScreenWidth)/Screen::ScreenHeight);
+            camera->SetAspectRatio(static_cast<float>(Screen::ScreenSize.width)/Screen::ScreenSize.height);
             camera->SetNearClipPlane(0.1f);
             camera->SetFarClipPlane(100.f);
 
@@ -262,7 +262,7 @@ namespace test
             
             // Game manager.
             Entity &gameManger = scene.CreateEntity("Game Manger");
-            gameManger.AddComponent<PostEffectSwitcher>();
+            gameManger.AddComponent<FeatureSwitcher>();
         }
         
         std::unique_ptr<Feng::Scene> CreateScene()

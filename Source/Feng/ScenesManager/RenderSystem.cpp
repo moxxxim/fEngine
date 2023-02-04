@@ -52,11 +52,6 @@ namespace Feng
         glDeleteBuffers(1, &camUbo);
     }
     
-    void RenderSystem::SetShadowSetup(const ShadowSetup& aShadowSetup)
-    {
-        shadowSetup = aShadowSetup;
-    }
-
     void RenderSystem::SetAmbientLight(Vector4 color, float intensity)
     {
         renderProperties.ambientColorAndIntencity = Vector4{color.GetXyz(), intensity };
@@ -97,6 +92,11 @@ namespace Feng
 
     void RenderSystem::AddLight(Light *light)
     {
+        if(light->IsShadowCaster())
+        {
+            shadowSetup.light = light->GetEntity();
+        }
+
         switch (light->GetType())
         {
             case Light::eType::Directional:
@@ -110,7 +110,6 @@ namespace Feng
             case Light::eType::Spot:
             renderProperties.spotLight = light;
             break;
-
         }
     }
 
@@ -133,6 +132,7 @@ namespace Feng
                     ? GetFrameBuffer(Engine::IsMultisampleEnabled())
                     : FrameBuffer{};
 
+        glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
         glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer.frame);
         Print_Errors_OpengGL();
 
@@ -187,7 +187,14 @@ namespace Feng
     
     void RenderSystem::DrawShadowMap()
     {
-        
+        if (Engine::IsShadowsEnabled())
+        {
+            FrameBuffer shadowPassBuffer = GetShadowMapBuffer();
+            glViewport(0, 0, shadowPassBuffer.settings.size.width, shadowPassBuffer.settings.size.height);
+            glBindBuffer(GL_FRAMEBUFFER, shadowPassBuffer.frame);
+
+            glBindBuffer(GL_FRAMEBUFFER, 0);
+        }
     }
     
     void RenderSystem::DrawOpaque()
@@ -235,8 +242,8 @@ namespace Feng
                 postEffectInput = GetFrameBuffer(false);
                 glBindFramebuffer(GL_READ_FRAMEBUFFER, renderBuffer.frame);
                 glBindFramebuffer(GL_DRAW_FRAMEBUFFER, postEffectInput.frame);
-                glBlitFramebuffer(0, 0, renderBuffer.settings.width, renderBuffer.settings.height,
-                                  0, 0, postEffectInput.settings.width, postEffectInput.settings.height,
+                glBlitFramebuffer(0, 0, renderBuffer.settings.size.width, renderBuffer.settings.size.height,
+                                  0, 0, postEffectInput.settings.size.width, postEffectInput.settings.size.height,
                                   GL_COLOR_BUFFER_BIT, GL_NEAREST);
                 fboPool.Push(renderBuffer);
             }
@@ -249,20 +256,25 @@ namespace Feng
     FrameBuffer RenderSystem::GetFrameBuffer(bool multisample)
     {
         FrameBuffer::Settings bufferSettings;
+        bufferSettings.size = Screen::ScreenSize;
         bufferSettings.color = FrameBuffer::eAttachementState::Texture;
         bufferSettings.depth = FrameBuffer::eAttachementState::Buffer;
         bufferSettings.stencil = FrameBuffer::eAttachementState::Buffer;
         bufferSettings.multisample = multisample;
         bufferSettings.combinedDepthStencil = true;
-
-        #ifdef __APPLE__
-            // m.alekseev Hack-fix for GLFW problem with hight dpi screens.
-            bufferSettings.width = 2 * Screen::ScreenWidth;
-            bufferSettings.height = 2 * Screen::ScreenHeight;
-        #else
-            bufferSettings.width = Screen::ScreenWidth;
-            bufferSettings.height = Screen::ScreenHeight;
-        #endif
+        
+        return fboPool.Pop(bufferSettings);
+    }
+    
+    FrameBuffer RenderSystem::GetShadowMapBuffer()
+    {
+        FrameBuffer::Settings bufferSettings;
+        bufferSettings.size = shadowSetup.size;
+        bufferSettings.color = FrameBuffer::eAttachementState::None;
+        bufferSettings.depth = FrameBuffer::eAttachementState::Texture;
+        bufferSettings.stencil = FrameBuffer::eAttachementState::None;
+        bufferSettings.multisample = false;
+        bufferSettings.combinedDepthStencil = false;
         
         return fboPool.Pop(bufferSettings);
     }

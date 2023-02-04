@@ -20,11 +20,13 @@ namespace Feng
         static Vector2 GetMousePos();
         static Vector2 GetMouseScroll();
         static bool IsShadowsEnabled();
-        static void SetShadowsEnabled(bool aShadowsEnabled);
+        static void SetShadowsEnabled(bool enabled);
         static bool IsShowDepth();
         static void ShowDepth(bool show);
         static bool IsMultisampleEnabled();
         static void SetMultisampleEnabled(bool enabled);
+        static bool IsCursorVisible();
+        static void SetCursorVisible(bool visible);
 
         Engine();
         int32_t Run();
@@ -46,6 +48,7 @@ namespace Feng
         static float time;
         static bool shadowsEnabled;
         static bool showDepth;
+        static bool cursorVisible;
         
         std::unique_ptr<Feng::Scene> scene;
     };
@@ -75,9 +78,9 @@ namespace Feng
         return Engine::shadowsEnabled;
     }
     
-    inline void Engine::SetShadowsEnabled(bool aShadowsEnabled)
+    inline void Engine::SetShadowsEnabled(bool enabled)
     {
-        Engine::shadowsEnabled = aShadowsEnabled;
+        Engine::shadowsEnabled = enabled;
     }
     
     inline bool Engine::IsShowDepth()
@@ -89,7 +92,7 @@ namespace Feng
     {
         showDepth = show;
     }
-    
+
     inline void Engine::SetScene(std::unique_ptr<Scene>&& aScene)
     {
         scene = std::move(aScene);

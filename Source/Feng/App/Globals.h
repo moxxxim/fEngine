@@ -1,12 +1,11 @@
 #pragma once
 
-#include <cstdint>
+#include <Feng/Math/Size.h>
 
 namespace Feng
 {
     namespace Screen
     {
-        extern uint32_t ScreenWidth;
-        extern uint32_t ScreenHeight;
+        extern Size2ui ScreenSize;
     }
 }

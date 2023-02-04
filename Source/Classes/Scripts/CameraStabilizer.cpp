@@ -18,7 +18,7 @@ void CameraStabilizer::Update(float deltaTime)
     fovY = std::min(fovY, 45.0f);
 
     myCam->SetFovY(fovY);
-    myCam->SetAspectRatio(static_cast<float>(Feng::Screen::ScreenWidth)/Feng::Screen::ScreenHeight);
+    myCam->SetAspectRatio(static_cast<float>(Feng::Screen::ScreenSize.width)/Feng::Screen::ScreenSize.height);
     myCam->SetNearClipPlane(0.1f);
     myCam->SetFarClipPlane(100.f);
 }

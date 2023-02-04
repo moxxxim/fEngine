@@ -1,9 +1,10 @@
-#include <Classes/Scripts/PostEffectSwitcher.hpp>
+#include <Classes/Scripts/FeatureSwitcher.hpp>>
 
 #include <Classes/TempResouces.h>
 #include <Feng/Core/Engine.hpp>
+#include <GLFW/glfw3.h>
 
-void PostEffectSwitcher::Update(float deltaTime)
+void FeatureSwitcher::Update(float deltaTime)
 {
     if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_O))
     {
@@ -29,6 +30,16 @@ void PostEffectSwitcher::Update(float deltaTime)
         }
     }
     
+    if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_B))
+    {
+        Feng::Engine::SetShadowsEnabled(!Feng::Engine::IsShadowsEnabled());
+    }
+    
+    if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_C))
+    {
+        Feng::Engine::SetCursorVisible(!Feng::Engine::IsCursorVisible());
+    }
+    
     if(isDelayActive)
     {
         delay += deltaTime;
@@ -40,7 +51,7 @@ void PostEffectSwitcher::Update(float deltaTime)
     }
 }
 
-void PostEffectSwitcher::ApplyNextPostEffect()
+void FeatureSwitcher::ApplyNextPostEffect()
 {
     float time = Feng::Engine::Time();
     if(Feng::Engine::Time() - lastEffectChangeTime > effectChangeInputDelay)

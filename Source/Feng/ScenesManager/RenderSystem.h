@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Feng/Math/Size.h>
 #include <Feng/Render/FrameBuffersPool.h>
 #include <Feng/Render/FrameBuffer.h>
 #include <Feng/Render/PostEffects/Core/RenderPostProcessing.h>
@@ -19,17 +20,17 @@ namespace Feng
     class RenderSystem final
     {
     public:
+        static constexpr int32_t DefaultShadowMapSize = 1024;
+        
         struct ShadowSetup final
         {
             Entity *light = nullptr;
-            int32_t width = 0;
-            int32_t height = 0;
+            Size2ui size {DefaultShadowMapSize, DefaultShadowMapSize};
         };
         
         RenderSystem();
         ~RenderSystem();
 
-        void SetShadowSetup(const ShadowSetup& aShadowSetup);
         void SetAmbientLight(Vector4 color, float intensity);
 
         void SetCamera(Camera *camera);
@@ -53,8 +54,7 @@ namespace Feng
         void DrawSkybox();
         void ApplyPostEffects(const FrameBuffer& renderBuffer);
         FrameBuffer GetFrameBuffer(bool multisample);
-
-        static constexpr int32_t DefaultShadowMapSize = 1024;
+        FrameBuffer GetShadowMapBuffer();
         
         std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;
