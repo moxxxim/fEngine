@@ -6,6 +6,7 @@
 
 #include <Feng/App/Globals.h>
 #include <Feng/Math/Size.h>
+#include <Feng/ScenesManager/RenderSystem.h>
 #include <Feng/Utils/Debug.h>
 
 #include <iostream>
@@ -21,13 +22,13 @@ namespace Feng
         static Vector2 mousePos;
         static Vector2 mouseScroll;
         
-        void MouseCallback(GLFWwindow* window, double x, double y)
+        static void MouseCallback(GLFWwindow* window, double x, double y)
         {
             mousePos.x = static_cast<float>(x);
             mousePos.y = static_cast<float>(y);
         }
 
-        void ScrollCallback(GLFWwindow* window, double x, double y)
+        static void ScrollCallback(GLFWwindow* window, double x, double y)
         {
             mouseScroll.x = static_cast<float>(x);
             mouseScroll.y = static_cast<float>(y);
@@ -96,7 +97,7 @@ namespace Feng
             Print_Errors_OpengGL();
         }
         
-        GLFWwindow* CreateWindow()
+        static GLFWwindow* CreateWindow()
         {
             Screen::ScreenSize = InitiaScreenSize;
             glfwWindowHint(GLFW_SAMPLES, 4);
@@ -119,7 +120,7 @@ namespace Feng
             return window;
         }
         
-        void RenderWithOutline(const std::vector<Entity*>& outlined)
+        static void RenderWithOutline(const std::vector<Entity*>& outlined)
         {
             /*
             // Put 1s (ones) into stencil buffer for all drawn fragments.
@@ -162,6 +163,23 @@ namespace Feng
             glStencilFunc(GL_ALWAYS, 1, 0xFF);
             glStencilMask(0xFF);
             */
+        }
+        
+        void FixWindow()
+        {
+#ifdef __APPLE__
+            static bool macMoved = false;
+
+            if(!macMoved)
+            {
+                int width, height;
+                glfwGetWindowSize(SEngine::window, &width, &height);
+                glfwSetWindowSize(SEngine::window, width + 16, height + 9);
+                glViewport(0, 0, width + 16, height + 9);
+
+                macMoved = true;
+            }
+#endif
         }
     }
 
@@ -208,6 +226,7 @@ namespace Feng
             Debug::LogMessage("Start loop.");
             while(!glfwWindowShouldClose(SEngine::window))
             {
+                SEngine::FixWindow();
                 UpdateTime();
                 UpdateInputKeys();
                 Update();
@@ -216,17 +235,6 @@ namespace Feng
                 glfwSwapBuffers(SEngine::window);
                 glfwPollEvents();
 
-    #ifdef __APPLE__
-                static bool macMoved = false;
-
-                if(!macMoved)
-                {
-                    int x, y;
-                    glfwGetWindowPos(SEngine::window, &x, &y);
-                    glfwSetWindowPos(SEngine::window, ++x, y);
-                    macMoved = true;
-                }
-    #endif
                 Print_Errors_OpengGL();
                 
                 if(Engine::IsKeyPressed(InputKey::Kb_Escape))
@@ -244,12 +252,12 @@ namespace Feng
     
     void Engine::SetPostEffect(PostEffectDefinition *postEffect)
     {
-        scene->SetPostEffect(postEffect);
+        scene->GetRenderSystem()->SetPostEffect(postEffect);
     }
     
     void Engine::RemovePostEffect()
     {
-        scene->RemovePostEffect();
+        scene->GetRenderSystem()->RemovePostEffect();
     }
     
     Vector2 Engine::GetMousePos()

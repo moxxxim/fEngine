@@ -26,22 +26,22 @@ namespace Feng
         const Material *GetMaterial() const;
         Material *GetMaterial();
         void SetMaterial(Material *aMaterial);
+        bool IsShadowCaster() const;
+        void SetShadowCaster(bool aShadowCaster);
 
         const Mesh *GetMesh() const;
         Mesh *GetMesh();
         void SetMesh(Mesh *aMesh);
         void SetInstanceTransforms(const std::vector<Matrix4>& instances);
 
-        bool CanDraw() const;
-        void Draw(const RenderProperties &renderProperties);
+        void Draw(const RenderProperties &aRenderProperties, Material *externalMaterial = nullptr);
 
     private:
-        void StartDraw();
+        void StartDraw(Material &workingMaterial);
         void FinishDraw();
 
-        void SetGlobalUniforms(const RenderProperties &renderProperties);
+        void SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
         void ExecuteDraw();
-        void ActivateTexture(const std::string& name, const Texture &texture, uint32_t unit);
 
         void CreateGeometryBuffers();
         void DeleteGeomertyBuffers();
@@ -56,9 +56,9 @@ namespace Feng
         uint32_t CreateVertexBuffer();
         uint32_t CreateIndexBuffer();
 
-        void SetCameraUniforms(const RenderProperties &renderProperties);
-        void SetLightUniforms(const RenderProperties &renderProperties);
-        void SetFogUniforms(const RenderProperties &renderProperties);
+        void SetCameraUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
+        void SetLightUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
+        void SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial);
 
         uint32_t vao = Render::UndefinedBuffer;
         uint32_t vbo = Render::UndefinedBuffer;
@@ -71,6 +71,7 @@ namespace Feng
         Mesh *mesh = nullptr;
         uint32_t instancesCount = 0;
         uint32_t firstInstanceAttributeIndex = 0;
+        bool shadowCaster = false;
     };
 }
 

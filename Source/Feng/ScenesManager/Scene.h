@@ -27,12 +27,9 @@ namespace Feng
         Entity& CreateMesh(Material *material, Mesh *mesh, const std::string& name = "");
         Entity& CreateSkybox(Material *material);
 
-        void SetAmbientLight(Vector4 color, float intensity);
-        void SetPostEffect(PostEffectDefinition *postEffect);
-        void RemovePostEffect();
-
         void Update(float deltaTime);
         void Draw();
+        RenderSystem *GetRenderSystem();
 
     private:
         std::unique_ptr<RenderSystem> renderSystem;

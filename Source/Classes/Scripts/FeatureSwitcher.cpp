@@ -1,4 +1,4 @@
-#include <Classes/Scripts/FeatureSwitcher.hpp>>
+#include <Classes/Scripts/FeatureSwitcher.hpp>
 
 #include <Classes/TempResouces.h>
 #include <Feng/Core/Engine.hpp>
@@ -39,7 +39,7 @@ void FeatureSwitcher::Update(float deltaTime)
     {
         Feng::Engine::SetCursorVisible(!Feng::Engine::IsCursorVisible());
     }
-    
+
     if(isDelayActive)
     {
         delay += deltaTime;

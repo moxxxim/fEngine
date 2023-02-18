@@ -139,6 +139,8 @@ namespace Feng::Render
                 continue;
             }
         }
+        
+        Print_Errors_OpengGL();
     }
 
     std::map<std::string, uint32_t> CreateTextureBuffers(const Material &material)

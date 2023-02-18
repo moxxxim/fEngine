@@ -14,6 +14,7 @@ namespace Feng
     class Camera;
     class Entity;
     class Light;
+    class Material;
     class MeshRenderer;
     class PostEffectDefinition;
 
@@ -22,12 +23,6 @@ namespace Feng
     public:
         static constexpr int32_t DefaultShadowMapSize = 1024;
         
-        struct ShadowSetup final
-        {
-            Entity *light = nullptr;
-            Size2ui size {DefaultShadowMapSize, DefaultShadowMapSize};
-        };
-        
         RenderSystem();
         ~RenderSystem();
 
@@ -35,6 +30,8 @@ namespace Feng
 
         void SetCamera(Camera *camera);
         void SetSkybox(MeshRenderer *aSkybox);
+        void SetShadowMaterial(Material *shadowMaterial);
+        void SetShadowLight(Entity *light);
 
         void AddRenderer(MeshRenderer *renderer);
         void RemoveRenderer(MeshRenderer *renderer);
@@ -46,9 +43,19 @@ namespace Feng
         void Draw();
 
     private:
+        struct ShadowSetup final
+        {
+            Entity *light = nullptr;
+            Material *material = nullptr;
+            Size2ui size { DefaultShadowMapSize, DefaultShadowMapSize };
+            FrameBuffer shadowMap;
+        };
+        
+        bool IsShadowsEnabled();
         void CreateCamUniformBuffer();
         void BindCamUniformBuffer();
         void DrawShadowMap();
+        void DrawShadowCastersInShadowMap();
         void DrawOpaque();
         void DrawTransparent();
         void DrawSkybox();
@@ -63,7 +70,6 @@ namespace Feng
         FrameBuffersPool fboPool;
         RenderPostProcessing postProcessing;
         RenderProperties renderProperties;
-        FrameBuffer shadowMap;
         MeshRenderer *skybox = nullptr;
         uint32_t camUbo = 0;
     };

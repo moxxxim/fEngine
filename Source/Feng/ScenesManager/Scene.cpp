@@ -155,21 +155,6 @@ namespace Feng
         return skybox;
     }
 
-    void Scene::SetAmbientLight(Vector4 color, float intensity)
-    {
-        renderSystem->SetAmbientLight(color, intensity);
-    }
-
-    void Scene::SetPostEffect(PostEffectDefinition *postEffect)
-    {
-        renderSystem->SetPostEffect(postEffect);
-    }
-
-    void Scene::RemovePostEffect()
-    {
-        renderSystem->RemovePostEffect();
-    }
-
     void Scene::Update(float deltaTime)
     {
         std::for_each(
@@ -181,5 +166,10 @@ namespace Feng
     void Scene::Draw()
     {
         renderSystem->Draw();
+    }
+    
+    RenderSystem *Scene::GetRenderSystem()
+    {
+        return renderSystem.get();
     }
 }

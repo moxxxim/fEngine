@@ -61,6 +61,16 @@ namespace Feng
     {
         renderProperties.cam = camera;
     }
+    
+    void RenderSystem::SetShadowMaterial(Material *shadowMaterial)
+    {
+        shadowSetup.material = shadowMaterial;
+    }
+    
+    void RenderSystem::SetShadowLight(Entity *light)
+    {
+        shadowSetup.light = light;
+    }
 
     void RenderSystem::AddRenderer(MeshRenderer *renderer)
     {
@@ -94,7 +104,7 @@ namespace Feng
     {
         if(light->IsShadowCaster())
         {
-            shadowSetup.light = light->GetEntity();
+            SetShadowLight(light->GetEntity());
         }
 
         switch (light->GetType())
@@ -149,6 +159,11 @@ namespace Feng
         
         Print_Errors_OpengGL();
     }
+    
+    bool RenderSystem::IsShadowsEnabled()
+    {
+        return Engine::IsShadowsEnabled() && shadowSetup.light && shadowSetup.material;
+    }
 
     void RenderSystem::CreateCamUniformBuffer()
     {
@@ -187,14 +202,39 @@ namespace Feng
     
     void RenderSystem::DrawShadowMap()
     {
-        if (Engine::IsShadowsEnabled())
+        if (IsShadowsEnabled())
         {
-            FrameBuffer shadowPassBuffer = GetShadowMapBuffer();
-            glViewport(0, 0, shadowPassBuffer.settings.size.width, shadowPassBuffer.settings.size.height);
-            glBindBuffer(GL_FRAMEBUFFER, shadowPassBuffer.frame);
+            shadowSetup.shadowMap = GetShadowMapBuffer();
+            glViewport(0, 0, shadowSetup.shadowMap.settings.size.width, shadowSetup.shadowMap.settings.size.height);
+            glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.shadowMap.frame);
+            Print_Errors_OpengGL();
 
-            glBindBuffer(GL_FRAMEBUFFER, 0);
+            DrawShadowCastersInShadowMap();
+            
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
+    }
+    
+    void RenderSystem::DrawShadowCastersInShadowMap()
+    {
+        for(MeshRenderer *renderer : renderersOpaque)
+        {
+            if(renderer->IsShadowCaster())
+            {
+                renderer->Draw(renderProperties, shadowSetup.material);
+            }
+        }
+        
+        SRenderSystem::SortSceneByDistance(*renderProperties.cam, renderersTransparent);
+        for(MeshRenderer *renderer : renderersTransparent)
+        {
+            if(renderer->IsShadowCaster())
+            {
+                renderer->Draw(renderProperties, shadowSetup.material);
+            }
+        }
+        
+        Print_Errors_OpengGL();
     }
     
     void RenderSystem::DrawOpaque()

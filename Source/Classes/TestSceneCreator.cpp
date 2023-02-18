@@ -15,6 +15,7 @@
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/MeshRenderer.h>
+#include <Feng/ScenesManager/RenderSystem.h>
 #include <Feng/ScenesManager/Transform.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 
@@ -23,6 +24,8 @@ namespace test
     namespace
     {
         std::map<Feng::Light *, std::unique_ptr<Feng::Material>> lightMaterials;
+        
+        constexpr Feng::Vector3 planePos{0.f, -1.f, 0.f};
         
         std::array<Feng::Vector3, 10> cubePositions =
         {
@@ -35,36 +38,34 @@ namespace test
             Feng::Vector3( -2.0f, 1.0f, -4.0f),
             Feng::Vector3( 0.0f, 1.0f, -4.0f),
             Feng::Vector3( 2.0f, 1.0f, -4.0f),
-            Feng::Vector3( 0.0f, -3.0f, -2.0f),
+            Feng::Vector3( 0.0f, -0.2f, -2.0f),
         };
-        
+
         std::array<Feng::Vector3, 10> vegetationPositions
         {
-            Feng::Vector3(10.0f, -5.4f, 10.0f),
-            Feng::Vector3(10.0f, -5.4f, -10.0f),
-            Feng::Vector3(-10.0f, -5.4f, -10.0f),
-            Feng::Vector3(-10.0f, -5.4f, 10.0f),
-            Feng::Vector3(10.0f, -5.4f, 5.0f),
-            Feng::Vector3(5.0f, -5.4f, 10.0f),
-            Feng::Vector3(5.0f, -5.4f, 5.0f),
-            Feng::Vector3(10.0f, -5.4f, 1.0f),
-            Feng::Vector3(5.0f, -5.4f, 1.0f),
-            Feng::Vector3(1.0f, -5.4f, 10.0f),
+            Feng::Vector3(10.0f, planePos.y + 0.6f, 10.0f),
+            Feng::Vector3(10.0f, planePos.y + 0.6f, -10.0f),
+            Feng::Vector3(-10.0f, planePos.y + 0.6f, -10.0f),
+            Feng::Vector3(-10.0f, planePos.y + 0.6f, 10.0f),
+            Feng::Vector3(10.0f, planePos.y + 0.6f, 5.0f),
+            Feng::Vector3(5.0f, planePos.y + 0.6f, 10.0f),
+            Feng::Vector3(5.0f, planePos.y + 0.6f, 5.0f),
+            Feng::Vector3(10.0f, planePos.y + 0.6f, 1.0f),
+            Feng::Vector3(5.0f, planePos.y + 0.6f, 1.0f),
+            Feng::Vector3(1.0f, planePos.y + 0.6f, 10.0f),
         };
 
         std::array<Feng::Vector3, 8> windowPositions
         {
-            Feng::Vector3(10.0f, -5.4f, 20.0f),
-            Feng::Vector3(20.0f, -5.4f, -10.0f),
-            Feng::Vector3(-10.0f, -5.4f, -20.0f),
-            Feng::Vector3(-20.0f, -5.4f, 10.0f),
+            Feng::Vector3(10.0f, planePos.y + 0.6f, 20.0f),
+            Feng::Vector3(20.0f, planePos.y + 0.6f, -10.0f),
+            Feng::Vector3(-10.0f, planePos.y + 0.6f, -20.0f),
+            Feng::Vector3(-20.0f, planePos.y + 0.6f, 10.0f),
             Feng::Vector3(0.0f, 0.0f, 2.0f),
             Feng::Vector3(1.0f, 2.0f, 2.0f),
-            Feng::Vector3(-1.0f, -2.0f, 2.0f),
+            Feng::Vector3(-1.0f, -0.2f, 2.0f),
             Feng::Vector3(0.5f, 0.5f, 2.5f)
         };
-
-        Feng::Vector3 planePos{0.f, -6.f, 0.f};
 
         Feng::Entity* CreateCamera(Feng::Scene& scene)
         {
@@ -98,7 +99,7 @@ namespace test
         void CreateDirectLight(Feng::Scene& scene, bool isShadowCaster)
         {
             using namespace Feng;
-            
+
             Vector4 color {1.f, 0.95f, 0.8f, 1.f};
 
             std::unique_ptr<Material> material = CreateLightMaterial(color);
@@ -113,10 +114,12 @@ namespace test
             light->SetColor(color);
             light->SetIntensity(1.f);
             light->SetShadowCaster(isShadowCaster);
+            
+            scene.GetRenderSystem()->SetShadowLight(&lightEntity);
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
             lightTransform->SetPosition(0.f, 0.f, 4.f);
-            lightTransform->SetRotation(Quaternion{Vector3::OneY, 180}, eSpace::World);
+            lightTransform->SetEuler(-30.f, 150.f, 0.f);
         }
 
         void CreatePointLight(Feng::Scene& scene)
@@ -185,10 +188,13 @@ namespace test
                                 const Feng::Vector3& position,
                                 const std::string& name,
                                 Feng::Mesh &mesh,
-                                Feng::Material& material)
+                                Feng::Material& material,
+                                bool shadowCaster)
         {
             Feng::Material *finalMaterial = Feng::Engine::IsShowDepth() ? test::res.ShowDepthMaterial.get() : &material;
             Feng::Entity& obj = scene.CreateMesh(finalMaterial, &mesh, name);
+            Feng::MeshRenderer* renderer = obj.GetComponent<Feng::MeshRenderer>();
+            renderer->SetShadowCaster(shadowCaster);
 
             Feng::Transform *transform = obj.GetComponent<Feng::Transform>();
             transform->SetPosition(position);
@@ -200,7 +206,7 @@ namespace test
         {
             Feng::Entity& obj = scene.CreateMesh(test::res.PhongTexInstancedMaterial.get(), &mesh, "Instanced");
             InstancedObjectTransformController &instances = obj.AddComponent<InstancedObjectTransformController>();
-            instances.SetCount(10'000);
+            instances.SetCount(1'000);
         }
         
         void CreateObjects(Feng::Scene& scene)
@@ -222,7 +228,7 @@ namespace test
                 Material *material = ((i % 2) == 0)
                     ? test::res.DiffTex1SpecTex2Material.get()
                     : test::res.SpecularTexMaterial.get();
-                Entity* object = CreateObject(scene, position, name, *test::res.CubeMesh, *material);
+                Entity* object = CreateObject(scene, position, name, *test::res.CubeMesh, *material, true);
                 if ((i % 2) == 0)
                 {
                     GameObjectRotation& objectRotation = object->AddComponent<GameObjectRotation>();
@@ -230,36 +236,37 @@ namespace test
                     objectRotation.SetPeriod(4.f);
                 }
             }
+            
+            // Plane.
+            Entity *planeEntity = CreateObject(scene, planePos, "Plane", *test::res.CubeMesh, *test::res.PhongTexMaterial, false);
+            Transform *planeTransform = planeEntity->GetComponent<Transform>();
+            planeTransform->SetScale(40.f, 0.2f, 40.f);
 
             // Grass.
             for(int32_t i = 0; i < vegetationPositions.size(); ++i)
             {
                 const Vector3& position = vegetationPositions[i];
                 std::string name = "grass " + std::to_string(i);
-                std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.GrassMaterial);
+                std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.GrassMaterial, true);
             }
 
-            // Grass.
+            // Windows.
             for(int32_t i = 0; i < windowPositions.size(); ++i)
             {
                 const Vector3& position = windowPositions[i];
                 std::string name = "window " + std::to_string(i);
-                std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.WindowMaterial);
+                std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.WindowMaterial, false);
             }
 
-            Feng::Entity *reflectiveObject = CreateObject(
+            Feng::Entity *refractiveObject = CreateObject(
                                                           scene,
                                                           Vector3(0.f, 2.f, -2.5f),
                                                           "Reflective",
                                                           *test::res.CubeMesh,
-                                                          *test::res.CubemapRefractionMaterial);
-            Feng::Transform *reflectiveObjectTransform = reflectiveObject->GetComponent<Feng::Transform>();
-            //reflectiveObjectTransform->Rotate(Feng::Vector3::One.ToNormalized(), 45.f);
+                                                          *test::res.CubemapRefractionMaterial,
+                                                          false);
+            Feng::Transform *reflectiveObjectTransform = refractiveObject->GetComponent<Feng::Transform>();
 
-            Entity *planeEntity = CreateObject(scene, planePos, "Plane", *test::res.CubeMesh, *test::res.PhongTexMaterial);
-            Transform *planeTransform = planeEntity->GetComponent<Transform>();
-            planeTransform->SetScale(40.f, 0.2f, 40.f);
-            
             // Game manager.
             Entity &gameManger = scene.CreateEntity("Game Manger");
             gameManger.AddComponent<FeatureSwitcher>();
@@ -268,7 +275,8 @@ namespace test
         std::unique_ptr<Feng::Scene> CreateScene()
         {
             std::unique_ptr<Feng::Scene> scene = std::make_unique<Feng::Scene>();
-            scene->SetAmbientLight(Feng::Vector4{1.f, 1.f, 1.f, 1.f}, 0.2f);
+            scene->GetRenderSystem()->SetAmbientLight(Feng::Vector4{1.f, 1.f, 1.f, 1.f}, 0.2f);
+            scene->GetRenderSystem()->SetShadowMaterial(res.ShadowPassMaterial.get());
             CreateObjects(*scene);
 
             return scene;

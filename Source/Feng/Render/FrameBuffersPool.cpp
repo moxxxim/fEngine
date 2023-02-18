@@ -105,11 +105,11 @@ namespace Feng
                 glTexImage2D(
                              GL_TEXTURE_2D,
                              0,
-                             GL_RGB,
+                             GL_DEPTH_COMPONENT,
                              settings.size.width,
                              settings.size.height,
                              0,
-                             GL_RGB,
+                             GL_DEPTH_COMPONENT,
                              GL_UNSIGNED_BYTE,
                              nullptr);
             }

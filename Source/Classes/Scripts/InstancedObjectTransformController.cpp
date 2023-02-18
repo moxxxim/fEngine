@@ -17,7 +17,7 @@ namespace
         std::uniform_real_distribution<float> angleDistribution(0.f, 359.9f);
         std::uniform_real_distribution<float> scaleDistribution(0.2f, 0.5f);
         std::uniform_real_distribution<float> radiusDistribution(20.f, 35.f);
-        std::uniform_real_distribution<float> heightDistribution(1.5f, -1.5f);
+        std::uniform_real_distribution<float> heightDistribution(3.f, 0.f);
 
         std::vector<Feng::Matrix4> objects;
         objects.resize(instancesCount);

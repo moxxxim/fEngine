@@ -1,5 +1,6 @@
 #include <Feng/ScenesManager/MeshRenderer.h>
 
+#include <Feng/Math/MatrixUtils.h>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/Light.h>
@@ -19,6 +20,19 @@
 
 namespace Feng
 {
+    namespace SMeshRenderer
+    {
+        Matrix4 GetShadowCastLightViewMatrix(const Entity* light)
+        {
+            const Transform *lightTransform = light->GetComponent<Transform>();
+            const Matrix4 lightTransformMatrix = lightTransform->GetGlobalMatrix();
+
+            Matrix4 transformInverted;
+            std::ignore = lightTransformMatrix.TryInvert(transformInverted);
+            return transformInverted;
+        }
+    }
+    
     MeshRenderer::~MeshRenderer()
     {
         DeleteGeomertyBuffers();
@@ -38,6 +52,16 @@ namespace Feng
         }
     }
 
+    bool MeshRenderer::IsShadowCaster() const
+    {
+        return shadowCaster;
+    }
+    
+    void MeshRenderer::SetShadowCaster(bool aShadowCaster)
+    {
+        shadowCaster = aShadowCaster;
+    }
+    
     void MeshRenderer::SetMesh(Mesh *aMesh)
     {
         if (mesh != aMesh)
@@ -57,61 +81,70 @@ namespace Feng
         {
             DeleteInstanceBuffer();
             CreateInstanceBuffer();
+            Print_Errors_OpengGL();
         }
 
-        Print_Errors_OpengGL();
-        
         UpdateInstanceBuffer(instances);
         Print_Errors_OpengGL();
 
         instancesCount = static_cast<uint32_t>(instances.size());
     }
 
-    bool MeshRenderer::CanDraw() const
+    void MeshRenderer::Draw(const RenderProperties &renderProperties, Material *externalMaterial /*= nullptr*/)
     {
-        if ((material != nullptr) && (mesh != nullptr))
+        Material* workingMaterial = externalMaterial ? externalMaterial : material;
+        
+        if (mesh && workingMaterial)
         {
-            return material->HasShader();
-        }
-
-        return false;
-    }
-
-    void MeshRenderer::Draw(const RenderProperties &renderProperties)
-    {
-        if (CanDraw())
-        {
-            StartDraw();
-            SetGlobalUniforms(renderProperties);
-            Render::BindMaterialUniforms(*material, textureBuffers);
+            std::map<std::string, uint32_t> externalTextureBuffers;
+            if(externalMaterial)
+            {
+                externalTextureBuffers = Render::CreateTextureBuffers(*externalMaterial);
+            }
+            
+            std::map<std::string, uint32_t> *workingTextures = externalMaterial
+                ? &externalTextureBuffers
+                : &textureBuffers;
+            
+            StartDraw(*workingMaterial);
+            SetGlobalUniforms(renderProperties, *workingMaterial);
+            Render::BindMaterialUniforms(*workingMaterial, *workingTextures);
             ExecuteDraw();
             FinishDraw();
+            
+            for(auto&& [name, tbo] : externalTextureBuffers)
+            {
+                glDeleteTextures(1, &tbo);
+            }
         }
     }
 
-    void MeshRenderer::StartDraw()
+    void MeshRenderer::StartDraw(Material &workingMaterial)
     {
-        material->Apply();
+        workingMaterial.Apply();
+        Print_Errors_OpengGL();
     }
 
     void MeshRenderer::FinishDraw()
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Render::UndefinedBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, Render::UndefinedBuffer);
+        Print_Errors_OpengGL();
     }
 
-    void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties)
+    void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
     {
         if(instancesCount == 0)
         {
-            const Shader *shader = material->GetShader();
+            const Shader *shader = workingMaterial.GetShader();
             const Transform *myTransform = GetEntity()->GetComponent<Transform>();
             shader->SetUniformMatrix4(ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
+            Print_Errors_OpengGL();
         }
 
-        SetCameraUniforms(renderProperties);
-        SetLightUniforms(renderProperties);
-        SetFogUniforms(renderProperties);
+        SetCameraUniforms(renderProperties, workingMaterial);
+        SetLightUniforms(renderProperties, workingMaterial);
+        SetShadowLightUniform(renderProperties, workingMaterial);
     }
 
     void MeshRenderer::ExecuteDraw()
@@ -157,16 +190,7 @@ namespace Feng
         }
 
         glBindVertexArray(Render::UndefinedBuffer);
-    }
-
-    void MeshRenderer::ActivateTexture(const std::string& name, const Texture &texture, uint32_t unit)
-    {
-        GLenum target = ToOpenGLValue(texture.GetType());
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(target, textureBuffers[name]);
-
-        const Shader *shader = material->GetShader();
-        shader->SetUniformInt(name.c_str(), unit);
+        Print_Errors_OpengGL();
     }
 
     void MeshRenderer::CreateGeometryBuffers()
@@ -276,18 +300,19 @@ namespace Feng
         return bufferObject;
     }
 
-    void MeshRenderer::SetCameraUniforms(const RenderProperties &renderProperties)
+    void MeshRenderer::SetCameraUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
     {
-        const Shader *shader = material->GetShader();
+        const Shader *shader = workingMaterial.GetShader();
         
         shader->SetUniformFloat(ShaderParams::NearClipPlane.data(), renderProperties.cam->GetNearClipPlane());
         shader->SetUniformFloat(ShaderParams::FarClipPlane.data(), renderProperties.cam->GetFarClipPlane());
         shader->SetUniformBuffer(ShaderParams::CamUniformBlock.data(), RenderProperties::CamBufferBinding);
+        Print_Errors_OpengGL();
     }
 
-    void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties)
+    void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
     {
-        const Shader *shader = material->GetShader();
+        const Shader *shader = workingMaterial.GetShader();
         shader->SetUniformVector4(ShaderParams::AmbientColor.data(), renderProperties.ambientColorAndIntencity);
 
         const Transform *pointLightTransform = renderProperties.pointLight->GetEntity()->GetComponent<Transform>();
@@ -318,20 +343,18 @@ namespace Feng
         shader->SetUniformVector4(ShaderParams::SpotLightColor.data(), spotLightColor);
         shader->SetUniformVector4(ShaderParams::SpotLightPositionAndRange.data(), spotLightPosAndRange);
         shader->SetUniformVector4(ShaderParams::SpotLightDirAndAngle.data(), spotLightDirAndAngle);
+        Print_Errors_OpengGL();
     }
-
-    void MeshRenderer::SetFogUniforms(const RenderProperties &renderProperties)
+    
+    void MeshRenderer::SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial)
     {
-//        const feng::Camera *cam = renderProperties->GetCamera();
-//        const feng::Fog& fog = renderProperties->GetFog();
-//
-//        const char *fogStartUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogStart);
-//        m_shader->SetUniformFloat(fogStartUniform, fog.GetStart());
-//        const char *fogRangeUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogRange);
-//        m_shader->SetUniformFloat(fogRangeUniform, fog.GetRange());
-//        const char *fogDensityUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogDensity);
-//        m_shader->SetUniformFloat(fogDensityUniform, fog.GetDensity());
-//        const char *fogColorUniform = feng::ShaderParameters::GetReservedUniformName(feng::ShaderParameters::ReservedUniform::FogColor);
-//        m_shader->SetUniformVector3(fogColorUniform, fog.GetColor());
+        if(renderProperties.shadowLight)
+        {
+            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(20, 20, 1, 200);
+            Matrix4 lightViewMatrix = SMeshRenderer::GetShadowCastLightViewMatrix(renderProperties.shadowLight);
+            Matrix4 lightViewProjectionMatrix = lightViewMatrix * lightProjection;
+            const Shader *shader = workingMaterial.GetShader();
+            shader->SetUniformMatrix4(ShaderParams::ShadowLightViewProj.data(), lightViewProjectionMatrix);
+        }
     }
 }
