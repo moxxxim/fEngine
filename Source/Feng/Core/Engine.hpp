@@ -27,6 +27,8 @@ namespace Feng
         static void SetMultisampleEnabled(bool enabled);
         static bool IsCursorVisible();
         static void SetCursorVisible(bool visible);
+        static bool IsShowDebugShadowMap();
+        static void SetShowDebugShadowMap(bool show);
 
         Engine();
         int32_t Run();
@@ -49,6 +51,7 @@ namespace Feng
         static bool shadowsEnabled;
         static bool showDepth;
         static bool cursorVisible;
+        static bool showDebugShadowMap;
         
         std::unique_ptr<Feng::Scene> scene;
     };

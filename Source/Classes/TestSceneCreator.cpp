@@ -27,9 +27,9 @@ namespace test
         
         constexpr Feng::Vector3 planePos{0.f, -1.f, 0.f};
         
-        std::array<Feng::Vector3, 10> cubePositions =
+        std::vector<Feng::Vector3> cubePositions =
         {
-            Feng::Vector3(-2.0f, 0.0f, 0.0f),
+            Feng::Vector3(-4.0f, 0.0f, 0.0f),
             Feng::Vector3( 0.0f,  0.0f,  0.0f),
             Feng::Vector3( 2.0f,  0.0f, 0.0f),
             Feng::Vector3(-2.0f, 2.0f, 0.0f),
@@ -118,8 +118,8 @@ namespace test
             scene.GetRenderSystem()->SetShadowLight(&lightEntity);
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
-            lightTransform->SetPosition(0.f, 0.f, 4.f);
-            lightTransform->SetEuler(-30.f, 150.f, 0.f);
+            lightTransform->SetPosition(0, 0, 5);
+            lightTransform->SetEuler(0.f, 180.f, 0.f);
         }
 
         void CreatePointLight(Feng::Scene& scene)
@@ -247,7 +247,7 @@ namespace test
             {
                 const Vector3& position = vegetationPositions[i];
                 std::string name = "grass " + std::to_string(i);
-                std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.GrassMaterial, true);
+                std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.GrassMaterial, false);
             }
 
             // Windows.
@@ -276,7 +276,7 @@ namespace test
         {
             std::unique_ptr<Feng::Scene> scene = std::make_unique<Feng::Scene>();
             scene->GetRenderSystem()->SetAmbientLight(Feng::Vector4{1.f, 1.f, 1.f, 1.f}, 0.2f);
-            scene->GetRenderSystem()->SetShadowMaterial(res.ShadowPassMaterial.get());
+            scene->GetRenderSystem()->SetShadowMaterial(res.ShadowPassMaterial.get(), res.ShadowMapDrawMaterial.get());
             CreateObjects(*scene);
 
             return scene;

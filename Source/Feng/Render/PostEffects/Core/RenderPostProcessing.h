@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Feng/Render/FrameBuffersPool.h>
+#include <Feng/Render/VertexBuffer.h>
 #include <memory>
 #include <vector>
 
@@ -23,12 +24,10 @@ namespace Feng
 
     private:
         void ApplyPostEffectsSequence(const FrameBuffer& screenBuffer);
-        void CreateQuadBuffer();
         std::unique_ptr<PostEffect> CreatePostEffect(PostEffectDefinition &postEffect);
 
         std::vector<std::unique_ptr<PostEffect>> effects;
         FrameBuffersPool buffersPool;
-        uint32_t vao = 0;
-        uint32_t vbo = 0;
+        VertexBuffer quadBuffer;
     };
 }

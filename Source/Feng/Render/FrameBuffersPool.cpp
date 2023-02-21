@@ -98,8 +98,8 @@ namespace Feng
 
             if(target == GL_TEXTURE_2D)
             {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexImage2D(
@@ -110,7 +110,7 @@ namespace Feng
                              settings.size.height,
                              0,
                              GL_DEPTH_COMPONENT,
-                             GL_UNSIGNED_BYTE,
+                             GL_FLOAT,
                              nullptr);
             }
             else if (target == GL_TEXTURE_2D_MULTISAMPLE)
@@ -126,7 +126,7 @@ namespace Feng
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, depth, 0);
         }
-        if (settings.depth == FrameBuffer::eAttachementState::Buffer)
+        else if (settings.depth == FrameBuffer::eAttachementState::Buffer)
         {
             glGenRenderbuffers(1, &depth);
             glBindRenderbuffer(GL_RENDERBUFFER, depth);

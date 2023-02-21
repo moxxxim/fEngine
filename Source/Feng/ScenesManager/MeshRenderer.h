@@ -2,6 +2,7 @@
 
 #include <Feng/Math/Matrix4.h>
 #include <Feng/Render/RenderBase.h>
+#include <Feng/Render/VertexBuffer.h>
 #include <Feng/ScenesManager/Component.h>
 
 #include <cstdint>
@@ -60,9 +61,7 @@ namespace Feng
         void SetLightUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
         void SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial);
 
-        uint32_t vao = Render::UndefinedBuffer;
-        uint32_t vbo = Render::UndefinedBuffer;
-        uint32_t ibo = Render::UndefinedBuffer;
+        VertexBuffer vertexBuffer;
         uint32_t instancesBuffer = Render::UndefinedBuffer;
 
         std::map<std::string, uint32_t> textureBuffers;

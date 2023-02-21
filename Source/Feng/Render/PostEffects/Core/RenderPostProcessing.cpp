@@ -21,8 +21,8 @@ namespace Feng
 
     RenderPostProcessing::~RenderPostProcessing()
     {
-        glDeleteBuffers(1, &vao);
-        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &quadBuffer.vao);
+        glDeleteBuffers(1, &quadBuffer.vbo);
     }
 
     bool RenderPostProcessing::HasPostEffects()
@@ -49,12 +49,12 @@ namespace Feng
 
     void RenderPostProcessing::ApplyPostEffects(const FrameBuffer& screenBuffer)
     {
-        if (vao == 0)
+        if (quadBuffer.vao == 0)
         {
-            CreateQuadBuffer();
+            quadBuffer = Render::CreateQuadBuffer();
         }
 
-        glBindVertexArray(vao);
+        glBindVertexArray(quadBuffer.vao);
         ApplyPostEffectsSequence(screenBuffer);
         glBindVertexArray(Render::UndefinedBuffer);
     }
@@ -89,33 +89,6 @@ namespace Feng
         {
             buffersPool.Push(intermediateBuffer);
         }
-    }
-
-    void RenderPostProcessing::CreateQuadBuffer()
-    {
-        std::array<float, 6 * (3 + 2)> quadVertices
-        {
-            -1.0, -1.0, 0.0,    0.0, 0.0,
-            -1.0,  1.0, 0.0,    0.0, 1.0,
-             1.0, -1.0, 0.0,    1.0, 0.0,
-
-             1.0, -1.0, 0.0,    1.0, 0.0,
-            -1.0,  1.0, 0.0,    0.0, 1.0,
-             1.0,  1.0, 0.0,    1.0, 1.0
-        };
-
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * quadVertices.size(), quadVertices.data(), GL_STATIC_DRAW);
-
-        uint32_t attributes = eVertexAtributes::Position | eVertexAtributes::Uv0;
-        std::ignore = Render::EnableVertexAttributes(static_cast<eVertexAtributes>(attributes));
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(Render::UndefinedBuffer);
     }
 
     std::unique_ptr<PostEffect> RenderPostProcessing::CreatePostEffect(PostEffectDefinition &effectDefinition)

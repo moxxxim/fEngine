@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Feng/Render/VertexBuffer.h>
 #include <Feng/Utils/Render/MeshParams.h>
 #include <OpenGL/gl.h>
 
@@ -25,5 +26,6 @@ namespace Feng
         uint32_t CreateTextureBuffer(const Texture& texture);
         void LoadTextureData(const Texture& texture);
         GLenum ToOpenGLValue(eShaderType shaderType);
+        VertexBuffer CreateQuadBuffer();
     }
 }

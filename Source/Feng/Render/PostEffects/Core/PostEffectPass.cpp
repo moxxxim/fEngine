@@ -11,7 +11,7 @@ namespace Feng
 {
     PostEffectPass::PostEffectPass(
         Material *aMaterial,
-        std::map<std::string, uint32_t>& aShaderInputTextures,
+        std::map<std::string, uint32_t> *aShaderInputTextures,
         int32_t aCustomBuffersCount,
         FrameBuffersPool *aBuffersPool)
         : material(aMaterial)
@@ -94,6 +94,6 @@ namespace Feng
 
     void PostEffectPass::SetShaderInput(const char *textureName, unsigned int buffer)
     {
-        shaderInputTextures[textureName] = buffer;
+        (*shaderInputTextures)[textureName] = buffer;
     }
 }

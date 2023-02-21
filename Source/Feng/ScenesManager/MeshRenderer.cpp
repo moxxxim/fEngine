@@ -25,7 +25,10 @@ namespace Feng
         Matrix4 GetShadowCastLightViewMatrix(const Entity* light)
         {
             const Transform *lightTransform = light->GetComponent<Transform>();
-            const Matrix4 lightTransformMatrix = lightTransform->GetGlobalMatrix();
+            const Matrix4 lightTransformMatrix = Mat4::MakeTransformation(
+                                                                          Vector3::One,
+                                                                          lightTransform->GetPosition(),
+                                                                          lightTransform->GetRotation());
 
             Matrix4 transformInverted;
             std::ignore = lightTransformMatrix.TryInvert(transformInverted);
@@ -66,8 +69,12 @@ namespace Feng
     {
         if (mesh != aMesh)
         {
+            if(mesh)
+            {
+                DeleteGeomertyBuffers();
+            }
+
             mesh = aMesh;
-            DeleteGeomertyBuffers();
             if(mesh)
             {
                 CreateGeometryBuffers();
@@ -79,7 +86,11 @@ namespace Feng
     {
         if(static_cast<uint32_t>(instances.size()) > instancesCount)
         {
-            DeleteInstanceBuffer();
+            if(instancesCount > 0)
+            {
+                DeleteInstanceBuffer();
+            }
+            
             CreateInstanceBuffer();
             Print_Errors_OpengGL();
         }
@@ -149,13 +160,13 @@ namespace Feng
 
     void MeshRenderer::ExecuteDraw()
     {
-        glBindVertexArray(vao);
+        glBindVertexArray(vertexBuffer.vao);
 
         ePrimitiveType primitiveType = mesh->GetPrimitiveType();
 
         // No need to call 'glBindBuffer' because it was bound while VAO was still bound.
 
-        if(ibo != Render::UndefinedBuffer)
+        if(vertexBuffer.ibo != Render::UndefinedBuffer)
         {
             const std::vector<uint32_t>& indices = mesh->GetIndices();
             if(instancesCount > 0)
@@ -195,14 +206,16 @@ namespace Feng
 
     void MeshRenderer::CreateGeometryBuffers()
     {
+        GLuint vao;
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
-        vbo = CreateVertexBuffer();
+        vertexBuffer.vao = vao;
+        vertexBuffer.vbo = CreateVertexBuffer();
 
         if(mesh->HasIndices())
         {
-            ibo = CreateIndexBuffer();
+            vertexBuffer.ibo = CreateIndexBuffer();
         }
 
         glBindVertexArray(Render::UndefinedBuffer);
@@ -212,12 +225,12 @@ namespace Feng
 
     void MeshRenderer::DeleteGeomertyBuffers()
     {
-        glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &ibo);
-        glDeleteBuffers(1, &vao);
+        glDeleteBuffers(1, &vertexBuffer.vbo);
+        glDeleteBuffers(1, &vertexBuffer.ibo);
+        glDeleteBuffers(1, &vertexBuffer.vao);
         glDeleteBuffers(1, &instancesBuffer);
 
-        vao = vbo = ibo = instancesBuffer = Render::UndefinedBuffer;
+        vertexBuffer.vao = vertexBuffer.vbo = vertexBuffer.ibo = instancesBuffer = Render::UndefinedBuffer;
     }
 
     void MeshRenderer::CreateTexturesBuffers()
@@ -237,7 +250,7 @@ namespace Feng
     {
         glGenBuffers(1, &instancesBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, instancesBuffer);
-        glBindVertexArray(vao);
+        glBindVertexArray(vertexBuffer.vao);
 
         glEnableVertexAttribArray(firstInstanceAttributeIndex);
         glVertexAttribPointer(firstInstanceAttributeIndex, sizeof(float), GL_FLOAT, GL_FALSE,
@@ -266,7 +279,10 @@ namespace Feng
         if(!instances.empty())
         {
             glBindBuffer(GL_ARRAY_BUFFER, instancesBuffer);
+            Print_Errors_OpengGL();
             glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(Matrix4), instances.data(), GL_STATIC_DRAW);
+            Print_Errors_OpengGL();
+            glBindBuffer(GL_ARRAY_BUFFER, Render::UndefinedBuffer);
         }
     }
 
@@ -350,7 +366,7 @@ namespace Feng
     {
         if(renderProperties.shadowLight)
         {
-            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(20, 20, 1, 200);
+            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(5, 5, 0.1, 30);
             Matrix4 lightViewMatrix = SMeshRenderer::GetShadowCastLightViewMatrix(renderProperties.shadowLight);
             Matrix4 lightViewProjectionMatrix = lightViewMatrix * lightProjection;
             const Shader *shader = workingMaterial.GetShader();

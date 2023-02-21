@@ -38,9 +38,9 @@ namespace Feng
     Matrix4 Camera::GetViewProjectionMatrix() const
     {
         Matrix4 viewMatrix = GetViewMatrix();
-        Matrix4 perspectiveProjection = GetProjectionMatrix();
+        Matrix4 projection = GetProjectionMatrix();
 
-        return viewMatrix * perspectiveProjection;
+        return viewMatrix * projection;
     }
 
     Matrix4 Camera::GetViewMatrix() const

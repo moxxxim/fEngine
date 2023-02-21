@@ -9,9 +9,14 @@
 #include <Feng/ScenesManager/Transform.h>
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/Utils/Debug.h>
+#include <Feng/Utils/Render/RenderUtils.h>
+#include <Feng/Utils/Render/ShaderParams.h>
 
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
+
+
+#include <Classes/TempResouces.h>
 
 namespace Feng
 {
@@ -50,6 +55,8 @@ namespace Feng
     RenderSystem::~RenderSystem()
     {
         glDeleteBuffers(1, &camUbo);
+        glDeleteBuffers(1, &quadBuffer.vao);
+        glDeleteBuffers(1, &quadBuffer.vbo);
     }
     
     void RenderSystem::SetAmbientLight(Vector4 color, float intensity)
@@ -62,14 +69,15 @@ namespace Feng
         renderProperties.cam = camera;
     }
     
-    void RenderSystem::SetShadowMaterial(Material *shadowMaterial)
+    void RenderSystem::SetShadowMaterial(Material *shadowMaterial, Material *shadowDebugMaterial)
     {
         shadowSetup.material = shadowMaterial;
+        shadowSetup.debugMaterial = shadowDebugMaterial;
     }
     
     void RenderSystem::SetShadowLight(Entity *light)
     {
-        shadowSetup.light = light;
+        renderProperties.shadowLight = light;
     }
 
     void RenderSystem::AddRenderer(MeshRenderer *renderer)
@@ -138,31 +146,23 @@ namespace Feng
     {
         DrawShadowMap();
 
-        FrameBuffer renderBuffer = postProcessing.HasPostEffects()
-                    ? GetFrameBuffer(Engine::IsMultisampleEnabled())
-                    : FrameBuffer{};
-
-        glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
-        glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer.frame);
-        Print_Errors_OpengGL();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        BindCamUniformBuffer();
-        DrawOpaque();
-
-        // Draw skybox after opaque objects for good use of a depth buffer.
-        // Draw skybox before transparent object for correct visual effect.
-        DrawSkybox();
-        DrawTransparent();
-        ApplyPostEffects(renderBuffer);
+        if(Engine::IsShowDebugShadowMap())
+        {
+            DrawDebugShadowMap();
+        }
+        else
+        {
+            DrawGeneric();
+        }
+        
+        fboPool.Push(shadowSetup.shadowMap);
         
         Print_Errors_OpengGL();
     }
     
     bool RenderSystem::IsShadowsEnabled()
     {
-        return Engine::IsShadowsEnabled() && shadowSetup.light && shadowSetup.material;
+        return Engine::IsShadowsEnabled() && renderProperties.shadowLight && shadowSetup.material;
     }
 
     void RenderSystem::CreateCamUniformBuffer()
@@ -207,34 +207,81 @@ namespace Feng
             shadowSetup.shadowMap = GetShadowMapBuffer();
             glViewport(0, 0, shadowSetup.shadowMap.settings.size.width, shadowSetup.shadowMap.settings.size.height);
             glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.shadowMap.frame);
+            glClear(GL_DEPTH_BUFFER_BIT);
             Print_Errors_OpengGL();
 
             DrawShadowCastersInShadowMap();
-            
+
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
     }
     
     void RenderSystem::DrawShadowCastersInShadowMap()
     {
-        for(MeshRenderer *renderer : renderersOpaque)
+        auto firstNotCaster = std::partition(
+                                             renderersOpaque.begin(),
+                                             renderersOpaque.end(),
+                                             std::mem_fn(&MeshRenderer::IsShadowCaster));
+        std::for_each(renderersOpaque.begin(), firstNotCaster, [this](MeshRenderer *renderer)
         {
-            if(renderer->IsShadowCaster())
-            {
-                renderer->Draw(renderProperties, shadowSetup.material);
-            }
-        }
-        
-        SRenderSystem::SortSceneByDistance(*renderProperties.cam, renderersTransparent);
-        for(MeshRenderer *renderer : renderersTransparent)
-        {
-            if(renderer->IsShadowCaster())
-            {
-                renderer->Draw(renderProperties, shadowSetup.material);
-            }
-        }
-        
+            renderer->Draw(renderProperties, shadowSetup.material);
+        });
+
         Print_Errors_OpengGL();
+    }
+    
+    void RenderSystem::DrawDebugShadowMap()
+    {
+        if (quadBuffer.vao == 0)
+        {
+            quadBuffer = Render::CreateQuadBuffer();
+        }
+        
+        glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
+        glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer::Default);
+        Print_Errors_OpengGL();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        glBindVertexArray(quadBuffer.vao);
+
+        const Shader *shader = shadowSetup.debugMaterial->GetShader();
+        shader->StartUse();
+        Print_Errors_OpengGL();
+
+        glActiveTexture(GL_TEXTURE0);
+        Print_Errors_OpengGL();
+        glBindTexture(GL_TEXTURE_2D, shadowSetup.shadowMap.depth);
+        Print_Errors_OpengGL();
+        shader->SetUniformInt(ShaderParams::ShadowMap.data(), 0);
+        Print_Errors_OpengGL();
+        
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        shader->StopUse();
+        Print_Errors_OpengGL();
+
+        glBindVertexArray(Render::UndefinedBuffer);
+    }
+    
+    void RenderSystem::DrawGeneric()
+    {
+        FrameBuffer renderBuffer = postProcessing.HasPostEffects()
+                    ? GetFrameBuffer(Engine::IsMultisampleEnabled())
+                    : FrameBuffer{};
+
+        glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
+        glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer.frame);
+        Print_Errors_OpengGL();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        BindCamUniformBuffer();
+        DrawOpaque();
+
+        // Draw skybox after opaque objects for good use of a depth buffer.
+        // Draw skybox before transparent object for correct visual effect.
+        DrawSkybox();
+        DrawTransparent();
+        ApplyPostEffects(renderBuffer);
     }
     
     void RenderSystem::DrawOpaque()
@@ -310,7 +357,7 @@ namespace Feng
     {
         FrameBuffer::Settings bufferSettings;
         bufferSettings.size = shadowSetup.size;
-        bufferSettings.color = FrameBuffer::eAttachementState::None;
+        bufferSettings.color = FrameBuffer::eAttachementState::Texture;
         bufferSettings.depth = FrameBuffer::eAttachementState::Texture;
         bufferSettings.stencil = FrameBuffer::eAttachementState::None;
         bufferSettings.multisample = false;

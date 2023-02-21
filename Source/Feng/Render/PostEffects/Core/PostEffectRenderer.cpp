@@ -12,7 +12,7 @@ namespace Feng
 {
     PostEffectRenderer::PostEffectRenderer(
                                     Material *aMaterial,
-                                    const std::map<std::string, uint32_t>& aFrameBufferTextures)
+                                    const std::map<std::string, uint32_t>* aFrameBufferTextures)
         : material { aMaterial }
         , frameBufferTextures { aFrameBufferTextures }
     { }
@@ -23,7 +23,7 @@ namespace Feng
         shader->StartUse();
 
         SetupBufferedTextures();
-        Render::BindMaterialUniforms(*material, materialTextures, frameBufferTextures.size());
+        Render::BindMaterialUniforms(*material, materialTextures, frameBufferTextures->size());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         shader->StopUse();
@@ -33,7 +33,7 @@ namespace Feng
     {
         const Shader* shader = material->GetShader();
         unsigned int textureUnit = 0;
-        for(const auto& [name, buffer] : frameBufferTextures)
+        for(const auto& [name, buffer] : *frameBufferTextures)
         {
             glActiveTexture(GL_TEXTURE0 + textureUnit);
             glBindTexture(GL_TEXTURE_2D, buffer);

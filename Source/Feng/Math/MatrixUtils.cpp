@@ -64,7 +64,7 @@ namespace Feng::Mat4
         return MakeTransformation(scale, translation, rotation.ToMatrix3());
     }
 
-    Matrix4 MakePerspectiveProjection(float fovDegY, float aspect, float near, float far)
+    Matrix4 MakePerspectiveProjection(float fovDegY, float aspect, float near, float far, bool alongZ /*= false*/)
     {
         Matrix4 projection = Matrix4::Zero;
 
@@ -80,7 +80,7 @@ namespace Feng::Mat4
         return projection;
     }
 
-    Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far)
+    Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far, bool alongZ /*= false*/)
     {
         Matrix4 projection = Matrix4::Zero;
 

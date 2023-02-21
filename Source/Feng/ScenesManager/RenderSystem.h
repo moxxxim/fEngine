@@ -4,6 +4,7 @@
 #include <Feng/Render/FrameBuffersPool.h>
 #include <Feng/Render/FrameBuffer.h>
 #include <Feng/Render/PostEffects/Core/RenderPostProcessing.h>
+#include <Feng/Render/VertexBuffer.h>
 #include <Feng/ScenesManager/RenderProperties.h>
 
 #include <cstdint>
@@ -30,7 +31,7 @@ namespace Feng
 
         void SetCamera(Camera *camera);
         void SetSkybox(MeshRenderer *aSkybox);
-        void SetShadowMaterial(Material *shadowMaterial);
+        void SetShadowMaterial(Material *shadowMaterial, Material *shadowDebugMaterial);
         void SetShadowLight(Entity *light);
 
         void AddRenderer(MeshRenderer *renderer);
@@ -45,8 +46,8 @@ namespace Feng
     private:
         struct ShadowSetup final
         {
-            Entity *light = nullptr;
             Material *material = nullptr;
+            Material *debugMaterial = nullptr;
             Size2ui size { DefaultShadowMapSize, DefaultShadowMapSize };
             FrameBuffer shadowMap;
         };
@@ -56,6 +57,8 @@ namespace Feng
         void BindCamUniformBuffer();
         void DrawShadowMap();
         void DrawShadowCastersInShadowMap();
+        void DrawDebugShadowMap();
+        void DrawGeneric();
         void DrawOpaque();
         void DrawTransparent();
         void DrawSkybox();
@@ -67,6 +70,7 @@ namespace Feng
         std::vector<MeshRenderer*> renderersOpaque;
         std::vector<Light*> lights;
         ShadowSetup shadowSetup;
+        VertexBuffer quadBuffer;
         FrameBuffersPool fboPool;
         RenderPostProcessing postProcessing;
         RenderProperties renderProperties;

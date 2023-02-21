@@ -190,6 +190,7 @@ namespace Feng
     bool Engine::shadowsEnabled = false;
     bool Engine::showDepth = false;
     bool Engine::cursorVisible = false;
+    bool Engine::showDebugShadowMap = false;
     
     bool Engine::IsMultisampleEnabled()
     {
@@ -364,5 +365,15 @@ namespace Feng
 
         int visibilityValue = cursorVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED;
         glfwSetInputMode(SEngine::window, GLFW_CURSOR, visibilityValue);
+    }
+    
+    bool Engine::IsShowDebugShadowMap()
+    {
+        return showDebugShadowMap;
+    }
+    
+    void Engine::SetShowDebugShadowMap(bool show)
+    {
+        showDebugShadowMap = show;
     }
 }

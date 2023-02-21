@@ -23,7 +23,7 @@ namespace Feng
 
         PostEffectPass(
                        Material *aMaterial,
-                       std::map<std::string, uint32_t>& aShaderInputTextures,
+                       std::map<std::string, uint32_t> *aShaderInputTextures,
                        int32_t aCustomBuffersCount,
                        FrameBuffersPool *aBuffersPool);
 
@@ -42,7 +42,7 @@ namespace Feng
         PostEffectContext context;
         Material *material = nullptr;
         FrameBuffersPool *buffersPool = nullptr;
-        std::map<std::string, uint32_t>& shaderInputTextures;
+        std::map<std::string, uint32_t> *shaderInputTextures = nullptr;
         int customBuffersCount = 0;
         std::vector<FrameBuffer> buffers;
     };

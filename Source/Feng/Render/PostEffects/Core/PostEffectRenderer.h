@@ -13,7 +13,7 @@ namespace Feng
     class PostEffectRenderer final
     {
     public:
-        PostEffectRenderer(Material *aMaterial, const std::map<std::string, uint32_t> &aFrameBufferTextures);
+        PostEffectRenderer(Material *aMaterial, const std::map<std::string, uint32_t> *aFrameBufferTextures);
         void Draw();
 
     private:
@@ -23,7 +23,7 @@ namespace Feng
         void ClearTexturesBuffers();
 
         Material *material = nullptr;
-        const std::map<std::string, uint32_t> &frameBufferTextures;
+        const std::map<std::string, uint32_t> *frameBufferTextures = nullptr;
         uint32_t colorBuffer = 0;
         uint32_t depthBuffer = 0;
         std::map<std::string, uint32_t> materialTextures;

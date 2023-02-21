@@ -17,7 +17,7 @@ namespace Feng
                                            FrameBuffersPool *aBuffersPool,
                                            PostEffectPassBehaviour *aPassBehaviour)
         : passBehaviour { aPassBehaviour }
-        , renderer { std::make_unique<PostEffectRenderer>(aMaterial, shaderInputTextures)}
+        , renderer { std::make_unique<PostEffectRenderer>(aMaterial, &shaderInputTextures)}
     {
         int32_t customBuffersCount = 0;
         if (passBehaviour != nullptr)
@@ -27,7 +27,7 @@ namespace Feng
             customBuffersCount = prePass.GetCustomBuffersCount();
         }
 
-        pass = std::make_unique<PostEffectPass>(aMaterial, shaderInputTextures, customBuffersCount, aBuffersPool);
+        pass = std::make_unique<PostEffectPass>(aMaterial, &shaderInputTextures, customBuffersCount, aBuffersPool);
     }
 
     MaterialPostEffect::~MaterialPostEffect() = default;

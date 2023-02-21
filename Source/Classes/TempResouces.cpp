@@ -37,6 +37,8 @@ namespace
     
     constexpr const char *ShadowPassVs = "Utils/ShadowPassVs.vs";
     constexpr const char *EmptyFs = "Utils/EmptyFs.fs";
+    
+    constexpr const char *ShadowMapDrawFs = "Utils/ShowShadowMapFs.fs";
 
     constexpr const char *PostEffectVs = "PostEffects/PostEffectVs.vs";
     constexpr const char *GrayscalePostEffectFs = "PostEffects/PostEffectGrayscaleFs.fs";
@@ -258,8 +260,9 @@ namespace
         test::res.CubemapRefractionMaterial->SetTransparent(false);
         
         test::res.ShadowPassMaterial = std::make_unique<Material>(LoadShader(ShadowPassVs, EmptyFs));
+        test::res.ShadowMapDrawMaterial = std::make_unique<Material>(LoadShader(PostEffectVs, ShadowMapDrawFs));
     }
-    
+
     void CreatePostEffectDefinitions()
     {
         using namespace Feng;

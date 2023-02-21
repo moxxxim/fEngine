@@ -6,6 +6,9 @@
 #include <Feng/Utils/Render/TextureParams.h>
 #include <Feng/Utils/Debug.h>
 
+#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
+
 namespace Feng::Render
 {
     namespace SRenderUtils
@@ -220,5 +223,40 @@ namespace Feng::Render
             case eShaderType::Fragment:
                 return GL_FRAGMENT_SHADER;
         }
+    }
+    
+    VertexBuffer CreateQuadBuffer()
+    {
+        std::array<float, 6 * (3 + 2)> quadVertices
+        {
+            -1.0, -1.0, 0.0,    0.0, 0.0,
+            -1.0,  1.0, 0.0,    0.0, 1.0,
+             1.0, -1.0, 0.0,    1.0, 0.0,
+
+             1.0, -1.0, 0.0,    1.0, 0.0,
+            -1.0,  1.0, 0.0,    0.0, 1.0,
+             1.0,  1.0, 0.0,    1.0, 1.0
+        };
+
+        GLuint vao;
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        GLuint vbo;
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * quadVertices.size(), quadVertices.data(), GL_STATIC_DRAW);
+
+        uint32_t attributes = eVertexAtributes::Position | eVertexAtributes::Uv0;
+        std::ignore = Render::EnableVertexAttributes(static_cast<eVertexAtributes>(attributes));
+
+        glBindBuffer(GL_ARRAY_BUFFER, Render::UndefinedBuffer);
+        glBindVertexArray(Render::UndefinedBuffer);
+        
+        VertexBuffer buffer;
+        buffer.vao = vao;
+        buffer.vbo = vbo;
+        
+        return buffer;
     }
 }
