@@ -22,7 +22,7 @@ namespace Feng
     class RenderSystem final
     {
     public:
-        static constexpr int32_t DefaultShadowMapSize = 2048;
+        static constexpr int32_t DefaultShadowMapSize = 1024;
         
         RenderSystem();
         ~RenderSystem();
