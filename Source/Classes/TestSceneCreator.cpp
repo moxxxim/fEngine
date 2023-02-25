@@ -30,7 +30,7 @@ namespace test
         std::vector<Feng::Vector3> cubePositions =
         {
             Feng::Vector3(-4.0f, 0.0f, 0.0f),
-            Feng::Vector3( 0.0f,  0.0f,  0.0f),
+            Feng::Vector3( 0.0f,  0.0f,  -5.5f),
             Feng::Vector3( 2.0f,  0.0f, 0.0f),
             Feng::Vector3(-2.0f, 2.0f, 0.0f),
             Feng::Vector3(0.0f, 2.0f, 0.0f),
@@ -38,7 +38,7 @@ namespace test
             Feng::Vector3( -2.0f, 1.0f, -4.0f),
             Feng::Vector3( 0.0f, 1.0f, -4.0f),
             Feng::Vector3( 2.0f, 1.0f, -4.0f),
-            Feng::Vector3( 0.0f, -0.2f, -2.0f),
+            Feng::Vector3( -0.3f, -0.2f, -1.6f),
         };
 
         std::array<Feng::Vector3, 10> vegetationPositions
@@ -125,7 +125,7 @@ namespace test
         void CreatePointLight(Feng::Scene& scene)
         {
             using namespace Feng;
-            
+
             Vector4 color {1.f, 0.f, 0.f, 1.f};
 
             std::unique_ptr<Material> material = CreateLightMaterial(color);
@@ -207,6 +207,11 @@ namespace test
             Feng::Entity& obj = scene.CreateMesh(test::res.PhongTexInstancedMaterial.get(), &mesh, "Instanced");
             InstancedObjectTransformController &instances = obj.AddComponent<InstancedObjectTransformController>();
             instances.SetCount(1'000);
+        }
+        
+        Feng::Material* GetObjectMaterial(bool )
+        {
+            
         }
         
         void CreateObjects(Feng::Scene& scene)

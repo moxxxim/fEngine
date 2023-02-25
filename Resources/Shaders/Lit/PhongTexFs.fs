@@ -23,6 +23,7 @@ struct SpotLight
 
 // Material.
 uniform sampler2D uTexture0;
+uniform sampler2D uShadowMap;
 
 uniform vec4 uAmbientColor; // xyz - color, w - intencity.
 uniform PointLight uPointLight;
@@ -30,7 +31,8 @@ uniform DirectLight uDirectLight;
 uniform SpotLight uSpotLight;
 
 in VsOut
-{   
+{
+    vec4 FragPosLightSpace;
     vec3 FragPos;
     vec3 Norm;
     vec2 Uv0;
@@ -38,28 +40,45 @@ in VsOut
 
 out vec4 FragColor;
 
+// 0.f - fragment is in shadow, 1.f - fragment not in shadow.
+float CalculateShadowMultiplier(vec4 fragPosLightSpace);
 vec3 CalculateDirLight(DirectLight light, vec3 norm);
 vec3 CalculatePointLight(PointLight light, vec3 norm);
 vec3 CalculateSpotLight(SpotLight light, vec3 norm);
+vec4 ToLinearColor(vec4 srgbColor);
+vec4 ToSrgbColor(vec4 linearColor);
+
+const float gamma = 2.2f;
 
 void main()
 {
-    const float gamma = 2.2f;
     vec4 srgbColor = texture(uTexture0, fsIn.Uv0);
-    vec4 linearColor = vec4(pow(srgbColor.rgb, vec3(gamma)), srgbColor.a);
+    vec4 linearColor = ToLinearColor(srgbColor);
 
     // Calculate ambient component.
     vec3 ambientColor = uAmbientColor.w * uAmbientColor.rgb;
 
     vec3 norm = normalize(fsIn.Norm);
 
-    vec3 lightColor = CalculateDirLight(uDirectLight, norm);
+    float shadowValue = CalculateShadowMultiplier(fsIn.FragPosLightSpace);
+    vec3 lightColor = shadowValue * CalculateDirLight(uDirectLight, norm);
     lightColor += CalculatePointLight(uPointLight, norm);    
     lightColor += CalculateSpotLight(uSpotLight, norm);
 
     linearColor.rgb *= (ambientColor + lightColor);
 
-    FragColor = vec4(pow(linearColor.rgb, vec3(1.f / gamma)), linearColor.a);
+    FragColor = ToSrgbColor(linearColor);
+}
+
+float CalculateShadowMultiplier(vec4 fragPosLightSpace)
+{
+    vec3 ndcFragPos = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    vec3 fragPos01 = ndcFragPos * 0.5 + 0.5;
+    float shadowDepth = texture(uShadowMap, fragPos01.xy).r;
+    float fragmentDepth = fragPos01.z;
+    float shadowMultiplier = fragmentDepth > shadowDepth ? 0.0 : 1.0;
+
+    return shadowMultiplier;
 }
 
 vec3 CalculateDirLight(DirectLight light, vec3 norm)
@@ -96,4 +115,14 @@ vec3 CalculateSpotLight(SpotLight light, vec3 norm)
     float diffuseImpact = max(dot(norm, -rayDirNorm), 0.f);
     
     return lightColor * diffuseImpact;
+}
+
+vec4 ToLinearColor(vec4 srgbColor)
+{
+    return vec4(pow(srgbColor.rgb, vec3(gamma)), srgbColor.a);
+}
+
+vec4 ToSrgbColor(vec4 linearColor)
+{
+    return vec4(pow(linearColor.rgb, vec3(1.f / gamma)), linearColor.a);
 }

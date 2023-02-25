@@ -34,6 +34,7 @@ namespace Feng
         Mesh *GetMesh();
         void SetMesh(Mesh *aMesh);
         void SetInstanceTransforms(const std::vector<Matrix4>& instances);
+        void SetShadowTexture(int32_t bufferId);
 
         void Draw(const RenderProperties &aRenderProperties, Material *externalMaterial = nullptr);
 
@@ -70,6 +71,7 @@ namespace Feng
         Mesh *mesh = nullptr;
         uint32_t instancesCount = 0;
         uint32_t firstInstanceAttributeIndex = 0;
+        uint32_t shadowMapId = Render::UndefinedBuffer;
         bool shadowCaster = false;
     };
 }

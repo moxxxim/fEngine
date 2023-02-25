@@ -125,27 +125,32 @@ namespace Feng::Render
 
             if(const Texture *texture = material.GetTexture(name))
             {
+                GLenum target = ToOpenGLValue(texture->GetType());
                 if(auto it = textureBuffers.find(name); it != textureBuffers.end())
                 {
-                    GLenum target = ToOpenGLValue(texture->GetType());
-                    glActiveTexture(GL_TEXTURE0 + textureUnit);
-                    glBindTexture(target, it->second);
-
-                    shader->SetUniformInt(name.c_str(), textureUnit);
+                    BindTexture(material, texture->GetType(), textureUnit, name, it->second);
                     ++textureUnit;
                 }
                 else
                 {
                     Debug::LogWarning("No buffer for texture found: " + name);
                 }
-
-                continue;
             }
         }
         
         Print_Errors_OpengGL();
     }
 
+    void BindTexture(const Material &material, eTextureType textureType, uint32_t unit, const std::string_view& name, uint32_t textureBuffer)
+    {
+        GLenum target = ToOpenGLValue(textureType);
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(target, textureBuffer);
+        
+        const Shader* shader = material.GetShader();
+        shader->SetUniformInt(name.data(), unit);
+    }
+    
     std::map<std::string, uint32_t> CreateTextureBuffers(const Material &material)
     {
         std::map<std::string, uint32_t> buffers;

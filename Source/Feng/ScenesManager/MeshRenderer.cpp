@@ -100,6 +100,11 @@ namespace Feng
 
         instancesCount = static_cast<uint32_t>(instances.size());
     }
+    
+    void MeshRenderer::SetShadowTexture(int32_t bufferId)
+    {
+        shadowMapId = bufferId;
+    }
 
     void MeshRenderer::Draw(const RenderProperties &renderProperties, Material *externalMaterial /*= nullptr*/)
     {
@@ -118,10 +123,24 @@ namespace Feng
                 : &textureBuffers;
             
             StartDraw(*workingMaterial);
+            Print_Errors_OpengGL();
             SetGlobalUniforms(renderProperties, *workingMaterial);
+            Print_Errors_OpengGL();
             Render::BindMaterialUniforms(*workingMaterial, *workingTextures);
+            if(shadowMapId != Render::UndefinedBuffer)
+            {
+                Render::BindTexture(
+                                    *workingMaterial,
+                                    eTextureType::Tex2d,
+                                    static_cast<uint32_t>(workingTextures->size()),
+                                    ShaderParams::ShadowMap,
+                                    shadowMapId);
+            }
+            
+            Print_Errors_OpengGL();
             ExecuteDraw();
             FinishDraw();
+            Print_Errors_OpengGL();
             
             for(auto&& [name, tbo] : externalTextureBuffers)
             {
@@ -366,10 +385,11 @@ namespace Feng
     {
         if(renderProperties.shadowLight)
         {
-            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(10, 10, 0.1, 30, true);
+            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(10, 10, 0.1, 50, true);
             Matrix4 lightViewMatrix = SMeshRenderer::GetShadowCastLightViewMatrix(renderProperties.shadowLight);
             Matrix4 lightViewProjectionMatrix = lightViewMatrix * lightProjection;
             const Shader *shader = workingMaterial.GetShader();
+            shader->SetUniformMatrix4(ShaderParams::ShadowLightView.data(), lightViewMatrix);
             shader->SetUniformMatrix4(ShaderParams::ShadowLightViewProj.data(), lightViewProjectionMatrix);
         }
     }

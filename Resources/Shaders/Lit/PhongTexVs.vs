@@ -26,9 +26,11 @@ layout (std140) uniform ubCamera
 };
 
 uniform mat4 uModelMatrix;
+uniform mat4 uShadowLightViewProj;
 
 out VsOut
 {
+    vec4 FragPosLightSpace;
     vec3 FragPos;
     vec3 Norm;
     vec2 Uv0;
@@ -39,6 +41,7 @@ void main()
     vec4 worlPos = uModelMatrix * vec4(aPos, 1.0);
     gl_Position = uViewProjMatrix * worlPos;
     vsOut.FragPos = worlPos.xyz;
+    vsOut.FragPosLightSpace = uShadowLightViewProj * vec4(vsOut.FragPos, 1.0);
     // Inverse is a costly operation, it should not be used in shader.
     vsOut.Norm = transpose(inverse(mat3(uModelMatrix))) * aNorm;
     vsOut.Uv0 = aUv0;

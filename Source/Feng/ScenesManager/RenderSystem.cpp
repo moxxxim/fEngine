@@ -155,7 +155,10 @@ namespace Feng
             DrawGeneric();
         }
         
-        fboPool.Push(shadowSetup.shadowMap);
+        if(IsShadowsEnabled())
+        {
+            fboPool.Push(shadowSetup.shadowMap);
+        }
         
         Print_Errors_OpengGL();
     }
@@ -288,6 +291,7 @@ namespace Feng
     {
         for(MeshRenderer *renderer : renderersOpaque)
         {
+            renderer->SetShadowTexture(shadowSetup.shadowMap.depth);
             renderer->Draw(renderProperties);
         }
         
