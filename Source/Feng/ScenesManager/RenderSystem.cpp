@@ -208,6 +208,13 @@ namespace Feng
         if (IsShadowsEnabled())
         {
             shadowSetup.shadowMap = GetShadowMapBuffer();
+            glBindTexture(GL_TEXTURE_2D, shadowSetup.shadowMap.depth);
+            float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
             glViewport(0, 0, shadowSetup.shadowMap.settings.size.width, shadowSetup.shadowMap.settings.size.height);
             glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.shadowMap.frame);
             glClear(GL_DEPTH_BUFFER_BIT);

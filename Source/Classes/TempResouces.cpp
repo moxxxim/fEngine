@@ -260,6 +260,7 @@ namespace
         test::res.CubemapRefractionMaterial->SetTransparent(false);
         
         test::res.ShadowPassMaterial = std::make_unique<Material>(LoadShader(ShadowPassVs, EmptyFs));
+        test::res.ShadowPassMaterial->SetDrawFace(eDrawFace::Ccw);
         test::res.ShadowMapDrawMaterial = std::make_unique<Material>(LoadShader(PostEffectVs, ShadowMapDrawFs));
     }
 

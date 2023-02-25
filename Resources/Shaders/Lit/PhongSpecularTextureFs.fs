@@ -92,13 +92,16 @@ void main()
 
 float CalculateShadowMultiplier(vec4 fragPosLightSpace)
 {
+    const float bias = 0.00f;
     vec3 ndcFragPos = fragPosLightSpace.xyz / fragPosLightSpace.w;
     vec3 fragPos01 = ndcFragPos * 0.5 + 0.5;
     float shadowDepth = texture(uShadowMap, fragPos01.xy).r;
     float fragmentDepth = fragPos01.z;
-    float shadowMultiplier = fragmentDepth > shadowDepth ? 0.0 : 1.0;
+    float shadowMultiplier = step(fragmentDepth - bias, shadowDepth); // Gives 0.f if outside far clipping plane
+    float afterClippingPlaneMultiplier = step(1.f, fragmentDepth); // 1.f if outside far clipping plane (as deisred)
+    float resultMultiplier = clamp(shadowMultiplier + afterClippingPlaneMultiplier, 0.f, 1.f);
 
-    return shadowMultiplier;
+    return resultMultiplier;
 }
 
 vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir)

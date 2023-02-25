@@ -26,6 +26,7 @@ namespace test
         std::map<Feng::Light *, std::unique_ptr<Feng::Material>> lightMaterials;
         
         constexpr Feng::Vector3 planePos{0.f, -1.f, 0.f};
+        constexpr Feng::Vector3 reflectiveCubePos{6.f, planePos.y + 0.6f, 0.f};
         
         std::vector<Feng::Vector3> cubePositions =
         {
@@ -38,7 +39,7 @@ namespace test
             Feng::Vector3( -2.0f, 1.0f, -4.0f),
             Feng::Vector3( 0.0f, 1.0f, -4.0f),
             Feng::Vector3( 2.0f, 1.0f, -4.0f),
-            Feng::Vector3( -0.3f, -0.2f, -1.6f),
+            Feng::Vector3( -2.f, planePos.y + 0.6f, -1.f),
         };
 
         std::array<Feng::Vector3, 10> vegetationPositions
@@ -119,7 +120,7 @@ namespace test
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
             lightTransform->SetPosition(-7, 7, 5);
-            lightTransform->SetEuler(-30.f, 140.f, 0.f);
+            lightTransform->SetEuler(-40.f, 140.f, 0.f);
         }
 
         void CreatePointLight(Feng::Scene& scene)
@@ -209,11 +210,6 @@ namespace test
             instances.SetCount(1'000);
         }
         
-        Feng::Material* GetObjectMaterial(bool )
-        {
-            
-        }
-        
         void CreateObjects(Feng::Scene& scene)
         {
             using namespace Feng;
@@ -263,14 +259,14 @@ namespace test
                 std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.WindowMaterial, false);
             }
 
-            Feng::Entity *refractiveObject = CreateObject(
+            Feng::Entity *reflectiveeObject = CreateObject(
                                                           scene,
-                                                          Vector3(0.f, 2.f, -2.5f),
+                                                          reflectiveCubePos,
                                                           "Reflective",
                                                           *test::res.CubeMesh,
-                                                          *test::res.CubemapRefractionMaterial,
-                                                          false);
-            Feng::Transform *reflectiveObjectTransform = refractiveObject->GetComponent<Feng::Transform>();
+                                                          *test::res.CubemapReflectiveMaterial,
+                                                          true);
+            Feng::Transform *reflectiveObjectTransform = reflectiveeObject->GetComponent<Feng::Transform>();
 
             // Game manager.
             Entity &gameManger = scene.CreateEntity("Game Manger");
