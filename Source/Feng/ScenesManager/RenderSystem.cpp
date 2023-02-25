@@ -75,7 +75,7 @@ namespace Feng
         shadowSetup.debugMaterial = shadowDebugMaterial;
     }
     
-    void RenderSystem::SetShadowLight(Entity *light)
+    void RenderSystem::SetDirectionalShadowLight(Entity *light)
     {
         renderProperties.shadowLight = light;
     }
@@ -112,7 +112,7 @@ namespace Feng
     {
         if(light->IsShadowCaster())
         {
-            SetShadowLight(light->GetEntity());
+            SetDirectionalShadowLight(light->GetEntity());
         }
 
         switch (light->GetType())

@@ -32,7 +32,7 @@ namespace Feng
         void SetCamera(Camera *camera);
         void SetSkybox(MeshRenderer *aSkybox);
         void SetShadowMaterial(Material *shadowMaterial, Material *shadowDebugMaterial);
-        void SetShadowLight(Entity *light);
+        void SetDirectionalShadowLight(Entity *light);
 
         void AddRenderer(MeshRenderer *renderer);
         void RemoveRenderer(MeshRenderer *renderer);

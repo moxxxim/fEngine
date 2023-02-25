@@ -116,7 +116,7 @@ namespace test
             light->SetIntensity(1.f);
             light->SetShadowCaster(isShadowCaster);
             
-            scene.GetRenderSystem()->SetShadowLight(&lightEntity);
+            scene.GetRenderSystem()->SetDirectionalShadowLight(&lightEntity);
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
             lightTransform->SetPosition(-7, 7, 5);
