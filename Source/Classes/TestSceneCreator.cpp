@@ -3,6 +3,7 @@
 #include <Classes/Scripts/CameraStabilizer.hpp>
 #include <Classes/Scripts/CameraWasdController.h>
 #include <Classes/Scripts/GameObjectRotation.h>
+#include <Classes/Scripts/GameObjectSliderX.hpp>
 #include <Classes/Scripts/InstancedObjectTransformController.hpp>
 #include <Classes/Scripts/FeatureSwitcher.hpp>
 #include <Classes/TempResouces.h>
@@ -142,17 +143,9 @@ namespace test
             light->SetColor(color);
             light->SetIntensity(1.5f);
 
+            std::ignore = lightEntity.AddComponent<GameObjectSliderX>();
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
-
-            constexpr bool isUp = true;
-            if(isUp)
-            {
-                lightTransform->SetPosition(0.f, 4.f, -1.f);
-            }
-            else
-            {
-                lightTransform->SetPosition(0.f, -12.f, -1.f);
-            }
+            lightTransform->SetPosition(0.f, 1.f, -2.f);
         }
 
         void CreateSpotLight(Feng::Scene& scene)
