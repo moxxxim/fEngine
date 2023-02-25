@@ -118,8 +118,8 @@ namespace test
             scene.GetRenderSystem()->SetShadowLight(&lightEntity);
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
-            lightTransform->SetPosition(0, 0, 5);
-            lightTransform->SetEuler(0.f, 180.f, 0.f);
+            lightTransform->SetPosition(-7, 7, 5);
+            lightTransform->SetEuler(-30.f, 140.f, 0.f);
         }
 
         void CreatePointLight(Feng::Scene& scene)

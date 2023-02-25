@@ -366,7 +366,7 @@ namespace Feng
     {
         if(renderProperties.shadowLight)
         {
-            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(5, 5, 0.1, 30);
+            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(10, 10, 0.1, 30, true);
             Matrix4 lightViewMatrix = SMeshRenderer::GetShadowCastLightViewMatrix(renderProperties.shadowLight);
             Matrix4 lightViewProjectionMatrix = lightViewMatrix * lightProjection;
             const Shader *shader = workingMaterial.GetShader();
