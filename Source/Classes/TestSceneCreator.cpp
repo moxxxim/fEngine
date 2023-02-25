@@ -2,6 +2,7 @@
 
 #include <Classes/Scripts/CameraStabilizer.hpp>
 #include <Classes/Scripts/CameraWasdController.h>
+#include <Classes/Scripts/DirectionalLightMovement.hpp>
 #include <Classes/Scripts/GameObjectRotation.h>
 #include <Classes/Scripts/GameObjectSliderX.hpp>
 #include <Classes/Scripts/InstancedObjectTransformController.hpp>
@@ -109,6 +110,7 @@ namespace test
                                                     Light::eType::Directional,
                                                     material.get(),
                                                     test::res.CubeMesh.get());
+            lightEntity.AddComponent<DirectionalLightMovement>();
 
             Light* light = lightEntity.GetComponent<Light>();
             lightMaterials[light] = std::move(material);
@@ -120,7 +122,7 @@ namespace test
             scene.GetRenderSystem()->SetDirectionalShadowLight(&lightEntity);
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
-            lightTransform->SetPosition(-7, 7, 5);
+            lightTransform->SetPosition(-7, 3, 5);
             lightTransform->SetEuler(-40.f, 140.f, 0.f);
         }
 

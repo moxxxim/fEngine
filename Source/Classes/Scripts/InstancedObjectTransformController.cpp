@@ -14,7 +14,7 @@ namespace
     {
         std::random_device randomDevice;
         std::mt19937 generator(randomDevice());
-        std::uniform_real_distribution<float> angleDistribution(0.f, 359.9f);
+        std::uniform_real_distribution<float> angleDistribution(0.f, Feng::Math::Pi * 2);
         std::uniform_real_distribution<float> scaleDistribution(0.2f, 0.5f);
         std::uniform_real_distribution<float> radiusDistribution(20.f, 35.f);
         std::uniform_real_distribution<float> heightDistribution(3.f, 0.f);
