@@ -9,7 +9,7 @@ int main(int argc, const char * argv[])
     std::unique_ptr<Feng::Scene> scene = test::CreateTestScene();
     engine.SetScene(std::move(scene));
     engine.SetShadowsEnabled(true);
-    engine.SetShowDebugShadowMap(false);
+    engine.SetShowDebugShadowMap(true);
 
     return engine.Run();
 }
