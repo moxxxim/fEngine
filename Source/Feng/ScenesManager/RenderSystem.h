@@ -33,6 +33,7 @@ namespace Feng
         void SetSkybox(MeshRenderer *aSkybox);
         void SetShadowMaterial(Material *shadowMaterial, Material *shadowDebugMaterial);
         void SetDirectionalShadowLight(Entity *light);
+        void SetPointShadowLight(Entity *light);
 
         void AddRenderer(MeshRenderer *renderer);
         void RemoveRenderer(MeshRenderer *renderer);
@@ -56,6 +57,8 @@ namespace Feng
         void CreateCamUniformBuffer();
         void BindCamUniformBuffer();
         void DrawShadowMap();
+        void DrawDirectShadowMap();
+        void DrawPointShadowMap();
         void DrawShadowCastersInShadowMap();
         void DrawDebugShadowMap();
         void DrawGeneric();

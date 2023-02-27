@@ -34,7 +34,8 @@ namespace Feng
         Mesh *GetMesh();
         void SetMesh(Mesh *aMesh);
         void SetInstanceTransforms(const std::vector<Matrix4>& instances);
-        void SetShadowTexture(int32_t bufferId);
+        void SetDirectShadowTexture(int32_t bufferId);
+        void SetPointShadowTexture(int32_t bufferId);
 
         void Draw(const RenderProperties &aRenderProperties, Material *externalMaterial = nullptr);
 
@@ -58,6 +59,7 @@ namespace Feng
         uint32_t CreateVertexBuffer();
         uint32_t CreateIndexBuffer();
 
+        void BindShadowMaps(uint32_t firstTextureUnit, Material &workingMaterial);
         void SetCameraUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
         void SetLightUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
         void SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial);
@@ -71,7 +73,8 @@ namespace Feng
         Mesh *mesh = nullptr;
         uint32_t instancesCount = 0;
         uint32_t firstInstanceAttributeIndex = 0;
-        uint32_t shadowMapId = Render::UndefinedBuffer;
+        uint32_t directShadowMapId = Render::UndefinedBuffer;
+        uint32_t pointShadowMapId = Render::UndefinedBuffer;
         bool shadowCaster = false;
     };
 }

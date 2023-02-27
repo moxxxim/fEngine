@@ -13,7 +13,7 @@ private:
     
     void ApplyNextPostEffect();
     
-    constexpr static float MultisampleSwitchTimeOut = 0.25f;
+    constexpr static float KeyPressTimeOut = 0.25f;
     
     float effectChangeInputDelay = 0.3f;
     float lastEffectChangeTime = 0.f;

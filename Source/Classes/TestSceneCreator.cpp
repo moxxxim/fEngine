@@ -144,6 +144,8 @@ namespace test
             light->SetRange(8.f);
             light->SetColor(color);
             light->SetIntensity(1.5f);
+            
+            scene.GetRenderSystem()->SetPointShadowLight(&lightEntity);
 
             std::ignore = lightEntity.AddComponent<GameObjectSliderX>();
             Transform *lightTransform = lightEntity.GetComponent<Transform>();

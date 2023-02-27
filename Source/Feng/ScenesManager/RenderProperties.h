@@ -14,11 +14,12 @@ namespace Feng
     {
         static constexpr uint32_t CamBufferBinding = 0;
         
-        const Camera *cam = nullptr;
-        const Light *directLight = nullptr;
-        const Light *pointLight = nullptr;
-        const Light *spotLight = nullptr;
-        const Entity *shadowLight = nullptr;
+        Camera *cam = nullptr;
+        Light *directLight = nullptr;
+        Light *pointLight = nullptr;
+        Light *spotLight = nullptr;
+        Entity *directShadowLight = nullptr;
+        Entity *pointShadowLight = nullptr;
         Vector4 ambientColorAndIntencity = Vector4 {1.f, 1.f, 1.f, 1.f};
         bool useShadows = false;
     };

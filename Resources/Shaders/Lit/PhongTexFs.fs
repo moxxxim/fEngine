@@ -23,7 +23,7 @@ struct SpotLight
 
 // Material.
 uniform sampler2D uTexture0;
-uniform sampler2D uShadowMap;
+uniform sampler2D uDirectShadowMap;
 
 uniform vec4 uAmbientColor; // xyz - color, w - intencity.
 uniform PointLight uPointLight;
@@ -82,7 +82,7 @@ vec3 CalculateNdcFragPos01(vec4 fragPosLightSpace)
 float CalculateShadowMultiplierPart(vec4 fragPosLightSpace, vec2 uvOffset)
 {
     vec3 fragPos01 = CalculateNdcFragPos01(fragPosLightSpace);
-    float shadowDepth = texture(uShadowMap, fragPos01.xy + uvOffset).r;
+    float shadowDepth = texture(uDirectShadowMap, fragPos01.xy + uvOffset).r;
     float fragmentDepth = fragPos01.z;
 
     const float bias = 0.005f;
@@ -96,7 +96,7 @@ float CalculateShadowMultiplierPart(vec4 fragPosLightSpace, vec2 uvOffset)
 float CalculateShadowMultiplier(vec4 fragPosLightSpace)
 {
     float shadowMultiplier = 0.f;
-    vec2 texelSize = 1.0f / textureSize(uShadowMap, 0);
+    vec2 texelSize = 1.0f / textureSize(uDirectShadowMap, 0);
     for(int x = -1; x <= 1; ++x)
     {
         for(int y = -1; y <= 1; ++y)

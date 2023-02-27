@@ -32,18 +32,26 @@ void FeatureSwitcher::Update(float deltaTime)
     
     if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_B))
     {
-        Feng::Engine::SetShadowsEnabled(!Feng::Engine::IsShadowsEnabled());
+        if(!isDelayActive)
+        {
+            Feng::Engine::SetShadowsEnabled(!Feng::Engine::IsShadowsEnabled());
+            isDelayActive = true;
+        }
     }
-    
+
     if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_C))
     {
-        Feng::Engine::SetCursorVisible(!Feng::Engine::IsCursorVisible());
+        if(!isDelayActive)
+        {
+            Feng::Engine::SetCursorVisible(!Feng::Engine::IsCursorVisible());
+            isDelayActive = true;
+        }
     }
 
     if(isDelayActive)
     {
         delay += deltaTime;
-        if(delay > MultisampleSwitchTimeOut)
+        if(delay > KeyPressTimeOut)
         {
             delay = 0.f;
             isDelayActive = false;

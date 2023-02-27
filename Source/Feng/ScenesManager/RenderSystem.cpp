@@ -15,9 +15,6 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 
-
-#include <Classes/TempResouces.h>
-
 namespace Feng
 {
     namespace SRenderSystem
@@ -77,7 +74,12 @@ namespace Feng
     
     void RenderSystem::SetDirectionalShadowLight(Entity *light)
     {
-        renderProperties.shadowLight = light;
+        renderProperties.directShadowLight = light;
+    }
+    
+    void RenderSystem::SetPointShadowLight(Entity *light)
+    {
+        renderProperties.pointShadowLight = light;
     }
 
     void RenderSystem::AddRenderer(MeshRenderer *renderer)
@@ -110,11 +112,6 @@ namespace Feng
 
     void RenderSystem::AddLight(Light *light)
     {
-        if(light->IsShadowCaster())
-        {
-            SetDirectionalShadowLight(light->GetEntity());
-        }
-
         switch (light->GetType())
         {
             case Light::eType::Directional:
@@ -144,7 +141,7 @@ namespace Feng
 
     void RenderSystem::Draw()
     {
-        DrawShadowMap();
+        DrawDirectShadowMap();
 
         if(Engine::IsShowDebugShadowMap())
         {
@@ -165,7 +162,7 @@ namespace Feng
     
     bool RenderSystem::IsShadowsEnabled()
     {
-        return Engine::IsShadowsEnabled() && renderProperties.shadowLight && shadowSetup.material;
+        return Engine::IsShadowsEnabled() && renderProperties.directShadowLight && shadowSetup.material;
     }
 
     void RenderSystem::CreateCamUniformBuffer()
@@ -207,23 +204,34 @@ namespace Feng
     {
         if (IsShadowsEnabled())
         {
-            shadowSetup.shadowMap = GetShadowMapBuffer();
-            glBindTexture(GL_TEXTURE_2D, shadowSetup.shadowMap.depth);
-            float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            glViewport(0, 0, shadowSetup.shadowMap.settings.size.width, shadowSetup.shadowMap.settings.size.height);
-            glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.shadowMap.frame);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            Print_Errors_OpengGL();
-
-            DrawShadowCastersInShadowMap();
-
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            DrawDirectShadowMap();
+            DrawPointShadowMap();
         }
+    }
+    
+    void RenderSystem::DrawDirectShadowMap()
+    {
+        shadowSetup.shadowMap = GetShadowMapBuffer();
+        glBindTexture(GL_TEXTURE_2D, shadowSetup.shadowMap.depth);
+        float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glViewport(0, 0, shadowSetup.shadowMap.settings.size.width, shadowSetup.shadowMap.settings.size.height);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.shadowMap.frame);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        Print_Errors_OpengGL();
+
+        DrawShadowCastersInShadowMap();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    
+    void RenderSystem::DrawPointShadowMap()
+    {
+        
     }
     
     void RenderSystem::DrawShadowCastersInShadowMap()
@@ -262,7 +270,7 @@ namespace Feng
         Print_Errors_OpengGL();
         glBindTexture(GL_TEXTURE_2D, shadowSetup.shadowMap.depth);
         Print_Errors_OpengGL();
-        shader->SetUniformInt(ShaderParams::ShadowMap.data(), 0);
+        shader->SetUniformInt(ShaderParams::DirectShadowMap.data(), 0);
         Print_Errors_OpengGL();
         
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -298,7 +306,7 @@ namespace Feng
     {
         for(MeshRenderer *renderer : renderersOpaque)
         {
-            renderer->SetShadowTexture(shadowSetup.shadowMap.depth);
+            renderer->SetDirectShadowTexture(shadowSetup.shadowMap.depth);
             renderer->Draw(renderProperties);
         }
         

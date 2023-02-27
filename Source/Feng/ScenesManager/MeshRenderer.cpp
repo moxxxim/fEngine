@@ -101,9 +101,14 @@ namespace Feng
         instancesCount = static_cast<uint32_t>(instances.size());
     }
     
-    void MeshRenderer::SetShadowTexture(int32_t bufferId)
+    void MeshRenderer::SetDirectShadowTexture(int32_t bufferId)
     {
-        shadowMapId = bufferId;
+        directShadowMapId = bufferId;
+    }
+    
+    void MeshRenderer::SetPointShadowTexture(int32_t bufferId)
+    {
+        pointShadowMapId = bufferId;
     }
 
     void MeshRenderer::Draw(const RenderProperties &renderProperties, Material *externalMaterial /*= nullptr*/)
@@ -127,17 +132,9 @@ namespace Feng
             SetGlobalUniforms(renderProperties, *workingMaterial);
             Print_Errors_OpengGL();
             Render::BindMaterialUniforms(*workingMaterial, *workingTextures);
-            if(shadowMapId != Render::UndefinedBuffer)
-            {
-                Render::BindTexture(
-                                    *workingMaterial,
-                                    eTextureType::Tex2d,
-                                    static_cast<uint32_t>(workingTextures->size()),
-                                    ShaderParams::ShadowMap,
-                                    shadowMapId);
-            }
-            
+            BindShadowMaps(static_cast<uint32_t>(workingTextures->size()), *workingMaterial);
             Print_Errors_OpengGL();
+            
             ExecuteDraw();
             FinishDraw();
             Print_Errors_OpengGL();
@@ -334,6 +331,29 @@ namespace Feng
 
         return bufferObject;
     }
+    
+    void MeshRenderer::BindShadowMaps(uint32_t firstTextureUnit, Material &workingMaterial)
+    {
+        if(directShadowMapId != Render::UndefinedBuffer)
+        {
+            Render::BindTexture(
+                                workingMaterial,
+                                eTextureType::Tex2d,
+                                firstTextureUnit,
+                                ShaderParams::DirectShadowMap,
+                                directShadowMapId);
+        }
+        
+        if(pointShadowMapId != Render::UndefinedBuffer)
+        {
+            Render::BindTexture(
+                                workingMaterial,
+                                eTextureType::Tex2d,
+                                firstTextureUnit + 1,
+                                ShaderParams::PointShadowMap,
+                                pointShadowMapId);
+        }
+    }
 
     void MeshRenderer::SetCameraUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
     {
@@ -383,14 +403,19 @@ namespace Feng
     
     void MeshRenderer::SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial)
     {
-        if(renderProperties.shadowLight)
+        if(renderProperties.directShadowLight)
         {
             Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(8, 8, 0.1, 20, true);
-            Matrix4 lightViewMatrix = SMeshRenderer::GetShadowCastLightViewMatrix(renderProperties.shadowLight);
+            Matrix4 lightViewMatrix = SMeshRenderer::GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
             Matrix4 lightViewProjectionMatrix = lightViewMatrix * lightProjection;
             const Shader *shader = workingMaterial.GetShader();
             shader->SetUniformMatrix4(ShaderParams::ShadowLightView.data(), lightViewMatrix);
             shader->SetUniformMatrix4(ShaderParams::ShadowLightViewProj.data(), lightViewProjectionMatrix);
+        }
+        
+        if(renderProperties.pointShadowLight)
+        {
+            
         }
     }
 }
