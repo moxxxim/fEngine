@@ -42,6 +42,23 @@ namespace Feng
 
             std::sort(renderers.begin(), renderers.end(), compare);
         }
+        
+        void ClampShadowMapToBorder(FrameBuffer buffer)
+        {
+            GLenum target = buffer.settings.isDepthCubemap ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
+            
+            glBindTexture(target, buffer.depth);
+            float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
+            glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            if(buffer.settings.isDepthCubemap)
+            {
+                glTexParameteri(target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+            }
+            
+            glBindTexture(target, 0);
+        }
     }
 
     RenderSystem::RenderSystem()
@@ -66,10 +83,14 @@ namespace Feng
         renderProperties.cam = camera;
     }
     
-    void RenderSystem::SetShadowMaterial(Material *shadowMaterial, Material *shadowDebugMaterial)
+    void RenderSystem::SetShadowMaterials(
+                                         Material *directLightShadowMaterial,
+                                         Material *pointLightShadowMaterial,
+                                         Material *directLightShadowDebugMaterial)
     {
-        shadowSetup.material = shadowMaterial;
-        shadowSetup.debugMaterial = shadowDebugMaterial;
+        shadowSetup.directLightShadowMaterial = directLightShadowMaterial;
+        shadowSetup.pointLightShadowMaterial = pointLightShadowMaterial;
+        shadowSetup.directLightShadowDebugMaterial = directLightShadowDebugMaterial;
     }
     
     void RenderSystem::SetDirectionalShadowLight(Entity *light)
@@ -141,7 +162,7 @@ namespace Feng
 
     void RenderSystem::Draw()
     {
-        DrawDirectShadowMap();
+        DrawShadowMap();
 
         if(Engine::IsShowDebugShadowMap())
         {
@@ -154,7 +175,7 @@ namespace Feng
         
         if(IsShadowsEnabled())
         {
-            fboPool.Push(shadowSetup.shadowMap);
+            fboPool.Push(shadowSetup.directShadowMap);
         }
         
         Print_Errors_OpengGL();
@@ -162,7 +183,7 @@ namespace Feng
     
     bool RenderSystem::IsShadowsEnabled()
     {
-        return Engine::IsShadowsEnabled() && renderProperties.directShadowLight && shadowSetup.material;
+        return Engine::IsShadowsEnabled() && renderProperties.directShadowLight && shadowSetup.directLightShadowMaterial;
     }
 
     void RenderSystem::CreateCamUniformBuffer()
@@ -211,16 +232,11 @@ namespace Feng
     
     void RenderSystem::DrawDirectShadowMap()
     {
-        shadowSetup.shadowMap = GetShadowMapBuffer();
-        glBindTexture(GL_TEXTURE_2D, shadowSetup.shadowMap.depth);
-        float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        shadowSetup.directShadowMap = GetDirectShadowMapBuffer();
+        SRenderSystem::ClampShadowMapToBorder(shadowSetup.directShadowMap);
 
-        glViewport(0, 0, shadowSetup.shadowMap.settings.size.width, shadowSetup.shadowMap.settings.size.height);
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.shadowMap.frame);
+        glViewport(0, 0, shadowSetup.directShadowMap.settings.size.width, shadowSetup.directShadowMap.settings.size.height);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.directShadowMap.frame);
         glClear(GL_DEPTH_BUFFER_BIT);
         Print_Errors_OpengGL();
 
@@ -231,7 +247,17 @@ namespace Feng
     
     void RenderSystem::DrawPointShadowMap()
     {
-        
+        shadowSetup.pointShadowMap = GetDirectShadowMapBuffer();
+        SRenderSystem::ClampShadowMapToBorder(shadowSetup.pointShadowMap);
+
+        glViewport(0, 0, shadowSetup.directShadowMap.settings.size.width, shadowSetup.directShadowMap.settings.size.height);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.directShadowMap.frame);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        Print_Errors_OpengGL();
+
+        DrawShadowCastersInShadowMap();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     
     void RenderSystem::DrawShadowCastersInShadowMap()
@@ -242,7 +268,7 @@ namespace Feng
                                              std::mem_fn(&MeshRenderer::IsShadowCaster));
         std::for_each(renderersOpaque.begin(), firstNotCaster, [this](MeshRenderer *renderer)
         {
-            renderer->Draw(renderProperties, shadowSetup.material);
+            renderer->Draw(renderProperties, true, shadowSetup.directLightShadowMaterial);
         });
 
         Print_Errors_OpengGL();
@@ -262,13 +288,13 @@ namespace Feng
 
         glBindVertexArray(quadBuffer.vao);
 
-        const Shader *shader = shadowSetup.debugMaterial->GetShader();
+        const Shader *shader = shadowSetup.directLightShadowDebugMaterial->GetShader();
         shader->StartUse();
         Print_Errors_OpengGL();
 
         glActiveTexture(GL_TEXTURE0);
         Print_Errors_OpengGL();
-        glBindTexture(GL_TEXTURE_2D, shadowSetup.shadowMap.depth);
+        glBindTexture(GL_TEXTURE_2D, shadowSetup.directShadowMap.depth);
         Print_Errors_OpengGL();
         shader->SetUniformInt(ShaderParams::DirectShadowMap.data(), 0);
         Print_Errors_OpengGL();
@@ -306,8 +332,8 @@ namespace Feng
     {
         for(MeshRenderer *renderer : renderersOpaque)
         {
-            renderer->SetDirectShadowTexture(shadowSetup.shadowMap.depth);
-            renderer->Draw(renderProperties);
+            renderer->SetDirectShadowTexture(shadowSetup.directShadowMap.depth);
+            renderer->Draw(renderProperties, false);
         }
         
         Print_Errors_OpengGL();
@@ -318,7 +344,7 @@ namespace Feng
         SRenderSystem::SortSceneByDistance(*renderProperties.cam, renderersTransparent);
         for(MeshRenderer *renderer : renderersTransparent)
         {
-            renderer->Draw(renderProperties);
+            renderer->Draw(renderProperties, false);
         }
         
         Print_Errors_OpengGL();
@@ -331,7 +357,7 @@ namespace Feng
             // We need less-or-equal function for skybox to pass depth testing,
             // as its depth will be 1 (initial depth value of a fragment in depth buffer).
             glDepthFunc(GL_LEQUAL);
-            skybox->Draw(renderProperties);
+            skybox->Draw(renderProperties, false);
             glDepthFunc(GL_LESS);
         }
 
@@ -372,7 +398,7 @@ namespace Feng
         return fboPool.Pop(bufferSettings);
     }
     
-    FrameBuffer RenderSystem::GetShadowMapBuffer()
+    FrameBuffer RenderSystem::GetDirectShadowMapBuffer()
     {
         FrameBuffer::Settings bufferSettings;
         bufferSettings.size = shadowSetup.size;
@@ -381,7 +407,7 @@ namespace Feng
         bufferSettings.stencil = FrameBuffer::eAttachementState::None;
         bufferSettings.multisample = false;
         bufferSettings.combinedDepthStencil = false;
-        
+
         return fboPool.Pop(bufferSettings);
     }
 }

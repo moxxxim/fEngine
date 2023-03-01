@@ -34,6 +34,30 @@ namespace Feng
             std::ignore = lightTransformMatrix.TryInvert(transformInverted);
             return transformInverted;
         }
+        
+        std::vector<Matrix4> GetOmnidirectionalShadowLightMatrices(const Entity* lightEntity)
+        {
+            std::vector<Matrix4> matrices;
+            
+            const Light* light = lightEntity->GetComponent<Light>();
+            const Matrix4 lightProjection = Mat4::MakePerspectiveProjection(90.f, 1.f, 1.f, light->GetRange());
+            const Transform *lightTransform = lightEntity->GetComponent<Transform>();
+            const Vector3& lightPos = lightTransform->GetPosition();
+            Matrix4 transformPosX = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneY, 90.f});
+            matrices.push_back(transformPosX * lightProjection);
+            Matrix4 transformNegX = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneY, -90.f});
+            matrices.push_back(transformNegX * lightProjection);
+            Matrix4 transformPosY = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, 90.f});
+            matrices.push_back(transformPosY * lightProjection);
+            Matrix4 transformNegY = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, -90.f});
+            matrices.push_back(transformNegY * lightProjection);
+            Matrix4 transformPosZ = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion::Identity());
+            matrices.push_back(lightProjection);
+            Matrix4 transformNegZ = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneY, 180.f});
+            matrices.push_back(transformNegZ * lightProjection);
+
+            return matrices;
+        }
     }
     
     MeshRenderer::~MeshRenderer()
@@ -111,7 +135,7 @@ namespace Feng
         pointShadowMapId = bufferId;
     }
 
-    void MeshRenderer::Draw(const RenderProperties &renderProperties, Material *externalMaterial /*= nullptr*/)
+    void MeshRenderer::Draw(const RenderProperties &renderProperties, bool isShadowPass, Material *externalMaterial)
     {
         Material* workingMaterial = externalMaterial ? externalMaterial : material;
         
@@ -129,7 +153,7 @@ namespace Feng
             
             StartDraw(*workingMaterial);
             Print_Errors_OpengGL();
-            SetGlobalUniforms(renderProperties, *workingMaterial);
+            SetGlobalUniforms(renderProperties, *workingMaterial, isShadowPass);
             Print_Errors_OpengGL();
             Render::BindMaterialUniforms(*workingMaterial, *workingTextures);
             BindShadowMaps(static_cast<uint32_t>(workingTextures->size()), *workingMaterial);
@@ -159,7 +183,7 @@ namespace Feng
         Print_Errors_OpengGL();
     }
 
-    void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
+    void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial, bool isShadowPass)
     {
         if(instancesCount == 0)
         {
@@ -171,7 +195,7 @@ namespace Feng
 
         SetCameraUniforms(renderProperties, workingMaterial);
         SetLightUniforms(renderProperties, workingMaterial);
-        SetShadowLightUniform(renderProperties, workingMaterial);
+        SetShadowLightUniform(renderProperties, workingMaterial, isShadowPass);
     }
 
     void MeshRenderer::ExecuteDraw()
@@ -348,7 +372,7 @@ namespace Feng
         {
             Render::BindTexture(
                                 workingMaterial,
-                                eTextureType::Tex2d,
+                                eTextureType::Cubemap,
                                 firstTextureUnit + 1,
                                 ShaderParams::PointShadowMap,
                                 pointShadowMapId);
@@ -401,21 +425,30 @@ namespace Feng
         Print_Errors_OpengGL();
     }
     
-    void MeshRenderer::SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial)
+    void MeshRenderer::SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial, bool isShadowPass)
     {
+        using namespace SMeshRenderer;
+        
+        const Shader *shader = workingMaterial.GetShader();
         if(renderProperties.directShadowLight)
         {
-            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(8, 8, 0.1, 20, true);
-            Matrix4 lightViewMatrix = SMeshRenderer::GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
+            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(8.f, 8.f, 0.1f, 20.f, true);
+            Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
             Matrix4 lightViewProjectionMatrix = lightViewMatrix * lightProjection;
-            const Shader *shader = workingMaterial.GetShader();
-            shader->SetUniformMatrix4(ShaderParams::ShadowLightView.data(), lightViewMatrix);
-            shader->SetUniformMatrix4(ShaderParams::ShadowLightViewProj.data(), lightViewProjectionMatrix);
+            shader->SetUniformMatrix4(ShaderParams::DirectShadowLightView.data(), lightViewMatrix);
+            shader->SetUniformMatrix4(ShaderParams::DirectShadowLightViewProj.data(), lightViewProjectionMatrix);
         }
-        
+
         if(renderProperties.pointShadowLight)
         {
+            std::vector<Matrix4> matrices = GetOmnidirectionalShadowLightMatrices(renderProperties.pointShadowLight);
+            const Light* light = renderProperties.pointShadowLight->GetComponent<Light>();
+            shader->SetUniformMatrices4(ShaderParams::OmniShadowLightViewProj.data(), matrices);
             
+            if(isShadowPass)
+            {
+                shader->SetUniformFloat(ShaderParams::FarClipPlane.data(), light->GetRange());
+            }
         }
     }
 }

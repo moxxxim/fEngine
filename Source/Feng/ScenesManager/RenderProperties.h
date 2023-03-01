@@ -3,6 +3,7 @@
 #include <Feng/Math/Matrix4.h>
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
+#include <Feng/Math/Size.h>
 #include <Feng/ScenesManager/Entity.h>
 
 namespace Feng
@@ -21,6 +22,7 @@ namespace Feng
         Entity *directShadowLight = nullptr;
         Entity *pointShadowLight = nullptr;
         Vector4 ambientColorAndIntencity = Vector4 {1.f, 1.f, 1.f, 1.f};
+        Size2ui shadowMapSize = {};
         bool useShadows = false;
     };
 }

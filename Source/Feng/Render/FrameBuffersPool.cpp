@@ -93,30 +93,65 @@ namespace Feng
         GLuint depth = 0;
         if (settings.depth == FrameBuffer::eAttachementState::Texture)
         {
-            glGenTextures(1, &depth);
-            glBindTexture(target, depth);
-
-            if(target == GL_TEXTURE_2D)
+            GLenum texType = GL_TEXTURE_2D;
+            if(settings.isDepthCubemap)
             {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexImage2D(
-                             GL_TEXTURE_2D,
-                             0,
-                             GL_DEPTH_COMPONENT,
-                             settings.size.width,
-                             settings.size.height,
-                             0,
-                             GL_DEPTH_COMPONENT,
-                             GL_FLOAT,
-                             nullptr);
+                texType = GL_TEXTURE_CUBE_MAP;
             }
-            else if (target == GL_TEXTURE_2D_MULTISAMPLE)
+            else if (settings.multisample)
+            {
+                texType = GL_MULTISAMPLE;
+            }
+            
+            glGenTextures(1, &depth);
+            glBindTexture(texType, depth);
+
+            if((texType == GL_TEXTURE_2D) || (texType == GL_TEXTURE_CUBE_MAP))
+            {
+                glTexParameteri(texType, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(texType, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTexParameteri(texType, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(texType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                if(texType == GL_TEXTURE_CUBE_MAP)
+                {
+                    glTexParameteri(texType, GL_TEXTURE_WRAP_R, GL_REPEAT);
+                }
+                
+                if(texType == GL_TEXTURE_2D)
+                {
+                    glTexImage2D(
+                                 texType,
+                                 0,
+                                 GL_DEPTH_COMPONENT,
+                                 settings.size.width,
+                                 settings.size.height,
+                                 0,
+                                 GL_DEPTH_COMPONENT,
+                                 GL_FLOAT,
+                                 nullptr);
+                }
+                else
+                {
+                    for (int32_t i = 0; i < 6; ++i)
+                    {
+                        const GLenum face = GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
+                        glTexImage2D(
+                                     face,
+                                     0,
+                                     GL_DEPTH_COMPONENT,
+                                     settings.size.width,
+                                     settings.size.height,
+                                     0,
+                                     GL_DEPTH_COMPONENT,
+                                     GL_FLOAT,
+                                     nullptr);
+                    }
+                }
+            }
+            else if (texType == GL_TEXTURE_2D_MULTISAMPLE)
             {
                 glTexImage2DMultisample(
-                                        GL_TEXTURE_2D_MULTISAMPLE,
+                                        texType,
                                         samplesCount,
                                         GL_RGB,
                                         settings.size.width,

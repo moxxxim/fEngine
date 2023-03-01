@@ -274,7 +274,10 @@ namespace test
         {
             std::unique_ptr<Feng::Scene> scene = std::make_unique<Feng::Scene>();
             scene->GetRenderSystem()->SetAmbientLight(Feng::Vector4{1.f, 1.f, 1.f, 1.f}, 0.2f);
-            scene->GetRenderSystem()->SetShadowMaterial(res.ShadowPassMaterial.get(), res.ShadowMapDrawMaterial.get());
+            scene->GetRenderSystem()->SetShadowMaterials(
+                                                         res.DirectShadowPassMaterial.get(),
+                                                         res.OmniShadowPassMaterial.get(),
+                                                         res.ShadowMapDrawMaterial.get());
             CreateObjects(*scene);
 
             return scene;

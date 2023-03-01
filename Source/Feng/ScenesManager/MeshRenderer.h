@@ -37,13 +37,13 @@ namespace Feng
         void SetDirectShadowTexture(int32_t bufferId);
         void SetPointShadowTexture(int32_t bufferId);
 
-        void Draw(const RenderProperties &aRenderProperties, Material *externalMaterial = nullptr);
+        void Draw(const RenderProperties &aRenderProperties, bool isShadowPass, Material *externalMaterial = nullptr);
 
     private:
         void StartDraw(Material &workingMaterial);
         void FinishDraw();
 
-        void SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
+        void SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial, bool isShadowPass);
         void ExecuteDraw();
 
         void CreateGeometryBuffers();
@@ -62,7 +62,7 @@ namespace Feng
         void BindShadowMaps(uint32_t firstTextureUnit, Material &workingMaterial);
         void SetCameraUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
         void SetLightUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
-        void SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial);
+        void SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial, bool isShadowPass);
 
         VertexBuffer vertexBuffer;
         uint32_t instancesBuffer = Render::UndefinedBuffer;

@@ -25,6 +25,7 @@ namespace Feng
             eAttachementState stencil = eAttachementState::None;
             bool multisample = false;
             bool combinedDepthStencil = false;
+            bool isDepthCubemap = false;
         };
         
         uint32_t frame = Default;

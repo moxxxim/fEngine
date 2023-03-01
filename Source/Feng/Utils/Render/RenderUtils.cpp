@@ -223,7 +223,7 @@ namespace Feng::Render
                 return GL_VERTEX_SHADER;
 
             case eShaderType::Geometry:
-                return 0;//GL_GEOMETRY_SHADER;
+                return GL_GEOMETRY_SHADER;
 
             case eShaderType::Fragment:
                 return GL_FRAGMENT_SHADER;

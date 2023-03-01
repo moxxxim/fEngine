@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace Feng
 {
@@ -22,7 +23,7 @@ namespace Feng
     class Shader final
     {
     public:
-        Shader(const std::string& vs, const std::string& fs);
+        Shader(const std::string& vs, const std::string& fs, const std::string& gs = "");
         ~Shader();
 
         bool IsLoaded() const;
@@ -44,13 +45,14 @@ namespace Feng
         bool SetUniformVector4(const char *name, const Vector4& value) const;
         bool SetUniformMatrix3(const char *name, const Matrix3& matrix) const;
         bool SetUniformMatrix4(const char *name, const Matrix4& matrix) const;
+        bool SetUniformMatrices4(const char *name, const std::vector<Matrix4>& matrices) const;
         bool SetUniformBuffer(const char *name, uint32_t index) const;
 
     private:
         bool SetUniformFloatArray(const char *name, const float *value, int size) const;
         void FetchActiveAttributes();
         void FetchActiveUniforms();
-        void Load(const std::string& vs, const std::string& fs);
+        void Load(const std::string& vs, const std::string& fs, const std::string& gs);
         void Unload();
 
         static const int32_t UndefinedProgram = 0;
@@ -61,7 +63,10 @@ namespace Feng
         uint32_t program = Shader::UndefinedProgram;
     };
 
-    std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath);
+    std::unique_ptr<Shader> LoadShader(
+                                       const std::string& vsPath,
+                                       const std::string& fsPath,
+                                       const std::string& gsPath = "");
 }
 
 namespace Feng

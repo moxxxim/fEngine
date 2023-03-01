@@ -66,10 +66,9 @@ namespace Feng
         }
     }
 
-    Shader::Shader(const std::string& vs, const std::string& fs)
-        : program{UndefinedProgram}
+    Shader::Shader(const std::string& vs, const std::string& fs, const std::string& gs /*= ""*/)
     {
-        Load(vs, fs);
+        Load(vs, fs, gs);
     }
 
     Shader::~Shader()
@@ -84,7 +83,6 @@ namespace Feng
 
     void Shader::StopUse() const
     {
-
     }
 
     bool Shader::TryGetAttributeLocation(const char *name, uint32_t& location) const
@@ -202,6 +200,22 @@ namespace Feng
 
         return false;
     }
+    
+    bool Shader::SetUniformMatrices4(const char *name, const std::vector<Matrix4>& matrices) const
+    {
+        uint32_t location = UndefinedParamLocation;
+        if(TryGetUniformLocation(name, location))
+        {
+            glUniformMatrix4fv(
+                               location,
+                               static_cast<int32_t>(matrices.size()),
+                               GL_FALSE,
+                               matrices.data()->data);
+            return true;
+        }
+
+        return false;
+    }
 
     bool Shader::SetUniformBuffer(const char *name, uint32_t index) const
     {
@@ -251,6 +265,7 @@ namespace Feng
     {
         int uniformsCount;
         glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformsCount);
+        Print_Errors_OpengGL();
 
         for (int i = 0; i < uniformsCount; ++i)
         {
@@ -267,31 +282,50 @@ namespace Feng
         }
     }
 
-    void Shader::Load(const std::string& vs, const std::string& fs)
+    void Shader::Load(const std::string& vs, const std::string& fs, const std::string& gs)
     {
         uint32_t vertexShader = SShader::CompileShader(eShaderType::Vertex, vs);
+        Print_Errors_OpengGL();
         if (vertexShader == UndefinedProgram)
         {
             return;
         }
 
         uint32_t fragmentShader = SShader::CompileShader(eShaderType::Fragment, fs);
+        Print_Errors_OpengGL();
         if (fragmentShader == UndefinedProgram)
         {
             glDeleteShader(vertexShader);
             return;
+        }
+        
+        uint32_t geometryShader = UndefinedProgram;
+        if(!gs.empty())
+        {
+            geometryShader = SShader::CompileShader(eShaderType::Geometry, gs);
+            Print_Errors_OpengGL();
+            if (geometryShader == UndefinedProgram)
+            {
+                glDeleteShader(vertexShader);
+                glDeleteShader(fragmentShader);
+                return;
+            }
         }
 
         program = glCreateProgram();
         if(program != UndefinedProgram)
         {
             glAttachShader(program, vertexShader);
+            if(geometryShader != UndefinedProgram)
+            {
+                glAttachShader(program, geometryShader);
+            }
             glAttachShader(program, fragmentShader);
             glLinkProgram(program);
 
             GLint success;
             glGetProgramiv(program, GL_LINK_STATUS, &success);
-            if(!success)
+            if(success == GL_FALSE)
             {
                 constexpr int logSize = 512;
                 char errorLog[logSize];
@@ -301,11 +335,16 @@ namespace Feng
                 Debug::LogError(errorLog);
 
                 glDeleteProgram(program);
+                program = UndefinedProgram;
             }
         }
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+        if(geometryShader != UndefinedProgram)
+        {
+            glDeleteShader(geometryShader);
+        }
 
         if (program != UndefinedProgram)
         {
@@ -319,10 +358,16 @@ namespace Feng
         glDeleteProgram(program);
     }
 
-    std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath)
+    std::unique_ptr<Shader> LoadShader(const std::string& vsPath, const std::string& fsPath, const std::string& gsPath)
     {
         std::string vSource = SShader::LoadShaderSource(vsPath);
         std::string fSource = SShader::LoadShaderSource(fsPath);
-        return std::make_unique<Shader>(vSource, fSource);
+        std::string gSource;
+        if(!gsPath.empty())
+        {
+             gSource = SShader::LoadShaderSource(gsPath);
+        }
+        
+        return std::make_unique<Shader>(vSource, fSource, gSource);
     }
 }

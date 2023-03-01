@@ -83,11 +83,13 @@ namespace Feng
         const GLubyte *version = glGetString(GL_VERSION);
         const GLubyte *vendor = glGetString(GL_VENDOR);
         const GLubyte *renderer = glGetString(GL_RENDERER);
+        const GLubyte *languageVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
 
         std::cout << "------------------ Open GL Info ----------------------\n";
         std::cout << "OpenGL Version: " << version << "\n";
         std::cout << "OpenGL Vendor: " << vendor << "\n";
         std::cout << "OpenGL Renderer: " << renderer << "\n";
+        std::cout << "OpenGL Language Version: " << languageVersion << "\n";
         std::cout << "OpenGL Maximum vertex attributes number: " << maxAttributes << "\n";
         std::cout << "OpenGL Supported Extensions:\n";
         for(const GLubyte* extension : extensions)

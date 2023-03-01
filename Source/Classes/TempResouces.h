@@ -39,7 +39,8 @@ namespace test
         std::unique_ptr<Feng::Material> SkyboxMaterial;
         std::unique_ptr<Feng::Material> CubemapReflectiveMaterial;
         std::unique_ptr<Feng::Material> CubemapRefractionMaterial;
-        std::unique_ptr<Feng::Material> ShadowPassMaterial;
+        std::unique_ptr<Feng::Material> DirectShadowPassMaterial;
+        std::unique_ptr<Feng::Material> OmniShadowPassMaterial;
         std::unique_ptr<Feng::Material> ShadowMapDrawMaterial;
 
         std::unique_ptr<Feng::Mesh> CubeMesh;

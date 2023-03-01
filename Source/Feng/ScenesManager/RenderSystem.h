@@ -31,7 +31,9 @@ namespace Feng
 
         void SetCamera(Camera *camera);
         void SetSkybox(MeshRenderer *aSkybox);
-        void SetShadowMaterial(Material *shadowMaterial, Material *shadowDebugMaterial);
+        void SetShadowMaterials(Material *directLightShadowMaterial,
+                               Material *pointLightShadowMaterial,
+                               Material *directLightShadowDebugMaterial);
         void SetDirectionalShadowLight(Entity *light);
         void SetPointShadowLight(Entity *light);
 
@@ -47,10 +49,12 @@ namespace Feng
     private:
         struct ShadowSetup final
         {
-            Material *material = nullptr;
-            Material *debugMaterial = nullptr;
+            Material *directLightShadowMaterial = nullptr;
+            Material *pointLightShadowMaterial = nullptr;
+            Material *directLightShadowDebugMaterial = nullptr;
             Size2ui size { DefaultShadowMapSize, DefaultShadowMapSize };
-            FrameBuffer shadowMap;
+            FrameBuffer directShadowMap;
+            FrameBuffer pointShadowMap;
         };
         
         bool IsShadowsEnabled();
@@ -67,7 +71,7 @@ namespace Feng
         void DrawSkybox();
         void ApplyPostEffects(const FrameBuffer& renderBuffer);
         FrameBuffer GetFrameBuffer(bool multisample);
-        FrameBuffer GetShadowMapBuffer();
+        FrameBuffer GetDirectShadowMapBuffer();
         
         std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;

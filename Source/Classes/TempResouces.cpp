@@ -36,6 +36,9 @@ namespace
     constexpr const char *CubemapRefractionVs = "Unlit/CubemapRefractionColorVs.vs";
     
     constexpr const char *ShadowPassVs = "Utils/ShadowPassVs.vs";
+    constexpr const char *OmniShadowPassVs = "Utils/OmniShadowPassVs.vs";
+    constexpr const char *OmniShadowPassFs = "Utils/OmniShadowPassFs.fs";
+    constexpr const char *OmniShadowPassGs = "Utils/OmniShadowPassGs.gs";
     constexpr const char *EmptyFs = "Utils/EmptyFs.fs";
     
     constexpr const char *ShadowMapDrawFs = "Utils/ShowShadowMapFs.fs";
@@ -141,11 +144,15 @@ namespace
     std::unique_ptr<Feng::PostEffectDefinition> blurFx;
     std::unique_ptr<Feng::PostEffectDefinition> edgeDetectionFx;
     
-    std::unique_ptr<Feng::Shader> LoadShader(const std::string& vsFileName, const std::string& fsFileName)
+    std::unique_ptr<Feng::Shader> LoadShader(
+                                             const std::string& vsFileName,
+                                             const std::string& fsFileName,
+                                             const std::string& gsFileName = "")
     {
         std::string vsFilePath = BaseShadersDir + vsFileName;
         std::string fsFilePath = BaseShadersDir + fsFileName;
-        return Feng::LoadShader(vsFilePath, fsFilePath);
+        std::string gsFilePath = gsFileName.empty() ? std::string{""} : BaseShadersDir + gsFileName;
+        return Feng::LoadShader(vsFilePath, fsFilePath, gsFilePath);
     }
 
     std::unique_ptr<Feng::TextureData> LoadTexture(std::string name, bool flip)
@@ -259,7 +266,8 @@ namespace
         test::res.CubemapRefractionMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
         test::res.CubemapRefractionMaterial->SetTransparent(false);
         
-        test::res.ShadowPassMaterial = std::make_unique<Material>(LoadShader(ShadowPassVs, EmptyFs));
+        test::res.DirectShadowPassMaterial = std::make_unique<Material>(LoadShader(ShadowPassVs, EmptyFs));
+        test::res.OmniShadowPassMaterial = std::make_unique<Material>(LoadShader(OmniShadowPassVs, OmniShadowPassFs, OmniShadowPassGs));
         test::res.ShadowMapDrawMaterial = std::make_unique<Material>(LoadShader(PostEffectVs, ShadowMapDrawFs));
     }
 
