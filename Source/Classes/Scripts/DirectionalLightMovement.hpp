@@ -21,8 +21,8 @@ private:
     float xAngleDeg = 40.f;
     float radius = 0.f;
     float height = 0.f;
-    float speed = 1.f;
     float yStartAngleRad = 0.f;
     float period = 30.f;
     float timeSegment = 0.f;
+    float timeScale = 1.f;
 };

@@ -152,7 +152,7 @@ namespace Feng
             
             StartDraw(*workingMaterial);
             Print_Errors_OpengGL();
-            SetGlobalUniforms(renderProperties, *workingMaterial, isShadowPass);
+            SetGlobalUniforms(renderProperties, *workingMaterial);
             Print_Errors_OpengGL();
             Render::BindMaterialUniforms(*workingMaterial, *workingTextures);
             BindExternalTextures(static_cast<uint32_t>(workingTextures->size()), *workingMaterial);
@@ -182,7 +182,7 @@ namespace Feng
         Print_Errors_OpengGL();
     }
 
-    void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial, bool isShadowPass)
+    void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
     {
         if(instancesCount == 0)
         {
@@ -194,7 +194,7 @@ namespace Feng
 
         SetCameraUniforms(renderProperties, workingMaterial);
         SetLightUniforms(renderProperties, workingMaterial);
-        SetShadowLightUniform(renderProperties, workingMaterial, isShadowPass);
+        SetShadowLightUniform(renderProperties, workingMaterial);
     }
 
     void MeshRenderer::ExecuteDraw()
@@ -415,7 +415,7 @@ namespace Feng
         Print_Errors_OpengGL();
     }
     
-    void MeshRenderer::SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial, bool isShadowPass)
+    void MeshRenderer::SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial)
     {
         using namespace SMeshRenderer;
         
@@ -434,11 +434,7 @@ namespace Feng
             std::vector<Matrix4> matrices = GetOmnidirectionalShadowLightMatrices(renderProperties.pointShadowLight);
             const Light* light = renderProperties.pointShadowLight->GetComponent<Light>();
             shader->SetUniformMatrices4(ShaderParams::OmniShadowLightViewProj.data(), matrices);
-            
-            if(isShadowPass)
-            {
-                shader->SetUniformFloat(ShaderParams::FarClipPlane.data(), light->GetRange());
-            }
+            shader->SetUniformFloat(ShaderParams::FarClipPlane.data(), light->GetRange());
         }
     }
 }

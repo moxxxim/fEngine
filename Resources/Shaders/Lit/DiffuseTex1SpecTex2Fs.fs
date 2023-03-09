@@ -27,6 +27,8 @@ uniform sampler2D uTexture1;    // Specular mask.
 uniform sampler2D uDirectShadowMap;
 uniform float uSpecularity;
 uniform float uShininess;
+uniform samplerCube uPointShadowMap;
+uniform float uFarClipPlane;
 
 uniform vec4 uAmbientColor; // xyz - color, w - intencity.
 uniform PointLight uPointLight;
@@ -64,42 +66,13 @@ in VsOut
 
 out vec4 FragColor;
 
-vec3 CalculateNdcFragPos01(vec4 fragPosLightSpace);
-float CalculateShadowMultiplierPart(vec4 fragPosLightSpace, vec2 uvOffset);
-// 0.f - fragment is in shadow, 1.f - fragment not in shadow.
-float CalculateShadowMultiplier(vec4 fragPosLightSpace);
-vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir, vec4 specularityFilter);
-vec3 CalculatePointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 specularityFilter);
-vec3 CalculateSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 specularityFilter);
-
-void main()
-{
-    vec4 outColor = texture(uTexture0, fsIn.Uv0);
-    vec4 specularityFilter = texture(uTexture1, fsIn.Uv0);
-
-    // Calculate ambient component.
-    vec3 ambientColor = uAmbientColor.w * uAmbientColor.rgb;
-
-    vec3 norm = normalize(fsIn.Norm);
-    vec3 viewDir = normalize(uCamPos - fsIn.FragPos);
-
-    float shadowValue = CalculateShadowMultiplier(fsIn.FragPosLightSpace);
-    vec3 lightColor = shadowValue * CalculateDirLight(uDirectLight, norm, viewDir, specularityFilter);
-    lightColor += CalculatePointLight(uPointLight, norm, viewDir, specularityFilter);    
-    lightColor += CalculateSpotLight(uSpotLight, norm, viewDir, specularityFilter);
-
-    outColor.rgb *= (ambientColor + lightColor);
-
-    FragColor = outColor;
-}
-
 vec3 CalculateNdcFragPos01(vec4 fragPosLightSpace)
 {
     vec3 ndcFragPos = fragPosLightSpace.xyz / fragPosLightSpace.w;
     return ndcFragPos * 0.5 + 0.5;
 }
 
-float CalculateShadowMultiplierPart(vec4 fragPosLightSpace, vec2 uvOffset)
+float CalculateShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffset)
 {
     vec3 fragPos01 = CalculateNdcFragPos01(fragPosLightSpace);
     float shadowDepth = texture(uDirectShadowMap, fragPos01.xy + uvOffset).r;
@@ -113,7 +86,8 @@ float CalculateShadowMultiplierPart(vec4 fragPosLightSpace, vec2 uvOffset)
     return resultMultiplier;
 }
 
-float CalculateShadowMultiplier(vec4 fragPosLightSpace)
+// 0.f - fragment is in shadow, 1.f - fragment not in shadow.
+float CalculateDirectShadowMultiplier(vec4 fragPosLightSpace)
 {
     float shadowMultiplier = 0.f;
     vec2 texelSize = 1.0f / textureSize(uDirectShadowMap, 0);
@@ -122,11 +96,25 @@ float CalculateShadowMultiplier(vec4 fragPosLightSpace)
         for(int y = -1; y <= 1; ++y)
         {
             vec2 uvOffset = vec2(x, y) * texelSize;
-            shadowMultiplier += CalculateShadowMultiplierPart(fragPosLightSpace, uvOffset);
+            shadowMultiplier += CalculateShadowMultiplierPcfPart(fragPosLightSpace, uvOffset);
         }    
     }
 
     return shadowMultiplier / 9.0;
+}
+
+// 0.f - fragment is in shadow, 1.f - fragment not in shadow.
+float CalculatePointShadowMultiplier(PointLight light, vec3 fragPos)
+{
+    vec3 fragToLight = fragPos - light.PositionAndRange.xyz;
+    float closestDepth = texture(uPointShadowMap, fragToLight).r;
+
+    // It is currently in linear range between [0,1]. Re-transform back to original value
+    closestDepth *= uFarClipPlane;
+
+    float fragDepth = length(fragToLight);
+    float bias = 0.005; 
+    return (fragDepth - bias) > closestDepth ? 0.0 : 1.0;
 }
 
 vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir, vec4 specularityFilter)
@@ -194,4 +182,27 @@ vec3 CalculateSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 speculari
     vec3 specularColor = (specularImpact * uSpecularity) * lightColor * specularityFilter.rgb;
 
     return diffuseColor + specularColor;
+}
+
+void main()
+{
+    vec4 outColor = texture(uTexture0, fsIn.Uv0);
+    vec4 specularityFilter = texture(uTexture1, fsIn.Uv0);
+
+    // Calculate ambient component.
+    vec3 ambientColor = uAmbientColor.w * uAmbientColor.rgb;
+
+    vec3 norm = normalize(fsIn.Norm);
+    vec3 viewDir = normalize(uCamPos - fsIn.FragPos);
+
+    float directShadowValue = CalculateDirectShadowMultiplier(fsIn.FragPosLightSpace);
+    float pointShadowValue = CalculatePointShadowMultiplier(uPointLight, fsIn.FragPos);
+
+    vec3 lightColor = directShadowValue * CalculateDirLight(uDirectLight, norm, viewDir, specularityFilter);
+    lightColor += pointShadowValue * CalculatePointLight(uPointLight, norm, viewDir, specularityFilter);    
+    lightColor += CalculateSpotLight(uSpotLight, norm, viewDir, specularityFilter);
+
+    outColor.rgb *= (ambientColor + lightColor);
+
+    FragColor = outColor;
 }

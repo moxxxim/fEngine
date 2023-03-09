@@ -141,7 +141,7 @@ namespace test
             Light* light = lightEntity.GetComponent<Light>();
             lightMaterials[light] = std::move(material);
 
-            light->SetRange(8.f);
+            light->SetRange(20.f);
             light->SetColor(color);
             light->SetIntensity(1.5f);
             

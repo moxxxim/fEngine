@@ -28,7 +28,7 @@ void DirectionalLightMovement::Update(float deltaTime)
         timeSegment = 0.f;
     }
 
-    timeSegment += deltaTime;
+    timeSegment += deltaTime * timeScale;
     float angleOffsetY = 2 * Feng::Math::Pi * (timeSegment / period);
     float yAngleRad = yStartAngleRad + angleOffsetY;
     
