@@ -40,7 +40,7 @@ namespace Feng
         static constexpr std::string_view ScreenColorProcessed {"uScreenColorProcessed"};
         static constexpr std::string_view DirectShadowLightView {"uShadowLightView"};
         static constexpr std::string_view DirectShadowLightViewProj {"uShadowLightViewProj"};
-        static constexpr std::string_view OmniShadowLightViewProj {"uOmniShadowLightViewProj"};
+        static constexpr std::string_view OmniShadowLightViewProj {"uOmniShadowLightViewProj[0]"};
         static constexpr std::string_view DirectShadowMap {"uDirectShadowMap"};
         static constexpr std::string_view PointShadowMap {"uPointShadowMap"};
 

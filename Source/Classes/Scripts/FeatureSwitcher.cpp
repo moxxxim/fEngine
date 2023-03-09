@@ -34,7 +34,16 @@ void FeatureSwitcher::Update(float deltaTime)
     {
         if(!isDelayActive)
         {
-            Feng::Engine::SetShadowsEnabled(!Feng::Engine::IsShadowsEnabled());
+            Feng::Engine::SetDirectShowDebugShadowMap(!Feng::Engine::IsDirectShowDebugShadowMap());
+            isDelayActive = true;
+        }
+    }
+    
+    if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_N))
+    {
+        if(!isDelayActive)
+        {
+            Feng::Engine::SetOmniShowDebugShadowMap(!Feng::Engine::IsOmniShowDebugShadowMap());
             isDelayActive = true;
         }
     }

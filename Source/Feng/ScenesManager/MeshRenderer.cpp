@@ -11,7 +11,6 @@
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/ResourcesManager/Texture.h>
 #include <Feng/Utils/Render/ShaderParams.h>
-#include <Feng/Utils/Render/TextureParams.h>
 #include <Feng/Utils/Render/RenderUtils.h>
 #include <Feng/Utils/Debug.h>
 
@@ -124,17 +123,17 @@ namespace Feng
 
         instancesCount = static_cast<uint32_t>(instances.size());
     }
-    
-    void MeshRenderer::SetDirectShadowTexture(int32_t bufferId)
-    {
-        directShadowMapId = bufferId;
-    }
-    
-    void MeshRenderer::SetPointShadowTexture(int32_t bufferId)
-    {
-        pointShadowMapId = bufferId;
-    }
 
+    void MeshRenderer::AddExternalTexture(const std::string_view& name, eTextureType type, int32_t bufferId)
+    {
+        externalTextures[name] = std::make_pair(type, bufferId);
+    }
+    
+    void MeshRenderer::RemoveExternalTexture(const std::string_view& name)
+    {
+        externalTextures.erase(name);
+    }
+    
     void MeshRenderer::Draw(const RenderProperties &renderProperties, bool isShadowPass, Material *externalMaterial)
     {
         Material* workingMaterial = externalMaterial ? externalMaterial : material;
@@ -156,7 +155,7 @@ namespace Feng
             SetGlobalUniforms(renderProperties, *workingMaterial, isShadowPass);
             Print_Errors_OpengGL();
             Render::BindMaterialUniforms(*workingMaterial, *workingTextures);
-            BindShadowMaps(static_cast<uint32_t>(workingTextures->size()), *workingMaterial);
+            BindExternalTextures(static_cast<uint32_t>(workingTextures->size()), *workingMaterial);
             Print_Errors_OpengGL();
             
             ExecuteDraw();
@@ -356,26 +355,17 @@ namespace Feng
         return bufferObject;
     }
     
-    void MeshRenderer::BindShadowMaps(uint32_t firstTextureUnit, Material &workingMaterial)
+    void MeshRenderer::BindExternalTextures(uint32_t firstTextureUnit, Material &workingMaterial)
     {
-        if(directShadowMapId != Render::UndefinedBuffer)
+        uint32_t textureUnit = firstTextureUnit;
+        for(auto&& [name, typeAndId] : externalTextures)
         {
-            Render::BindTexture(
-                                workingMaterial,
-                                eTextureType::Tex2d,
-                                firstTextureUnit,
-                                ShaderParams::DirectShadowMap,
-                                directShadowMapId);
-        }
-        
-        if(pointShadowMapId != Render::UndefinedBuffer)
-        {
-            Render::BindTexture(
-                                workingMaterial,
-                                eTextureType::Cubemap,
-                                firstTextureUnit + 1,
-                                ShaderParams::PointShadowMap,
-                                pointShadowMapId);
+            uint32_t bufferId = typeAndId.second;
+            if(bufferId != Render::UndefinedBuffer)
+            {
+                Render::BindTexture(workingMaterial, typeAndId.first, textureUnit, name, bufferId);
+                ++textureUnit;
+            }
         }
     }
 

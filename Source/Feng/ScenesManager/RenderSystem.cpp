@@ -164,9 +164,13 @@ namespace Feng
     {
         DrawShadowMap();
 
-        if(Engine::IsShowDebugShadowMap())
+        if(Engine::IsDirectShowDebugShadowMap())
         {
-            DrawDebugShadowMap();
+            DrawDebugDirectShadowMap();
+        }
+        else if (Engine::IsOmniShowDebugShadowMap())
+        {
+            DrawDebugOmniShadowMap();
         }
         else
         {
@@ -176,6 +180,7 @@ namespace Feng
         if(IsShadowsEnabled())
         {
             fboPool.Push(shadowSetup.directShadowMap);
+            fboPool.Push(shadowSetup.pointShadowMap);
         }
         
         Print_Errors_OpengGL();
@@ -240,41 +245,41 @@ namespace Feng
         glClear(GL_DEPTH_BUFFER_BIT);
         Print_Errors_OpengGL();
 
-        DrawShadowCastersInShadowMap();
+        DrawShadowCastersInShadowMap(shadowSetup.directLightShadowMaterial);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     
     void RenderSystem::DrawPointShadowMap()
     {
-        shadowSetup.pointShadowMap = GetDirectShadowMapBuffer();
+        shadowSetup.pointShadowMap = GetPointShadowMapBuffer();
         SRenderSystem::ClampShadowMapToBorder(shadowSetup.pointShadowMap);
 
-        glViewport(0, 0, shadowSetup.directShadowMap.settings.size.width, shadowSetup.directShadowMap.settings.size.height);
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.directShadowMap.frame);
+        glViewport(0, 0, shadowSetup.pointShadowMap.settings.size.width, shadowSetup.pointShadowMap.settings.size.height);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowSetup.pointShadowMap.frame);
         glClear(GL_DEPTH_BUFFER_BIT);
         Print_Errors_OpengGL();
 
-        DrawShadowCastersInShadowMap();
+        DrawShadowCastersInShadowMap(shadowSetup.pointLightShadowMaterial);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     
-    void RenderSystem::DrawShadowCastersInShadowMap()
+    void RenderSystem::DrawShadowCastersInShadowMap(Material *shadowMaterial)
     {
         auto firstNotCaster = std::partition(
                                              renderersOpaque.begin(),
                                              renderersOpaque.end(),
                                              std::mem_fn(&MeshRenderer::IsShadowCaster));
-        std::for_each(renderersOpaque.begin(), firstNotCaster, [this](MeshRenderer *renderer)
+        std::for_each(renderersOpaque.begin(), firstNotCaster, [this, shadowMaterial](MeshRenderer *renderer)
         {
-            renderer->Draw(renderProperties, true, shadowSetup.directLightShadowMaterial);
+            renderer->Draw(renderProperties, true, shadowMaterial);
         });
 
         Print_Errors_OpengGL();
     }
     
-    void RenderSystem::DrawDebugShadowMap()
+    void RenderSystem::DrawDebugDirectShadowMap()
     {
         if (quadBuffer.vao == 0)
         {
@@ -306,6 +311,13 @@ namespace Feng
         glBindVertexArray(Render::UndefinedBuffer);
     }
     
+    void RenderSystem::DrawDebugOmniShadowMap()
+    {
+        skybox->AddExternalTexture(ShaderParams::Texture0, eTextureType::Cubemap, shadowSetup.pointShadowMap.depth);
+        DrawGeneric();
+        skybox->RemoveExternalTexture(ShaderParams::Texture0);
+    }
+    
     void RenderSystem::DrawGeneric()
     {
         FrameBuffer renderBuffer = postProcessing.HasPostEffects()
@@ -332,7 +344,8 @@ namespace Feng
     {
         for(MeshRenderer *renderer : renderersOpaque)
         {
-            renderer->SetDirectShadowTexture(shadowSetup.directShadowMap.depth);
+            renderer->AddExternalTexture(ShaderParams::DirectShadowMap, eTextureType::Tex2d, shadowSetup.directShadowMap.depth);
+            renderer->AddExternalTexture(ShaderParams::PointShadowMap, eTextureType::Cubemap, shadowSetup.pointShadowMap.depth);
             renderer->Draw(renderProperties, false);
         }
         
@@ -402,11 +415,25 @@ namespace Feng
     {
         FrameBuffer::Settings bufferSettings;
         bufferSettings.size = shadowSetup.size;
-        bufferSettings.color = FrameBuffer::eAttachementState::Texture;
+        bufferSettings.color = FrameBuffer::eAttachementState::None;
         bufferSettings.depth = FrameBuffer::eAttachementState::Texture;
         bufferSettings.stencil = FrameBuffer::eAttachementState::None;
         bufferSettings.multisample = false;
         bufferSettings.combinedDepthStencil = false;
+
+        return fboPool.Pop(bufferSettings);
+    }
+    
+    FrameBuffer RenderSystem::GetPointShadowMapBuffer()
+    {
+        FrameBuffer::Settings bufferSettings;
+        bufferSettings.size = shadowSetup.size;
+        bufferSettings.color = FrameBuffer::eAttachementState::None;
+        bufferSettings.depth = FrameBuffer::eAttachementState::Texture;
+        bufferSettings.stencil = FrameBuffer::eAttachementState::None;
+        bufferSettings.multisample = false;
+        bufferSettings.combinedDepthStencil = false;
+        bufferSettings.isDepthCubemap = true;
 
         return fboPool.Pop(bufferSettings);
     }

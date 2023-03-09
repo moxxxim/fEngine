@@ -63,8 +63,9 @@ namespace Feng
         void DrawShadowMap();
         void DrawDirectShadowMap();
         void DrawPointShadowMap();
-        void DrawShadowCastersInShadowMap();
-        void DrawDebugShadowMap();
+        void DrawShadowCastersInShadowMap(Material *shadowMaterial);
+        void DrawDebugDirectShadowMap();
+        void DrawDebugOmniShadowMap();
         void DrawGeneric();
         void DrawOpaque();
         void DrawTransparent();
@@ -72,6 +73,7 @@ namespace Feng
         void ApplyPostEffects(const FrameBuffer& renderBuffer);
         FrameBuffer GetFrameBuffer(bool multisample);
         FrameBuffer GetDirectShadowMapBuffer();
+        FrameBuffer GetPointShadowMapBuffer();
         
         std::vector<MeshRenderer*> renderersTransparent;
         std::vector<MeshRenderer*> renderersOpaque;

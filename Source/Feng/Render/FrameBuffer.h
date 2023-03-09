@@ -27,12 +27,12 @@ namespace Feng
             bool combinedDepthStencil = false;
             bool isDepthCubemap = false;
         };
-        
+
         uint32_t frame = Default;
         uint32_t color = Default;
         uint32_t depth = Default;
         uint32_t stencil = Default;
-        
+
         FrameBuffer::Settings settings;
     };
     

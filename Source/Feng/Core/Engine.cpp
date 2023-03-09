@@ -190,7 +190,8 @@ namespace Feng
     bool Engine::shadowsEnabled = false;
     bool Engine::showDepth = false;
     bool Engine::cursorVisible = false;
-    bool Engine::showDebugShadowMap = false;
+    bool Engine::showDirectShadowMap = false;
+    bool Engine::showOmniShadowMap = false;
     
     bool Engine::IsMultisampleEnabled()
     {
@@ -280,15 +281,6 @@ namespace Feng
 
     void Engine::UpdateInputKeys()
     {
-        inputKeys[InputKey::Kb_A] = (glfwGetKey(SEngine::window, GLFW_KEY_A) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-        inputKeys[InputKey::Kb_B] = (glfwGetKey(SEngine::window, GLFW_KEY_B) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-        inputKeys[InputKey::Kb_C] = (glfwGetKey(SEngine::window, GLFW_KEY_C) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
         inputKeys[InputKey::Kb_Left_Shift] = (glfwGetKey(SEngine::window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
@@ -298,22 +290,10 @@ namespace Feng
         inputKeys[InputKey::Kb_Escape] = (glfwGetKey(SEngine::window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        inputKeys[InputKey::Kb_W] = (glfwGetKey(SEngine::window, GLFW_KEY_W) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-        inputKeys[InputKey::Kb_S] = (glfwGetKey(SEngine::window, GLFW_KEY_S) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-        inputKeys[InputKey::Kb_D] = (glfwGetKey(SEngine::window, GLFW_KEY_D) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-        inputKeys[InputKey::Kb_O] = (glfwGetKey(SEngine::window, GLFW_KEY_O) == GLFW_PRESS)
+        inputKeys[InputKey::Kb_Down] = (glfwGetKey(SEngine::window, GLFW_KEY_DOWN) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
         inputKeys[InputKey::Kb_Up] = (glfwGetKey(SEngine::window, GLFW_KEY_UP) == GLFW_PRESS)
-                    ? eKeyStatus::Pressed
-                    : eKeyStatus::Released;
-        inputKeys[InputKey::Kb_Down] = (glfwGetKey(SEngine::window, GLFW_KEY_DOWN) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
         inputKeys[InputKey::Kb_Left] = (glfwGetKey(SEngine::window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -322,13 +302,38 @@ namespace Feng
         inputKeys[InputKey::Kb_Right] = (glfwGetKey(SEngine::window, GLFW_KEY_RIGHT) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
-        inputKeys[InputKey::Kb_Q] = (glfwGetKey(SEngine::window, GLFW_KEY_Q) == GLFW_PRESS)
+        
+        inputKeys[InputKey::Kb_A] = (glfwGetKey(SEngine::window, GLFW_KEY_A) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_B] = (glfwGetKey(SEngine::window, GLFW_KEY_B) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_C] = (glfwGetKey(SEngine::window, GLFW_KEY_C) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_D] = (glfwGetKey(SEngine::window, GLFW_KEY_D) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
         inputKeys[InputKey::Kb_E] = (glfwGetKey(SEngine::window, GLFW_KEY_E) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
         inputKeys[InputKey::Kb_I] = (glfwGetKey(SEngine::window, GLFW_KEY_I) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_N] = (glfwGetKey(SEngine::window, GLFW_KEY_N) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_O] = (glfwGetKey(SEngine::window, GLFW_KEY_O) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_Q] = (glfwGetKey(SEngine::window, GLFW_KEY_Q) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_S] = (glfwGetKey(SEngine::window, GLFW_KEY_S) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_W] = (glfwGetKey(SEngine::window, GLFW_KEY_W) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
     }
@@ -367,13 +372,23 @@ namespace Feng
         glfwSetInputMode(SEngine::window, GLFW_CURSOR, visibilityValue);
     }
     
-    bool Engine::IsShowDebugShadowMap()
+    bool Engine::IsDirectShowDebugShadowMap()
     {
-        return showDebugShadowMap;
+        return showDirectShadowMap;
     }
     
-    void Engine::SetShowDebugShadowMap(bool show)
+    void Engine::SetDirectShowDebugShadowMap(bool show)
     {
-        showDebugShadowMap = show;
+        showDirectShadowMap = show;
+    }
+    
+    bool Engine::IsOmniShowDebugShadowMap()
+    {
+        return showOmniShadowMap;
+    }
+    
+    void Engine::SetOmniShowDebugShadowMap(bool show)
+    {
+        showOmniShadowMap = show;
     }
 }

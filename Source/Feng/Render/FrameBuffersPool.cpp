@@ -89,6 +89,8 @@ namespace Feng
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
         }
+        
+        Print_Errors_OpengGL();
 
         GLuint depth = 0;
         if (settings.depth == FrameBuffer::eAttachementState::Texture)
@@ -108,15 +110,15 @@ namespace Feng
 
             if((texType == GL_TEXTURE_2D) || (texType == GL_TEXTURE_CUBE_MAP))
             {
-                glTexParameteri(texType, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(texType, GL_TEXTURE_WRAP_T, GL_REPEAT);
                 glTexParameteri(texType, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(texType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(texType, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(texType, GL_TEXTURE_WRAP_T, GL_REPEAT);
                 if(texType == GL_TEXTURE_CUBE_MAP)
                 {
                     glTexParameteri(texType, GL_TEXTURE_WRAP_R, GL_REPEAT);
                 }
-                
+
                 if(texType == GL_TEXTURE_2D)
                 {
                     glTexImage2D(
@@ -158,8 +160,11 @@ namespace Feng
                                         settings.size.height,
                                         GL_TRUE);
             }
+            
+            Print_Errors_OpengGL();
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, depth, 0);
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth, 0);
+            Print_Errors_OpengGL();
         }
         else if (settings.depth == FrameBuffer::eAttachementState::Buffer)
         {
@@ -184,6 +189,8 @@ namespace Feng
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depth);
         }
         
+        Print_Errors_OpengGL();
+        
         GLuint stencil = 0;
         if ((settings.stencil != FrameBuffer::eAttachementState::None) && !settings.combinedDepthStencil)
         {
@@ -195,6 +202,8 @@ namespace Feng
         {
             Debug::LogError("Cannot create frame buffer.");
         }
+        
+        Print_Errors_OpengGL();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -205,7 +214,6 @@ namespace Feng
         frameBuffer.stencil = stencil;
         frameBuffer.settings = settings;
 
-        Print_Errors_OpengGL();
         return frameBuffer;
     }
     
