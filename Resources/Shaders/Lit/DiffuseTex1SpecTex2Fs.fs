@@ -81,9 +81,8 @@ float CalculateShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffset)
     const float bias = 0.005f;
     float shadowMultiplier = step(fragmentDepth - bias, shadowDepth); // Gives 0.f if outside far clipping plane
     float afterClippingPlaneMultiplier = step(1.f, fragmentDepth); // 1.f if outside far clipping plane (as deisred)
-    float resultMultiplier = clamp(shadowMultiplier + afterClippingPlaneMultiplier, 0.f, 1.f);
 
-    return resultMultiplier;
+    return clamp(shadowMultiplier + afterClippingPlaneMultiplier, 0.f, 1.f);
 }
 
 // 0.f - fragment is in shadow, 1.f - fragment not in shadow.

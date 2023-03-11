@@ -40,19 +40,27 @@ namespace Feng
             
             const Light* light = lightEntity->GetComponent<Light>();
             const Matrix4 lightProjection = Mat4::MakePerspectiveProjection(90.f, 1.f, 1.f, light->GetRange());
-            const Transform *lightTransform = lightEntity->GetComponent<Transform>();
-            const Vector3& lightPos = lightTransform->GetPosition();
-            Matrix4 transformPosX = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneY, 90.f});
+            const Vector3& lightPos = lightEntity->GetComponent<Transform>()->GetPosition();
+            
+            Matrix4 transformPosX;
+            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, -90.f}).TryInvert(transformPosX);
+            Matrix4 transformNegX;
+            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, 90.f}).TryInvert(transformNegX);
             matrices.push_back(transformPosX * lightProjection);
-            Matrix4 transformNegX = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneY, -90.f});
             matrices.push_back(transformNegX * lightProjection);
-            Matrix4 transformPosY = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, 90.f});
+            
+            Matrix4 transformPosY;
+            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, 90.f}).TryInvert(transformPosY);
+            Matrix4 transformNegY;
+            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, -90.f}).TryInvert(transformNegY);
             matrices.push_back(transformPosY * lightProjection);
-            Matrix4 transformNegY = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, -90.f});
             matrices.push_back(transformNegY * lightProjection);
-            Matrix4 transformPosZ = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion::Identity());
-            matrices.push_back(lightProjection);
-            Matrix4 transformNegZ = Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneY, 180.f});
+            
+            Matrix4 transformPosZ;
+            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, 180.f}).TryInvert(transformPosZ);
+            Matrix4 transformNegZ;
+            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f}).TryInvert(transformNegZ);
+            matrices.push_back(transformPosZ * lightProjection);
             matrices.push_back(transformNegZ * lightProjection);
 
             return matrices;

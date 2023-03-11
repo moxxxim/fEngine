@@ -13,7 +13,7 @@ void GameObjectSliderX::Update(float deltaTime)
         start = myTransform->GetPosition();
     }
     
-    constexpr float speedFactor = 0.5f;
+    constexpr float speedFactor = 0.1;
     float time = Feng::Engine::Time();
     float xOffset = std::sin(speedFactor * time) * amplitude;
     Feng::Vector3 position = start + xOffset * Feng::Vector3::OneX;

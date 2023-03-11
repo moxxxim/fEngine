@@ -143,7 +143,7 @@ namespace test
 
             light->SetRange(20.f);
             light->SetColor(color);
-            light->SetIntensity(1.5f);
+            light->SetIntensity(3.f);
             
             scene.GetRenderSystem()->SetPointShadowLight(&lightEntity);
 

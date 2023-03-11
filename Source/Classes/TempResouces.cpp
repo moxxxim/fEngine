@@ -268,6 +268,7 @@ namespace
         
         test::res.DirectShadowPassMaterial = std::make_unique<Material>(LoadShader(ShadowPassVs, EmptyFs));
         test::res.OmniShadowPassMaterial = std::make_unique<Material>(LoadShader(OmniShadowPassVs, OmniShadowPassFs, OmniShadowPassGs));
+        test::res.OmniShadowPassMaterial->SetDrawFace(eDrawFace::Ccw);
         test::res.ShadowMapDrawMaterial = std::make_unique<Material>(LoadShader(PostEffectVs, ShadowMapDrawFs));
     }
 

@@ -295,6 +295,7 @@ namespace Feng
 
         const Shader *shader = shadowSetup.directLightShadowDebugMaterial->GetShader();
         shader->StartUse();
+        Render::SetDrawFace(eDrawFace::Cw);
         Print_Errors_OpengGL();
 
         glActiveTexture(GL_TEXTURE0);
