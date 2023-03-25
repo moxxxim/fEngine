@@ -80,7 +80,23 @@ namespace Feng::Mat4
         return projection;
     }
 
-    Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far, bool alongZ /*= false*/)
+    Matrix4 MakePerspectiveProjection(float r, float l, float t, float b, float n, float f, bool alongZ)
+    {
+        // http://www.songho.ca/opengl/gl_projectionmatrix.html
+        Matrix4 projection = Matrix4::Zero;
+
+        projection.m00 = (2 * n) / (r - l);
+        projection.m02 = (r + l) / (r - l);
+        projection.m11 = 2 * n / (t - b);
+        projection.m12 = (t + b) / (t - b);
+        projection.m22 = - (f + n) / (f - n);
+        projection.m23 = -1.f;
+        projection.m32 = -2.f * f * n / (f - n);
+
+        return projection;
+    }
+    
+    Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far, bool alongZ)
     {
         float xSign = alongZ ? -1 : 1;
         if(alongZ)
@@ -91,11 +107,34 @@ namespace Feng::Mat4
 
         Matrix4 projection = Matrix4::Zero;
 
-        projection.m00 = xSign / static_cast<float>(width);
-        projection.m11 = 1 / static_cast<float>(height);
+        projection.m00 = xSign * 2 / static_cast<float>(width);
+        projection.m11 = 2 / static_cast<float>(height);
         projection.m22 = -2 / (far - near);
-        projection.m33 = 1;
         projection.m32 = - (far + near) / (far - near);
+        projection.m33 = 1;
+
+        return projection;
+    }
+
+    Matrix4 MakeOrthogonalProjection(float l, float r, float b, float t, float n, float f, bool alongZ)
+    {
+//        float xSign = alongZ ? -1 : 1;
+//        if(alongZ)
+//        {
+//            f *= -1;
+//            n *= -1;
+//        }
+        
+        // http://www.songho.ca/opengl/gl_projectionmatrix.html
+        Matrix4 projection = Matrix4::Zero;
+
+        projection.m00 = 2 / (r - l);
+        projection.m11 = 2 / (t - b);
+        projection.m22 = -2 / (f - n);
+        projection.m30 = - (r + l) / (r - l);
+        projection.m31 = - (t + b) / (t - b);
+        projection.m32 = - (f + n) / (f - n);
+        projection.m33 = 1;
 
         return projection;
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Feng/Math/Vector4.h>
 #include <Feng/Render/VertexBuffer.h>
 #include <Feng/Utils/Render/MeshParams.h>
 #include <Feng/Utils/Render/TextureParams.h>
@@ -8,9 +9,11 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace Feng
 {
+    class Camera;
     class Material;
     class Texture;
     enum class eShaderType : uint8_t;
@@ -34,5 +37,6 @@ namespace Feng
         void LoadTextureData(const Texture& texture);
         GLenum ToOpenGLValue(eShaderType shaderType);
         VertexBuffer CreateQuadBuffer();
+        std::array<Vector4, 8> GetFrustumXyzMinMax(const Camera& camera);
     }
 }

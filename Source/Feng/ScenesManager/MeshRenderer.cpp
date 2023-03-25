@@ -21,17 +21,53 @@ namespace Feng
 {
     namespace SMeshRenderer
     {
+        Matrix4 GetShadowCastLightProjectionMatrix(const RenderProperties &renderProperties, const Matrix4& lightViewMatrix)
+        {
+            std::array<Vector4, 8> camFrustum = Render::GetFrustumXyzMinMax(*renderProperties.cam);
+            float minX = std::numeric_limits<float>::max();
+            float maxX = std::numeric_limits<float>::lowest();
+            float minY = std::numeric_limits<float>::max();
+            float maxY = std::numeric_limits<float>::lowest();
+            float minZ = std::numeric_limits<float>::max();
+            float maxZ = std::numeric_limits<float>::lowest();
+            for(const Vector4& corner : camFrustum)
+            {
+                const Vector4 cornerInLightSpace = corner * lightViewMatrix;
+                minX = std::min(minX, cornerInLightSpace.x);
+                maxX = std::max(maxX, cornerInLightSpace.x);
+                minY = std::min(minY, cornerInLightSpace.y);
+                maxY = std::max(maxY, cornerInLightSpace.y);
+                minZ = std::min(minZ, cornerInLightSpace.z);
+                maxZ = std::max(maxZ, cornerInLightSpace.z);
+            }
+
+            constexpr float zMult = 1.0f;
+            if (minZ < 0)
+            {
+                minZ *= zMult;
+            }
+            else
+            {
+                minZ /= zMult;
+            }
+            
+            if (maxZ < 0)
+            {
+                maxZ /= zMult;
+            }
+            else
+            {
+                maxZ *= zMult;
+            }
+
+            //return Mat4::MakeOrthogonalProjection(maxX, minX, minY, maxY, maxZ, minZ, true);
+            return Mat4::MakeOrthogonalProjection(maxX - minX, maxY - minY, maxZ, minZ, false);
+        }
+        
         Matrix4 GetShadowCastLightViewMatrix(const Entity* light)
         {
             const Transform *lightTransform = light->GetComponent<Transform>();
-            const Matrix4 lightTransformMatrix = Mat4::MakeTransformation(
-                                                                          Vector3::One,
-                                                                          lightTransform->GetPosition(),
-                                                                          lightTransform->GetRotation());
-
-            Matrix4 transformInverted;
-            std::ignore = lightTransformMatrix.TryInvert(transformInverted);
-            return transformInverted;
+            return Mat4::MakeTransformation(Vector3::One, Vector3::Zero, lightTransform->GetRotation().Inverse());
         }
         
         std::vector<Matrix4> GetOmnidirectionalShadowLightMatrices(const Entity* lightEntity)
@@ -430,8 +466,8 @@ namespace Feng
         const Shader *shader = workingMaterial.GetShader();
         if(renderProperties.directShadowLight)
         {
-            Matrix4 lightProjection = Mat4::MakeOrthogonalProjection(8.f, 8.f, 0.1f, 20.f, true);
             Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
+            Matrix4 lightProjection = GetShadowCastLightProjectionMatrix(renderProperties, lightViewMatrix);
             Matrix4 lightViewProjectionMatrix = lightViewMatrix * lightProjection;
             shader->SetUniformMatrix4(ShaderParams::DirectShadowLightView.data(), lightViewMatrix);
             shader->SetUniformMatrix4(ShaderParams::DirectShadowLightViewProj.data(), lightViewProjectionMatrix);

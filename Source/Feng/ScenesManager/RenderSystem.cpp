@@ -93,6 +93,11 @@ namespace Feng
         shadowSetup.directLightShadowDebugMaterial = directLightShadowDebugMaterial;
     }
     
+    void RenderSystem::SetCascadesCount(int32_t aCascadesCount)
+    {
+        shadowSetup.cascadesCount = std::clamp(aCascadesCount, 1, 4);
+    }
+    
     void RenderSystem::SetDirectionalShadowLight(Entity *light)
     {
         renderProperties.directShadowLight = light;

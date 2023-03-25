@@ -84,6 +84,9 @@ namespace test
 
             Transform *camTransform = camEntity.GetComponent<Transform>();
             camTransform->SetPosition(0.f, 3.5f, 3.f);
+            
+            camTransform->SetPosition(0.f, 0.f, 0.f);
+            camTransform->SetEuler(0.f, 0.f, 0.f);
 
             std::ignore = camEntity.AddComponent<CameraWasdController>();
             CameraStabilizer& stabilizer = camEntity.AddComponent<CameraStabilizer>();

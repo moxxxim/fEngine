@@ -17,7 +17,9 @@ namespace Feng
         Matrix4 MakeTransformation(const Vector3& scale, const Vector3& translation, const Matrix3& rotation);
         Matrix4 MakeTransformation(const Vector3& scale, const Vector3& translation, const Quaternion& rotation);
         Matrix4 MakePerspectiveProjection(float fovYDeg, float aspect, float near, float far, bool alongZ = false);
+        Matrix4 MakePerspectiveProjection(float r, float l, float t, float b, float n, float f, bool alongZ = false);
         Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far, bool alongZ = false);
+        Matrix4 MakeOrthogonalProjection(float l, float r, float b, float t, float n, float f, bool alongZ = false);
     }
 
     namespace Mat3

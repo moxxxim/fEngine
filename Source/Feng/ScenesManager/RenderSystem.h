@@ -34,6 +34,7 @@ namespace Feng
         void SetShadowMaterials(Material *directLightShadowMaterial,
                                Material *pointLightShadowMaterial,
                                Material *directLightShadowDebugMaterial);
+        void SetCascadesCount(int32_t aCascadesCount);
         void SetDirectionalShadowLight(Entity *light);
         void SetPointShadowLight(Entity *light);
 
@@ -55,6 +56,7 @@ namespace Feng
             Size2ui size { DefaultShadowMapSize, DefaultShadowMapSize };
             FrameBuffer directShadowMap;
             FrameBuffer pointShadowMap;
+            int32_t cascadesCount = 1;
         };
         
         bool IsShadowsEnabled();
