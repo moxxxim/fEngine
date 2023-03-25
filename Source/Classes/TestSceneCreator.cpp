@@ -80,14 +80,15 @@ namespace test
             camera->SetFovY(45.f);
             camera->SetAspectRatio(static_cast<float>(Screen::ScreenSize.width)/Screen::ScreenSize.height);
             camera->SetNearClipPlane(0.1f);
-            camera->SetFarClipPlane(100.f);
+            camera->SetFarClipPlane(50.f);
 
             Transform *camTransform = camEntity.GetComponent<Transform>();
             camTransform->SetPosition(0.f, 3.5f, 3.f);
 
             std::ignore = camEntity.AddComponent<CameraWasdController>();
-            std::ignore = camEntity.AddComponent<CameraStabilizer>();
-
+            CameraStabilizer& stabilizer = camEntity.AddComponent<CameraStabilizer>();
+            stabilizer.SetMinMaxFov(20.f, 60.f);
+            
             return &camEntity;
         }
 

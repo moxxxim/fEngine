@@ -5,20 +5,25 @@
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
 
+void CameraStabilizer::SetMinMaxFov(float min, float max)
+{
+    minFovY = min;
+    maxFovY = max;
+}
+
 void CameraStabilizer::Update(float deltaTime)
 {
     if(!myCam)
     {
         Feng::Entity *myEntity = GetEntity();
         myCam = myEntity->GetComponent<Feng::Camera>();
+        fovY = myCam->GetFovY();
     }
-    
+
     fovY -= static_cast<float>(Feng::Engine::GetMouseScroll().y);
-    fovY = std::max(fovY, 1.0f);
-    fovY = std::min(fovY, 45.0f);
+    fovY = std::max(fovY, minFovY);
+    fovY = std::min(fovY, maxFovY);
+    fovY = std::clamp(fovY, minFovY, maxFovY);
 
     myCam->SetFovY(fovY);
-    myCam->SetAspectRatio(static_cast<float>(Feng::Screen::ScreenSize.width)/Feng::Screen::ScreenSize.height);
-    myCam->SetNearClipPlane(0.1f);
-    myCam->SetFarClipPlane(100.f);
 }

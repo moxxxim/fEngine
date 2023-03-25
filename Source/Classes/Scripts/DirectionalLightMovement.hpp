@@ -24,5 +24,5 @@ private:
     float yStartAngleRad = 0.f;
     float period = 30.f;
     float timeSegment = 0.f;
-    float timeScale = 1.f;
+    float timeScale = 0.f;
 };
