@@ -81,7 +81,7 @@ float CalculateShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffset)
     const float bias = 0.005f;
     float shadowMultiplier = step(fragmentDepth - bias, shadowDepth); // Gives 0.f if outside far clipping plane
     float afterClippingPlaneMultiplier = step(1.f, fragmentDepth); // 1.f if outside far clipping plane (as deisred)
-    
+
     return clamp(shadowMultiplier + afterClippingPlaneMultiplier, 0.f, 1.f);
 }
 
@@ -122,7 +122,7 @@ vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir)
     vec3 lightColor = light.Color.w * light.Color.rgb;
 
     // Calculate diffuse component. 
-    float diffuseImpact = max(dot(norm, lightDir), 0.f);
+    float diffuseImpact = max(dot(norm, -lightDir), 0.f);
     vec3 diffuseColor = diffuseImpact * lightColor;
 
     // Calculate specular component.

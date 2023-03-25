@@ -118,7 +118,7 @@ float CalculatePointShadowMultiplier(PointLight light, vec3 fragPos)
 
 vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir, vec4 specularityFilter)
 {
-    vec3 lightDir = normalize(-light.Dir);
+    vec3 lightDir = normalize(light.Dir);
     vec3 lightColor = light.Color.w * light.Color.rgb;
 
     // Calculate diffuse component. 
