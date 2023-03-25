@@ -17,7 +17,7 @@ namespace Feng
         float Determinant() const;
         float Trace() const;
         bool TryInvert(Matrix4& inverted) const;
-        Matrix4 Transposed() const;
+        Matrix4 ToTransposed() const;
 
         void Transpose();
 
@@ -124,7 +124,7 @@ namespace Feng
         return true;
     }
 
-    inline Matrix4 Matrix4::Transposed() const
+    inline Matrix4 Matrix4::ToTransposed() const
     {
         Matrix4 transposed = *this;
         transposed.Transpose();
@@ -189,10 +189,10 @@ namespace Feng
     {
         Vector4 result;
 
-        result.x = (a.x * b.m00) + (a.y * b.m10) + (a.z * b.m20) + (a.z * b.m30);
-        result.y = (a.x * b.m01) + (a.y * b.m11) + (a.z * b.m21) + (a.z * b.m31);
-        result.z = (a.x * b.m02) + (a.y * b.m12) + (a.z * b.m22) + (a.z * b.m32);
-        result.w = (a.x * b.m03) + (a.y * b.m13) + (a.z * b.m23) + (a.z * b.m33);
+        result.x = (a.x * b.m00) + (a.y * b.m10) + (a.z * b.m20) + (a.w * b.m30);
+        result.y = (a.x * b.m01) + (a.y * b.m11) + (a.z * b.m21) + (a.w * b.m31);
+        result.z = (a.x * b.m02) + (a.y * b.m12) + (a.z * b.m22) + (a.w * b.m32);
+        result.w = (a.x * b.m03) + (a.y * b.m13) + (a.z * b.m23) + (a.w * b.m33);
 
         return result;
     }
