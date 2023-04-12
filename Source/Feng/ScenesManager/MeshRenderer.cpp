@@ -60,7 +60,8 @@ namespace Feng
                 maxZ *= zMult;
             }
 
-            //return Mat4::MakeOrthogonalProjection(maxX, minX, minY, maxY, maxZ, minZ, true);
+            //return Mat4::MakeOrthogonalProjection(15.f, 15.f, -50.f, 50.f);
+            return Mat4::MakeOrthogonalProjection(maxX, minX, minY, maxY, maxZ, minZ);
             return Mat4::MakeOrthogonalProjection(maxX - minX, maxY - minY, maxZ, minZ, false);
         }
         

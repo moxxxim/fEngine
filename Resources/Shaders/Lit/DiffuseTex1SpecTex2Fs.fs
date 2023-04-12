@@ -72,13 +72,13 @@ vec3 CalculateNdcFragPos01(vec4 fragPosLightSpace)
     return ndcFragPos * 0.5 + 0.5;
 }
 
-float CalculateShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffset)
+float CalculateDirectShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffset)
 {
     vec3 fragPos01 = CalculateNdcFragPos01(fragPosLightSpace);
     float shadowDepth = texture(uDirectShadowMap, fragPos01.xy + uvOffset).r;
     float fragmentDepth = fragPos01.z;
 
-    const float bias = 0.005f;
+    const float bias = 0.0001f;
     float shadowMultiplier = step(fragmentDepth - bias, shadowDepth); // Gives 0.f if outside far clipping plane
     float afterClippingPlaneMultiplier = step(1.f, fragmentDepth); // 1.f if outside far clipping plane (as deisred)
 
@@ -95,7 +95,7 @@ float CalculateDirectShadowMultiplier(vec4 fragPosLightSpace)
         for(int y = -1; y <= 1; ++y)
         {
             vec2 uvOffset = vec2(x, y) * texelSize;
-            shadowMultiplier += CalculateShadowMultiplierPcfPart(fragPosLightSpace, uvOffset);
+            shadowMultiplier += CalculateDirectShadowMultiplierPcfPart(fragPosLightSpace, uvOffset);
         }    
     }
 

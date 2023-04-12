@@ -33,7 +33,7 @@ namespace test
         std::vector<Feng::Vector3> cubePositions =
         {
             Feng::Vector3(-4.0f, 0.0f, 0.0f),
-            Feng::Vector3( 0.0f,  0.0f,  -5.5f),
+            Feng::Vector3( 0.0f,  planePos.y + 0.6f,  -5.5f),
             Feng::Vector3( 2.0f,  0.0f, 0.0f),
             Feng::Vector3(-2.0f, 2.0f, 0.0f),
             Feng::Vector3(0.0f, 2.0f, 0.0f),
@@ -84,9 +84,6 @@ namespace test
 
             Transform *camTransform = camEntity.GetComponent<Transform>();
             camTransform->SetPosition(0.f, 3.5f, 3.f);
-            
-            camTransform->SetPosition(0.f, 0.f, 0.f);
-            camTransform->SetEuler(0.f, 0.f, 0.f);
 
             std::ignore = camEntity.AddComponent<CameraWasdController>();
             CameraStabilizer& stabilizer = camEntity.AddComponent<CameraStabilizer>();
@@ -114,7 +111,7 @@ namespace test
                                                     Light::eType::Directional,
                                                     material.get(),
                                                     test::res.CubeMesh.get());
-            lightEntity.AddComponent<DirectionalLightMovement>();
+            //lightEntity.AddComponent<DirectionalLightMovement>();
 
             Light* light = lightEntity.GetComponent<Light>();
             lightMaterials[light] = std::move(material);
@@ -127,7 +124,7 @@ namespace test
 
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
             lightTransform->SetPosition(-7, 3, 5);
-            lightTransform->SetEuler(-40.f, 140.f, 0.f);
+            lightTransform->SetEuler(-40.f, -40, 0.f);
         }
 
         void CreatePointLight(Feng::Scene& scene)
@@ -151,7 +148,7 @@ namespace test
             
             scene.GetRenderSystem()->SetPointShadowLight(&lightEntity);
 
-            std::ignore = lightEntity.AddComponent<GameObjectSliderX>();
+            //std::ignore = lightEntity.AddComponent<GameObjectSliderX>();
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
             lightTransform->SetPosition(0.f, 1.f, -2.f);
         }
@@ -180,9 +177,9 @@ namespace test
             lightTransform->SetPosition(5.f, 4.f, -2.f);
             lightTransform->SetRotation(Quaternion{Vector3::OneY, 90});
 
-            GameObjectRotation& lightRotation = lightEntity.AddComponent<GameObjectRotation>();
-            lightRotation.SetAxis(Feng::Vector3::OneX);
-            lightRotation.SetPeriod(4.f);
+//            GameObjectRotation& lightRotation = lightEntity.AddComponent<GameObjectRotation>();
+//            lightRotation.SetAxis(Feng::Vector3::OneX);
+//            lightRotation.SetPeriod(4.f);
         }
 
         Feng::Entity* CreateObject(
@@ -203,7 +200,7 @@ namespace test
 
             return &obj;
         }
-        
+
         void CreateInstancedObject(Feng::Scene& scene, Feng::Mesh &mesh)
         {
             Feng::Entity& obj = scene.CreateMesh(test::res.PhongTexInstancedMaterial.get(), &mesh, "Instanced");

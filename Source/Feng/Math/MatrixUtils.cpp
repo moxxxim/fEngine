@@ -80,7 +80,7 @@ namespace Feng::Mat4
         return projection;
     }
 
-    Matrix4 MakePerspectiveProjection(float r, float l, float t, float b, float n, float f, bool alongZ)
+    Matrix4 MakePerspectiveProjection(float r, float l, float t, float b, float n, float f)
     {
         // http://www.songho.ca/opengl/gl_projectionmatrix.html
         Matrix4 projection = Matrix4::Zero;
@@ -116,15 +116,8 @@ namespace Feng::Mat4
         return projection;
     }
 
-    Matrix4 MakeOrthogonalProjection(float l, float r, float b, float t, float n, float f, bool alongZ)
+    Matrix4 MakeOrthogonalProjection(float l, float r, float b, float t, float n, float f)
     {
-//        float xSign = alongZ ? -1 : 1;
-//        if(alongZ)
-//        {
-//            f *= -1;
-//            n *= -1;
-//        }
-        
         // http://www.songho.ca/opengl/gl_projectionmatrix.html
         Matrix4 projection = Matrix4::Zero;
 
