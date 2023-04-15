@@ -78,7 +78,7 @@ float CalculateDirectShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffs
     float shadowDepth = texture(uDirectShadowMap, fragPos01.xy + uvOffset).r;
     float fragmentDepth = fragPos01.z;
 
-    const float bias = 0.0001f;
+    const float bias = 0.001f;
     float shadowMultiplier = step(fragmentDepth - bias, shadowDepth); // Gives 0.f if outside far clipping plane
     float afterClippingPlaneMultiplier = step(1.f, fragmentDepth); // 1.f if outside far clipping plane (as deisred)
 

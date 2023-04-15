@@ -32,6 +32,7 @@ namespace Feng
 
     Matrix4 Camera::GetProjectionMatrix() const
     {
+        //return Mat4::MakeOrthogonalProjection(-5, 5, -5, 5, -50, 50);
         return Mat4::MakePerspectiveProjection(fovY, aspectRatio, near, far);
     }
 

@@ -64,7 +64,7 @@ namespace Feng::Mat4
         return MakeTransformation(scale, translation, rotation.ToMatrix3());
     }
 
-    Matrix4 MakePerspectiveProjection(float fovYDeg, float aspect, float near, float far, bool alongZ /*= false*/)
+    Matrix4 MakePerspectiveProjection(float fovYDeg, float aspect, float near, float far)
     {
         Matrix4 projection = Matrix4::Zero;
 
@@ -96,18 +96,11 @@ namespace Feng::Mat4
         return projection;
     }
     
-    Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far, bool alongZ)
+    Matrix4 MakeOrthogonalProjection(uint32_t width, uint32_t height, float near, float far)
     {
-        float xSign = alongZ ? -1 : 1;
-        if(alongZ)
-        {
-            far *= -1;
-            near *= -1;
-        }
-
         Matrix4 projection = Matrix4::Zero;
 
-        projection.m00 = xSign * 2 / static_cast<float>(width);
+        projection.m00 = 2 / static_cast<float>(width);
         projection.m11 = 2 / static_cast<float>(height);
         projection.m22 = -2 / (far - near);
         projection.m32 = - (far + near) / (far - near);

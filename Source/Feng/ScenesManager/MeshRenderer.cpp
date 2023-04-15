@@ -41,28 +41,10 @@ namespace Feng
                 maxZ = std::max(maxZ, cornerInLightSpace.z);
             }
 
-            constexpr float zMult = 1.0f;
-            if (minZ < 0)
-            {
-                minZ *= zMult;
-            }
-            else
-            {
-                minZ /= zMult;
-            }
-            
-            if (maxZ < 0)
-            {
-                maxZ /= zMult;
-            }
-            else
-            {
-                maxZ *= zMult;
-            }
+            minZ -= 10.f;
+            maxZ += 20.f;
 
-            //return Mat4::MakeOrthogonalProjection(15.f, 15.f, -50.f, 50.f);
-            return Mat4::MakeOrthogonalProjection(maxX, minX, minY, maxY, maxZ, minZ);
-            return Mat4::MakeOrthogonalProjection(maxX - minX, maxY - minY, maxZ, minZ, false);
+            return Mat4::MakeOrthogonalProjection(minX, maxX, minY, maxY, minZ, maxZ);
         }
         
         Matrix4 GetShadowCastLightViewMatrix(const Entity* light)
