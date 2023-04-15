@@ -19,6 +19,7 @@ namespace Feng
     {
         Tex2d = 0,
         Cubemap = 1,
+        Array2d = 2,
     };
 
     enum class eTextureMinFilter : uint8_t

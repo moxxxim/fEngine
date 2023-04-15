@@ -10,22 +10,23 @@ namespace Feng
     public:
         static constexpr uint32_t Default = 0;
 
-        enum class eAttachementState
+        enum class eAttachement
         {
             None = 0,
-            Texture = 1,
-            Buffer = 2,
+            Buffer = 1,
+            Texture2d = 2,
+            Cubemap = 3,
+            Texture2dArray = 4,
         };
         
         struct Settings final
         {
             Size2ui size {};
-            eAttachementState color = eAttachementState::None;
-            eAttachementState depth = eAttachementState::None;
-            eAttachementState stencil = eAttachementState::None;
+            eAttachement color = eAttachement::None;
+            eAttachement depth = eAttachement::None;
+            eAttachement stencil = eAttachement::None;
             bool multisample = false;
             bool combinedDepthStencil = false;
-            bool isDepthCubemap = false;
         };
 
         uint32_t frame = Default;

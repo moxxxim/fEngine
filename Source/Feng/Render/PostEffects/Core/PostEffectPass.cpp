@@ -75,9 +75,9 @@ namespace Feng
         for (int i = 0; i < customBuffersCount; ++i)
         {
             FrameBuffer::Settings bufferSettings = context.input.settings;
-            bufferSettings.color = FrameBuffer::eAttachementState::Texture;
-            bufferSettings.depth = FrameBuffer::eAttachementState::None;
-            bufferSettings.stencil = FrameBuffer::eAttachementState::None;
+            bufferSettings.color = FrameBuffer::eAttachement::Texture2d;
+            bufferSettings.depth = FrameBuffer::eAttachement::None;
+            bufferSettings.stencil = FrameBuffer::eAttachement::None;
             bufferSettings.multisample = false;
             bufferSettings.combinedDepthStencil = false;
             buffers[i] = buffersPool->Pop(bufferSettings);

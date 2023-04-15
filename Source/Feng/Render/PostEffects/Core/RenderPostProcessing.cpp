@@ -62,9 +62,9 @@ namespace Feng
     void RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer)
     {
         FrameBuffer::Settings intermediateSettings = screenBuffer.settings;
-        intermediateSettings.color = FrameBuffer::eAttachementState::Texture;
-        intermediateSettings.depth = FrameBuffer::eAttachementState::None;
-        intermediateSettings.stencil = FrameBuffer::eAttachementState::None;
+        intermediateSettings.color = FrameBuffer::eAttachement::Texture2d;
+        intermediateSettings.depth = FrameBuffer::eAttachement::None;
+        intermediateSettings.stencil = FrameBuffer::eAttachement::None;
         intermediateSettings.multisample = false;
         intermediateSettings.combinedDepthStencil = false;
         

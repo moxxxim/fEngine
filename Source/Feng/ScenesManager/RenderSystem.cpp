@@ -45,19 +45,29 @@ namespace Feng
         
         void ClampShadowMapToBorder(FrameBuffer buffer)
         {
-            GLenum target = buffer.settings.isDepthCubemap ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
+            GLenum target = static_cast<GLenum>(FrameBuffersPool::GetBindTarget(buffer.settings.depth));
             
             glBindTexture(target, buffer.depth);
             float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
             glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
             glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
             glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-            if(buffer.settings.isDepthCubemap)
+            if(buffer.settings.depth == FrameBuffer::eAttachement::Cubemap)
             {
                 glTexParameteri(target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
             }
             
             glBindTexture(target, 0);
+        }
+        
+        bool ValidateCascadeBorders(const std::vector<float> cascadeBorders)
+        {
+            if(!std::is_sorted(cascadeBorders.cbegin(), cascadeBorders.cend()))
+            {
+                return false;
+            }
+            
+            return true;
         }
     }
 
@@ -93,9 +103,10 @@ namespace Feng
         shadowSetup.directLightShadowDebugMaterial = directLightShadowDebugMaterial;
     }
     
-    void RenderSystem::SetCascadesCount(int32_t aCascadesCount)
+    void RenderSystem::SetCascadeBorders(std::vector<float> aCascadeBorders)
     {
-        shadowSetup.cascadesCount = std::clamp(aCascadesCount, 1, 4);
+        bool validCascades = SRenderSystem::ValidateCascadeBorders(aCascadeBorders);
+        shadowSetup.cascadeBorders = validCascades ? aCascadeBorders : std::vector<float>();
     }
     
     void RenderSystem::SetDirectionalShadowLight(Entity *light)
@@ -408,9 +419,9 @@ namespace Feng
     {
         FrameBuffer::Settings bufferSettings;
         bufferSettings.size = Screen::ScreenSize;
-        bufferSettings.color = FrameBuffer::eAttachementState::Texture;
-        bufferSettings.depth = FrameBuffer::eAttachementState::Buffer;
-        bufferSettings.stencil = FrameBuffer::eAttachementState::Buffer;
+        bufferSettings.color = FrameBuffer::eAttachement::Texture2d;
+        bufferSettings.depth = FrameBuffer::eAttachement::Buffer;
+        bufferSettings.stencil = FrameBuffer::eAttachement::Buffer;
         bufferSettings.multisample = multisample;
         bufferSettings.combinedDepthStencil = true;
         
@@ -421,9 +432,9 @@ namespace Feng
     {
         FrameBuffer::Settings bufferSettings;
         bufferSettings.size = shadowSetup.size;
-        bufferSettings.color = FrameBuffer::eAttachementState::None;
-        bufferSettings.depth = FrameBuffer::eAttachementState::Texture;
-        bufferSettings.stencil = FrameBuffer::eAttachementState::None;
+        bufferSettings.color = FrameBuffer::eAttachement::None;
+        bufferSettings.depth = FrameBuffer::eAttachement::Texture2d;
+        bufferSettings.stencil = FrameBuffer::eAttachement::None;
         bufferSettings.multisample = false;
         bufferSettings.combinedDepthStencil = false;
 
@@ -434,12 +445,11 @@ namespace Feng
     {
         FrameBuffer::Settings bufferSettings;
         bufferSettings.size = shadowSetup.size;
-        bufferSettings.color = FrameBuffer::eAttachementState::None;
-        bufferSettings.depth = FrameBuffer::eAttachementState::Texture;
-        bufferSettings.stencil = FrameBuffer::eAttachementState::None;
+        bufferSettings.color = FrameBuffer::eAttachement::None;
+        bufferSettings.depth = FrameBuffer::eAttachement::Cubemap;
+        bufferSettings.stencil = FrameBuffer::eAttachement::None;
         bufferSettings.multisample = false;
         bufferSettings.combinedDepthStencil = false;
-        bufferSettings.isDepthCubemap = true;
 
         return fboPool.Pop(bufferSettings);
     }
