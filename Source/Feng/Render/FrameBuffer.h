@@ -25,6 +25,7 @@ namespace Feng
             eAttachement color = eAttachement::None;
             eAttachement depth = eAttachement::None;
             eAttachement stencil = eAttachement::None;
+            uint32_t depth2dArraySize = 0;
             bool multisample = false;
             bool combinedDepthStencil = false;
         };

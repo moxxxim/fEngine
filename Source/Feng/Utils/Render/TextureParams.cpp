@@ -1,7 +1,9 @@
 #include <Feng/Utils/Render/TextureParams.h>
 
 #include <Feng/ResourcesManager/Texture.h>
+#include <Feng/Utils/Debug.h>>
 #include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 
 namespace Feng
 {
@@ -14,7 +16,13 @@ namespace Feng
 
             case eTextureType::Cubemap:
                 return GL_TEXTURE_CUBE_MAP;
+
+            case eTextureType::Array2d:
+                return GL_TEXTURE_2D_ARRAY;
         }
+        
+        Debug::LogError("Invalid texture type specified.");
+        return 0;
     }
 
     GLint ToOpenGLValue(eTextureWrapping wrapping)
@@ -33,6 +41,9 @@ namespace Feng
             case eTextureWrapping::ClampToBorder:
                 return GL_CLAMP_TO_BORDER;
         }
+        
+        Debug::LogError("Invalid wrapping specified.");
+        return 0;
     }
 
     GLint ToOpenGLValue(eTextureMinFilter minFilter)
@@ -57,6 +68,9 @@ namespace Feng
             case eTextureMinFilter::LinearMipLinear:
                 return GL_LINEAR_MIPMAP_LINEAR;
         }
+        
+        Debug::LogError("Invalid minification filter specified.");
+        return 0;
     }
 
     GLint ToOpenGLValue(eTextureMagFilter magFilter)
@@ -69,6 +83,9 @@ namespace Feng
             case eTextureMagFilter::Linear:
                 return GL_LINEAR;
         }
+        
+        Debug::LogError("Invalid magnification filter specified.");
+        return 0;
     }
 
     GLenum GetTextureFormat(const Texture& texture)

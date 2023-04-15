@@ -11,6 +11,7 @@ namespace Feng
     public:
         static constexpr std::string_view CamUniformBlock {"ubCamera"};
         static constexpr std::string_view ViewProjMatrix {"uViewProjMatrix"};
+        static constexpr std::string_view ViewMatrix {"uViewMatrix"};
         static constexpr std::string_view ProjMatrix {"uProjMatrix"};
         static constexpr std::string_view CameraPos {"uCamPos"};
         static constexpr std::string_view CameraDir {"uCamDir"};
@@ -38,11 +39,11 @@ namespace Feng
         static constexpr std::string_view ScreenColorOriginal {"uScreenColorOriginal"};
         static constexpr std::string_view ScreenDepthOriginal {"uScreenDepthOriginal"};
         static constexpr std::string_view ScreenColorProcessed {"uScreenColorProcessed"};
-        static constexpr std::string_view DirectShadowLightView {"uShadowLightView"};
-        static constexpr std::string_view DirectShadowLightViewProj {"uShadowLightViewProj"};
+        static constexpr std::string_view DirectShadowLightViewProj {"uDirShadowLightViewProj[0]"};
         static constexpr std::string_view OmniShadowLightViewProj {"uOmniShadowLightViewProj[0]"};
         static constexpr std::string_view DirectShadowMap {"uDirectShadowMap"};
         static constexpr std::string_view PointShadowMap {"uPointShadowMap"};
+        static constexpr std::string_view CascadesCount {"uCascadesCount"};
 
         static constexpr std::string_view VertexPos {"aPos"};
         static constexpr std::string_view VertexUv0 {"aUv0"};

@@ -21,9 +21,26 @@ namespace Feng
 {
     namespace SMeshRenderer
     {
-        Matrix4 GetShadowCastLightProjectionMatrix(const RenderProperties &renderProperties, const Matrix4& lightViewMatrix)
+        Matrix4 GetCamViewProjInverse(const RenderProperties &renderProperties, const std::pair<float, float>& nearFar)
         {
-            std::array<Vector4, 8> camFrustum = Render::GetFrustumXyzMinMax(*renderProperties.cam);
+            const float camFov = renderProperties.cam->GetFovY();
+            const float camAspect = renderProperties.cam->GetAspectRatio();
+            const Matrix4 camTransform = renderProperties.cam->GetEntity()->GetComponent<Transform>()->GetGlobalMatrix();
+            const Matrix4 projection = Mat4::MakePerspectiveProjection(camFov, camAspect, nearFar.first, nearFar.second);
+            Matrix4 projectionInverted;
+            std::ignore = projection.TryInvert(projectionInverted);
+            
+            return projectionInverted * camTransform;
+        }
+        
+        Matrix4 GetShadowCastLightProjectionMatrix(
+                                                   const RenderProperties &renderProperties,
+                                                   const Matrix4& lightViewMatrix,
+                                                   const std::pair<float, float>& nearFar)
+        {
+            Matrix4 camViewProjInverse = GetCamViewProjInverse(renderProperties, nearFar);
+            std::array<Vector4, 8> camFrustum = Render::GetFrustumXyzMinMax(camViewProjInverse);
+
             float minX = std::numeric_limits<float>::max();
             float maxX = std::numeric_limits<float>::lowest();
             float minY = std::numeric_limits<float>::max();
@@ -51,6 +68,41 @@ namespace Feng
         {
             const Transform *lightTransform = light->GetComponent<Transform>();
             return Mat4::MakeTransformation(Vector3::One, Vector3::Zero, lightTransform->GetRotation().Inverse());
+        }
+ 
+        std::vector<std::pair<float, float>> CalculateCascadesNeraFar(const RenderProperties &renderProperties)
+        {
+            std::vector<std::pair<float, float>> cascadesNearFar;
+            
+            float minNear = renderProperties.cam->GetNearClipPlane();
+            float maxFar = renderProperties.cam->GetFarClipPlane();
+            float near = minNear;
+            for(int i = 0; i < renderProperties.cascadeBorders.size(); ++i)
+            {
+                float cascadeBorder = renderProperties.cascadeBorders[i];
+                float far = minNear + (maxFar - minNear) * cascadeBorder;
+                cascadesNearFar.push_back(std::make_pair(near, far));
+                near = far;
+            }
+            
+            cascadesNearFar.push_back(std::make_pair(near, maxFar));
+
+            return cascadesNearFar;
+        }
+        
+        std::vector<Matrix4> GetDirectShadowMatrices(const RenderProperties &renderProperties)
+        {
+            std::vector<Matrix4> cascadeMatrices;
+
+            std::vector<std::pair<float, float>> cascadesNearFar = CalculateCascadesNeraFar(renderProperties);
+            Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
+            for(const std::pair<float, float>& nearFar : cascadesNearFar)
+            {
+                Matrix4 lightProjection = GetShadowCastLightProjectionMatrix(renderProperties, lightViewMatrix, nearFar);
+                cascadeMatrices.push_back(lightViewMatrix * lightProjection);
+            }
+            
+            return cascadeMatrices;
         }
         
         std::vector<Matrix4> GetOmnidirectionalShadowLightMatrices(const Entity* lightEntity)
@@ -449,11 +501,8 @@ namespace Feng
         const Shader *shader = workingMaterial.GetShader();
         if(renderProperties.directShadowLight)
         {
-            Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
-            Matrix4 lightProjection = GetShadowCastLightProjectionMatrix(renderProperties, lightViewMatrix);
-            Matrix4 lightViewProjectionMatrix = lightViewMatrix * lightProjection;
-            shader->SetUniformMatrix4(ShaderParams::DirectShadowLightView.data(), lightViewMatrix);
-            shader->SetUniformMatrix4(ShaderParams::DirectShadowLightViewProj.data(), lightViewProjectionMatrix);
+            std::vector<Matrix4> lightViewProjectionMatrices = SMeshRenderer::GetDirectShadowMatrices(renderProperties);
+            shader->SetUniformMatrices4(ShaderParams::DirectShadowLightViewProj.data(), lightViewProjectionMatrices);
         }
 
         if(renderProperties.pointShadowLight)

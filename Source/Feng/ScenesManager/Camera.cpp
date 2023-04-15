@@ -30,6 +30,17 @@ namespace Feng
         far = aFar;
     }
 
+    Matrix4 Camera::GetViewMatrix() const
+    {
+        const Matrix4 myTransformMatrix = GetGlobalTransformMatrix();
+
+        Matrix4 transformInverted;
+        std::ignore = myTransformMatrix.TryInvert(transformInverted);
+
+        // TODO: m.alekseev Ignore scale.
+        return transformInverted;
+    }
+    
     Matrix4 Camera::GetProjectionMatrix() const
     {
         //return Mat4::MakeOrthogonalProjection(-5, 5, -5, 5, -50, 50);
@@ -53,17 +64,6 @@ namespace Feng
         std::ignore = projection.TryInvert(projectionInverted);
         
         return projectionInverted * myTransformMatrix;
-    }
-
-    Matrix4 Camera::GetViewMatrix() const
-    {
-        const Matrix4 myTransformMatrix = GetGlobalTransformMatrix();
-
-        Matrix4 transformInverted;
-        std::ignore = myTransformMatrix.TryInvert(transformInverted);
-
-        // TODO: m.alekseev Ignore scale.
-        return transformInverted;
     }
     
     Matrix4 Camera::GetGlobalTransformMatrix() const

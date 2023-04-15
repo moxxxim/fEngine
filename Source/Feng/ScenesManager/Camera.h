@@ -22,6 +22,7 @@ namespace Feng
 	    float GetFarClipPlane() const;
 	    void SetFarClipPlane(float aFar);
         
+        Matrix4 GetViewMatrix() const;
         Matrix4 GetProjectionMatrix() const;
         Matrix4 GetViewProjectionMatrix() const;
         Matrix4 GetViewProjectionMatrixInverse() const;
@@ -36,7 +37,6 @@ namespace Feng
         static constexpr float DefaultNear = 1.f;
         static constexpr float DefaultFar = 10.f;
 
-        Matrix4 GetViewMatrix() const;
         Matrix4 GetGlobalTransformMatrix() const;
 
         float aspectRatio = DefaultAspectRatio;;

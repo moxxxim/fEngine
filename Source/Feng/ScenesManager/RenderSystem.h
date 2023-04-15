@@ -56,7 +56,6 @@ namespace Feng
             Size2ui size { DefaultShadowMapSize, DefaultShadowMapSize };
             FrameBuffer directShadowMap;
             FrameBuffer pointShadowMap;
-            std::vector<float> cascadeBorders;
         };
         
         bool IsShadowsEnabled();

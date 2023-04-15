@@ -23,7 +23,12 @@ struct SpotLight
 
 // Material.
 uniform sampler2D uTexture0;
-uniform sampler2D uDirectShadowMap;
+
+// Shadows.
+uniform sampler2DArray uDirectShadowMap;
+uniform mat4 uDirShadowLightViewProj[16];
+uniform float uCascadeDistances[16];
+uniform int uCascadesCount = 1;
 uniform samplerCube uPointShadowMap;
 uniform float uFarClipPlane;
 
@@ -32,9 +37,29 @@ uniform PointLight uPointLight;
 uniform DirectLight uDirectLight;
 uniform SpotLight uSpotLight;
 
+layout (std140) uniform ubCamera
+{
+                            // base alignment (size occupied)       // aligned offset (multiple of a base alignment)
+    mat4 uViewMatrix;       // 4 * 4 = 16                               0   (col #1)
+                            // 4 * 4 = 16                               16  (col #2)
+                            // 4 * 4 = 16                               32  (col #3)
+                            // 4 * 4 = 16                               48  (col #4)
+
+    mat4 uProjMatrix;       // 4 * 4 = 16                               64  (col #1)
+                            // 4 * 4 = 16                               80  (col #2)
+                            // 4 * 4 = 16                               96  (col #3)
+                            // 4 * 4 = 16                               112 (col #4)
+
+    mat3 uCamRotation;      // 4 * 4 = 16                               128 (col #1)
+                            // 4 * 4 = 16                               144 (col #2)
+                            // 4 * 4 = 16                               160 (col #3)
+    vec3 uCamPos;           // 4 * 4 = 16                               176
+    vec3 uCamDir;           // 4 * 4 = 16                               192
+                            // Total            208
+};
+
 in VsOut
 {
-    vec4 FragPosLightSpace;
     vec3 FragPos;
     vec3 Norm;
     vec2 Uv0;
@@ -44,16 +69,40 @@ out vec4 FragColor;
 
 const float gamma = 2.2f;
 
+int CalculateShadowMapLayer(vec3 fragPosWorld)
+{
+    int layer = -1;
+
+    vec4 fragPosViewSpace = uViewMatrix * vec4(fragPosWorld, 1.0);
+    float depthValue = abs(fragPosViewSpace.z);
+    
+    for (int i = 0; i < uCascadesCount; ++i)
+    {
+        if (depthValue < uCascadeDistances[i])
+        {
+            layer = i;
+            break;
+        }
+    }
+
+    if (layer == -1)
+    {
+        layer = uCascadesCount - 1;
+    }
+
+    return layer;
+}
+
 vec3 CalculateNdcFragPos01(vec4 fragPosLightSpace)
 {
     vec3 ndcFragPos = fragPosLightSpace.xyz / fragPosLightSpace.w;
     return ndcFragPos * 0.5 + 0.5;
 }
 
-float CalculateDirectShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffset)
+float CalculateDirectShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffset, int layer)
 {
     vec3 fragPos01 = CalculateNdcFragPos01(fragPosLightSpace);
-    float shadowDepth = texture(uDirectShadowMap, fragPos01.xy + uvOffset).r;
+    float shadowDepth = texture(uDirectShadowMap, vec3(fragPos01.xy + uvOffset, layer)).r;
     float fragmentDepth = fragPos01.z;
 
     const float bias = 0.001f;
@@ -64,16 +113,19 @@ float CalculateDirectShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffs
 }
 
 // 0.f - fragment is in shadow, 1.f - fragment not in shadow.
-float CalculateDirectShadowMultiplier(vec4 fragPosLightSpace)
+float CalculateDirectShadowMultiplier()
 {
     float shadowMultiplier = 0.f;
-    vec2 texelSize = 1.0f / textureSize(uDirectShadowMap, 0);
+
+    int shadowMapLayer = CalculateShadowMapLayer(fsIn.FragPos);
+    vec4 fragPosLightSpace = uDirShadowLightViewProj[shadowMapLayer] * vec4(fsIn.FragPos, 1.0);
+    vec2 texelSize = 1.0f / textureSize(uDirectShadowMap, 0).xy;
     for(int x = -1; x <= 1; ++x)
     {
         for(int y = -1; y <= 1; ++y)
         {
             vec2 uvOffset = vec2(x, y) * texelSize;
-            shadowMultiplier += CalculateDirectShadowMultiplierPcfPart(fragPosLightSpace, uvOffset);
+            shadowMultiplier += CalculateDirectShadowMultiplierPcfPart(fragPosLightSpace, uvOffset, shadowMapLayer);
         }    
     }
 
@@ -150,7 +202,7 @@ void main()
 
     vec3 norm = normalize(fsIn.Norm);
 
-    float directShadowValue = CalculateDirectShadowMultiplier(fsIn.FragPosLightSpace);
+    float directShadowValue = CalculateDirectShadowMultiplier();
     float pointShadowValue = CalculatePointShadowMultiplier(uPointLight, fsIn.FragPos);
 
     vec3 lightColor = directShadowValue * CalculateDirLight(uDirectLight, norm);

@@ -15,6 +15,7 @@ namespace Feng
     {
         static constexpr uint32_t CamBufferBinding = 0;
         
+        std::vector<float> cascadeBorders;
         Camera *cam = nullptr;
         Light *directLight = nullptr;
         Light *pointLight = nullptr;
@@ -23,6 +24,5 @@ namespace Feng
         Entity *pointShadowLight = nullptr;
         Vector4 ambientColorAndIntencity = Vector4 {1.f, 1.f, 1.f, 1.f};
         Size2ui shadowMapSize = {};
-        bool useShadows = false;
     };
 }

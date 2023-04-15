@@ -115,7 +115,7 @@ namespace Feng
                             GL_DEPTH_COMPONENT32F,
                             settings.size.width,
                             settings.size.height,
-                            1,
+                            settings.depth2dArraySize,
                             0,
                             GL_DEPTH_COMPONENT,
                             GL_FLOAT,

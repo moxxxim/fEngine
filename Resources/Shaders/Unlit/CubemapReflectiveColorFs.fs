@@ -3,7 +3,7 @@
 layout (std140) uniform ubCamera
 {
                             // base alignment (size occupied)       // aligned offset (multiple of a base alignment)
-    mat4 uViewProjMatrix;   // 4 * 4 = 16                               0   (col #1)
+    mat4 uViewMatrix;       // 4 * 4 = 16                               0   (col #1)
                             // 4 * 4 = 16                               16  (col #2)
                             // 4 * 4 = 16                               32  (col #3)
                             // 4 * 4 = 16                               48  (col #4)

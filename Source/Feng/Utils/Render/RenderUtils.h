@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Feng/Math/Vector4.h>
+#include <Feng/Math/Matrix4.h>
 #include <Feng/Render/VertexBuffer.h>
 #include <Feng/Utils/Render/MeshParams.h>
 #include <Feng/Utils/Render/TextureParams.h>
@@ -37,6 +38,6 @@ namespace Feng
         void LoadTextureData(const Texture& texture);
         GLenum ToOpenGLValue(eShaderType shaderType);
         VertexBuffer CreateQuadBuffer();
-        std::array<Vector4, 8> GetFrustumXyzMinMax(const Camera& camera);
+        std::array<Vector4, 8> GetFrustumXyzMinMax(const Matrix4& camViewProjInverse);
     }
 }

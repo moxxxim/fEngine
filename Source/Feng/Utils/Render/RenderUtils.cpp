@@ -147,6 +147,7 @@ namespace Feng::Render
         GLenum target = ToOpenGLValue(textureType);
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(target, textureBuffer);
+        Print_Errors_OpengGL();
         
         const Shader* shader = material.GetShader();
         shader->SetUniformInt(name.data(), unit);
@@ -266,10 +267,9 @@ namespace Feng::Render
         return buffer;
     }
     
-    std::array<Vector4, 8> GetFrustumXyzMinMax(const Camera& camera)
+    std::array<Vector4, 8> GetFrustumXyzMinMax(const Matrix4& camViewProjInverse)
     {
         std::array<Vector4, 8> corners;
-        Matrix4 camViewProjInverse = camera.GetViewProjectionMatrixInverse();
 
         int32_t i = 0;
         for(int x = 0; x < 2; ++x)

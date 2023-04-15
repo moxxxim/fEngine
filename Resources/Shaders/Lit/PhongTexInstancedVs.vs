@@ -8,7 +8,7 @@ layout (location = 3) in mat4 aModelMatrix;
 layout (std140) uniform ubCamera
 {
                             // base alignment (size occupied)       // aligned offset (multiple of a base alignment)
-    mat4 uViewProjMatrix;   // 4 * 4 = 16                               0   (col #1)
+    mat4 uViewMatrix;       // 4 * 4 = 16                               0   (col #1)
                             // 4 * 4 = 16                               16  (col #2)
                             // 4 * 4 = 16                               32  (col #3)
                             // 4 * 4 = 16                               48  (col #4)
@@ -26,11 +26,12 @@ layout (std140) uniform ubCamera
                             // Total            208
 };
 
-uniform mat4 uShadowLightViewProj;
+uniform mat4 uDirShadowLightViewProj[3];
+uniform float uCascadeDistances[16];
+uniform int uCascadesCount = 1;
 
 out VsOut
 {
-    vec4 FragPosLightSpace;
     vec3 FragPos;
     vec3 Norm;
     vec2 Uv0;
@@ -39,9 +40,8 @@ out VsOut
 void main()
 {
     vec4 worlPos = aModelMatrix * vec4(aPos, 1.0);
-    gl_Position = uViewProjMatrix * worlPos;
+    gl_Position = uProjMatrix * uViewMatrix * worlPos;
     vsOut.FragPos = worlPos.xyz;
-    vsOut.FragPosLightSpace = uShadowLightViewProj * vec4(vsOut.FragPos, 1.0);
     // Inverse is a costly operation, it should not be used in shader.
     vsOut.Norm = transpose(inverse(mat3(aModelMatrix))) * aNorm;
     vsOut.Uv0 = aUv0;

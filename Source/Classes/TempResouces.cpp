@@ -36,6 +36,7 @@ namespace
     constexpr const char *CubemapRefractionVs = "Unlit/CubemapRefractionColorVs.vs";
     
     constexpr const char *ShadowPassVs = "Utils/ShadowPassVs.vs";
+    constexpr const char *ShadowPassGs = "Utils/ShadowPassGs.gs";
     constexpr const char *OmniShadowPassVs = "Utils/OmniShadowPassVs.vs";
     constexpr const char *OmniShadowPassFs = "Utils/OmniShadowPassFs.fs";
     constexpr const char *OmniShadowPassGs = "Utils/OmniShadowPassGs.gs";
@@ -266,7 +267,7 @@ namespace
         test::res.CubemapRefractionMaterial->SetTexture(ShaderParams::Texture0.data(), test::res.SkyboxTexture.get());
         test::res.CubemapRefractionMaterial->SetTransparent(false);
         
-        test::res.DirectShadowPassMaterial = std::make_unique<Material>(LoadShader(ShadowPassVs, EmptyFs));
+        test::res.DirectShadowPassMaterial = std::make_unique<Material>(LoadShader(ShadowPassVs, EmptyFs, ShadowPassGs));
         test::res.OmniShadowPassMaterial = std::make_unique<Material>(LoadShader(OmniShadowPassVs, OmniShadowPassFs, OmniShadowPassGs));
         test::res.ShadowMapDrawMaterial = std::make_unique<Material>(LoadShader(PostEffectVs, ShadowMapDrawFs));
     }

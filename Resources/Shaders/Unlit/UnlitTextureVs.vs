@@ -6,7 +6,7 @@ layout (location = 1) in vec2 aUv0;
 layout (std140) uniform ubCamera
 {
                             // base alignment (size occupied)       // aligned offset (multiple of a base alignment)
-    mat4 uViewProjMatrix;   // 4 * 4 = 16                               0   (col #1)
+    mat4 uViewMatrix;       // 4 * 4 = 16                               0   (col #1)
                             // 4 * 4 = 16                               16  (col #2)
                             // 4 * 4 = 16                               32  (col #3)
                             // 4 * 4 = 16                               48  (col #4)
@@ -30,6 +30,6 @@ out vec2 varUv0;
 
 void main()
 {
-    gl_Position = uViewProjMatrix * uModelMatrix * vec4(aPos, 1.0);
+    gl_Position = uProjMatrix * uViewMatrix * uModelMatrix * vec4(aPos, 1.0);
     varUv0 = aUv0;
 }

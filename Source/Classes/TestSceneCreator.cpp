@@ -279,6 +279,7 @@ namespace test
                                                          res.DirectShadowPassMaterial.get(),
                                                          res.OmniShadowPassMaterial.get(),
                                                          res.ShadowMapDrawMaterial.get());
+            scene->GetRenderSystem()->SetCascadeBorders({0.33f, 0.66f});
             CreateObjects(*scene);
 
             return scene;

@@ -62,8 +62,16 @@ namespace Feng
         
         bool ValidateCascadeBorders(const std::vector<float> cascadeBorders)
         {
+            static constexpr uint32_t cascadesCount = 3;
+            
             if(!std::is_sorted(cascadeBorders.cbegin(), cascadeBorders.cend()))
             {
+                return false;
+            }
+            
+            if(cascadeBorders.size() != 2)
+            {
+                Debug::LogError("There only execty 3 shadow cascades supported, i.e. 2 cascade borders.");
                 return false;
             }
             
@@ -106,7 +114,7 @@ namespace Feng
     void RenderSystem::SetCascadeBorders(std::vector<float> aCascadeBorders)
     {
         bool validCascades = SRenderSystem::ValidateCascadeBorders(aCascadeBorders);
-        shadowSetup.cascadeBorders = validCascades ? aCascadeBorders : std::vector<float>();
+        renderProperties.cascadeBorders = validCascades ? aCascadeBorders : std::vector<float>{ 0.33f, 0.66f };
     }
     
     void RenderSystem::SetDirectionalShadowLight(Entity *light)
@@ -221,7 +229,7 @@ namespace Feng
         const Entity *camEntity = renderProperties.cam->GetEntity();
         const Transform *camTransform = camEntity->GetComponent<Transform>();
 
-        const Matrix4 viewProjMatrix = renderProperties.cam->GetViewProjectionMatrix();
+        const Matrix4 viewMatrix = renderProperties.cam->GetViewMatrix();
         const Matrix4 projMatrix = renderProperties.cam->GetProjectionMatrix();
         const Quaternion& camRotation = camTransform->GetRotation();
         const Matrix3 camRotationMat = camRotation.ToMatrix3();
@@ -231,7 +239,7 @@ namespace Feng
         glBindBuffer(GL_UNIFORM_BUFFER, camUbo);
         glBindBufferBase(GL_UNIFORM_BUFFER, RenderProperties::CamBufferBinding, camUbo);
         // Offsets are specified in shader's uniform block layout.
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4), viewProjMatrix.data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4), viewMatrix.data);
         glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(Matrix4), projMatrix.data);
         glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(Vector3), camRotationMat.rows[0].data);
         glBufferSubData(GL_UNIFORM_BUFFER, 144, sizeof(Vector3), camRotationMat.rows[1].data);
@@ -316,7 +324,7 @@ namespace Feng
 
         glActiveTexture(GL_TEXTURE0);
         Print_Errors_OpengGL();
-        glBindTexture(GL_TEXTURE_2D, shadowSetup.directShadowMap.depth);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, shadowSetup.directShadowMap.depth);
         Print_Errors_OpengGL();
         shader->SetUniformInt(ShaderParams::DirectShadowMap.data(), 0);
         Print_Errors_OpengGL();
@@ -361,7 +369,7 @@ namespace Feng
     {
         for(MeshRenderer *renderer : renderersOpaque)
         {
-            renderer->AddExternalTexture(ShaderParams::DirectShadowMap, eTextureType::Tex2d, shadowSetup.directShadowMap.depth);
+            renderer->AddExternalTexture(ShaderParams::DirectShadowMap, eTextureType::Array2d, shadowSetup.directShadowMap.depth);
             renderer->AddExternalTexture(ShaderParams::PointShadowMap, eTextureType::Cubemap, shadowSetup.pointShadowMap.depth);
             renderer->Draw(renderProperties, false);
         }
@@ -433,10 +441,11 @@ namespace Feng
         FrameBuffer::Settings bufferSettings;
         bufferSettings.size = shadowSetup.size;
         bufferSettings.color = FrameBuffer::eAttachement::None;
-        bufferSettings.depth = FrameBuffer::eAttachement::Texture2d;
+        bufferSettings.depth = FrameBuffer::eAttachement::Texture2dArray;
         bufferSettings.stencil = FrameBuffer::eAttachement::None;
         bufferSettings.multisample = false;
         bufferSettings.combinedDepthStencil = false;
+        bufferSettings.depth2dArraySize = renderProperties.cascadeBorders.size() + 1;
 
         return fboPool.Pop(bufferSettings);
     }
