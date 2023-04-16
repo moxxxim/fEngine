@@ -15,7 +15,7 @@ void DirectionalLightMovement::Update(float deltaTime)
         Feng::Vector3 startXz = start - Feng::Vector3{0.f, start.y, 0.f};
         radius = startXz.Length();
         height = start.y;
-        yStartAngleRad = acos(Feng::Vector3::Dot(Feng::Vector3::OneZ, startXz.ToNormalized()));
+        yStartAngleRad = acos(Feng::Vector3::Dot(myTransform->GetForward(), startXz.ToNormalized()));
         float acosX = acos(Feng::Vector3::Dot(Feng::Vector3::OneX, startXz.ToNormalized()));
         if(acosX > Feng::Math::Pi / 2)
         {
@@ -38,6 +38,6 @@ void DirectionalLightMovement::Update(float deltaTime)
     myTransform->SetPosition(position);
 
     Feng::Quaternion xRotation { Feng::Vector3::OneX, xAngleDeg };
-    Feng::Quaternion yRotation { Feng::Vector3::OneY, Feng::Math::RadToDeg(yAngleRad) + 180};
+    Feng::Quaternion yRotation { Feng::Vector3::OneY, Feng::Math::RadToDeg(yAngleRad)};
     myTransform->SetRotation(xRotation * yRotation);
 }

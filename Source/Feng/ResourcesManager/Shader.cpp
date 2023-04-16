@@ -140,6 +140,18 @@ namespace Feng
 
         return false;
     }
+    
+    bool Shader::SetUniformFloats(const char *name, std::vector<float> value) const
+    {
+        uint32_t location = UndefinedParamLocation;
+        if(TryGetUniformLocation(name, location))
+        {
+            glUniform1fv(location, static_cast<int32_t>(value.size()), value.data());
+            return true;
+        }
+
+        return false;
+    }
 
     bool Shader::SetUniformVector2(const char *name, const Vector2& value) const
     {

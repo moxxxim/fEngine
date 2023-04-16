@@ -44,6 +44,7 @@ namespace Feng
         static constexpr std::string_view DirectShadowMap {"uDirectShadowMap"};
         static constexpr std::string_view PointShadowMap {"uPointShadowMap"};
         static constexpr std::string_view CascadesCount {"uCascadesCount"};
+        static constexpr std::string_view CascadeDistances {"uCascadeDistances[0]"};
 
         static constexpr std::string_view VertexPos {"aPos"};
         static constexpr std::string_view VertexUv0 {"aUv0"};

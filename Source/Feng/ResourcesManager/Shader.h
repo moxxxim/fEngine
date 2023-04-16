@@ -40,6 +40,7 @@ namespace Feng
         bool SetUniformBool(const char *name, bool value) const;
         bool SetUniformInt(const char *name, int32_t value) const;
         bool SetUniformFloat(const char *name, float value) const;
+        bool SetUniformFloats(const char *name, std::vector<float> value) const;
         bool SetUniformVector2(const char *name, const Vector2& value) const;
         bool SetUniformVector3(const char *name, const Vector3& value) const;
         bool SetUniformVector4(const char *name, const Vector4& value) const;

@@ -69,37 +69,38 @@ namespace Feng
             const Transform *lightTransform = light->GetComponent<Transform>();
             return Mat4::MakeTransformation(Vector3::One, Vector3::Zero, lightTransform->GetRotation().Inverse());
         }
- 
-        std::vector<std::pair<float, float>> CalculateCascadesNeraFar(const RenderProperties &renderProperties)
+
+        std::vector<float> CalculateCascadeFarDistances(const RenderProperties &renderProperties)
         {
-            std::vector<std::pair<float, float>> cascadesNearFar;
+            std::vector<float> distances;
             
             float minNear = renderProperties.cam->GetNearClipPlane();
             float maxFar = renderProperties.cam->GetFarClipPlane();
-            float near = minNear;
             for(int i = 0; i < renderProperties.cascadeBorders.size(); ++i)
             {
                 float cascadeBorder = renderProperties.cascadeBorders[i];
                 float far = minNear + (maxFar - minNear) * cascadeBorder;
-                cascadesNearFar.push_back(std::make_pair(near, far));
-                near = far;
+                distances.push_back(far);
             }
             
-            cascadesNearFar.push_back(std::make_pair(near, maxFar));
+            distances.push_back(maxFar);
 
-            return cascadesNearFar;
+            return distances;
         }
         
-        std::vector<Matrix4> GetDirectShadowMatrices(const RenderProperties &renderProperties)
+        std::vector<Matrix4> GetDirectShadowMatrices(const RenderProperties &renderProperties,
+                                                     std::vector<float> farDistances)
         {
             std::vector<Matrix4> cascadeMatrices;
 
-            std::vector<std::pair<float, float>> cascadesNearFar = CalculateCascadesNeraFar(renderProperties);
             Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
-            for(const std::pair<float, float>& nearFar : cascadesNearFar)
+            float near = renderProperties.cam->GetNearClipPlane();
+            for(int i = 0; i < farDistances.size(); ++i)
             {
+                std::pair<float, float> nearFar = std::make_pair(near, farDistances[i]);
                 Matrix4 lightProjection = GetShadowCastLightProjectionMatrix(renderProperties, lightViewMatrix, nearFar);
                 cascadeMatrices.push_back(lightViewMatrix * lightProjection);
+                near = nearFar.second;
             }
             
             return cascadeMatrices;
@@ -502,8 +503,12 @@ namespace Feng
         const Shader *shader = workingMaterial.GetShader();
         if(renderProperties.directShadowLight)
         {
-            std::vector<Matrix4> lightViewProjectionMatrices = SMeshRenderer::GetDirectShadowMatrices(renderProperties);
+            std::vector<float> farDistances = CalculateCascadeFarDistances(renderProperties);
+            std::vector<Matrix4> lightViewProjectionMatrices = SMeshRenderer::GetDirectShadowMatrices(
+                                                                                                      renderProperties,
+                                                                                                      farDistances);
             shader->SetUniformMatrices4(ShaderParams::DirectShadowLightViewProj.data(), lightViewProjectionMatrices);
+            shader->SetUniformFloats(ShaderParams::CascadeDistances.data(), farDistances);
             shader->SetUniformInt(
                                   ShaderParams::CascadesCount.data(),
                                   static_cast<int32_t>(renderProperties.cascadeBorders.size()) + 1);

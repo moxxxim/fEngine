@@ -111,7 +111,7 @@ namespace test
                                                     Light::eType::Directional,
                                                     material.get(),
                                                     test::res.CubeMesh.get());
-            //lightEntity.AddComponent<DirectionalLightMovement>();
+            lightEntity.AddComponent<DirectionalLightMovement>();
 
             Light* light = lightEntity.GetComponent<Light>();
             lightMaterials[light] = std::move(material);
@@ -148,7 +148,7 @@ namespace test
             
             scene.GetRenderSystem()->SetPointShadowLight(&lightEntity);
 
-            //std::ignore = lightEntity.AddComponent<GameObjectSliderX>();
+            std::ignore = lightEntity.AddComponent<GameObjectSliderX>();
             Transform *lightTransform = lightEntity.GetComponent<Transform>();
             lightTransform->SetPosition(0.f, 1.f, -2.f);
         }
@@ -177,9 +177,9 @@ namespace test
             lightTransform->SetPosition(5.f, 4.f, -2.f);
             lightTransform->SetRotation(Quaternion{Vector3::OneY, 90});
 
-//            GameObjectRotation& lightRotation = lightEntity.AddComponent<GameObjectRotation>();
-//            lightRotation.SetAxis(Feng::Vector3::OneX);
-//            lightRotation.SetPeriod(4.f);
+            GameObjectRotation& lightRotation = lightEntity.AddComponent<GameObjectRotation>();
+            lightRotation.SetAxis(Feng::Vector3::OneX);
+            lightRotation.SetPeriod(4.f);
         }
 
         Feng::Entity* CreateObject(
@@ -279,7 +279,7 @@ namespace test
                                                          res.DirectShadowPassMaterial.get(),
                                                          res.OmniShadowPassMaterial.get(),
                                                          res.ShadowMapDrawMaterial.get());
-            scene->GetRenderSystem()->SetCascadeBorders({0.33f, 0.66f});
+            scene->GetRenderSystem()->SetCascadeBorders({0.15f, 0.33f});
             CreateObjects(*scene);
 
             return scene;
