@@ -30,18 +30,40 @@ namespace test
         constexpr Feng::Vector3 planePos{0.f, -1.f, 0.f};
         constexpr Feng::Vector3 reflectiveCubePos{6.f, planePos.y + 0.6f, 0.f};
         
-        std::vector<Feng::Vector3> cubePositions =
+        struct CubeDesc final
         {
-            Feng::Vector3(-4.0f, 0.0f, 0.0f),
-            Feng::Vector3( 0.0f,  planePos.y + 0.6f,  -5.5f),
-            Feng::Vector3( 2.0f,  0.0f, 0.0f),
-            Feng::Vector3(-2.0f, 2.0f, 0.0f),
-            Feng::Vector3(0.0f, 2.0f, 0.0f),
-            Feng::Vector3(2.0f, 2.0f, 0.0f),
-            Feng::Vector3( -2.0f, 1.0f, -4.0f),
-            Feng::Vector3( 0.0f, 1.0f, -4.0f),
-            Feng::Vector3( 2.0f, 1.0f, -4.0f),
-            Feng::Vector3( -2.f, planePos.y + 0.6f, -1.f),
+            Feng::Vector3 pos {};
+            Feng::Quaternion rotation {};
+            std::string material;
+            bool rotating = false;
+        };
+        
+        Feng::Material *GetMaterial(std::string name)
+        {
+            if(name == "DiffTex1SpecTex2Material")
+            {
+                return test::res.DiffTex1SpecTex2Material.get();
+            }
+            else if (name == "SpecularTexMaterial")
+            {
+                return test::res.SpecularTexMaterial.get();
+            }
+            
+            return nullptr;
+        }
+
+        std::vector<CubeDesc> cubes =
+        {
+            { Feng::Vector3(-4.0f, 0.0f, 0.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", true },
+            { Feng::Vector3( 0.0f,  planePos.y + 0.6f,  -5.5f), Feng::Quaternion{}, "SpecularTexMaterial", false },
+            { Feng::Vector3( 2.0f,  0.0f, 0.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", true },
+            { Feng::Vector3(-2.0f, 2.0f, 0.0f), Feng::Quaternion{}, "SpecularTexMaterial", true },
+            { Feng::Vector3(0.0f, 2.0f, 0.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", false },
+            { Feng::Vector3(2.0f, 2.0f, 0.0f), Feng::Quaternion{}, "SpecularTexMaterial", false },
+            { Feng::Vector3( -2.0f, 1.0f, -4.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", true },
+            { Feng::Vector3( 0.0f, 1.0f, -4.0f), Feng::Quaternion{}, "SpecularTexMaterial", false },
+            { Feng::Vector3( 2.0f, 1.0f, -4.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", true },
+            { Feng::Vector3( -2.f, planePos.y + 0.6f, 0.f), Feng::Quaternion{}, "SpecularTexMaterial", false },
         };
 
         std::array<Feng::Vector3, 10> vegetationPositions
@@ -177,9 +199,9 @@ namespace test
             lightTransform->SetPosition(5.f, 4.f, -2.f);
             lightTransform->SetRotation(Quaternion{Vector3::OneY, 90});
 
-            GameObjectRotation& lightRotation = lightEntity.AddComponent<GameObjectRotation>();
-            lightRotation.SetAxis(Feng::Vector3::OneX);
-            lightRotation.SetPeriod(4.f);
+//            GameObjectRotation& lightRotation = lightEntity.AddComponent<GameObjectRotation>();
+//            lightRotation.SetAxis(Feng::Vector3::OneX);
+//            lightRotation.SetPeriod(4.f);
         }
 
         Feng::Entity* CreateObject(
@@ -220,19 +242,17 @@ namespace test
             CreateInstancedObject(scene, *test::res.CubeMesh);
 
             // Cubes.
-            for(int32_t i = 0; i < cubePositions.size(); ++i)
+            for(int32_t i = 0; i < cubes.size(); ++i)
             {
-                const Vector3& position = cubePositions[i];
+                const CubeDesc& cube = cubes[i];
                 std::string name = "cube " + std::to_string(i);
-                Material *material = ((i % 2) == 0)
-                    ? test::res.DiffTex1SpecTex2Material.get()
-                    : test::res.SpecularTexMaterial.get();
-                Entity* object = CreateObject(scene, position, name, *test::res.CubeMesh, *material, true);
-                if ((i % 2) == 0)
+                Feng::Material *material = GetMaterial(cube.material);
+                Entity* object = CreateObject(scene, cube.pos, name, *test::res.CubeMesh, *material, true);
+                if(cube.rotating)
                 {
                     GameObjectRotation& objectRotation = object->AddComponent<GameObjectRotation>();
                     objectRotation.SetAxis(Vector3::OneZ);
-                    objectRotation.SetPeriod(4.f);
+                    objectRotation.SetPeriod(6.f);
                 }
             }
             

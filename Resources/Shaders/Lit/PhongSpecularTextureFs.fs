@@ -71,6 +71,17 @@ in VsOut
 
 out vec4 FragColor;
 
+float CalculateDirectShadowBias(int layer)
+{
+    return 0.001f;
+}
+
+// 0.f - fragment is in shadow, 1.f - fragment not in shadow.
+float IsInShadow(float fragmentDepth, float shadowDepth, float bias)
+{
+    return step(fragmentDepth - bias, shadowDepth); // Gives 0.f if outside far clipping plane   
+}
+
 int CalculateShadowMapLayer(vec3 fragPosWorld)
 {
     int layer = -1;
@@ -107,10 +118,10 @@ float CalculateDirectShadowMultiplierPcfPart(vec4 fragPosLightSpace, vec2 uvOffs
     float shadowDepth = texture(uDirectShadowMap, vec3(fragPos01.xy + uvOffset, layer)).r;
     float fragmentDepth = fragPos01.z;
 
-    const float bias = 0.001f;
-    float shadowMultiplier = step(fragmentDepth - bias, shadowDepth); // Gives 0.f if outside far clipping plane
+    float bias = CalculateDirectShadowBias(layer);
+    float shadowMultiplier = IsInShadow(fragmentDepth, shadowDepth, bias);
     float afterClippingPlaneMultiplier = step(1.f, fragmentDepth); // 1.f if outside far clipping plane (as deisred)
-
+    
     return clamp(shadowMultiplier + afterClippingPlaneMultiplier, 0.f, 1.f);
 }
 
@@ -138,14 +149,14 @@ float CalculateDirectShadowMultiplier()
 float CalculatePointShadowMultiplier(PointLight light, vec3 fragPos)
 {
     vec3 fragToLight = fragPos - light.PositionAndRange.xyz;
-    float closestDepth = texture(uPointShadowMap, fragToLight).r;
+    float shadowDepth = texture(uPointShadowMap, fragToLight).r;
 
     // It is currently in linear range between [0,1]. Re-transform back to original value
-    closestDepth *= uFarClipPlane;
+    shadowDepth *= uFarClipPlane;
 
-    float fragDepth = length(fragToLight);
-    float bias = 0.005; 
-    return (fragDepth - bias) > closestDepth ? 0.0 : 1.0;
+    float fragmentDepth = length(fragToLight);
+    float bias = 0.05; 
+    return IsInShadow(fragmentDepth, shadowDepth, bias);
 }
 
 vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir)
