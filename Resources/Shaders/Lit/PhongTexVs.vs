@@ -27,10 +27,6 @@ layout (std140) uniform ubCamera
 
 uniform mat4 uModelMatrix;
 
-uniform mat4 uDirShadowLightViewProj[16];
-uniform float uCascadeDistances[16];
-uniform int uCascadesCount = 1;
-
 out VsOut
 {
     vec3 FragPos;

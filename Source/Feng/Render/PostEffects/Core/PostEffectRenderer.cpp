@@ -19,11 +19,11 @@ namespace Feng
 
     void PostEffectRenderer::Draw()
     {
-        const Shader *shader = material->GetShader();
+        Shader *shader = material->GetShader();
         shader->StartUse();
 
         SetupBufferedTextures();
-        Render::BindMaterialUniforms(*material, materialTextures, frameBufferTextures->size());
+        Render::ResolveBindings(*shader, material->Bindings(), materialTextures, frameBufferTextures->size());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         shader->StopUse();

@@ -16,18 +16,21 @@ namespace Feng
 {
     class Camera;
     class Material;
+    class Shader;
+    class ShaderBindings;
     class Texture;
     enum class eShaderType : uint8_t;
     
     namespace Render
     {
         uint32_t EnableVertexAttributes(eVertexAtributes attributesMask);
-        void BindMaterialUniforms(
-                                const Material &material,
-                                const std::map<std::string, uint32_t>& textureBuffers,
-                                uint32_t firstTextureUnit = 0);
+
+        void ResolveBindings(Shader& shader,
+                             const ShaderBindings& bindings,
+                             const std::map<std::string, uint32_t>& textureBuffers,
+                             uint32_t firstTextureUnit = 0);
         void BindTexture(
-                         const Material &material,
+                         const Shader &shader,
                          eTextureType textureType,
                          uint32_t unit,
                          const std::string_view& name,

@@ -317,8 +317,9 @@ namespace Feng
 
         glBindVertexArray(quadBuffer.vao);
 
-        const Shader *shader = shadowSetup.directLightShadowDebugMaterial->GetShader();
+        Shader *shader = shadowSetup.directLightShadowDebugMaterial->GetShader();
         shader->StartUse();
+        Render::ResolveBindings(*shader, renderProperties.globalBindigs, { });
         Render::SetDrawFace(eDrawFace::Cw);
         Print_Errors_OpengGL();
 

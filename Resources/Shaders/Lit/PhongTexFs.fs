@@ -28,7 +28,7 @@ uniform sampler2D uTexture0;
 uniform sampler2DArray uDirectShadowMap;
 uniform mat4 uDirShadowLightViewProj[16];
 uniform float uCascadeDistances[16];
-uniform int uCascadesCount = 1;
+uniform int uCascadesCount = 3;
 uniform samplerCube uPointShadowMap;
 uniform float uFarClipPlane;
 

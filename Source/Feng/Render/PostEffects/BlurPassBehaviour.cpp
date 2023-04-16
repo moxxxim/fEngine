@@ -56,6 +56,6 @@ namespace Feng
         float w = sqrt(2.0) / 2.0 * y;
         float pixelSize = m_blurStrength[passIndex];
         Vector4 step = Vector4(pixelSize * x, pixelSize * y, pixelSize * z, pixelSize * w);
-        material->SetVector4("u_step", step);
+        material->Bindings().SetVector4("u_step", step);
     }
 }

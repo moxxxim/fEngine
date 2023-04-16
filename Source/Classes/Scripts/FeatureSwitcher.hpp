@@ -11,13 +11,15 @@ public:
 private:
     void Update(float deltaTime) override;
     
-    void ApplyNextPostEffect();
+    void SwitchPostEffect();
+    void SwitchShadowMapCascade();
+    bool CheckTimeout();
+    int SwitchValues(int value, int max, int last) const;
     
-    constexpr static float KeyPressTimeOut = 0.25f;
+    constexpr static float KeyPressTimeOut = 0.3f;
     
-    float effectChangeInputDelay = 0.3f;
-    float lastEffectChangeTime = 0.f;
+    float switcherInputDelay = 0.3f;
+    float lastInput = 0.f;
     int32_t appliedEffectIndex = -1;
-    float delay = 0.25;
-    bool isDelayActive = false;
+    int32_t appliedCascade = -1;
 };

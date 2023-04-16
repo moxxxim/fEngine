@@ -95,7 +95,7 @@ namespace test
         std::unique_ptr<Feng::Material> CreateLightMaterial(const Feng::Vector4& color)
         {
             std::unique_ptr<Feng::Material> material = test::CreateGizmoMaterial(Feng::Engine::IsShowDepth());
-            material->SetVector3(Feng::ShaderParams::MainColor.data(), color.GetXyz());
+            material->Bindings().SetVector3(Feng::ShaderParams::MainColor.data(), color.GetXyz());
 
             return material;
         }

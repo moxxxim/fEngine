@@ -233,7 +233,7 @@ namespace Feng
             Print_Errors_OpengGL();
             SetGlobalUniforms(renderProperties, *workingMaterial);
             Print_Errors_OpengGL();
-            Render::BindMaterialUniforms(*workingMaterial, *workingTextures);
+            Render::ResolveBindings(*workingMaterial->GetShader(), workingMaterial->Bindings(), *workingTextures);
             BindExternalTextures(static_cast<uint32_t>(workingTextures->size()), *workingMaterial);
             Print_Errors_OpengGL();
             
@@ -442,7 +442,8 @@ namespace Feng
             uint32_t bufferId = typeAndId.second;
             if(bufferId != Render::UndefinedBuffer)
             {
-                Render::BindTexture(workingMaterial, typeAndId.first, textureUnit, name, bufferId);
+                Shader *shader = workingMaterial.GetShader();
+                Render::BindTexture(*shader, typeAndId.first, textureUnit, name, bufferId);
                 ++textureUnit;
             }
         }
@@ -503,6 +504,9 @@ namespace Feng
         {
             std::vector<Matrix4> lightViewProjectionMatrices = SMeshRenderer::GetDirectShadowMatrices(renderProperties);
             shader->SetUniformMatrices4(ShaderParams::DirectShadowLightViewProj.data(), lightViewProjectionMatrices);
+            shader->SetUniformInt(
+                                  ShaderParams::CascadesCount.data(),
+                                  static_cast<int32_t>(renderProperties.cascadeBorders.size()) + 1);
         }
 
         if(renderProperties.pointShadowLight)

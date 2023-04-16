@@ -50,5 +50,7 @@ namespace Feng
         static constexpr std::string_view VertexNorm {"aNorm"};
         static constexpr std::string_view VertexBinorm {"aBinorm"};
         static constexpr std::string_view VertexTangent {"aTangent"};
+        
+        static constexpr std::string_view DebugCascadeNum {"uDebugCascadeNum"};
     };
 }

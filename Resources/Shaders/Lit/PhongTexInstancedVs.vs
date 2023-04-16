@@ -28,7 +28,7 @@ layout (std140) uniform ubCamera
 
 uniform mat4 uDirShadowLightViewProj[3];
 uniform float uCascadeDistances[16];
-uniform int uCascadesCount = 1;
+uniform int uCascadesCount = 3;
 
 out VsOut
 {

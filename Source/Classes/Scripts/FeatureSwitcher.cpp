@@ -2,85 +2,96 @@
 
 #include <Classes/TempResouces.h>
 #include <Feng/Core/Engine.hpp>
+#include <Feng/ScenesManager/RenderSystem.h>
+#include <Feng/Utils/Debug.h>
+#include <Feng/Utils/Render/ShaderParams.h>
 #include <GLFW/glfw3.h>
 
 void FeatureSwitcher::Update(float deltaTime)
 {
-    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_O))
-    {
-        ApplyNextPostEffect();
-    }
-
+    Feng::Engine *engine = Feng::Engine::Instance();
     if(appliedEffectIndex >= 0)
     {
         Feng::PostEffectDefinition *postEffect = test::res.Effects[appliedEffectIndex];
-        Feng::Engine::Instance()->SetPostEffect(postEffect);
+        engine->SetPostEffect(postEffect);
     }
     else
     {
-        Feng::Engine::Instance()->RemovePostEffect();
+        engine->RemovePostEffect();
+    }
+    
+    Feng::Engine::SetDirectShowDebugShadowMap(appliedCascade != -1);
+    if(appliedCascade != -1)
+    {
+        Feng::RenderSystem *renderSystem = engine->GetCurrentScene()->GetRenderSystem();
+        renderSystem->GlobalBindings().SetInt(Feng::ShaderParams::DebugCascadeNum.data(), appliedCascade);
+    }
+    
+    if (Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_O))
+    {
+        if(CheckTimeout())
+        {
+            SwitchPostEffect();
+        }
     }
     
     if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_I))
     {
-        if(!isDelayActive)
+        if(CheckTimeout())
         {
             Feng::Engine::SetMultisampleEnabled(!Feng::Engine::IsMultisampleEnabled());
-            isDelayActive = true;
         }
     }
     
     if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_B))
     {
-        if(!isDelayActive)
+        if(CheckTimeout())
         {
-            Feng::Engine::SetDirectShowDebugShadowMap(!Feng::Engine::IsDirectShowDebugShadowMap());
-            isDelayActive = true;
+            SwitchShadowMapCascade();
         }
     }
     
     if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_N))
     {
-        if(!isDelayActive)
+        if(CheckTimeout())
         {
             Feng::Engine::SetOmniShowDebugShadowMap(!Feng::Engine::IsOmniShowDebugShadowMap());
-            isDelayActive = true;
         }
     }
 
     if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_C))
     {
-        if(!isDelayActive)
+        if(CheckTimeout())
         {
             Feng::Engine::SetCursorVisible(!Feng::Engine::IsCursorVisible());
-            isDelayActive = true;
-        }
-    }
-
-    if(isDelayActive)
-    {
-        delay += deltaTime;
-        if(delay > KeyPressTimeOut)
-        {
-            delay = 0.f;
-            isDelayActive = false;
         }
     }
 }
 
-void FeatureSwitcher::ApplyNextPostEffect()
+void FeatureSwitcher::SwitchPostEffect()
+{
+    appliedEffectIndex = SwitchValues(appliedEffectIndex, static_cast<int32_t>(test::res.Effects.size()), -1);
+}
+
+void FeatureSwitcher::SwitchShadowMapCascade()
+{
+    constexpr int32_t cascadesCount = 3;
+    appliedCascade = SwitchValues(appliedCascade, cascadesCount, -1);
+}
+
+bool FeatureSwitcher::CheckTimeout()
 {
     float time = Feng::Engine::Time();
-    if(Feng::Engine::Time() - lastEffectChangeTime > effectChangeInputDelay)
+    if(Feng::Engine::Time() - lastInput > switcherInputDelay)
     {
-        lastEffectChangeTime = time;
-        if(appliedEffectIndex + 1 < test::res.Effects.size())
-        {
-            ++appliedEffectIndex;
-        }
-        else
-        {
-            appliedEffectIndex = -1;
-        }
+        lastInput = time;
+        return true;
     }
+
+    return false;
+}
+
+int FeatureSwitcher::SwitchValues(int value, int max, int last) const
+{
+    return (value + 1 < max) ? value + 1 : last;
 }

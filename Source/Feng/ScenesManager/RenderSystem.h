@@ -27,6 +27,8 @@ namespace Feng
         RenderSystem();
         ~RenderSystem();
 
+        const ShaderBindings& GlobalBindings() const;
+        ShaderBindings& GlobalBindings();
         void SetAmbientLight(Vector4 color, float intensity);
 
         void SetCamera(Camera *camera);
@@ -88,6 +90,16 @@ namespace Feng
         uint32_t camUbo = 0;
     };
 
+    inline const ShaderBindings& RenderSystem::GlobalBindings() const
+    {
+        return renderProperties.globalBindigs;
+    }
+    
+    inline ShaderBindings& RenderSystem::GlobalBindings()
+    {
+        return const_cast<ShaderBindings&>(static_cast<const RenderSystem*>(this)->GlobalBindings());
+    }
+    
     inline void RenderSystem::SetSkybox(MeshRenderer *aSkybox)
     {
         skybox = aSkybox;

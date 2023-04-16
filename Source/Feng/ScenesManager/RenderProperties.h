@@ -4,6 +4,7 @@
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
 #include <Feng/Math/Size.h>
+#include <Feng/Render/ShaderBindings.hpp>
 #include <Feng/ScenesManager/Entity.h>
 
 namespace Feng
@@ -15,6 +16,7 @@ namespace Feng
     {
         static constexpr uint32_t CamBufferBinding = 0;
         
+        ShaderBindings globalBindigs;
         std::vector<float> cascadeBorders;
         Camera *cam = nullptr;
         Light *directLight = nullptr;

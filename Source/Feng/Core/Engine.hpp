@@ -34,6 +34,7 @@ namespace Feng
 
         Engine();
         int32_t Run();
+        Scene* GetCurrentScene();
         void SetScene(std::unique_ptr<Scene>&& aScene);
         void SetPostEffect(PostEffectDefinition *postEffect);
         void RemovePostEffect();
@@ -97,6 +98,11 @@ namespace Feng
     inline void Engine::ShowDepth(bool show)
     {
         showDepth = show;
+    }
+    
+    inline Scene* Engine::GetCurrentScene()
+    {
+        return scene.get();
     }
 
     inline void Engine::SetScene(std::unique_ptr<Scene>&& aScene)

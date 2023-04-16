@@ -77,59 +77,58 @@ namespace Feng::Render
         return attributeIndex;
     }
 
-    void BindMaterialUniforms(
-                            const Material &material,
-                            const std::map<std::string, uint32_t>& textureBuffers,
-                            uint32_t firstTextureUnit /* = 0 */)
+    void ResolveBindings(Shader& shader,
+                         const ShaderBindings& bindings,
+                         const std::map<std::string, uint32_t>& textureBuffers,
+                         uint32_t firstTextureUnit)
     {
-        const Shader* shader = material.GetShader();
-        const std::map<std::string, int> uniforms = shader->GetUniforms();
+        const std::map<std::string, int> uniforms = shader.GetUniforms();
 
         uint32_t textureUnit = firstTextureUnit;
 
         for(const auto& [name, location] : uniforms)
         {
             int intValue;
-            if(material.TryGetInt(name, intValue))
+            if(bindings.TryGetInt(name, intValue))
             {
-                shader->SetUniformInt(name.c_str(), intValue);
+                shader.SetUniformInt(name.c_str(), intValue);
                 continue;
             }
 
             float floatValue;
-            if(material.TryGetFloat(name, floatValue))
+            if(bindings.TryGetFloat(name, floatValue))
             {
-                shader->SetUniformFloat(name.c_str(), floatValue);
+                shader.SetUniformFloat(name.c_str(), floatValue);
                 continue;
             }
 
             Vector2 vector2Value;
-            if(material.TryGetVector2(name, vector2Value))
+            if(bindings.TryGetVector2(name, vector2Value))
             {
-                shader->SetUniformVector2(name.c_str(), vector2Value);
+                shader.SetUniformVector2(name.c_str(), vector2Value);
                 continue;
             }
 
             Vector3 vector3Value;
-            if(material.TryGetVector3(name, vector3Value))
+            if(bindings.TryGetVector3(name, vector3Value))
             {
-                shader->SetUniformVector3(name.c_str(), vector3Value);
+                shader.SetUniformVector3(name.c_str(), vector3Value);
                 continue;
             }
 
             Vector4 vector4Value;
-            if(material.TryGetVector4(name, vector4Value))
+            if(bindings.TryGetVector4(name, vector4Value))
             {
-                shader->SetUniformVector4(name.c_str(), vector4Value);
+                shader.SetUniformVector4(name.c_str(), vector4Value);
                 continue;
             }
 
-            if(const Texture *texture = material.GetTexture(name))
+            if(const Texture *texture = bindings.GetTexture(name))
             {
                 GLenum target = ToOpenGLValue(texture->GetType());
                 if(auto it = textureBuffers.find(name); it != textureBuffers.end())
                 {
-                    BindTexture(material, texture->GetType(), textureUnit, name, it->second);
+                    BindTexture(shader, texture->GetType(), textureUnit, name, it->second);
                     ++textureUnit;
                 }
                 else
@@ -141,23 +140,22 @@ namespace Feng::Render
         
         Print_Errors_OpengGL();
     }
-
-    void BindTexture(const Material &material, eTextureType textureType, uint32_t unit, const std::string_view& name, uint32_t textureBuffer)
+    
+    void BindTexture(const Shader &shader, eTextureType textureType, uint32_t unit, const std::string_view& name, uint32_t textureBuffer)
     {
         GLenum target = ToOpenGLValue(textureType);
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(target, textureBuffer);
         Print_Errors_OpengGL();
         
-        const Shader* shader = material.GetShader();
-        shader->SetUniformInt(name.data(), unit);
+        shader.SetUniformInt(name.data(), unit);
     }
     
     std::map<std::string, uint32_t> CreateTextureBuffers(const Material &material)
     {
         std::map<std::string, uint32_t> buffers;
 
-        const std::map<std::string, const Texture*> &textures = material.GetTextures();
+        const std::map<std::string, const Texture*> &textures = material.Bindings().GetTextures();
 
         for(const auto& [name, texture] : textures)
         {
