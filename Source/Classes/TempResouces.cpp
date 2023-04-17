@@ -16,40 +16,40 @@ namespace
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
 
-    constexpr const char *FlatColorFsName = "Unlit/UnlitFlatColorFs.fs";
-    constexpr const char *FlatColorVsName = "Unlit/UnlitFlatColorVs.vs";
-    constexpr const char *UnlitTextureFsName = "Unlit/UnlitTextureFs.fs";
-    constexpr const char *UnlitTextureVsName = "Unlit/UnlitTextureVs.vs";
+    constexpr const char *FlatColorFsName = "Unlit/UnlitFlatColorFs.shader";
+    constexpr const char *FlatColorVsName = "Unlit/UnlitFlatColorVs.shader";
+    constexpr const char *UnlitTextureFsName = "Unlit/UnlitTextureFs.shader";
+    constexpr const char *UnlitTextureVsName = "Unlit/UnlitTextureVs.shader";
 
-    constexpr const char *PhongTexFs = "Lit/PhongTexFs.fs";
-    constexpr const char *PhongTexVs = "Lit/PhongTexVs.vs";
-    constexpr const char *PhongTexInstancedVs = "Lit/PhongTexInstancedVs.vs";
-    constexpr const char *PhongSpecularTextureFs = "Lit/PhongSpecularTextureFs.fs";
-    constexpr const char *DiffTex1SpecTex2Fs = "Lit/DiffuseTex1SpecTex2Fs.fs";
-    constexpr const char *ShowDepthFs = "Utils/ShowDepthFs.fs";
-    constexpr const char *ShowDepthVs = "Utils/ShowDepthVs.vs";
-    constexpr const char *SkyboxFs = "SkyboxFs.fs";
-    constexpr const char *SkyboxVs = "SkyboxVs.vs";
-    constexpr const char *CubemapReflectiveFs = "Unlit/CubemapReflectiveColorFs.fs";
-    constexpr const char *CubemapReflectiveVs = "Unlit/CubemapReflectiveColorVs.vs";
-    constexpr const char *CubemapRefractionFs = "Unlit/CubemapRefractionColorFs.fs";
-    constexpr const char *CubemapRefractionVs = "Unlit/CubemapRefractionColorVs.vs";
+    constexpr const char *PhongTexFs = "Lit/PhongTexFs.shader";
+    constexpr const char *PhongTexVs = "Lit/PhongTexVs.shader";
+    constexpr const char *PhongTexInstancedVs = "Lit/PhongTexInstancedVs.shader";
+    constexpr const char *PhongSpecularTextureFs = "Lit/PhongSpecularTextureFs.shader";
+    constexpr const char *DiffTex1SpecTex2Fs = "Lit/DiffuseTex1SpecTex2Fs.shader";
+    constexpr const char *ShowDepthFs = "Utils/ShowDepthFs.shader";
+    constexpr const char *ShowDepthVs = "Utils/ShowDepthVs.shader";
+    constexpr const char *SkyboxFs = "SkyboxFs.shader";
+    constexpr const char *SkyboxVs = "SkyboxVs.shader";
+    constexpr const char *CubemapReflectiveFs = "Unlit/CubemapReflectiveColorFs.shader";
+    constexpr const char *CubemapReflectiveVs = "Unlit/CubemapReflectiveColorVs.shader";
+    constexpr const char *CubemapRefractionFs = "Unlit/CubemapRefractionColorFs.shader";
+    constexpr const char *CubemapRefractionVs = "Unlit/CubemapRefractionColorVs.shader";
     
-    constexpr const char *ShadowPassVs = "Utils/ShadowPassVs.vs";
-    constexpr const char *ShadowPassGs = "Utils/ShadowPassGs.gs";
-    constexpr const char *OmniShadowPassVs = "Utils/OmniShadowPassVs.vs";
-    constexpr const char *OmniShadowPassFs = "Utils/OmniShadowPassFs.fs";
-    constexpr const char *OmniShadowPassGs = "Utils/OmniShadowPassGs.gs";
-    constexpr const char *EmptyFs = "Utils/EmptyFs.fs";
+    constexpr const char *ShadowPassVs = "Utils/ShadowPassVs.shader";
+    constexpr const char *ShadowPassGs = "Utils/ShadowPassGs.shader";
+    constexpr const char *OmniShadowPassVs = "Utils/OmniShadowPassVs.shader";
+    constexpr const char *OmniShadowPassFs = "Utils/OmniShadowPassFs.shader";
+    constexpr const char *OmniShadowPassGs = "Utils/OmniShadowPassGs.shader";
+    constexpr const char *EmptyFs = "Utils/EmptyFs.shader";
     
-    constexpr const char *ShadowMapDrawFs = "Utils/ShowShadowMapFs.fs";
+    constexpr const char *ShadowMapDrawFs = "Utils/ShowShadowMapFs.shader";
 
-    constexpr const char *PostEffectVs = "PostEffects/PostEffectVs.vs";
-    constexpr const char *GrayscalePostEffectFs = "PostEffects/PostEffectGrayscaleFs.fs";
-    constexpr const char *InvertColorsPostEffectFs = "PostEffects/PostEffectInvertColorsFs.fs";
-    constexpr const char *SharpColorPostEffectFs = "PostEffects/PostEffectSharpColorFs.fs";
-    constexpr const char *BlurPostEffectFs = "PostEffects/PostEffectBlurFs.fs";
-    constexpr const char *EdgeDetectionPostEffectFs = "PostEffects/PostEffectEdgeDetectionFs.fs";
+    constexpr const char *PostEffectVs = "PostEffects/PostEffectVs.shader";
+    constexpr const char *GrayscalePostEffectFs = "PostEffects/PostEffectGrayscaleFs.shader";
+    constexpr const char *InvertColorsPostEffectFs = "PostEffects/PostEffectInvertColorsFs.shader";
+    constexpr const char *SharpColorPostEffectFs = "PostEffects/PostEffectSharpColorFs.shader";
+    constexpr const char *BlurPostEffectFs = "PostEffects/PostEffectBlurFs.shader";
+    constexpr const char *EdgeDetectionPostEffectFs = "PostEffects/PostEffectEdgeDetectionFs.shader";
 
     constexpr const char *woodenContainerJpg = "wood_container.jpg";
     constexpr const char *brickWallJpg = "brick_wall.jpg";
