@@ -62,7 +62,6 @@ namespace Feng
         
         bool IsShadowsEnabled();
         void CreateCamUniformBuffer();
-        void BindCamUniformBuffer();
         void DrawShadowMap();
         void DrawDirectShadowMap();
         void DrawPointShadowMap();
@@ -74,6 +73,11 @@ namespace Feng
         void DrawTransparent();
         void DrawSkybox();
         void ApplyPostEffects(const FrameBuffer& renderBuffer);
+        void UpdateGlobalBindings();
+        void UpdateCameraUniforms();
+        void UpdateLightUniforms();
+        void UpdateShadowLightUniform();
+        void BindCamUniformBuffer();
         FrameBuffer GetFrameBuffer(bool multisample);
         FrameBuffer GetDirectShadowMapBuffer();
         FrameBuffer GetPointShadowMapBuffer();
@@ -92,7 +96,7 @@ namespace Feng
 
     inline const ShaderBindings& RenderSystem::GlobalBindings() const
     {
-        return renderProperties.globalBindigs;
+        return renderProperties.globalBindings;
     }
     
     inline ShaderBindings& RenderSystem::GlobalBindings()

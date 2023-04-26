@@ -3,9 +3,12 @@
 #include <Feng/Math/Vector2.h>
 #include <Feng/Math/Vector3.h>
 #include <Feng/Math/Vector4.h>
+#include <Feng/Math/Matrix4.h>
 
+#include <cstdint>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace Feng
 {
@@ -45,82 +48,27 @@ namespace Feng
         const Texture* GetTexture(const std::string& name) const;
         void SetTexture(const std::string& name, const Texture *texture);
         
+        bool TryGetArrayFloats(const std::string& name, std::vector<float>& value) const;
+        void SetArrayFloats(const std::string& name, const std::vector<float>& value);
+        
+        bool TryGetArrayMatrices4(const std::string& name, std::vector<Matrix4>& matrices) const;
+        void SetArrayMatrices4(const std::string& name, const std::vector<Matrix4>& matrices);
+        
+        bool TryGetBuffer(const std::string& name, uint32_t& buffer) const;
+        void SetBuffer(const std::string& name, uint32_t buffer);
+        
     private:
         template <typename T>
         static bool TryGetValue(const std::map<std::string, T>& values, const std::string& name, T& value);
         
         std::map<std::string, float> floats;
+        std::map<std::string, std::vector<float>> arrayFloats;
         std::map<std::string, int> ints;
+        std::map<std::string, uint32_t> buffers;
         std::map<std::string, Vector2> vectors2;
         std::map<std::string, Vector3> vectors3;
         std::map<std::string, Vector4> vectors4;
         std::map<std::string, const Texture*> textures;
+        std::map<std::string, std::vector<Matrix4>> arrayMatrices;
     };
-    
-    inline const std::map<std::string, float>& ShaderBindings::GetFloats() const
-    {
-        return floats;
-    }
-
-    inline bool ShaderBindings::TryGetFloat(const std::string& name, float& value) const
-    {
-        return TryGetValue<float>(floats, name, value);
-    }
-
-    inline const std::map<std::string, int>& ShaderBindings::GetInts() const
-    {
-        return ints;
-    }
-
-    inline bool ShaderBindings::TryGetInt(const std::string& name, int& value) const
-    {
-        return TryGetValue<int>(ints, name, value);
-    }
-
-    inline const std::map<std::string, Vector2>& ShaderBindings::GetVectors2() const
-    {
-        return vectors2;
-    }
-
-    inline bool ShaderBindings::TryGetVector2(const std::string& name, Vector2& value) const
-    {
-        return TryGetValue<Vector2>(vectors2, name, value);
-    }
-
-    inline const std::map<std::string, Vector3>& ShaderBindings::GetVectors3() const
-    {
-        return vectors3;
-    }
-
-    inline bool ShaderBindings::TryGetVector3(const std::string& name, Vector3& value) const
-    {
-        return TryGetValue<Vector3>(vectors3, name, value);
-    }
-
-    inline const std::map<std::string, Vector4>& ShaderBindings::GetVectors4() const
-    {
-        return vectors4;
-    }
-
-    inline bool ShaderBindings::TryGetVector4(const std::string& name, Vector4& value) const
-    {
-        return TryGetValue<Vector4>(vectors4, name, value);
-    }
-
-    inline const std::map<std::string, const Texture*>& ShaderBindings::GetTextures() const
-    {
-        return textures;
-    }
-
-    template <typename T>
-    bool ShaderBindings::TryGetValue(const std::map<std::string, T>& values, const std::string& name, T& value)
-    {
-        if (auto it = values.find(name); it != values.end())
-        {
-            value = it->second;
-            return true;
-        }
-
-        return false;
-    }
 }

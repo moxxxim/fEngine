@@ -19,126 +19,6 @@
 
 namespace Feng
 {
-    namespace SMeshRenderer
-    {
-        Matrix4 GetCamViewProjInverse(const RenderProperties &renderProperties, const std::pair<float, float>& nearFar)
-        {
-            const float camFov = renderProperties.cam->GetFovY();
-            const float camAspect = renderProperties.cam->GetAspectRatio();
-            const Matrix4 camTransform = renderProperties.cam->GetEntity()->GetComponent<Transform>()->GetGlobalMatrix();
-            const Matrix4 projection = Mat4::MakePerspectiveProjection(camFov, camAspect, nearFar.first, nearFar.second);
-            Matrix4 projectionInverted;
-            std::ignore = projection.TryInvert(projectionInverted);
-            
-            return projectionInverted * camTransform;
-        }
-        
-        Matrix4 GetShadowCastLightProjectionMatrix(
-                                                   const RenderProperties &renderProperties,
-                                                   const Matrix4& lightViewMatrix,
-                                                   const std::pair<float, float>& nearFar)
-        {
-            Matrix4 camViewProjInverse = GetCamViewProjInverse(renderProperties, nearFar);
-            std::array<Vector4, 8> camFrustum = Render::GetFrustumXyzMinMax(camViewProjInverse);
-
-            float minX = std::numeric_limits<float>::max();
-            float maxX = std::numeric_limits<float>::lowest();
-            float minY = std::numeric_limits<float>::max();
-            float maxY = std::numeric_limits<float>::lowest();
-            float minZ = std::numeric_limits<float>::max();
-            float maxZ = std::numeric_limits<float>::lowest();
-            for(const Vector4& corner : camFrustum)
-            {
-                const Vector4 cornerInLightSpace = corner * lightViewMatrix;
-                minX = std::min(minX, cornerInLightSpace.x);
-                maxX = std::max(maxX, cornerInLightSpace.x);
-                minY = std::min(minY, cornerInLightSpace.y);
-                maxY = std::max(maxY, cornerInLightSpace.y);
-                minZ = std::min(minZ, cornerInLightSpace.z);
-                maxZ = std::max(maxZ, cornerInLightSpace.z);
-            }
-
-            minZ -= 10.f;
-            maxZ += 20.f;
-
-            return Mat4::MakeOrthogonalProjection(minX, maxX, minY, maxY, minZ, maxZ);
-        }
-        
-        Matrix4 GetShadowCastLightViewMatrix(const Entity* light)
-        {
-            const Transform *lightTransform = light->GetComponent<Transform>();
-            return Mat4::MakeTransformation(Vector3::One, Vector3::Zero, lightTransform->GetRotation().Inverse());
-        }
-
-        std::vector<float> CalculateCascadeFarDistances(const RenderProperties &renderProperties)
-        {
-            std::vector<float> distances;
-            
-            float minNear = renderProperties.cam->GetNearClipPlane();
-            float maxFar = renderProperties.cam->GetFarClipPlane();
-            for(int i = 0; i < renderProperties.cascadeBorders.size(); ++i)
-            {
-                float cascadeBorder = renderProperties.cascadeBorders[i];
-                float far = minNear + (maxFar - minNear) * cascadeBorder;
-                distances.push_back(far);
-            }
-            
-            distances.push_back(maxFar);
-
-            return distances;
-        }
-        
-        std::vector<Matrix4> GetDirectShadowMatrices(const RenderProperties &renderProperties,
-                                                     std::vector<float> farDistances)
-        {
-            std::vector<Matrix4> cascadeMatrices;
-
-            Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
-            float near = renderProperties.cam->GetNearClipPlane();
-            for(int i = 0; i < farDistances.size(); ++i)
-            {
-                std::pair<float, float> nearFar = std::make_pair(near, farDistances[i]);
-                Matrix4 lightProjection = GetShadowCastLightProjectionMatrix(renderProperties, lightViewMatrix, nearFar);
-                cascadeMatrices.push_back(lightViewMatrix * lightProjection);
-                near = nearFar.second;
-            }
-            
-            return cascadeMatrices;
-        }
-        
-        std::vector<Matrix4> GetOmnidirectionalShadowLightMatrices(const Entity* lightEntity)
-        {
-            std::vector<Matrix4> matrices;
-            
-            const Light* light = lightEntity->GetComponent<Light>();
-            const Matrix4 lightProjection = Mat4::MakePerspectiveProjection(90.f, 1.f, 1.f, light->GetRange());
-            const Vector3& lightPos = lightEntity->GetComponent<Transform>()->GetPosition();
-            
-            Matrix4 transformPosX;
-            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, -90.f}).TryInvert(transformPosX);
-            Matrix4 transformNegX;
-            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, 90.f}).TryInvert(transformNegX);
-            matrices.push_back(transformPosX * lightProjection);
-            matrices.push_back(transformNegX * lightProjection);
-            
-            Matrix4 transformPosY;
-            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, 90.f}).TryInvert(transformPosY);
-            Matrix4 transformNegY;
-            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, -90.f}).TryInvert(transformNegY);
-            matrices.push_back(transformPosY * lightProjection);
-            matrices.push_back(transformNegY * lightProjection);
-            
-            Matrix4 transformPosZ;
-            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, 180.f}).TryInvert(transformPosZ);
-            Matrix4 transformNegZ;
-            Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f}).TryInvert(transformNegZ);
-            matrices.push_back(transformPosZ * lightProjection);
-            matrices.push_back(transformNegZ * lightProjection);
-
-            return matrices;
-        }
-    }
-    
     MeshRenderer::~MeshRenderer()
     {
         DeleteGeomertyBuffers();
@@ -232,7 +112,8 @@ namespace Feng
             
             StartDraw(*workingMaterial);
             Print_Errors_OpengGL();
-            SetGlobalUniforms(renderProperties, *workingMaterial);
+            Render::ResolveBindings(*workingMaterial->GetShader(), renderProperties.globalBindings, {});
+            SetModelUniforms(*workingMaterial);
             Print_Errors_OpengGL();
             Render::ResolveBindings(*workingMaterial->GetShader(), workingMaterial->Bindings(), *workingTextures);
             BindExternalTextures(static_cast<uint32_t>(workingTextures->size()), *workingMaterial);
@@ -262,7 +143,7 @@ namespace Feng
         Print_Errors_OpengGL();
     }
 
-    void MeshRenderer::SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
+    void MeshRenderer::SetModelUniforms(Material &workingMaterial)
     {
         if(instancesCount == 0)
         {
@@ -271,10 +152,6 @@ namespace Feng
             shader->SetUniformMatrix4(ShaderParams::ModelMatrix.data(), myTransform->GetGlobalMatrix());
             Print_Errors_OpengGL();
         }
-
-        SetCameraUniforms(renderProperties, workingMaterial);
-        SetLightUniforms(renderProperties, workingMaterial);
-        SetShadowLightUniform(renderProperties, workingMaterial);
     }
 
     void MeshRenderer::ExecuteDraw()
@@ -447,79 +324,6 @@ namespace Feng
                 Render::BindTexture(*shader, typeAndId.first, textureUnit, name, bufferId);
                 ++textureUnit;
             }
-        }
-    }
-
-    void MeshRenderer::SetCameraUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
-    {
-        const Shader *shader = workingMaterial.GetShader();
-        
-        shader->SetUniformFloat(ShaderParams::NearClipPlane.data(), renderProperties.cam->GetNearClipPlane());
-        shader->SetUniformFloat(ShaderParams::FarClipPlane.data(), renderProperties.cam->GetFarClipPlane());
-        shader->SetUniformBuffer(ShaderParams::CamUniformBlock.data(), RenderProperties::CamBufferBinding);
-        Print_Errors_OpengGL();
-    }
-
-    void MeshRenderer::SetLightUniforms(const RenderProperties &renderProperties, Material &workingMaterial)
-    {
-        const Shader *shader = workingMaterial.GetShader();
-        shader->SetUniformVector4(ShaderParams::AmbientColor.data(), renderProperties.ambientColorAndIntencity);
-
-        const Transform *pointLightTransform = renderProperties.pointLight->GetEntity()->GetComponent<Transform>();
-        Vector4 pointLightPositionAndRange = pointLightTransform->GetPosition();
-        pointLightPositionAndRange.w = renderProperties.pointLight->GetRange();
-        Vector4 pointLightColor = renderProperties.pointLight->GetColor();
-        pointLightColor.w = renderProperties.pointLight->GetIntesity();
-
-        shader->SetUniformVector4(ShaderParams::PointLightColor.data(), pointLightColor);
-        shader->SetUniformVector4(ShaderParams::PointLightPositionAndRange.data(), pointLightPositionAndRange);
-
-        const Transform *directLightTransform = renderProperties.directLight->GetEntity()->GetComponent<Transform>();
-        Vector3 directLightDirection = directLightTransform->GetForward();
-        Vector4 directLightColor = renderProperties.directLight->GetColor();
-        directLightColor.w = renderProperties.directLight->GetIntesity();
-
-        shader->SetUniformVector4(ShaderParams::DirectLightColor.data(), directLightColor);
-        shader->SetUniformVector3(ShaderParams::DirectLightDir.data(), directLightDirection);
-
-        const Transform *spotLightTransform = renderProperties.spotLight->GetEntity()->GetComponent<Transform>();
-        Vector4 spotLightDirAndAngle = spotLightTransform->GetForward();
-        spotLightDirAndAngle.w = renderProperties.spotLight->GetSpotAngle();
-        Vector4 spotLightColor = renderProperties.spotLight->GetColor();
-        spotLightColor.w = renderProperties.spotLight->GetIntesity();
-        Vector4 spotLightPosAndRange = spotLightTransform->GetPosition();
-        spotLightPosAndRange.w = renderProperties.spotLight->GetRange();
-
-        shader->SetUniformVector4(ShaderParams::SpotLightColor.data(), spotLightColor);
-        shader->SetUniformVector4(ShaderParams::SpotLightPositionAndRange.data(), spotLightPosAndRange);
-        shader->SetUniformVector4(ShaderParams::SpotLightDirAndAngle.data(), spotLightDirAndAngle);
-        Print_Errors_OpengGL();
-    }
-    
-    void MeshRenderer::SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial)
-    {
-        using namespace SMeshRenderer;
-        
-        const Shader *shader = workingMaterial.GetShader();
-        if(renderProperties.directShadowLight)
-        {
-            std::vector<float> farDistances = CalculateCascadeFarDistances(renderProperties);
-            std::vector<Matrix4> lightViewProjectionMatrices = SMeshRenderer::GetDirectShadowMatrices(
-                                                                                                      renderProperties,
-                                                                                                      farDistances);
-            shader->SetUniformMatrices4(ShaderParams::DirectShadowLightViewProj.data(), lightViewProjectionMatrices);
-            shader->SetUniformFloats(ShaderParams::CascadeDistances.data(), farDistances);
-            shader->SetUniformInt(
-                                  ShaderParams::CascadesCount.data(),
-                                  static_cast<int32_t>(renderProperties.cascadeBorders.size()) + 1);
-        }
-
-        if(renderProperties.pointShadowLight)
-        {
-            std::vector<Matrix4> matrices = GetOmnidirectionalShadowLightMatrices(renderProperties.pointShadowLight);
-            const Light* light = renderProperties.pointShadowLight->GetComponent<Light>();
-            shader->SetUniformMatrices4(ShaderParams::OmniShadowLightViewProj.data(), matrices);
-            shader->SetUniformFloat(ShaderParams::FarClipPlane.data(), light->GetRange());
         }
     }
 }

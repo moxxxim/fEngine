@@ -2,6 +2,7 @@
 
 #include <Feng/App/Globals.h>
 #include <Feng/Core/Engine.hpp>
+#include <Feng/Math/MatrixUtils.h>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
 #include <Feng/ScenesManager/Light.h>
@@ -76,6 +77,126 @@ namespace Feng
             }
             
             return true;
+        }
+        
+        namespace Shadow
+        {
+            Matrix4 GetCamViewProjInverse(const RenderProperties &renderProperties, const std::pair<float, float>& nearFar)
+            {
+                const float camFov = renderProperties.cam->GetFovY();
+                const float camAspect = renderProperties.cam->GetAspectRatio();
+                const Matrix4 camTransform = renderProperties.cam->GetEntity()->GetComponent<Transform>()->GetGlobalMatrix();
+                const Matrix4 projection = Mat4::MakePerspectiveProjection(camFov, camAspect, nearFar.first, nearFar.second);
+                Matrix4 projectionInverted;
+                std::ignore = projection.TryInvert(projectionInverted);
+                
+                return projectionInverted * camTransform;
+            }
+            
+            Matrix4 GetShadowCastLightProjectionMatrix(
+                                                       const RenderProperties &renderProperties,
+                                                       const Matrix4& lightViewMatrix,
+                                                       const std::pair<float, float>& nearFar)
+            {
+                Matrix4 camViewProjInverse = GetCamViewProjInverse(renderProperties, nearFar);
+                std::array<Vector4, 8> camFrustum = Render::GetFrustumXyzMinMax(camViewProjInverse);
+
+                float minX = std::numeric_limits<float>::max();
+                float maxX = std::numeric_limits<float>::lowest();
+                float minY = std::numeric_limits<float>::max();
+                float maxY = std::numeric_limits<float>::lowest();
+                float minZ = std::numeric_limits<float>::max();
+                float maxZ = std::numeric_limits<float>::lowest();
+                for(const Vector4& corner : camFrustum)
+                {
+                    const Vector4 cornerInLightSpace = corner * lightViewMatrix;
+                    minX = std::min(minX, cornerInLightSpace.x);
+                    maxX = std::max(maxX, cornerInLightSpace.x);
+                    minY = std::min(minY, cornerInLightSpace.y);
+                    maxY = std::max(maxY, cornerInLightSpace.y);
+                    minZ = std::min(minZ, cornerInLightSpace.z);
+                    maxZ = std::max(maxZ, cornerInLightSpace.z);
+                }
+
+                minZ -= 10.f;
+                maxZ += 20.f;
+
+                return Mat4::MakeOrthogonalProjection(minX, maxX, minY, maxY, minZ, maxZ);
+            }
+            
+            Matrix4 GetShadowCastLightViewMatrix(const Entity* light)
+            {
+                const Transform *lightTransform = light->GetComponent<Transform>();
+                return Mat4::MakeTransformation(Vector3::One, Vector3::Zero, lightTransform->GetRotation().Inverse());
+            }
+
+            std::vector<float> CalculateCascadeFarDistances(const RenderProperties &renderProperties)
+            {
+                std::vector<float> distances;
+                
+                float minNear = renderProperties.cam->GetNearClipPlane();
+                float maxFar = renderProperties.cam->GetFarClipPlane();
+                for(int i = 0; i < renderProperties.cascadeBorders.size(); ++i)
+                {
+                    float cascadeBorder = renderProperties.cascadeBorders[i];
+                    float far = minNear + (maxFar - minNear) * cascadeBorder;
+                    distances.push_back(far);
+                }
+                
+                distances.push_back(maxFar);
+
+                return distances;
+            }
+            
+            std::vector<Matrix4> GetDirectShadowMatrices(const RenderProperties &renderProperties,
+                                                         std::vector<float> farDistances)
+            {
+                std::vector<Matrix4> cascadeMatrices;
+
+                Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
+                float near = renderProperties.cam->GetNearClipPlane();
+                for(int i = 0; i < farDistances.size(); ++i)
+                {
+                    std::pair<float, float> nearFar = std::make_pair(near, farDistances[i]);
+                    Matrix4 lightProjection = GetShadowCastLightProjectionMatrix(renderProperties, lightViewMatrix, nearFar);
+                    cascadeMatrices.push_back(lightViewMatrix * lightProjection);
+                    near = nearFar.second;
+                }
+                
+                return cascadeMatrices;
+            }
+            
+            std::vector<Matrix4> GetOmnidirectionalShadowLightMatrices(const Entity* lightEntity)
+            {
+                std::vector<Matrix4> matrices;
+                
+                const Light* light = lightEntity->GetComponent<Light>();
+                const Matrix4 lightProjection = Mat4::MakePerspectiveProjection(90.f, 1.f, 1.f, light->GetRange());
+                const Vector3& lightPos = lightEntity->GetComponent<Transform>()->GetPosition();
+                
+                Matrix4 transformPosX;
+                Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, -90.f}).TryInvert(transformPosX);
+                Matrix4 transformNegX;
+                Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, 90.f}).TryInvert(transformNegX);
+                matrices.push_back(transformPosX * lightProjection);
+                matrices.push_back(transformNegX * lightProjection);
+                
+                Matrix4 transformPosY;
+                Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, 90.f}).TryInvert(transformPosY);
+                Matrix4 transformNegY;
+                Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneX, -90.f}).TryInvert(transformNegY);
+                matrices.push_back(transformPosY * lightProjection);
+                matrices.push_back(transformNegY * lightProjection);
+                
+                Matrix4 transformPosZ;
+                Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f} * Quaternion{Vector3::OneY, 180.f}).TryInvert(transformPosZ);
+                Matrix4 transformNegZ;
+                Mat4::MakeTransformation(Vector3::One, lightPos, Quaternion{Vector3::OneZ, 180.f}).TryInvert(transformNegZ);
+                matrices.push_back(transformPosZ * lightProjection);
+                matrices.push_back(transformNegZ * lightProjection);
+
+                return matrices;
+            }
         }
     }
 
@@ -186,6 +307,7 @@ namespace Feng
 
     void RenderSystem::Draw()
     {
+        UpdateGlobalBindings();
         DrawShadowMap();
 
         if(Engine::IsDirectShowDebugShadowMap())
@@ -221,32 +343,6 @@ namespace Feng
         glGenBuffers(1, &camUbo);
         glBindBuffer(GL_UNIFORM_BUFFER, camUbo);
         glBufferData(GL_UNIFORM_BUFFER, camUniformsSize, nullptr, GL_STATIC_DRAW);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    }
-
-    void RenderSystem::BindCamUniformBuffer()
-    {
-        const Entity *camEntity = renderProperties.cam->GetEntity();
-        const Transform *camTransform = camEntity->GetComponent<Transform>();
-
-        const Matrix4 viewMatrix = renderProperties.cam->GetViewMatrix();
-        const Matrix4 projMatrix = renderProperties.cam->GetProjectionMatrix();
-        const Quaternion& camRotation = camTransform->GetRotation();
-        const Matrix3 camRotationMat = camRotation.ToMatrix3();
-        const Vector3& camPos = camTransform->GetPosition();
-        const Vector3 camDir = camTransform->GetForward();
-
-        glBindBuffer(GL_UNIFORM_BUFFER, camUbo);
-        glBindBufferBase(GL_UNIFORM_BUFFER, RenderProperties::CamBufferBinding, camUbo);
-        // Offsets are specified in shader's uniform block layout.
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4), viewMatrix.data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(Matrix4), projMatrix.data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(Vector3), camRotationMat.rows[0].data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 144, sizeof(Vector3), camRotationMat.rows[1].data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 160, sizeof(Vector3), camRotationMat.rows[2].data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 176, sizeof(Vector3), camPos.data);
-        glBufferSubData(GL_UNIFORM_BUFFER, 192, sizeof(Vector3), camDir.data);
-
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
     
@@ -319,7 +415,7 @@ namespace Feng
 
         Shader *shader = shadowSetup.directLightShadowDebugMaterial->GetShader();
         shader->StartUse();
-        Render::ResolveBindings(*shader, renderProperties.globalBindigs, { });
+        Render::ResolveBindings(*shader, renderProperties.globalBindings, { });
         Render::SetDrawFace(eDrawFace::Cw);
         Print_Errors_OpengGL();
 
@@ -355,8 +451,6 @@ namespace Feng
         Print_Errors_OpengGL();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        BindCamUniformBuffer();
         DrawOpaque();
 
         // Draw skybox after opaque objects for good use of a depth buffer.
@@ -422,6 +516,105 @@ namespace Feng
             postProcessing.ApplyPostEffects(postEffectInput);
             fboPool.Push(postEffectInput);
         }
+    }
+    
+    void RenderSystem::UpdateGlobalBindings()
+    {
+        UpdateCameraUniforms();
+        UpdateLightUniforms();
+        UpdateShadowLightUniform();
+    }
+    
+    void RenderSystem::UpdateCameraUniforms()
+    {
+        BindCamUniformBuffer();
+        renderProperties.globalBindings.SetFloat(ShaderParams::NearClipPlane.data(), renderProperties.cam->GetNearClipPlane());
+        renderProperties.globalBindings.SetFloat(ShaderParams::FarClipPlane.data(), renderProperties.cam->GetFarClipPlane());
+        renderProperties.globalBindings.SetBuffer(ShaderParams::CamUniformBlock.data(), RenderProperties::CamBufferBinding);
+    }
+
+    void RenderSystem::UpdateLightUniforms()
+    {
+        renderProperties.globalBindings.SetVector4(ShaderParams::AmbientColor.data(), renderProperties.ambientColorAndIntencity);
+
+        const Transform *pointLightTransform = renderProperties.pointLight->GetEntity()->GetComponent<Transform>();
+        Vector4 pointLightPositionAndRange = pointLightTransform->GetPosition();
+        pointLightPositionAndRange.w = renderProperties.pointLight->GetRange();
+        Vector4 pointLightColor = renderProperties.pointLight->GetColor();
+        pointLightColor.w = renderProperties.pointLight->GetIntesity();
+
+        renderProperties.globalBindings.SetVector4(ShaderParams::PointLightColor.data(), pointLightColor);
+        renderProperties.globalBindings.SetVector4(ShaderParams::PointLightPositionAndRange.data(), pointLightPositionAndRange);
+
+        const Transform *directLightTransform = renderProperties.directLight->GetEntity()->GetComponent<Transform>();
+        Vector3 directLightDirection = directLightTransform->GetForward();
+        Vector4 directLightColor = renderProperties.directLight->GetColor();
+        directLightColor.w = renderProperties.directLight->GetIntesity();
+
+        renderProperties.globalBindings.SetVector4(ShaderParams::DirectLightColor.data(), directLightColor);
+        renderProperties.globalBindings.SetVector3(ShaderParams::DirectLightDir.data(), directLightDirection);
+
+        const Transform *spotLightTransform = renderProperties.spotLight->GetEntity()->GetComponent<Transform>();
+        Vector4 spotLightDirAndAngle = spotLightTransform->GetForward();
+        spotLightDirAndAngle.w = renderProperties.spotLight->GetSpotAngle();
+        Vector4 spotLightColor = renderProperties.spotLight->GetColor();
+        spotLightColor.w = renderProperties.spotLight->GetIntesity();
+        Vector4 spotLightPosAndRange = spotLightTransform->GetPosition();
+        spotLightPosAndRange.w = renderProperties.spotLight->GetRange();
+
+        renderProperties.globalBindings.SetVector4(ShaderParams::SpotLightColor.data(), spotLightColor);
+        renderProperties.globalBindings.SetVector4(ShaderParams::SpotLightPositionAndRange.data(), spotLightPosAndRange);
+        renderProperties.globalBindings.SetVector4(ShaderParams::SpotLightDirAndAngle.data(), spotLightDirAndAngle);
+    }
+    
+    void RenderSystem::UpdateShadowLightUniform()
+    {
+        using namespace SRenderSystem::Shadow;
+        
+        if(renderProperties.directShadowLight)
+        {
+            std::vector<float> farDistances = CalculateCascadeFarDistances(renderProperties);
+            std::vector<Matrix4> lightViewProjectionMatrices = GetDirectShadowMatrices(renderProperties, farDistances);
+            renderProperties.globalBindings.SetArrayMatrices4(ShaderParams::DirectShadowLightViewProj.data(), lightViewProjectionMatrices);
+            renderProperties.globalBindings.SetArrayFloats(ShaderParams::CascadeDistances.data(), farDistances);
+            renderProperties.globalBindings.SetInt(
+                                  ShaderParams::CascadesCount.data(),
+                                  static_cast<int32_t>(renderProperties.cascadeBorders.size()) + 1);
+        }
+
+        if(renderProperties.pointShadowLight)
+        {
+            std::vector<Matrix4> matrices = GetOmnidirectionalShadowLightMatrices(renderProperties.pointShadowLight);
+            const Light* light = renderProperties.pointShadowLight->GetComponent<Light>();
+            renderProperties.globalBindings.SetArrayMatrices4(ShaderParams::OmniShadowLightViewProj.data(), matrices);
+            renderProperties.globalBindings.SetFloat(ShaderParams::FarClipPlane.data(), light->GetRange());
+        }
+    }
+    
+    void RenderSystem::BindCamUniformBuffer()
+    {
+        const Entity *camEntity = renderProperties.cam->GetEntity();
+        const Transform *camTransform = camEntity->GetComponent<Transform>();
+
+        const Matrix4 viewMatrix = renderProperties.cam->GetViewMatrix();
+        const Matrix4 projMatrix = renderProperties.cam->GetProjectionMatrix();
+        const Quaternion& camRotation = camTransform->GetRotation();
+        const Matrix3 camRotationMat = camRotation.ToMatrix3();
+        const Vector3& camPos = camTransform->GetPosition();
+        const Vector3 camDir = camTransform->GetForward();
+
+        glBindBuffer(GL_UNIFORM_BUFFER, camUbo);
+        glBindBufferBase(GL_UNIFORM_BUFFER, RenderProperties::CamBufferBinding, camUbo);
+        // Offsets are specified in shader's uniform block layout.
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4), viewMatrix.data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(Matrix4), projMatrix.data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(Vector3), camRotationMat.rows[0].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 144, sizeof(Vector3), camRotationMat.rows[1].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 160, sizeof(Vector3), camRotationMat.rows[2].data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 176, sizeof(Vector3), camPos.data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 192, sizeof(Vector3), camDir.data);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
     
     FrameBuffer RenderSystem::GetFrameBuffer(bool multisample)

@@ -141,7 +141,7 @@ namespace Feng
         return false;
     }
     
-    bool Shader::SetUniformFloats(const char *name, std::vector<float> value) const
+    bool Shader::SetUniformFloats(const char *name, const std::vector<float>& value) const
     {
         uint32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))

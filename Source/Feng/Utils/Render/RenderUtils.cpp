@@ -122,6 +122,27 @@ namespace Feng::Render
                 shader.SetUniformVector4(name.c_str(), vector4Value);
                 continue;
             }
+            
+            std::vector<float> arrayFloats;
+            if(bindings.TryGetArrayFloats(name, arrayFloats))
+            {
+                shader.SetUniformFloats(name.c_str(), arrayFloats);
+                continue;
+            }
+            
+            std::vector<Matrix4> arrayMatrices;
+            if(bindings.TryGetArrayMatrices4(name, arrayMatrices))
+            {
+                shader.SetUniformMatrices4(name.c_str(), arrayMatrices);
+                continue;
+            }
+            
+            uint32_t buffer;
+            if(bindings.TryGetBuffer(name, buffer))
+            {
+                shader.SetUniformBuffer(name.c_str(), buffer);
+                continue;
+            }
 
             if(const Texture *texture = bindings.GetTexture(name))
             {

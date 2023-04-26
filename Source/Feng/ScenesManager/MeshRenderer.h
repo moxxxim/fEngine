@@ -44,7 +44,7 @@ namespace Feng
         void StartDraw(Material &workingMaterial);
         void FinishDraw();
 
-        void SetGlobalUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
+        void SetModelUniforms(Material &workingMaterial);
         void ExecuteDraw();
 
         void CreateGeometryBuffers();
@@ -61,9 +61,6 @@ namespace Feng
         uint32_t CreateIndexBuffer();
 
         void BindExternalTextures(uint32_t firstTextureUnit, Material &workingMaterial);
-        void SetCameraUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
-        void SetLightUniforms(const RenderProperties &renderProperties, Material &workingMaterial);
-        void SetShadowLightUniform(const RenderProperties &renderProperties, Material &workingMaterial);
 
         VertexBuffer vertexBuffer;
         uint32_t instancesBuffer = Render::UndefinedBuffer;

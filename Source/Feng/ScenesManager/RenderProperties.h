@@ -16,7 +16,7 @@ namespace Feng
     {
         static constexpr uint32_t CamBufferBinding = 0;
         
-        ShaderBindings globalBindigs;
+        ShaderBindings globalBindings;
         std::vector<float> cascadeBorders;
         Camera *cam = nullptr;
         Light *directLight = nullptr;
