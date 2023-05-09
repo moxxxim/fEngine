@@ -33,6 +33,7 @@ namespace test
 
         std::unique_ptr<Feng::Material> WoodContainerMaterial;
         std::unique_ptr<Feng::Material> WoodContainerInstancedMaterial;
+        std::unique_ptr<Feng::Material> BrickWallMaterial;
         std::unique_ptr<Feng::Material> BrickWallWithNmMaterial;
         std::unique_ptr<Feng::Material> TileWallMaterial;
         std::unique_ptr<Feng::Material> DiffTex1SpecTex2Material;

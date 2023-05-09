@@ -184,7 +184,7 @@ vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir)
         specularImpact = pow(max(dot(viewDir, reflectDir), 0.f), uShininess);
     }
 
-    vec3 specularColor = (specularImpact * (light.Color.w * uSpecularity)) * light.Color.xyz;
+    vec3 specularColor = specularImpact * uSpecularity * lightColor;
     return diffuseColor + specularColor;
 }
 

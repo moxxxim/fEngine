@@ -59,6 +59,10 @@ namespace test
             {
                 return test::res.TileWallMaterial.get();
             }
+            else if (name == "BrickWallMaterial")
+            {
+                return test::res.BrickWallMaterial.get();
+            }
             else if (name == "BrickWallWithNmMaterial")
             {
                 return test::res.BrickWallWithNmMaterial.get();
@@ -75,6 +79,7 @@ namespace test
             { Feng::Vector3(-2.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", true },
             { Feng::Vector3(0.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", false },
             { Feng::Vector3(2.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "BrickWallWithNmMaterial", false },
+            { Feng::Vector3(4.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "BrickWallMaterial", false },
             { Feng::Vector3( -2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
             { Feng::Vector3( 0.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
             { Feng::Vector3( 2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
@@ -148,7 +153,7 @@ namespace test
                                                     Light::eType::Directional,
                                                     material.get(),
                                                     test::res.CubeMesh.get());
-            //lightEntity.AddComponent<DirectionalLightMovement>();
+            lightEntity.AddComponent<DirectionalLightMovement>();
 
             Light* light = lightEntity.GetComponent<Light>();
             lightMaterials[light] = std::move(material);

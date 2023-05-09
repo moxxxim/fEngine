@@ -253,6 +253,10 @@ namespace
         test::res.WoodContainerMaterial = std::make_unique<Material>(std::move(phongTexShader));
         test::res.WoodContainerMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
         test::res.WoodContainerMaterial->SetTransparent(false);
+        
+        std::unique_ptr<Shader> phongTexShader2 = LoadShader(PhongTexVs, PhongTexFs);
+        test::res.BrickWallMaterial = std::make_unique<Material>(std::move(phongTexShader2));
+        test::res.BrickWallMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.BrickwallBcTexture.get());
 
         std::unique_ptr<Shader> phongTexInstancedShader = LoadShader(PhongTexInstancedVs, PhongTexFs);
         test::res.WoodContainerInstancedMaterial = std::make_unique<Material>(std::move(phongTexInstancedShader));
@@ -265,11 +269,13 @@ namespace
         test::res.TileWallMaterial->Bindings().SetFloat("uSpecularity", 1.0f);
         test::res.TileWallMaterial->Bindings().SetFloat("uShininess", 64.0f);
         test::res.TileWallMaterial->SetTransparent(false);
-        
+
         std::unique_ptr<Shader> phongTexWithNmShader = LoadShader(PhongTexWithNormalMapVs, PhongTexWithNormalMapFs);
         test::res.BrickWallWithNmMaterial = std::make_unique<Material>(std::move(phongTexWithNmShader));
         test::res.BrickWallWithNmMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.BrickwallBcTexture.get());
         test::res.BrickWallWithNmMaterial->Bindings().SetTexture(ShaderParams::NormalMap0.data(), test::res.BrickwallNmTexture.get());
+        test::res.BrickWallWithNmMaterial->Bindings().SetFloat("uSpecularity", 1.0f);
+        test::res.BrickWallWithNmMaterial->Bindings().SetFloat("uShininess", 64.0f);
 
         std::unique_ptr<Shader> diff1Spec2Shader = LoadShader(PhongTexVs, DiffTex1SpecTex2Fs);
         test::res.DiffTex1SpecTex2Material = std::make_unique<Material>(std::move(diff1Spec2Shader));

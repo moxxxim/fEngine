@@ -33,10 +33,14 @@ uniform int uCascadesCount = 3;
 uniform samplerCube uPointShadowMap;
 uniform float uFarClipPlane;
 
+uniform float uSpecularity;
+uniform float uShininess;
+
 uniform vec4 uAmbientColor; // xyz - color, w - intencity.
 uniform PointLight uPointLight;
 uniform DirectLight uDirectLight;
 uniform SpotLight uSpotLight;
+uniform bool uBlinn = true;
 
 layout (std140) uniform ubCamera
 {
@@ -61,8 +65,8 @@ layout (std140) uniform ubCamera
 
 in VsOut
 {
+    mat3 TBN;
     vec3 FragPos;
-    //vec3 Norm;
     vec2 Uv0;
 } fsIn;
 
@@ -157,26 +161,69 @@ float CalculatePointShadowMultiplier(PointLight light, vec3 fragPos)
     return IsInShadow(fragmentDepth, shadowDepth, bias);
 }
 
-vec3 CalculateDirLight(DirectLight light, vec3 norm)
+vec3 CalculateDirLight(DirectLight light, vec3 norm, vec3 viewDir)
 {
     vec3 lightDir = normalize(light.Dir);
+    vec3 lightColor = light.Color.w * light.Color.rgb;
 
+    // Calculate diffuse component. 
     float diffuseImpact = max(dot(norm, -lightDir), 0.f);
-    return (diffuseImpact * light.Color.w) * light.Color.rgb;;
+    vec3 diffuseColor = diffuseImpact * lightColor;
+
+    // Calculate specular component.
+
+    float specularImpact = 0.f;
+    // Blinn-phong.
+    if(uBlinn)
+    {
+        vec3 halfway = normalize(viewDir - lightDir);
+        specularImpact = pow(max(dot(halfway, norm), 0.f), uShininess);
+    }
+    // Phong.
+    else
+    {
+        vec3 reflectDir = reflect(lightDir, norm);
+        specularImpact = pow(max(dot(viewDir, reflectDir), 0.f), uShininess);
+    }
+
+    vec3 specularColor = specularImpact * uSpecularity * lightColor;
+    return diffuseColor + specularColor;
 }
 
-vec3 CalculatePointLight(PointLight light, vec3 norm)
+vec3 CalculatePointLight(PointLight light, vec3 norm, vec3 viewDir)
 {
     vec3 lightDir = fsIn.FragPos - light.PositionAndRange.xyz;
     vec3 lightDirNorm = normalize(lightDir);
     float lightDistance = length(lightDir);
     float distanceAttenuation = pow(clamp(1.f - lightDistance / light.PositionAndRange.w, 0.f, 1.f), 2.f);
 
+    vec3 lightColor = (distanceAttenuation * light.Color.w) * light.Color.rgb;
+
+    // Calculate diffuse component. 
     float diffuseImpact = max(dot(norm, -lightDirNorm), 0.f);
-    return (diffuseImpact * distanceAttenuation * light.Color.w) * light.Color.rgb;
+    vec3 diffuseColor = lightColor * diffuseImpact;
+
+    // Calculate specular component.
+
+    float specularImpact = 0.f;
+    // Blinn-phong.
+    if(uBlinn)
+    {
+        vec3 halfway = normalize(viewDir - lightDirNorm);
+        specularImpact = pow(max(dot(halfway, norm), 0.f), uShininess);    
+    }
+    // Phong.
+    else
+    {
+        vec3 reflectDir = reflect(lightDirNorm, norm);
+        specularImpact = pow(max(dot(viewDir, reflectDir), 0.f), uShininess);    
+    }
+
+    vec3 specularColor = (specularImpact * uSpecularity) * lightColor;
+    return diffuseColor + specularColor;
 }
 
-vec3 CalculateSpotLight(SpotLight light, vec3 norm)
+vec3 CalculateSpotLight(SpotLight light, vec3 norm, vec3 viewDir)
 {
     vec3 rayDir = fsIn.FragPos - light.PositionAndRange.xyz;
     vec3 rayDirNorm = normalize(rayDir);
@@ -188,9 +235,30 @@ vec3 CalculateSpotLight(SpotLight light, vec3 norm)
     float distanceAttenuation = pow(clamp(1.f - lightDistance / light.PositionAndRange.w, 0.f, 1.f), 2.f);
 
     vec3 lightColor = (angleAttenuation * distanceAttenuation * light.Color.w) * light.Color.rgb;
+
+    // Calculate diffuse component. 
+
     float diffuseImpact = max(dot(norm, -rayDirNorm), 0.f);
-    
-    return lightColor * diffuseImpact;
+    vec3 diffuseColor = lightColor * diffuseImpact;
+
+    // Calculate specular component.
+
+    float specularImpact = 0.f;
+    // Blinn-phong.
+    if(uBlinn)
+    {
+        vec3 halfway = normalize(viewDir - rayDirNorm);
+        specularImpact = pow(max(dot(halfway, norm), 0.f), uShininess);
+    }
+    // Phong.
+    else
+    {
+        vec3 reflectDir = reflect(rayDirNorm, norm);
+        specularImpact = pow(max(dot(viewDir, reflectDir), 0.f), uShininess);   
+    }
+
+    vec3 specularColor = (specularImpact * uSpecularity) * lightColor;
+    return diffuseColor + specularColor;
 }
 
 vec4 ToLinearColor(vec4 srgbColor)
@@ -205,10 +273,9 @@ vec4 ToSrgbColor(vec4 linearColor)
 
 vec3 DeduceNorm()
 {
-    //return normalize(fsIn.Norm);
-
     vec4 norm01 = texture(uNormalMap0, fsIn.Uv0);
-    return normalize(norm01.xyz * 2 - 1);
+    vec3 normTan = norm01.xyz * 2.f - 1.f;
+    return normalize(fsIn.TBN * normTan);
 }
 
 void main()
@@ -220,13 +287,14 @@ void main()
     vec3 ambientColor = uAmbientColor.w * uAmbientColor.rgb;
 
     vec3 norm = DeduceNorm();
+    vec3 viewDir = normalize(uCamPos - fsIn.FragPos);
 
     float directShadowValue = CalculateDirectShadowMultiplier();
     float pointShadowValue = CalculatePointShadowMultiplier(uPointLight, fsIn.FragPos);
 
-    vec3 lightColor = directShadowValue * CalculateDirLight(uDirectLight, norm);
-    lightColor += pointShadowValue * CalculatePointLight(uPointLight, norm);    
-    lightColor += CalculateSpotLight(uSpotLight, norm);
+    vec3 lightColor = directShadowValue * CalculateDirLight(uDirectLight, norm, viewDir);
+    lightColor += pointShadowValue * CalculatePointLight(uPointLight, norm, viewDir);    
+    lightColor += CalculateSpotLight(uSpotLight, norm, viewDir);
 
     linearColor.rgb *= (ambientColor + lightColor);
 
