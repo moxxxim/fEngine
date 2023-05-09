@@ -4,6 +4,7 @@
 #include <Feng/Render/RenderBase.h>
 #include <Feng/Render/VertexBuffer.h>
 #include <Feng/ScenesManager/Component.h>
+#include <Feng/Utils/Render/MeshParams.h>
 #include <Feng/Utils/Render/TextureParams.h>
 
 #include <cstdint>
@@ -37,6 +38,8 @@ namespace Feng
         void SetInstanceTransforms(const std::vector<Matrix4>& instances);
         void AddExternalTexture(const std::string_view& name, eTextureType type, int32_t bufferId);
         void RemoveExternalTexture(const std::string_view& name);
+        void ActivateAttributes(eVertexAtributes aAttributes);
+        void DeactivateAttributes(eVertexAtributes aAttributes);
 
         void Draw(const RenderProperties &aRenderProperties, bool isShadowPass, Material *externalMaterial = nullptr);
 
@@ -64,11 +67,11 @@ namespace Feng
 
         VertexBuffer vertexBuffer;
         uint32_t instancesBuffer = Render::UndefinedBuffer;
-
         std::map<std::string, uint32_t> textureBuffers;
 
         Material *material = nullptr;
         Mesh *mesh = nullptr;
+        eVertexAtributes activeAttributes = eVertexAtributes::Empty;
         uint32_t instancesCount = 0;
         uint32_t firstInstanceAttributeIndex = 0;
         std::map<std::string_view, std::pair<eTextureType, uint32_t>> externalTextures;

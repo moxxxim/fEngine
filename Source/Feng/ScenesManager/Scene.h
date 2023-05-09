@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Feng/ScenesManager/Light.h>
+#include <Feng/Utils/Render/MeshParams.h>
 
 #include <memory>
 #include <string>
@@ -24,7 +25,10 @@ namespace Feng
         Entity& CreateEntity(const std::string& name = "");
         Entity& CreateCamera();
         Entity& CreateLight(Light::eType type, Material *material, Mesh *mesh);
-        Entity& CreateMesh(Material *material, Mesh *mesh, const std::string& name = "");
+        Entity& CreateMesh(
+                           Material *material,
+                           Mesh *mesh,
+                           const std::string& name = "");
         Entity& CreateSkybox(Material *material);
 
         void Update(float deltaTime);

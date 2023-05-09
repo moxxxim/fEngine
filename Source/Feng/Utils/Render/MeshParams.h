@@ -11,9 +11,9 @@ namespace Feng
         Empty = 0,
         Position = 1 << 0,
         Normal = 1 << 1,
-        Tangent = 1 << 2,
-        Binormal = 1 << 3,
-        Uv0 = 1 << 4,
+        Uv0 = 1 << 2,
+        Tangent = 1 << 3,
+        Bitangent = 1 << 4,
     };
 
     enum class ePrimitiveType : uint32_t

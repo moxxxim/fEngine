@@ -22,6 +22,7 @@ namespace Feng
         static constexpr std::string_view Texture0 {"uTexture0"};
         static constexpr std::string_view Texture1 {"uTexture1"};
         static constexpr std::string_view Texture2 {"uTexture2"};
+        static constexpr std::string_view NormalMap0 {"uNormalMap0"};
 
         static constexpr std::string_view AmbientColor {"uAmbientColor"};
         static constexpr std::string_view PointLightColor {"uPointLight.Color"};
@@ -49,7 +50,7 @@ namespace Feng
         static constexpr std::string_view VertexPos {"aPos"};
         static constexpr std::string_view VertexUv0 {"aUv0"};
         static constexpr std::string_view VertexNorm {"aNorm"};
-        static constexpr std::string_view VertexBinorm {"aBinorm"};
+        static constexpr std::string_view VertexBitangent {"aBitangent"};
         static constexpr std::string_view VertexTangent {"aTangent"};
         
         static constexpr std::string_view DebugCascadeNum {"uDebugCascadeNum"};

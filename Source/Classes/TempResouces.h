@@ -21,17 +21,20 @@ namespace test
     struct TempRes final
     {
         std::unique_ptr<Feng::Texture> WoodContainerTexture;
-        std::unique_ptr<Feng::Texture> BrickWallTexture;
+        std::unique_ptr<Feng::Texture> TileWallTexture;
         std::unique_ptr<Feng::Texture> AwesomeFaceTexture;
         std::unique_ptr<Feng::Texture> SteeledWoodTexture;
         std::unique_ptr<Feng::Texture> SteelBorderTexture;
         std::unique_ptr<Feng::Texture> GrassTexture;
         std::unique_ptr<Feng::Texture> WindowTexture;
         std::unique_ptr<Feng::Texture> SkyboxTexture;
+        std::unique_ptr<Feng::Texture> BrickwallBcTexture;
+        std::unique_ptr<Feng::Texture> BrickwallNmTexture;
 
-        std::unique_ptr<Feng::Material> PhongTexMaterial;
-        std::unique_ptr<Feng::Material> PhongTexInstancedMaterial;
-        std::unique_ptr<Feng::Material> SpecularTexMaterial;
+        std::unique_ptr<Feng::Material> WoodContainerMaterial;
+        std::unique_ptr<Feng::Material> WoodContainerInstancedMaterial;
+        std::unique_ptr<Feng::Material> BrickWallWithNmMaterial;
+        std::unique_ptr<Feng::Material> TileWallMaterial;
         std::unique_ptr<Feng::Material> DiffTex1SpecTex2Material;
         std::unique_ptr<Feng::Material> ShowDepthMaterial;
         std::unique_ptr<Feng::Material> GrassMaterial;

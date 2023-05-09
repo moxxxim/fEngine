@@ -3,7 +3,6 @@
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/ResourcesManager/Texture.h>
-#include <Feng/ScenesManager/Camera.h>>
 #include <Feng/Utils/Render/TextureParams.h>
 #include <Feng/Utils/Debug.h>
 
@@ -39,10 +38,10 @@ namespace Feng::Render
         }
     }
 
-    uint32_t EnableVertexAttributes(eVertexAtributes attributesMask)
+    uint32_t EnableVertexAttributes(eVertexAtributes enabled, eVertexAtributes all)
     {
-        uint32_t stride = AttributesParser::GetStride(attributesMask);
-        AttributesParser attributes { attributesMask };
+        uint32_t stride = AttributesParser::GetStride(all);
+        AttributesParser attributes { enabled };
 
         GLuint attributeIndex = 0;
         GLsizei offset = 0;
@@ -273,8 +272,8 @@ namespace Feng::Render
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * quadVertices.size(), quadVertices.data(), GL_STATIC_DRAW);
 
-        uint32_t attributes = eVertexAtributes::Position | eVertexAtributes::Uv0;
-        std::ignore = Render::EnableVertexAttributes(static_cast<eVertexAtributes>(attributes));
+        eVertexAtributes attributes = static_cast<eVertexAtributes>(eVertexAtributes::Position | eVertexAtributes::Uv0);
+        std::ignore = Render::EnableVertexAttributes(attributes, attributes);
 
         glBindBuffer(GL_ARRAY_BUFFER, Render::UndefinedBuffer);
         glBindVertexArray(Render::UndefinedBuffer);

@@ -3,10 +3,6 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
 layout (location = 2) in vec2 aUv0;
-// TODO: m.alekseev How to ignore this.
-layout (location = 3) in vec3 aTangent;
-layout (location = 4) in vec3 aBitangent;
-layout (location = 5) in mat4 aModelMatrix;
 
 layout (std140) uniform ubCamera
 {
@@ -29,6 +25,8 @@ layout (std140) uniform ubCamera
                             // Total            208
 };
 
+uniform mat4 uModelMatrix;
+
 out VsOut
 {
     vec3 FragPos;
@@ -38,10 +36,10 @@ out VsOut
 
 void main()
 {
-    vec4 worlPos = aModelMatrix * vec4(aPos, 1.0);
+    vec4 worlPos = uModelMatrix * vec4(aPos, 1.0);
     gl_Position = uProjMatrix * uViewMatrix * worlPos;
     vsOut.FragPos = worlPos.xyz;
-    // Inverse is a costly operation, it should not be used in shader.
-    vsOut.Norm = transpose(inverse(mat3(aModelMatrix))) * aNorm;
     vsOut.Uv0 = aUv0;
+
+    vsOut.Norm = transpose(inverse(mat3(uModelMatrix))) * aNorm;
 }

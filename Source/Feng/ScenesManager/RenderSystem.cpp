@@ -308,7 +308,7 @@ namespace Feng
     void RenderSystem::Draw()
     {
         UpdateGlobalBindings();
-        DrawShadowMap();
+        UpdateShadowMap();
 
         if(Engine::IsDirectShowDebugShadowMap())
         {
@@ -346,16 +346,16 @@ namespace Feng
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
     
-    void RenderSystem::DrawShadowMap()
+    void RenderSystem::UpdateShadowMap()
     {
         if (IsShadowsEnabled())
         {
-            DrawDirectShadowMap();
-            DrawPointShadowMap();
+            UpdateDirectShadowMap();
+            UpdatePointShadowMap();
         }
     }
     
-    void RenderSystem::DrawDirectShadowMap()
+    void RenderSystem::UpdateDirectShadowMap()
     {
         shadowSetup.directShadowMap = GetDirectShadowMapBuffer();
         SRenderSystem::ClampShadowMapToBorder(shadowSetup.directShadowMap);
@@ -370,7 +370,7 @@ namespace Feng
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     
-    void RenderSystem::DrawPointShadowMap()
+    void RenderSystem::UpdatePointShadowMap()
     {
         shadowSetup.pointShadowMap = GetPointShadowMapBuffer();
         SRenderSystem::ClampShadowMapToBorder(shadowSetup.pointShadowMap);

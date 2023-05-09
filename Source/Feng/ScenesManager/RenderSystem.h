@@ -62,9 +62,9 @@ namespace Feng
         
         bool IsShadowsEnabled();
         void CreateCamUniformBuffer();
-        void DrawShadowMap();
-        void DrawDirectShadowMap();
-        void DrawPointShadowMap();
+        void UpdateShadowMap();
+        void UpdateDirectShadowMap();
+        void UpdatePointShadowMap();
         void DrawShadowCastersInShadowMap(Material *shadowMaterial);
         void DrawDebugDirectShadowMap();
         void DrawDebugOmniShadowMap();

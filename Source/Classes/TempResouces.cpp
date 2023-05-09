@@ -34,6 +34,8 @@ namespace
     constexpr const char *CubemapReflectiveVs = "Unlit/CubemapReflectiveColorVs.shader";
     constexpr const char *CubemapRefractionFs = "Unlit/CubemapRefractionColorFs.shader";
     constexpr const char *CubemapRefractionVs = "Unlit/CubemapRefractionColorVs.shader";
+    constexpr const char *PhongTexWithNormalMapFs = "Lit/PhongTexWithNmFs.shader";
+    constexpr const char *PhongTexWithNormalMapVs = "Lit/PhongTexWithNmVs.shader";
     
     constexpr const char *ShadowPassVs = "Utils/ShadowPassVs.shader";
     constexpr const char *ShadowPassGs = "Utils/ShadowPassGs.shader";
@@ -51,13 +53,15 @@ namespace
     constexpr const char *BlurPostEffectFs = "PostEffects/PostEffectBlurFs.shader";
     constexpr const char *EdgeDetectionPostEffectFs = "PostEffects/PostEffectEdgeDetectionFs.shader";
 
-    constexpr const char *woodenContainerJpg = "wood_container.jpg";
-    constexpr const char *brickWallJpg = "brick_wall.jpg";
-    constexpr const char *awesomeFacePng = "awesomeface.png";
-    constexpr const char *steeledWoodPng = "steeled_wood.png";
-    constexpr const char *steeledBorderPng = "steel_border.png";
-    constexpr const char *grassPng = "grass.png";
-    constexpr const char *windowPng = "window.png";
+    constexpr const char *WoodenContainerJpg = "wood_container.jpg";
+    constexpr const char *TileWallJpg = "tile.jpg";
+    constexpr const char *AwesomeFacePng = "awesomeface.png";
+    constexpr const char *SteeledWoodPng = "steeled_wood.png";
+    constexpr const char *SteeledBorderPng = "steel_border.png";
+    constexpr const char *GrassPng = "grass.png";
+    constexpr const char *WindowPng = "window.png";
+    constexpr const char *BrickwallBcJpg = "Brickwall_BC.jpg";
+    constexpr const char *BrickwallNmJpg = "Brickwall_NM.jpg";
     
     std::array<std::string, 6> skyboxJpg =
     {
@@ -68,51 +72,68 @@ namespace
         "SkyboxBay/Bay_ZPos.jpg",
         "SkyboxBay/Bay_ZNeg.jpg"
     };
-    
+
     std::vector<float> cube
     {
-             // position            // normal          // uv
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
+             // position            // normal          // uv          // tangent            // bitangent
 
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+        
+         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+        
+        
 
-        0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        
+        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        
+        
 
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 1.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        
+        0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 0.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,  0.0f,  1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        
+        
 
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+        
+         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    1.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,    0.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  1.0f, 0.0f,
+        
+        
 
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f
+        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        
+         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        
+        
+
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        
+         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f,  1.0f,  0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
     };
     
     std::vector<float> quadVertices
@@ -131,12 +152,14 @@ namespace
     };
     
     std::unique_ptr<Feng::TextureData> woodContainerTextureData;
-    std::unique_ptr<Feng::TextureData> brickWallTextureData;
+    std::unique_ptr<Feng::TextureData> tileWallTextureData;
     std::unique_ptr<Feng::TextureData> awesomeFaceTextureData;
     std::unique_ptr<Feng::TextureData> steeledWoodTextureData;
     std::unique_ptr<Feng::TextureData> steelBorderTextureData;
     std::unique_ptr<Feng::TextureData> grassTextureData;
     std::unique_ptr<Feng::TextureData> windowTextureData;
+    std::unique_ptr<Feng::TextureData> brickwallBcTextureData;
+    std::unique_ptr<Feng::TextureData> brickwallNmTextureData;
     std::array<std::unique_ptr<Feng::TextureData>, 6> skyboxData;
 
     std::unique_ptr<Feng::PostEffectDefinition> grayscaleFx;
@@ -178,30 +201,38 @@ namespace
     {
         using namespace Feng;
         
-        woodContainerTextureData = LoadTexture(woodenContainerJpg, false);
+        woodContainerTextureData = LoadTexture(WoodenContainerJpg, false);
         test::res.WoodContainerTexture = std::make_unique<Texture>(*woodContainerTextureData);
         test::res.WoodContainerTexture->SetFilters(eTextureMinFilter::LinearMipLinear, eTextureMagFilter::Linear);
         test::res.WoodContainerTexture->SetUseMipmaps(true);
 
-        brickWallTextureData = LoadTexture(brickWallJpg, false);
-        test::res.BrickWallTexture = std::make_unique<Texture>(*brickWallTextureData);
+        tileWallTextureData = LoadTexture(TileWallJpg, false);
+        test::res.TileWallTexture = std::make_unique<Texture>(*tileWallTextureData);
 
-        awesomeFaceTextureData = LoadTexture(awesomeFacePng, true);
+        awesomeFaceTextureData = LoadTexture(AwesomeFacePng, true);
         test::res.AwesomeFaceTexture = std::make_unique<Texture>(*awesomeFaceTextureData);
 
-        steeledWoodTextureData = LoadTexture(steeledWoodPng, true);
+        steeledWoodTextureData = LoadTexture(SteeledWoodPng, true);
         test::res.SteeledWoodTexture = std::make_unique<Texture>(*steeledWoodTextureData);
 
-        steelBorderTextureData = LoadTexture(steeledBorderPng, true);
+        steelBorderTextureData = LoadTexture(SteeledBorderPng, true);
         test::res.SteelBorderTexture = std::make_unique<Texture>(*steelBorderTextureData);
 
-        grassTextureData = LoadTexture(grassPng, true);
+        grassTextureData = LoadTexture(GrassPng, true);
         test::res.GrassTexture = std::make_unique<Texture>(*grassTextureData);
         test::res.GrassTexture->SetWrapping(eTextureWrapping::ClampToEdge, Feng::eTextureWrapping::ClampToEdge);
 
-        windowTextureData = LoadTexture(windowPng, true);
+        windowTextureData = LoadTexture(WindowPng, true);
         test::res.WindowTexture = std::make_unique<Texture>(*windowTextureData);
         test::res.WindowTexture->SetWrapping(eTextureWrapping::ClampToEdge, Feng::eTextureWrapping::ClampToEdge);
+        
+        brickwallBcTextureData = LoadTexture(BrickwallBcJpg, false);
+        test::res.BrickwallBcTexture = std::make_unique<Texture>(*brickwallBcTextureData);
+        test::res.BrickwallBcTexture->SetWrapping(eTextureWrapping::ClampToEdge, Feng::eTextureWrapping::ClampToEdge);
+        
+        brickwallNmTextureData = LoadTexture(BrickwallNmJpg, false);
+        test::res.BrickwallNmTexture = std::make_unique<Texture>(*brickwallNmTextureData);
+        test::res.BrickwallNmTexture->SetWrapping(eTextureWrapping::ClampToEdge, Feng::eTextureWrapping::ClampToEdge);
 
         skyboxData = LoadCubemapTexture(skyboxJpg, false);
         std::array<const TextureData*, 6> skyboxFaces;
@@ -219,21 +250,26 @@ namespace
         LoadTextures();
 
         std::unique_ptr<Shader> phongTexShader = LoadShader(PhongTexVs, PhongTexFs);
-        test::res.PhongTexMaterial = std::make_unique<Material>(std::move(phongTexShader));
-        test::res.PhongTexMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
-        test::res.PhongTexMaterial->SetTransparent(false);
+        test::res.WoodContainerMaterial = std::make_unique<Material>(std::move(phongTexShader));
+        test::res.WoodContainerMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
+        test::res.WoodContainerMaterial->SetTransparent(false);
 
         std::unique_ptr<Shader> phongTexInstancedShader = LoadShader(PhongTexInstancedVs, PhongTexFs);
-        test::res.PhongTexInstancedMaterial = std::make_unique<Material>(std::move(phongTexInstancedShader));
-        test::res.PhongTexInstancedMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
-        test::res.PhongTexInstancedMaterial->SetTransparent(false);
+        test::res.WoodContainerInstancedMaterial = std::make_unique<Material>(std::move(phongTexInstancedShader));
+        test::res.WoodContainerInstancedMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.WoodContainerTexture.get());
+        test::res.WoodContainerInstancedMaterial->SetTransparent(false);
 
         std::unique_ptr<Shader> specularTextureShader = LoadShader(PhongTexVs, PhongSpecularTextureFs);
-        test::res.SpecularTexMaterial = std::make_unique<Material>(std::move(specularTextureShader));
-        test::res.SpecularTexMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.BrickWallTexture.get());
-        test::res.SpecularTexMaterial->Bindings().SetFloat("uSpecularity", 1.0f);
-        test::res.SpecularTexMaterial->Bindings().SetFloat("uShininess", 64.0f);
-        test::res.SpecularTexMaterial->SetTransparent(false);
+        test::res.TileWallMaterial = std::make_unique<Material>(std::move(specularTextureShader));
+        test::res.TileWallMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.TileWallTexture.get());
+        test::res.TileWallMaterial->Bindings().SetFloat("uSpecularity", 1.0f);
+        test::res.TileWallMaterial->Bindings().SetFloat("uShininess", 64.0f);
+        test::res.TileWallMaterial->SetTransparent(false);
+        
+        std::unique_ptr<Shader> phongTexWithNmShader = LoadShader(PhongTexWithNormalMapVs, PhongTexWithNormalMapFs);
+        test::res.BrickWallWithNmMaterial = std::make_unique<Material>(std::move(phongTexWithNmShader));
+        test::res.BrickWallWithNmMaterial->Bindings().SetTexture(ShaderParams::Texture0.data(), test::res.BrickwallBcTexture.get());
+        test::res.BrickWallWithNmMaterial->Bindings().SetTexture(ShaderParams::NormalMap0.data(), test::res.BrickwallNmTexture.get());
 
         std::unique_ptr<Shader> diff1Spec2Shader = LoadShader(PhongTexVs, DiffTex1SpecTex2Fs);
         test::res.DiffTex1SpecTex2Material = std::make_unique<Material>(std::move(diff1Spec2Shader));
@@ -307,7 +343,12 @@ namespace
     {
         using namespace Feng;
         
-        uint32_t cubeAttributesValue = eVertexAtributes::Position | eVertexAtributes::Normal | eVertexAtributes::Uv0;
+        uint32_t cubeAttributesValue = Feng::eVertexAtributes::Position
+                                     | Feng::eVertexAtributes::Normal
+                                     | Feng::eVertexAtributes::Tangent
+                                     | Feng::eVertexAtributes::Bitangent
+                                     | Feng::eVertexAtributes::Uv0;
+
         eVertexAtributes cubeAttributes = static_cast<eVertexAtributes>(cubeAttributesValue);
         test::res.CubeMesh = std::make_unique<Mesh>(cube, cubeAttributes, ePrimitiveType::Triangles);
 

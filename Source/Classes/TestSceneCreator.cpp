@@ -19,6 +19,7 @@
 #include <Feng/ScenesManager/MeshRenderer.h>
 #include <Feng/ScenesManager/RenderSystem.h>
 #include <Feng/ScenesManager/Transform.h>
+#include <Feng/Utils/Render/MeshParams.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 
 namespace test
@@ -29,11 +30,21 @@ namespace test
         
         constexpr Feng::Vector3 planePos{0.f, -1.f, 0.f};
         constexpr Feng::Vector3 reflectiveCubePos{6.f, planePos.y + 0.6f, 0.f};
+        constexpr uint32_t vertexFormatPNU = Feng::eVertexAtributes::Position
+                                           | Feng::eVertexAtributes::Normal
+                                           | Feng::eVertexAtributes::Uv0;
+        constexpr uint32_t vertexFormatPU = Feng::eVertexAtributes::Position | Feng::eVertexAtributes::Uv0;
+        constexpr uint32_t vertexFormatPNTBU = Feng::eVertexAtributes::Position
+                                             | Feng::eVertexAtributes::Normal
+                                             | Feng::eVertexAtributes::Tangent
+                                             | Feng::eVertexAtributes::Bitangent
+                                             | Feng::eVertexAtributes::Uv0;
         
         struct CubeDesc final
         {
             Feng::Vector3 pos {};
             Feng::Quaternion rotation {};
+            uint32_t attributes;
             std::string material;
             bool rotating = false;
         };
@@ -44,9 +55,13 @@ namespace test
             {
                 return test::res.DiffTex1SpecTex2Material.get();
             }
-            else if (name == "SpecularTexMaterial")
+            else if (name == "TileWallMaterial")
             {
-                return test::res.SpecularTexMaterial.get();
+                return test::res.TileWallMaterial.get();
+            }
+            else if (name == "BrickWallWithNmMaterial")
+            {
+                return test::res.BrickWallWithNmMaterial.get();
             }
             
             return nullptr;
@@ -54,16 +69,16 @@ namespace test
 
         std::vector<CubeDesc> cubes =
         {
-            { Feng::Vector3(-4.0f, 0.0f, 0.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", true },
-            { Feng::Vector3( 0.0f,  planePos.y + 0.6f,  -5.5f), Feng::Quaternion{}, "SpecularTexMaterial", false },
-            { Feng::Vector3( 2.0f,  0.0f, 0.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", true },
-            { Feng::Vector3(-2.0f, 2.0f, 0.0f), Feng::Quaternion{}, "SpecularTexMaterial", true },
-            { Feng::Vector3(0.0f, 2.0f, 0.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", false },
-            { Feng::Vector3(2.0f, 2.0f, 0.0f), Feng::Quaternion{}, "SpecularTexMaterial", false },
-            { Feng::Vector3( -2.0f, 1.0f, -4.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", true },
-            { Feng::Vector3( 0.0f, 1.0f, -4.0f), Feng::Quaternion{}, "SpecularTexMaterial", false },
-            { Feng::Vector3( 2.0f, 1.0f, -4.0f), Feng::Quaternion{}, "DiffTex1SpecTex2Material", true },
-            { Feng::Vector3( -2.f, planePos.y + 0.6f, 0.f), Feng::Quaternion{}, "SpecularTexMaterial", false },
+            { Feng::Vector3(-4.0f, 0.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
+            { Feng::Vector3( 0.0f,  planePos.y + 0.6f,  -5.5f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
+            { Feng::Vector3( 2.0f,  0.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
+            { Feng::Vector3(-2.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", true },
+            { Feng::Vector3(0.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", false },
+            { Feng::Vector3(2.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "BrickWallWithNmMaterial", false },
+            { Feng::Vector3( -2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
+            { Feng::Vector3( 0.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
+            { Feng::Vector3( 2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
+            { Feng::Vector3( -2.f, planePos.y + 0.6f, 0.f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
         };
 
         std::array<Feng::Vector3, 10> vegetationPositions
@@ -133,7 +148,7 @@ namespace test
                                                     Light::eType::Directional,
                                                     material.get(),
                                                     test::res.CubeMesh.get());
-            lightEntity.AddComponent<DirectionalLightMovement>();
+            //lightEntity.AddComponent<DirectionalLightMovement>();
 
             Light* light = lightEntity.GetComponent<Light>();
             lightMaterials[light] = std::move(material);
@@ -210,12 +225,14 @@ namespace test
                                 const std::string& name,
                                 Feng::Mesh &mesh,
                                 Feng::Material& material,
+                                Feng::eVertexAtributes attributes,
                                 bool shadowCaster)
         {
             Feng::Material *finalMaterial = Feng::Engine::IsShowDepth() ? test::res.ShowDepthMaterial.get() : &material;
             Feng::Entity& obj = scene.CreateMesh(finalMaterial, &mesh, name);
             Feng::MeshRenderer* renderer = obj.GetComponent<Feng::MeshRenderer>();
             renderer->SetShadowCaster(shadowCaster);
+            renderer->ActivateAttributes(attributes);
 
             Feng::Transform *transform = obj.GetComponent<Feng::Transform>();
             transform->SetPosition(position);
@@ -225,7 +242,7 @@ namespace test
 
         void CreateInstancedObject(Feng::Scene& scene, Feng::Mesh &mesh)
         {
-            Feng::Entity& obj = scene.CreateMesh(test::res.PhongTexInstancedMaterial.get(), &mesh, "Instanced");
+            Feng::Entity& obj = scene.CreateMesh(test::res.WoodContainerInstancedMaterial.get(), &mesh, "Instanced");
             InstancedObjectTransformController &instances = obj.AddComponent<InstancedObjectTransformController>();
             instances.SetCount(1'000);
         }
@@ -247,7 +264,14 @@ namespace test
                 const CubeDesc& cube = cubes[i];
                 std::string name = "cube " + std::to_string(i);
                 Feng::Material *material = GetMaterial(cube.material);
-                Entity* object = CreateObject(scene, cube.pos, name, *test::res.CubeMesh, *material, true);
+                Entity* object = CreateObject(
+                                              scene,
+                                              cube.pos,
+                                              name,
+                                              *test::res.CubeMesh,
+                                              *material,
+                                              static_cast<eVertexAtributes>(cube.attributes),
+                                              true);
                 if(cube.rotating)
                 {
                     GameObjectRotation& objectRotation = object->AddComponent<GameObjectRotation>();
@@ -257,7 +281,14 @@ namespace test
             }
             
             // Plane.
-            Entity *planeEntity = CreateObject(scene, planePos, "Plane", *test::res.CubeMesh, *test::res.PhongTexMaterial, false);
+            Entity *planeEntity = CreateObject(
+                                               scene,
+                                               planePos,
+                                               "Plane",
+                                               *test::res.CubeMesh,
+                                               *test::res.WoodContainerMaterial,
+                                               test::res.CubeMesh->GetAttributes(),
+                                               false);
             Transform *planeTransform = planeEntity->GetComponent<Transform>();
             planeTransform->SetScale(40.f, 0.2f, 40.f);
 
@@ -266,7 +297,14 @@ namespace test
             {
                 const Vector3& position = vegetationPositions[i];
                 std::string name = "grass " + std::to_string(i);
-                std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.GrassMaterial, false);
+                std::ignore = CreateObject(
+                                           scene,
+                                           position,
+                                           name,
+                                           *test::res.QuadMesh,
+                                           *test::res.GrassMaterial,
+                                           test::res.QuadMesh->GetAttributes(),
+                                           false);
             }
 
             // Windows.
@@ -274,7 +312,14 @@ namespace test
             {
                 const Vector3& position = windowPositions[i];
                 std::string name = "window " + std::to_string(i);
-                std::ignore = CreateObject(scene, position, name, *test::res.QuadMesh, *test::res.WindowMaterial, false);
+                std::ignore = CreateObject(
+                                           scene,
+                                           position,
+                                           name,
+                                           *test::res.QuadMesh,
+                                           *test::res.WindowMaterial,
+                                           test::res.QuadMesh->GetAttributes(),
+                                           false);
             }
 
             Feng::Entity *reflectiveeObject = CreateObject(
@@ -283,6 +328,7 @@ namespace test
                                                           "Reflective",
                                                           *test::res.CubeMesh,
                                                           *test::res.CubemapReflectiveMaterial,
+                                                          test::res.CubeMesh->GetAttributes(),
                                                           true);
             Feng::Transform *reflectiveObjectTransform = reflectiveeObject->GetComponent<Feng::Transform>();
 

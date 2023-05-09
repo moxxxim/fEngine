@@ -23,7 +23,7 @@ namespace Feng
     
     namespace Render
     {
-        uint32_t EnableVertexAttributes(eVertexAtributes attributesMask);
+        uint32_t EnableVertexAttributes(eVertexAtributes enabled, eVertexAtributes all);
 
         void ResolveBindings(Shader& shader,
                              const ShaderBindings& bindings,

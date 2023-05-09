@@ -9,21 +9,21 @@ namespace Feng
     {
         eVertexAtributes::Position,
         eVertexAtributes::Normal,
+        eVertexAtributes::Uv0,
         eVertexAtributes::Tangent,
-        eVertexAtributes::Binormal,
-        eVertexAtributes::Uv0
+        eVertexAtributes::Bitangent,
     };
 
     const std::array<uint32_t, 5> AttributesParser::DataSizes
     {
         static_cast<uint32_t>(sizeof(Vector3)),
         static_cast<uint32_t>(sizeof(Vector3)),
-        static_cast<uint32_t>(sizeof(Vector3)),
-        static_cast<uint32_t>(sizeof(Vector3)),
         static_cast<uint32_t>(sizeof(Vector2)),
+        static_cast<uint32_t>(sizeof(Vector3)),
+        static_cast<uint32_t>(sizeof(Vector3)),
     };
 
-    const std::array<GLint, 5> AttributesParser::ComponentNumbers { 3, 3, 3, 3, 2 };
+    const std::array<GLint, 5> AttributesParser::ComponentNumbers { 3, 3, 2, 3, 3 };
 
     const std::array<GLenum, 5> AttributesParser::DataTypes
     {

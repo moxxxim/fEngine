@@ -129,7 +129,10 @@ namespace Feng
         return entity;
     }
 
-    Entity& Scene::CreateMesh(Material *material, Mesh *mesh, const std::string& name)
+    Entity& Scene::CreateMesh(
+                              Material *material,
+                              Mesh *mesh,
+                              const std::string& name)
     {
         Entity &entity = CreateEntity(name);
         MeshRenderer& renderer = entity.AddComponent<MeshRenderer>();
@@ -148,6 +151,8 @@ namespace Feng
                                             ePrimitiveType::Triangles);
 
         Entity &skybox = CreateMesh(material, SScene::skyboxMesh.get(), "skybox");
+        MeshRenderer* renderer = skybox.GetComponent<MeshRenderer>();
+        renderer->ActivateAttributes(eVertexAtributes::Position);
 
         renderSystem->RemoveRenderer(skybox.GetComponent<MeshRenderer>()); // TODO: m.aleksee this is bad.
         renderSystem->SetSkybox(skybox.GetComponent<MeshRenderer>());

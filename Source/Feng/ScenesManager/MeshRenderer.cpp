@@ -60,6 +60,7 @@ namespace Feng
             mesh = aMesh;
             if(mesh)
             {
+                activeAttributes = mesh->GetAttributes();
                 CreateGeometryBuffers();
             }
         }
@@ -88,16 +89,28 @@ namespace Feng
     {
         externalTextures[name] = std::make_pair(type, bufferId);
     }
-    
+
     void MeshRenderer::RemoveExternalTexture(const std::string_view& name)
     {
         externalTextures.erase(name);
     }
-    
+
+    void MeshRenderer::ActivateAttributes(eVertexAtributes aAttributes)
+    {
+        eVertexAtributes attributes = mesh->GetAttributes();
+        activeAttributes = static_cast<eVertexAtributes>(attributes & aAttributes);
+    }
+
+    void MeshRenderer::DeactivateAttributes(eVertexAtributes aAttributes)
+    {
+        eVertexAtributes attributes = mesh->GetAttributes();
+        activeAttributes = static_cast<eVertexAtributes>((attributes | aAttributes) & attributes);
+    }
+
     void MeshRenderer::Draw(const RenderProperties &renderProperties, bool isShadowPass, Material *externalMaterial)
     {
         Material* workingMaterial = externalMaterial ? externalMaterial : material;
-        
+
         if (mesh && workingMaterial)
         {
             std::map<std::string, uint32_t> externalTextureBuffers;
@@ -105,11 +118,11 @@ namespace Feng
             {
                 externalTextureBuffers = Render::CreateTextureBuffers(*externalMaterial);
             }
-            
+
             std::map<std::string, uint32_t> *workingTextures = externalMaterial
                 ? &externalTextureBuffers
                 : &textureBuffers;
-            
+
             StartDraw(*workingMaterial);
             Print_Errors_OpengGL();
             Render::ResolveBindings(*workingMaterial->GetShader(), renderProperties.globalBindings, {});
@@ -118,11 +131,11 @@ namespace Feng
             Render::ResolveBindings(*workingMaterial->GetShader(), workingMaterial->Bindings(), *workingTextures);
             BindExternalTextures(static_cast<uint32_t>(workingTextures->size()), *workingMaterial);
             Print_Errors_OpengGL();
-            
+
             ExecuteDraw();
             FinishDraw();
             Print_Errors_OpengGL();
-            
+
             for(auto&& [name, tbo] : externalTextureBuffers)
             {
                 glDeleteTextures(1, &tbo);
@@ -157,7 +170,6 @@ namespace Feng
     void MeshRenderer::ExecuteDraw()
     {
         glBindVertexArray(vertexBuffer.vao);
-
         ePrimitiveType primitiveType = mesh->GetPrimitiveType();
 
         // No need to call 'glBindBuffer' because it was bound while VAO was still bound.
@@ -208,6 +220,7 @@ namespace Feng
 
         vertexBuffer.vao = vao;
         vertexBuffer.vbo = CreateVertexBuffer();
+        firstInstanceAttributeIndex = Render::EnableVertexAttributes(activeAttributes, mesh->GetAttributes());
 
         if(mesh->HasIndices())
         {
@@ -293,9 +306,7 @@ namespace Feng
         glGenBuffers(1, &bufferObject);
         glBindBuffer(GL_ARRAY_BUFFER, bufferObject);
         glBufferData(GL_ARRAY_BUFFER, mesh->GetDataSize(), mesh->GetData(), GL_STATIC_DRAW);
-
-        firstInstanceAttributeIndex = Render::EnableVertexAttributes(mesh->GetAttributes());
-
+ 
         return bufferObject;
     }
 
@@ -311,7 +322,7 @@ namespace Feng
 
         return bufferObject;
     }
-    
+
     void MeshRenderer::BindExternalTextures(uint32_t firstTextureUnit, Material &workingMaterial)
     {
         uint32_t textureUnit = firstTextureUnit;
