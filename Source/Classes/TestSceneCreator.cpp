@@ -67,6 +67,10 @@ namespace test
             {
                 return test::res.BrickWallWithNmMaterial.get();
             }
+            else if (name == "BrickWallParallaxMaterial")
+            {
+                return test::res.BrickWallParallaxMaterial.get();
+            }
             
             return nullptr;
         }
@@ -80,6 +84,7 @@ namespace test
             { Feng::Vector3(0.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", false },
             { Feng::Vector3(2.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "BrickWallWithNmMaterial", false },
             { Feng::Vector3(4.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "BrickWallMaterial", false },
+            { Feng::Vector3(6.0f, 2.0f, 0.0f), Feng::Quat::MakeRotation(0, 90, 0), vertexFormatPNU, "BrickWallParallaxMaterial", false },
             { Feng::Vector3( -2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
             { Feng::Vector3( 0.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
             { Feng::Vector3( 2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
@@ -153,7 +158,7 @@ namespace test
                                                     Light::eType::Directional,
                                                     material.get(),
                                                     test::res.CubeMesh.get());
-            lightEntity.AddComponent<DirectionalLightMovement>();
+            //lightEntity.AddComponent<DirectionalLightMovement>();
 
             Light* light = lightEntity.GetComponent<Light>();
             lightMaterials[light] = std::move(material);
@@ -277,6 +282,7 @@ namespace test
                                               *material,
                                               static_cast<eVertexAtributes>(cube.attributes),
                                               true);
+                object->GetComponent<Transform>()->SetRotation(cube.rotation);
                 if(cube.rotating)
                 {
                     GameObjectRotation& objectRotation = object->AddComponent<GameObjectRotation>();

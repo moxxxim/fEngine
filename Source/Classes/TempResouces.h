@@ -30,11 +30,15 @@ namespace test
         std::unique_ptr<Feng::Texture> SkyboxTexture;
         std::unique_ptr<Feng::Texture> BrickwallBcTexture;
         std::unique_ptr<Feng::Texture> BrickwallNmTexture;
+        std::unique_ptr<Feng::Texture> Brickwall2BcTexture;
+        std::unique_ptr<Feng::Texture> Brickwall2NmTexture;
+        std::unique_ptr<Feng::Texture> Brickwall2DepthTexture;
 
         std::unique_ptr<Feng::Material> WoodContainerMaterial;
         std::unique_ptr<Feng::Material> WoodContainerInstancedMaterial;
         std::unique_ptr<Feng::Material> BrickWallMaterial;
         std::unique_ptr<Feng::Material> BrickWallWithNmMaterial;
+        std::unique_ptr<Feng::Material> BrickWallParallaxMaterial;
         std::unique_ptr<Feng::Material> TileWallMaterial;
         std::unique_ptr<Feng::Material> DiffTex1SpecTex2Material;
         std::unique_ptr<Feng::Material> ShowDepthMaterial;

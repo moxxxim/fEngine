@@ -23,6 +23,7 @@ namespace Feng
         static constexpr std::string_view Texture1 {"uTexture1"};
         static constexpr std::string_view Texture2 {"uTexture2"};
         static constexpr std::string_view NormalMap0 {"uNormalMap0"};
+        static constexpr std::string_view DepthMap {"uDepthMap"};
 
         static constexpr std::string_view AmbientColor {"uAmbientColor"};
         static constexpr std::string_view PointLightColor {"uPointLight.Color"};
