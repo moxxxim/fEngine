@@ -84,7 +84,7 @@ namespace test
             { Feng::Vector3(0.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", false },
             { Feng::Vector3(2.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "BrickWallWithNmMaterial", false },
             { Feng::Vector3(4.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "BrickWallMaterial", false },
-            { Feng::Vector3(6.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "BrickWallParallaxMaterial", false },
+            { Feng::Vector3(6.0f, 2.0f, 0.0f), Feng::Quaternion{Feng::Vector3::OneY, 90}, vertexFormatPNU, "BrickWallParallaxMaterial", false },
             { Feng::Vector3( -2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
             { Feng::Vector3( 0.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
             { Feng::Vector3( 2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },

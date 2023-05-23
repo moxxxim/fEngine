@@ -284,9 +284,43 @@ vec3 DeduceNorm(vec2 uv)
 
 vec2 ParallaxUv(vec2 uv, vec3 tanFragToCam)
 {
-    float height =  texture(uDepthMap, uv).r;    
-    vec2 p = tanFragToCam.xy / tanFragToCam.z * (height * uParallaxStrength);
-    return uv - p; 
+    // number of depth layers
+    const float minLayers = 8.0;
+    const float maxLayers = 32.0;
+    float numLayers = mix(maxLayers, minLayers, max(dot(vec3(0.0, 0.0, 1.0), tanFragToCam), 0.0)); 
+    // calculate the size of each layer
+    float layerDepth = 1.0 / numLayers;
+    // depth of current layer
+    float currentLayerDepth = 0.0;
+    // the amount to shift the texture coordinates per layer (from vector P)
+    vec2 P = tanFragToCam.xy * uParallaxStrength; 
+    vec2 deltaUvPerLayer = P / numLayers;
+
+    vec2 currentUv = uv;
+    float currentDepthMapValue = texture(uDepthMap, currentUv).r;
+  
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        // shift texture coordinates along direction of P
+        currentUv -= deltaUvPerLayer;
+        // get depthmap value at current texture coordinates
+        currentDepthMapValue = texture(uDepthMap, currentUv).r;  
+        // get depth of next layer
+        currentLayerDepth += layerDepth;  
+    }   
+
+    // get texture coordinates before collision (reverse operations)
+    vec2 prevUv = currentUv + deltaUvPerLayer;
+
+    // get depth after and before collision for linear interpolation
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(uDepthMap, prevUv).r - currentLayerDepth + layerDepth;
+ 
+    // interpolation of texture coordinates
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevUv * weight + currentUv * (1.0 - weight);
+
+    return finalTexCoords; 
 }
 
 void main()
