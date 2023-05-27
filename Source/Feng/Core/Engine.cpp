@@ -92,7 +92,7 @@ namespace Feng
             glEnable(GL_STENCIL_TEST);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Default
-            glEnable(GL_MULTISAMPLE);
+            Engine::SetMultisampleEnabled(false);
 
             Print_Errors_OpengGL();
         }
@@ -316,6 +316,9 @@ namespace Feng
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
         inputKeys[InputKey::Kb_E] = (glfwGetKey(SEngine::window, GLFW_KEY_E) == GLFW_PRESS)
+                    ? eKeyStatus::Pressed
+                    : eKeyStatus::Released;
+        inputKeys[InputKey::Kb_H] = (glfwGetKey(SEngine::window, GLFW_KEY_H) == GLFW_PRESS)
                     ? eKeyStatus::Pressed
                     : eKeyStatus::Released;
         inputKeys[InputKey::Kb_I] = (glfwGetKey(SEngine::window, GLFW_KEY_I) == GLFW_PRESS)

@@ -8,8 +8,8 @@ namespace Feng
     {
         PostEffectContext(FrameBuffer aOriginal, FrameBuffer aInput, FrameBuffer aOutput)
         : original(aOriginal)
-		, input(aInput)
-		, output(aOutput)
+        , input(aInput)
+        , output(aOutput)
         { }
 
         PostEffectContext() = default;

@@ -357,6 +357,7 @@ namespace test
                                                          res.OmniShadowPassMaterial.get(),
                                                          res.ShadowMapDrawMaterial.get());
             scene->GetRenderSystem()->SetCascadeBorders({0.15f, 0.33f});
+            scene->GetRenderSystem()->SetToneMappingMaterial(res.ToneMappingMaterial.get());
             CreateObjects(*scene);
 
             return scene;

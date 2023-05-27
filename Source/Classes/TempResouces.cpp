@@ -47,6 +47,7 @@ namespace
         constexpr const char *OmniShadowPassFs = "Utils/OmniShadowPassFs.shader";
         constexpr const char *OmniShadowPassGs = "Utils/OmniShadowPassGs.shader";
         constexpr const char *EmptyFs = "Utils/EmptyFs.shader";
+        constexpr const char *ToneMappingFs = "Utils/ToneMappingFs.shader";
         
         constexpr const char *ShadowMapDrawFs = "Utils/ShowShadowMapFs.shader";
 
@@ -350,6 +351,8 @@ namespace
         test::res.DirectShadowPassMaterial = std::make_unique<Material>(LoadShader(ShaderSrc::ShadowPassVs, ShaderSrc::EmptyFs, ShaderSrc::ShadowPassGs));
         test::res.OmniShadowPassMaterial = std::make_unique<Material>(LoadShader(ShaderSrc::OmniShadowPassVs, ShaderSrc::OmniShadowPassFs, ShaderSrc::OmniShadowPassGs));
         test::res.ShadowMapDrawMaterial = std::make_unique<Material>(LoadShader(ShaderSrc::PostEffectVs, ShaderSrc::ShadowMapDrawFs));
+        
+        test::res.ToneMappingMaterial = std::make_unique<Material>(LoadShader(ShaderSrc::PostEffectVs, ShaderSrc::ToneMappingFs));
     }
 
     void CreatePostEffectDefinitions()

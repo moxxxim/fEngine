@@ -2,6 +2,7 @@
 
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/ResourcesManager/Shader.h>
+#include <Feng/Utils/Debug.h>
 #include <Feng/Utils/Render/TextureParams.h>
 #include <Feng/Utils/Render/RenderUtils.h>
 
@@ -37,6 +38,7 @@ namespace Feng
         {
             glActiveTexture(GL_TEXTURE0 + textureUnit);
             glBindTexture(GL_TEXTURE_2D, buffer);
+            Print_Errors_OpengGL();
             shader->SetUniformInt(name.c_str(), textureUnit);
             ++textureUnit;
         }

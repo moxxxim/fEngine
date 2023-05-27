@@ -91,6 +91,7 @@ namespace Feng::Render
             if(bindings.TryGetInt(name, intValue))
             {
                 shader.SetUniformInt(name.c_str(), intValue);
+                Print_Errors_OpengGL();
                 continue;
             }
 
@@ -98,6 +99,7 @@ namespace Feng::Render
             if(bindings.TryGetFloat(name, floatValue))
             {
                 shader.SetUniformFloat(name.c_str(), floatValue);
+                Print_Errors_OpengGL();
                 continue;
             }
 
@@ -105,6 +107,7 @@ namespace Feng::Render
             if(bindings.TryGetVector2(name, vector2Value))
             {
                 shader.SetUniformVector2(name.c_str(), vector2Value);
+                Print_Errors_OpengGL();
                 continue;
             }
 
@@ -112,6 +115,7 @@ namespace Feng::Render
             if(bindings.TryGetVector3(name, vector3Value))
             {
                 shader.SetUniformVector3(name.c_str(), vector3Value);
+                Print_Errors_OpengGL();
                 continue;
             }
 
@@ -119,6 +123,7 @@ namespace Feng::Render
             if(bindings.TryGetVector4(name, vector4Value))
             {
                 shader.SetUniformVector4(name.c_str(), vector4Value);
+                Print_Errors_OpengGL();
                 continue;
             }
             
@@ -126,6 +131,7 @@ namespace Feng::Render
             if(bindings.TryGetArrayFloats(name, arrayFloats))
             {
                 shader.SetUniformFloats(name.c_str(), arrayFloats);
+                Print_Errors_OpengGL();
                 continue;
             }
             
@@ -133,6 +139,7 @@ namespace Feng::Render
             if(bindings.TryGetArrayMatrices4(name, arrayMatrices))
             {
                 shader.SetUniformMatrices4(name.c_str(), arrayMatrices);
+                Print_Errors_OpengGL();
                 continue;
             }
             
@@ -140,6 +147,7 @@ namespace Feng::Render
             if(bindings.TryGetBuffer(name, buffer))
             {
                 shader.SetUniformBuffer(name.c_str(), buffer);
+                Print_Errors_OpengGL();
                 continue;
             }
 
@@ -149,6 +157,7 @@ namespace Feng::Render
                 if(auto it = textureBuffers.find(name); it != textureBuffers.end())
                 {
                     BindTexture(shader, texture->GetType(), textureUnit, name, it->second);
+                    Print_Errors_OpengGL();
                     ++textureUnit;
                 }
                 else
@@ -157,8 +166,6 @@ namespace Feng::Render
                 }
             }
         }
-        
-        Print_Errors_OpengGL();
     }
     
     void BindTexture(const Shader &shader, eTextureType textureType, uint32_t unit, const std::string_view& name, uint32_t textureBuffer)

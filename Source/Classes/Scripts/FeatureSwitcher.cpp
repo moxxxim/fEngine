@@ -66,6 +66,15 @@ void FeatureSwitcher::Update(float deltaTime)
             Feng::Engine::SetCursorVisible(!Feng::Engine::IsCursorVisible());
         }
     }
+    
+    if(Feng::Engine::IsKeyPressed(Feng::InputKey::Kb_H))
+    {
+        if(CheckTimeout())
+        {
+            Feng::RenderSystem *renderSystem = engine->GetCurrentScene()->GetRenderSystem();
+            renderSystem->SetHdr(!renderSystem->IsHdr());
+        }
+    }
 }
 
 void FeatureSwitcher::SwitchPostEffect()

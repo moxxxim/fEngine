@@ -33,7 +33,7 @@ namespace Feng
                     glTexImage2D(
                                  target,
                                  0,
-                                 GL_RGB,
+                                 settings.hdr ? GL_RGB16F : GL_RGB,
                                  settings.size.width,
                                  settings.size.height,
                                  0,
@@ -46,7 +46,7 @@ namespace Feng
                     glTexImage2DMultisample(
                                             target,
                                             samplesCount,
-                                            GL_RGB,
+                                            settings.hdr ? GL_RGB16F : GL_RGB,
                                             settings.size.width,
                                             settings.size.height,
                                             GL_TRUE);

@@ -47,7 +47,7 @@ namespace Feng
         effects.clear();
     }
 
-    void RenderPostProcessing::ApplyPostEffects(const FrameBuffer& screenBuffer)
+    void RenderPostProcessing::ApplyPostEffects(const FrameBuffer& screenBuffer, const FrameBuffer& outBuffer)
     {
         if (quadBuffer.vao == 0)
         {
@@ -55,11 +55,11 @@ namespace Feng
         }
 
         glBindVertexArray(quadBuffer.vao);
-        ApplyPostEffectsSequence(screenBuffer);
+        ApplyPostEffectsSequence(screenBuffer, outBuffer);
         glBindVertexArray(Render::UndefinedBuffer);
     }
 
-    void RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer)
+    void RenderPostProcessing::ApplyPostEffectsSequence(const FrameBuffer& screenBuffer, const FrameBuffer& outBuffer)
     {
         FrameBuffer::Settings intermediateSettings = screenBuffer.settings;
         intermediateSettings.color = FrameBuffer::eAttachement::Texture2d;
@@ -78,7 +78,7 @@ namespace Feng
         {
             // TODO: m.alekseev Seems like it doesn't work correctly for multiple effects.
             context.input = (i == 0) ? screenBuffer : intermediateBuffer;
-            context.output = (i == (effectsCount - 1)) ? FrameBuffer{} : intermediateBuffer;
+            context.output = (i == (effectsCount - 1)) ? outBuffer : intermediateBuffer;
 
             std::unique_ptr<PostEffect> &effect = effects[i];
             effect->Apply(context);

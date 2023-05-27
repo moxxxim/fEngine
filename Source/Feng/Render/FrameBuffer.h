@@ -28,6 +28,7 @@ namespace Feng
             uint32_t depth2dArraySize = 0;
             bool multisample = false;
             bool combinedDepthStencil = false;
+            bool hdr = false;
         };
 
         uint32_t frame = Default;
@@ -45,7 +46,8 @@ namespace Feng
             && (lhs.depth == rhs.depth)
             && (lhs.stencil == rhs.stencil)
             && (lhs.multisample == rhs.multisample)
-            && (lhs.combinedDepthStencil == rhs.combinedDepthStencil);
+            && (lhs.combinedDepthStencil == rhs.combinedDepthStencil)
+            && (lhs.hdr == rhs.hdr);
     }
     
     inline bool operator!=(const FrameBuffer::Settings& lhs, const FrameBuffer::Settings& rhs)

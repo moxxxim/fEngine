@@ -20,10 +20,10 @@ namespace Feng
         void SetPostEffect(PostEffectDefinition &postEffect);
         void AddPostEffect(PostEffectDefinition &postEffect);
         void RemoveEffects();
-        void ApplyPostEffects(const FrameBuffer& screenBuffer);
+        void ApplyPostEffects(const FrameBuffer& screenBuffer, const FrameBuffer& outBuffer);
 
     private:
-        void ApplyPostEffectsSequence(const FrameBuffer& screenBuffer);
+        void ApplyPostEffectsSequence(const FrameBuffer& screenBuffer, const FrameBuffer& outBuffer);
         std::unique_ptr<PostEffect> CreatePostEffect(PostEffectDefinition &postEffect);
 
         std::vector<std::unique_ptr<PostEffect>> effects;

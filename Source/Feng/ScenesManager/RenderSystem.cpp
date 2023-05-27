@@ -232,6 +232,11 @@ namespace Feng
         shadowSetup.directLightShadowDebugMaterial = directLightShadowDebugMaterial;
     }
     
+    void RenderSystem::SetToneMappingMaterial(Material* toneMapping)
+    {
+        toneMappingMaterial = toneMapping;
+    }
+    
     void RenderSystem::SetCascadeBorders(std::vector<float> aCascadeBorders)
     {
         bool validCascades = SRenderSystem::ValidateCascadeBorders(aCascadeBorders);
@@ -248,6 +253,16 @@ namespace Feng
         renderProperties.pointShadowLight = light;
     }
 
+    bool RenderSystem::IsHdr() const
+    {
+        return hdr;
+    }
+    
+    void RenderSystem::SetHdr(bool value)
+    {
+        hdr = value;
+    }
+    
     void RenderSystem::AddRenderer(MeshRenderer *renderer)
     {
         const Material* material = renderer->GetMaterial();
@@ -442,9 +457,13 @@ namespace Feng
     
     void RenderSystem::DrawGeneric()
     {
+        FrameBuffer outBuffer = IsOffscreenRender()
+            ? GetHdrBuffer(Engine::IsMultisampleEnabled())
+            : FrameBuffer{};
+        
         FrameBuffer renderBuffer = postProcessing.HasPostEffects()
                     ? GetFrameBuffer(Engine::IsMultisampleEnabled())
-                    : FrameBuffer{};
+                    : outBuffer;
 
         glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
         glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer.frame);
@@ -457,7 +476,15 @@ namespace Feng
         // Draw skybox before transparent object for correct visual effect.
         DrawSkybox();
         DrawTransparent();
-        ApplyPostEffects(renderBuffer);
+        ApplyPostEffects(renderBuffer, outBuffer);
+        
+        if(IsOffscreenRender())
+        {
+            RenderOnScreenQuad(outBuffer);
+        }
+        
+        fboPool.Push(outBuffer);
+        fboPool.Push(renderBuffer);
     }
     
     void RenderSystem::DrawOpaque()
@@ -497,23 +524,12 @@ namespace Feng
         Print_Errors_OpengGL();
     }
     
-    void RenderSystem::ApplyPostEffects(const FrameBuffer& renderBuffer)
+    void RenderSystem::ApplyPostEffects(const FrameBuffer& renderBuffer, const FrameBuffer& outBuffer)
     {
         if(postProcessing.HasPostEffects())
         {
-            FrameBuffer postEffectInput = renderBuffer;
-            if (renderBuffer.settings.multisample)
-            {
-                postEffectInput = GetFrameBuffer(false);
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, renderBuffer.frame);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, postEffectInput.frame);
-                glBlitFramebuffer(0, 0, renderBuffer.settings.size.width, renderBuffer.settings.size.height,
-                                  0, 0, postEffectInput.settings.size.width, postEffectInput.settings.size.height,
-                                  GL_COLOR_BUFFER_BIT, GL_NEAREST);
-                fboPool.Push(renderBuffer);
-            }
-
-            postProcessing.ApplyPostEffects(postEffectInput);
+            FrameBuffer postEffectInput = BlitFrameBuffer(renderBuffer);
+            postProcessing.ApplyPostEffects(postEffectInput, outBuffer);
             fboPool.Push(postEffectInput);
         }
     }
@@ -617,6 +633,77 @@ namespace Feng
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
     
+    bool RenderSystem::IsOffscreenRender() const
+    {
+        return hdr && toneMappingMaterial;
+    }
+    
+    void RenderSystem::RenderOnScreenQuad(const FrameBuffer& screen)
+    {
+        if (quadBuffer.vao == 0)
+        {
+            quadBuffer = Render::CreateQuadBuffer();
+        }
+        
+        glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
+        glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer::Default);
+        Print_Errors_OpengGL();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        
+        glBindVertexArray(quadBuffer.vao);
+        
+        Shader *shader = toneMappingMaterial->GetShader();
+        shader->StartUse();
+        Render::ResolveBindings(*shader, renderProperties.globalBindings, { });
+        Render::SetDrawFace(eDrawFace::Cw);
+        Print_Errors_OpengGL();
+
+        FrameBuffer screenProcessed = BlitFrameBuffer(screen);
+        glActiveTexture(GL_TEXTURE0);
+        Print_Errors_OpengGL();
+        glBindTexture(GL_TEXTURE_2D, screenProcessed.color);
+        Print_Errors_OpengGL();
+        shader->SetUniformInt(ShaderParams::ScreenColorProcessed.data(), 0);
+        Print_Errors_OpengGL();
+        
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        shader->StopUse();
+        Print_Errors_OpengGL();
+        glBindVertexArray(Render::UndefinedBuffer);
+        fboPool.Push(screenProcessed);
+    }
+    
+    FrameBuffer RenderSystem::BlitFrameBuffer(const FrameBuffer& input)
+    {
+        FrameBuffer output = input;
+        if (input.settings.multisample)
+        {
+            output = GetFrameBuffer(false);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, input.frame);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, output.frame);
+            glBlitFramebuffer(0, 0, input.settings.size.width, input.settings.size.height,
+                              0, 0, output.settings.size.width, output.settings.size.height,
+                              GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            fboPool.Push(input);
+        }
+        
+        return output;
+    }
+    
+    FrameBuffer RenderSystem::GetHdrBuffer(bool multisample)
+    {
+        FrameBuffer::Settings bufferSettings;
+        bufferSettings.size = Screen::ScreenSize;
+        bufferSettings.color = FrameBuffer::eAttachement::Texture2d;
+        bufferSettings.depth = FrameBuffer::eAttachement::Buffer;
+        bufferSettings.stencil = FrameBuffer::eAttachement::Buffer;
+        bufferSettings.multisample = multisample;
+        bufferSettings.combinedDepthStencil = true;
+        bufferSettings.hdr = true;
+        
+        return fboPool.Pop(bufferSettings);
+    }
+    
     FrameBuffer RenderSystem::GetFrameBuffer(bool multisample)
     {
         FrameBuffer::Settings bufferSettings;
@@ -626,6 +713,7 @@ namespace Feng
         bufferSettings.stencil = FrameBuffer::eAttachement::Buffer;
         bufferSettings.multisample = multisample;
         bufferSettings.combinedDepthStencil = true;
+        bufferSettings.hdr = hdr;
         
         return fboPool.Pop(bufferSettings);
     }

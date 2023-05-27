@@ -54,6 +54,7 @@ namespace test
         std::unique_ptr<Feng::Mesh> CubeMesh;
         std::unique_ptr<Feng::Mesh> QuadMesh;
         std::vector<Feng::PostEffectDefinition*> Effects;
+        std::unique_ptr<Feng::Material> ToneMappingMaterial;
     };
 
     extern TempRes res;

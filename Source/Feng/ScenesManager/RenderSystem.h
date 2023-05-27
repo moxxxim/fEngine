@@ -36,9 +36,12 @@ namespace Feng
         void SetShadowMaterials(Material *directLightShadowMaterial,
                                Material *pointLightShadowMaterial,
                                Material *directLightShadowDebugMaterial);
+        void SetToneMappingMaterial(Material* toneMapping);
         void SetCascadeBorders(std::vector<float> aCascadeBorders);
         void SetDirectionalShadowLight(Entity *light);
         void SetPointShadowLight(Entity *light);
+        bool IsHdr() const;
+        void SetHdr(bool value);
 
         void AddRenderer(MeshRenderer *renderer);
         void RemoveRenderer(MeshRenderer *renderer);
@@ -72,12 +75,16 @@ namespace Feng
         void DrawOpaque();
         void DrawTransparent();
         void DrawSkybox();
-        void ApplyPostEffects(const FrameBuffer& renderBuffer);
+        void ApplyPostEffects(const FrameBuffer& renderBuffer, const FrameBuffer& outBuffer);
         void UpdateGlobalBindings();
         void UpdateCameraUniforms();
         void UpdateLightUniforms();
         void UpdateShadowLightUniform();
         void BindCamUniformBuffer();
+        bool IsOffscreenRender() const;
+        void RenderOnScreenQuad(const FrameBuffer& screen);
+        FrameBuffer BlitFrameBuffer(const FrameBuffer& input);
+        FrameBuffer GetHdrBuffer(bool multisample);
         FrameBuffer GetFrameBuffer(bool multisample);
         FrameBuffer GetDirectShadowMapBuffer();
         FrameBuffer GetPointShadowMapBuffer();
@@ -91,7 +98,9 @@ namespace Feng
         RenderPostProcessing postProcessing;
         RenderProperties renderProperties;
         MeshRenderer *skybox = nullptr;
+        Material *toneMappingMaterial = nullptr;
         uint32_t camUbo = 0;
+        bool hdr = false;
     };
 
     inline const ShaderBindings& RenderSystem::GlobalBindings() const
