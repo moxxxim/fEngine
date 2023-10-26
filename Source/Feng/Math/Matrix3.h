@@ -3,6 +3,8 @@
 
 #include <Feng/Math/Vector3.h>
 #include <cstdint>
+#include <limits>
+#include <utility>
 
 namespace Feng
 {
@@ -48,6 +50,14 @@ namespace Feng
         }
 
         Matrix3() = default;
+        constexpr Matrix3(
+            float a00, float a01, float a02,
+            float a10, float a11, float a12,
+            float a20, float a21, float a22)
+            : m00{ a00 }, m01{ a01 }, m02{ a02 }
+            , m10{ a10 }, m11{ a11 }, m12{ a12 }
+            , m20{ a20 }, m21{ a21 }, m22{ a22 }
+        {}
         constexpr Matrix3(const Matrix3&) = default;
         constexpr Matrix3(Matrix3&&) = default;
 
@@ -112,15 +122,15 @@ namespace Feng
 {
     inline bool Matrix3::HasInverse() const
     {
+        constexpr float epsilon = std::numeric_limits<float>::epsilon();
         float determinant = Determinant();
-        float epsilon = std::numeric_limits<float>::epsilon();
         return !((epsilon < determinant) && (determinant < epsilon));
     }
 
     inline bool Matrix3::TryInvert(Matrix3& inverted) const
     {
+        constexpr float epsilon = std::numeric_limits<float>::epsilon();
         float det = Determinant();
-        float epsilon = std::numeric_limits<float>::epsilon();
         if((epsilon < det) && (det < epsilon))
         {
             return false;

@@ -1,10 +1,11 @@
 #pragma once
 
 #include <math.h>
+#include <numbers>
 
 namespace Feng::Math
 {
-    constexpr const float Pi = M_PI;
+    constexpr const float Pi = std::numbers::pi_v<float>;
     
     constexpr float DegToRad(float degrees)
     {

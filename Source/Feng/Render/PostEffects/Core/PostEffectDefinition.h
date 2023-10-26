@@ -2,6 +2,7 @@
 
 #include <Feng/Render/PostEffects/Core/PostEffectType.h>
 
+#include <memory>
 #include <vector>
 
 namespace Feng

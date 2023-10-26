@@ -2,6 +2,7 @@
 
 #include <Feng/ScenesManager/Component.h>
 
+#include <memory>
 #include <vector>
 #include <string>
 

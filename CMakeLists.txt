@@ -47,7 +47,7 @@ endfunction(log_message_framed)
 # ---------------- Define build process -----------------
 
 # Define required C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # specify where to put targets when built

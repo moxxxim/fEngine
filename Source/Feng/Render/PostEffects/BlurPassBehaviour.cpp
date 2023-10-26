@@ -50,10 +50,10 @@ namespace Feng
 
     void BlurPassBehaviour::SetupMaterial(int passIndex, Material *material)
     {
-        float x = 1.0 / Screen::ScreenSize.width;
-        float y = 1.0 / Screen::ScreenSize.height;
-        float z = sqrt(2.0) / 2.0 * x;
-        float w = sqrt(2.0) / 2.0 * y;
+        float x = 1.0f / Screen::ScreenSize.width;
+        float y = 1.0f / Screen::ScreenSize.height;
+        float z = static_cast<float>(sqrt(2.0)) / 2.0f * x;
+        float w = static_cast<float>(sqrt(2.0)) / 2.0f * y;
         float pixelSize = m_blurStrength[passIndex];
         Vector4 step = Vector4(pixelSize * x, pixelSize * y, pixelSize * z, pixelSize * w);
         material->Bindings().SetVector4("u_step", step);
