@@ -60,8 +60,8 @@ namespace Feng
 
     void MaterialPostEffect::ApplyGenericBehaviour()
     {
-        pass->SetTextureFromOriginal(PostEffectPass::InputTextureType::Color, ShaderParams::ScreenColorOriginal.data());
-        pass->SetTextureFromOriginal(PostEffectPass::InputTextureType::Depth, ShaderParams::ScreenDepthOriginal.data());
+        //pass->SetTextureFromOriginal(PostEffectPass::InputTextureType::Color, ShaderParams::ScreenColorOriginal.data());
+        //pass->SetTextureFromOriginal(PostEffectPass::InputTextureType::Depth, ShaderParams::ScreenDepthOriginal.data());
         pass->SetTextureFromInput(PostEffectPass::InputTextureType::Color, ShaderParams::ScreenColorProcessed.data());
         pass->SetRenderBufferOutput();
 

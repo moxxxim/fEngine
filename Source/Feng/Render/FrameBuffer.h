@@ -2,6 +2,7 @@
 
 #include <Feng/Math/Size.h>
 #include <cstdint>
+#include <vector>
 
 namespace Feng
 {
@@ -25,6 +26,7 @@ namespace Feng
             eAttachement color = eAttachement::None;
             eAttachement depth = eAttachement::None;
             eAttachement stencil = eAttachement::None;
+            uint32_t colorBuffersCount = 1;
             uint32_t depth2dArraySize = 0;
             bool multisample = false;
             bool combinedDepthStencil = false;
@@ -32,7 +34,7 @@ namespace Feng
         };
 
         uint32_t frame = Default;
-        uint32_t color = Default;
+        std::vector<uint32_t> color;
         uint32_t depth = Default;
         uint32_t stencil = Default;
 
@@ -45,6 +47,8 @@ namespace Feng
             && (lhs.color == rhs.color)
             && (lhs.depth == rhs.depth)
             && (lhs.stencil == rhs.stencil)
+            && (lhs.colorBuffersCount == rhs.colorBuffersCount)
+            && (lhs.depth2dArraySize == rhs.depth2dArraySize)
             && (lhs.multisample == rhs.multisample)
             && (lhs.combinedDepthStencil == rhs.combinedDepthStencil)
             && (lhs.hdr == rhs.hdr);

@@ -6,53 +6,74 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/gl3.h>
 
+
 namespace Feng
 {
     namespace SFrameBuffersPool
     {
         constexpr GLsizei samplesCount = 4;
         
-        GLuint BindColorBuffer(const FrameBuffer::Settings& settings)
+        std::vector<GLuint> BindColorBuffers(const FrameBuffer::Settings& settings)
         {
-            GLuint colorBuffer = 0;
+            if(settings.colorBuffersCount == 0)
+            {
+                glDrawBuffer(GL_NONE);
+                glReadBuffer(GL_NONE);
+                return { 0 };
+            }
+            
+            std::vector<GLuint> colorBuffers;
+            colorBuffers.resize(settings.colorBuffersCount);
+            glGenTextures(colorBuffers.size(), colorBuffers.data());
             
             GLenum target = settings.multisample
                 ? GL_TEXTURE_2D_MULTISAMPLE
                 : FrameBuffersPool::GetBindTarget(settings.color);
             if(settings.color == FrameBuffer::eAttachement::Texture2d)
             {
-                glGenTextures(1, &colorBuffer);
-                glBindTexture(target, colorBuffer);
-
-                if(target == GL_TEXTURE_2D)
+                for(uint32_t i = 0; i < colorBuffers.size(); ++i)
                 {
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                    glTexImage2D(
-                                 target,
-                                 0,
-                                 settings.hdr ? GL_RGB16F : GL_RGB,
-                                 settings.size.width,
-                                 settings.size.height,
-                                 0,
-                                 GL_RGB,
-                                 GL_UNSIGNED_BYTE,
-                                 nullptr);
-                }
-                else if (target == GL_TEXTURE_2D_MULTISAMPLE)
-                {
-                    glTexImage2DMultisample(
-                                            target,
-                                            samplesCount,
-                                            settings.hdr ? GL_RGB16F : GL_RGB,
-                                            settings.size.width,
-                                            settings.size.height,
-                                            GL_TRUE);
-                }
+                    glBindTexture(target, colorBuffers[i]);
 
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, colorBuffer, 0);
+                    if(target == GL_TEXTURE_2D)
+                    {
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                        glTexImage2D(
+                                     target,
+                                     0,
+                                     settings.hdr ? GL_RGB16F : GL_RGB,
+                                     settings.size.width,
+                                     settings.size.height,
+                                     0,
+                                     GL_RGB,
+                                     GL_UNSIGNED_BYTE,
+                                     nullptr);
+                    }
+                    else if (target == GL_TEXTURE_2D_MULTISAMPLE)
+                    {
+                        glTexImage2DMultisample(
+                                                target,
+                                                samplesCount,
+                                                settings.hdr ? GL_RGB16F : GL_RGB,
+                                                settings.size.width,
+                                                settings.size.height,
+                                                GL_TRUE);
+                    }
+
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, colorBuffers[i], 0);
+                }
+                
+                std::vector<GLuint> attachements;
+                attachements.resize(colorBuffers.size());
+                std::generate_n(attachements.begin(), attachements.size(),
+                                [attachement = GL_COLOR_ATTACHMENT0]() mutable
+                                {
+                                    return attachement++;
+                                });
+                glDrawBuffers(attachements.size(), attachements.data());
             }
             else if (settings.color == FrameBuffer::eAttachement::Buffer)
             {
@@ -68,7 +89,7 @@ namespace Feng
                 glReadBuffer(GL_NONE);
             }
             
-            return colorBuffer;
+            return colorBuffers;
         }
         
         GLuint BindDepthBuffer(const FrameBuffer::Settings& settings)
@@ -256,7 +277,7 @@ namespace Feng
         glGenFramebuffers(1, &fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-        GLuint colorBuffer = SFrameBuffersPool::BindColorBuffer(settings);
+        std::vector<GLuint> colorBuffers = SFrameBuffersPool::BindColorBuffers(settings);
         Print_Errors_OpengGL();
 
         GLuint depth = SFrameBuffersPool::BindDepthBuffer(settings);
@@ -269,7 +290,7 @@ namespace Feng
 
         FrameBuffer frameBuffer;
         frameBuffer.frame = fbo;
-        frameBuffer.color = colorBuffer;
+        frameBuffer.color = colorBuffers;
         frameBuffer.depth = depth;
         frameBuffer.stencil = stencil;
         frameBuffer.settings = settings;
@@ -285,7 +306,7 @@ namespace Feng
     void FrameBuffersPool::DeleteBuffer(const FrameBuffer& buffer)
     {
         glDeleteFramebuffers(1, &buffer.frame);
-        glDeleteTextures(1, &buffer.color);
+        glDeleteTextures(buffer.color.size(), buffer.color.data());
         glDeleteRenderbuffers(1, &buffer.depth);
         glDeleteRenderbuffers(1, &buffer.stencil);
     }

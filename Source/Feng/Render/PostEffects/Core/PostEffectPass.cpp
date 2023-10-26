@@ -28,7 +28,7 @@ namespace Feng
     void PostEffectPass::SetTextureFromOriginal(InputTextureType type, const char *textureName)
     {
         uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
-                ? context.original.color
+                ? context.original.color.front()
                 : context.original.depth;
         SetShaderInput(textureName, textureBuffer);
     }
@@ -36,7 +36,7 @@ namespace Feng
     void PostEffectPass::SetTextureFromInput(InputTextureType type, const char *textureName)
     {
         uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
-                ? context.input.color
+                ? context.input.color.front()
                 : context.input.depth;
         SetShaderInput(textureName, textureBuffer);
     }
@@ -47,7 +47,7 @@ namespace Feng
         {
             const FrameBuffer& buffer = buffers[textureBufferIndex];
             uint32_t textureBuffer = (type == PostEffectPass::InputTextureType::Color)
-                                    ? buffer.color
+                                    ? buffer.color.front()
                                     : buffer.depth;
             SetShaderInput(textureName, textureBuffer);
         }

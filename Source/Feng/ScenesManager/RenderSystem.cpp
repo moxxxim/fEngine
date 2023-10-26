@@ -661,7 +661,7 @@ namespace Feng
         FrameBuffer screenProcessed = BlitFrameBuffer(screen);
         glActiveTexture(GL_TEXTURE0);
         Print_Errors_OpengGL();
-        glBindTexture(GL_TEXTURE_2D, screenProcessed.color);
+        glBindTexture(GL_TEXTURE_2D, screenProcessed.color.front());
         Print_Errors_OpengGL();
         shader->SetUniformInt(ShaderParams::ScreenColorProcessed.data(), 0);
         Print_Errors_OpengGL();
