@@ -1,3 +1,7 @@
+1. Work for win
+2. Glfw through cmake
+
+
 0. Add compiler option to require return value definition.
 1. File system;
 2. GUID generation;

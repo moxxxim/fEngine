@@ -1,3 +1,0 @@
-[submodule "Source/Thirdparty/glfw.git"]
-	path = Source/Thirdparty/glfw.git
-	url = git@github.com:glfw/glfw.git
