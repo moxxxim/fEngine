@@ -117,4 +117,4 @@ Temporary Items
 *.app
 
 ## cmake ignores
-_cmake_build/
+_cmake
