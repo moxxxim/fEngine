@@ -1,5 +1,9 @@
 1. Work for win
 2. Glfw through cmake
+3. Feng as separate cmake project building like (lib, dylib, interface lib). - chapter 40
+4. resources into IDE (shaders, cfg, etc) (maybe 43.4)
+5. rewrite helper methods for handling paths new way cmake_path(...) 
+6. get rid of globbing
 
 
 0. Add compiler option to require return value definition.

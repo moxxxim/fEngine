@@ -1,0 +1,9 @@
+{
+    "version": 1, "configurePresets": [
+    {
+    "name": "Xcode_cmake_build",
+    "generator": "Xcode",
+    "displayName": "Xcode _cmake_build",
+    "binaryDir": "_cmake_build"
+    } ]
+}

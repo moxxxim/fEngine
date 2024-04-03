@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.27)
 
 project(Feng)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeUtils")
 
 option(USE_GLM_LIB "Add GLM lib to project" OFF)
 option(VERBOSE_BUILD "Use verbose logging when building project" ON)
@@ -14,7 +16,8 @@ if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
     message(FATAL_ERROR "Specify different directory for binaries: not allowed to build into source directory.")
 endif()
 
-include(CMakeUtils/CMakeUtils.cmake)
+include(FengCMakeUtils)
+set_property(GLOBAL PROPERTY USE_FOLDERS YES)
 
 # ---------------- Define build process -----------------
 
@@ -23,7 +26,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # specify where to put targets when built
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/_build/")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/_build/")
 
 # define variables
 set(MY_SOURCES_DIR ${PROJECT_SOURCE_DIR}/Source)
@@ -32,7 +35,6 @@ set(SOURCE_FILES_EXTENSIONS "*.cpp" "*.h" "*.hpp")
 
 # ---------------- Log build configuration -----------------
 if(VERBOSE_BUILD)
-
     log_delimeters()
     message("Build project '${PROJECT_NAME}' from source: ${PROJECT_SOURCE_DIR}")
     message("Build project to directory: ${PROJECT_BINARY_DIR}")
@@ -101,33 +103,43 @@ if(VERBOSE_BUILD)
 endif()
 
 # ---------------- Setup executable -----------------
-add_executable(OpenGLWindow)
-target_sources(OpenGLWindow 
+
+set(FENG_APP_NAME GlSandbox CACHE STRING "Name of the main target")
+set(FENG_TARGET_NAME ${PROJECT_NAME}_${FENG_APP_NAME})
+
+add_executable(${FENG_TARGET_NAME})
+add_executable(${PROJECT_NAME}::${FENG_APP_NAME} ALIAS ${FENG_TARGET_NAME})
+set_target_properties(${FENG_TARGET_NAME} PROPERTIES
+      OUTPUT_NAME ${FENG_APP_NAME}
+      EXPORT_NAME ${FENG_APP_NAME}
+  )
+
+target_sources(${FENG_TARGET_NAME}
     PUBLIC 
         ${MY_PROJECT_SOURCES_FILES})
 
 if(APPLE)
     # disable warnings aboug OpenGL deprecation of Mac
-    target_compile_definitions(OpenGLWindow 
+    target_compile_definitions(${FENG_TARGET_NAME} 
         PRIVATE 
             "GL_SILENCE_DEPRECATION")
 endif(APPLE)
 
 # add the binary tree to the search path for include files
 # can include files only using brackets(<>), but not with with quotes(""). Why?
-target_include_directories(OpenGLWindow 
+target_include_directories(${FENG_TARGET_NAME} 
     PUBLIC 
         "${PROJECT_SOURCE_DIR}"
         "${MY_SOURCES_DIR}"
         "${THIRDPARTY_SOURCES_DIR}")       
 
 # Link libraries
-target_link_libraries(OpenGLWindow
+target_link_libraries(${FENG_TARGET_NAME}
     PRIVATE
         ${THIRDPARTY_STATIC_LIBS}
         ${PLATFORM_SPECIFIC_LIBS})
 
-# ---------------- Make project groups -----------------
-assign_source_group(${MY_PROJECT_SOURCES_FILES})
+set_target_properties(${FENG_TARGET_NAME} PROPERTIES FOLDER "Apps")
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MY_PROJECT_SOURCES_FILES})
 
 # TODO: m.alekseev make resources folder visible in project.

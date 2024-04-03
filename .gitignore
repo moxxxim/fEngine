@@ -117,4 +117,6 @@ Temporary Items
 *.app
 
 ## cmake ignores
-_cmake
+_cmake*
+_build
+CMakeUserPresets.json
