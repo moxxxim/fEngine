@@ -3,8 +3,6 @@
 3. Feng as separate cmake project building like (lib, dylib, interface lib). - chapter 40
 4. resources into IDE (shaders, cfg, etc) (maybe 43.4)
 5. rewrite helper methods for handling paths new way cmake_path(...) 
-6. get rid of globbing
-
 
 0. Add compiler option to require return value definition.
 1. File system;
@@ -26,7 +24,6 @@
 17. Camera frustum culling.
 18. How linera filtering is calculated?
 19. Performance impact with mip-maps.
-20. How mip-maps works? When filtering applied (on which pipeline stage)?
 21. Checkered white-black texture on plane for testing mip-maps filtering.
 22. glTexImage2D - formats parameters?
 23. Visualize light sources: point - cube/sphere, directional - gram, spot - pyramid/cone.
@@ -36,7 +33,6 @@
 27. all degrees to rad by default.
 28. Copy material.
 29. Implementations of spot and point light sources.
-30. Linera color space vs. non-linear?
 31. Texture compression.
 32. Implement texture data sharing.
 33. Implement mesh data sharing.
@@ -44,17 +40,13 @@
 35. Implement outlined shader/pass for a single object (for multiple objects).
 36. Implement effect like in Death Stranding scaning.
 37. "discard" instruction. Only fragment? performance?
-38. glBlendFunc(GLenum sfunc, GLenum dfunc);
 39. "order independent transparency". depth/transparency conflict.
 40. <OpenGL/gl.h> vs./and <OpenGL/gl3.h>
 41. glVertexAttribPointer/glEnableVertexAttribArray why every call without VAO.
 42. glViewport and renderbuffer different sizes: what result?
 43. PostEffects: under water; bag on head; draw depth as posteffect; monochromacity (white-blue);
 44. Shader: glass, bottle, surface curvature.
-45. Why does image kernels work the way they do? What is empiric? What is the maths?
 46. Is frustum culling made automatically by OpenGL?
-47. Array textures: what for? usage scenario.
 48. Buffer texture what for?
 49. Use "shared" uniform block: fetch offsets and total size. 
 50. Extra vaiables in uniform block for several shaders. Is it bad?
-51. Multisampling in-depth. 
