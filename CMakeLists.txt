@@ -25,15 +25,13 @@ log_messages_optional(
         "Build project '${PROJECT_NAME}' from source: ${PROJECT_SOURCE_DIR}"
         "Build project to directory: ${PROJECT_BINARY_DIR}"
     DO_LOG ${VERBOSE_BUILD}
-    FRAMED)
+    FRAME_UP FRAME_DOWN)
 
 # ---------------------------------------------------------------------
 # ------------------- Collect thirdparty libraries --------------------
 # ---------------------------------------------------------------------
 
-set(THIRDPARTY_STATIC_LIBS)
-set(THIRDPARTY_STATIC_LIBS_DEBUG)
-set(THIRDPARTY_STATIC_LIBS_RELEASE)
+set(THIRDPARTY_STATIC_LIBS "")
 
 if(APPLE)
     file(GLOB_RECURSE THIRDPARTY_STATIC_LIBS REGEX "*.a")
@@ -41,15 +39,25 @@ elseif(WIN32)
     message(FATAL_ERROR "Not implemented libs collections for Win")
 endif()
 
-list(FILTER THIRDPARTY_STATIC_LIBS_DEBUG INCLUDE REGEX ".*${THIRDPARTY_SRC_DIR_NAME}.*Libs/Debug/*")
-list(FILTER THIRDPARTY_STATIC_LIBS_RELEASE INCLUDE REGEX ".*${THIRDPARTY_SRC_DIR_NAME}.*Libs/Release/*")
+set(THIRDPARTY_STATIC_LIBS_DEBUG ${THIRDPARTY_STATIC_LIBS})
+list(FILTER THIRDPARTY_STATIC_LIBS_DEBUG INCLUDE REGEX ".*${THIRDPARTY_SRC_DIR_NAME}.*Libs.*Debug.*")
+
+set(THIRDPARTY_STATIC_LIBS_RELEASE ${THIRDPARTY_STATIC_LIBS})
+list(FILTER THIRDPARTY_STATIC_LIBS_RELEASE INCLUDE REGEX ".*${THIRDPARTY_SRC_DIR_NAME}.*Libs.*Release.*")
 
 log_messages_optional(
     MESSAGES 
-        "Thirdparty static libraries:"
-        ${THIRDPARTY_STATIC_LIBS}
+        "Thirdparty static libraries (DEBUG):"
+        ${THIRDPARTY_STATIC_LIBS_DEBUG}
     DO_LOG
-    FRAMED)
+    FRAME_UP)
+
+log_messages_optional(
+    MESSAGES 
+        "Thirdparty static libraries (RELEASE):"
+        ${THIRDPARTY_STATIC_LIBS_RELEASE}
+    DO_LOG
+    FRAME_DOWN)
 
 # ----------------------------------------------------------------------
 # ---------------- Collect platform-specific libraries -----------------
@@ -74,7 +82,7 @@ log_messages_optional(
         "Platform-specific libraries:"
         ${PLATFORM_SPECIFIC_LIBS}
     DO_LOG ${VERBOSE_BUILD}
-    FRAMED)
+    FRAME_UP FRAME_DOWN)
 
 # -----------------------------------------------------------------------
 # ---------------- Collect all source files for project -----------------
@@ -97,7 +105,7 @@ log_messages_optional(
         "Source code directories for project '${PROJECT_NAME}':"
         ${MY_PROJECT_SOURCES_FILES_DIRS}
     DO_LOG ${VERBOSE_BUILD}
-    FRAMED)
+    FRAME_UP FRAME_DOWN)
 
 # ---------------------------------------------------------------------
 # ------------------------- Setup executable --------------------------
@@ -131,7 +139,8 @@ target_include_directories(${FENG_TARGET_NAME}
 # Link libraries
 target_link_libraries(${FENG_TARGET_NAME}
     PRIVATE
-        ${THIRDPARTY_STATIC_LIBS}
+        $<$<CONFIG:Debug>:${THIRDPARTY_STATIC_LIBS_DEBUG}>
+        $<$<CONFIG:Release>:${THIRDPARTY_STATIC_LIBS_RELEASE}>
         ${PLATFORM_SPECIFIC_LIBS})
 
 set_target_properties(${FENG_TARGET_NAME} PROPERTIES FOLDER "Apps")

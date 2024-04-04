@@ -28,7 +28,7 @@ endfunction()
 
 function(log_messages_optional)
     set(prefix ARG)
-    set(options      FRAMED)
+    set(options      FRAME_UP FRAME_DOWN)
     set(singleValues DO_LOG)
     set(multiValues  MESSAGES)
 
@@ -46,18 +46,13 @@ function(log_messages_optional)
     endif()
 
     if(showLog)
-        set(showFrame FALSE)
-        if(DEFINED ARG_FRAMED)
-            set(showFrame TRUE)
-        endif()
-
         if(DEFINED ARG_MESSAGES)
             foreach(msg IN LISTS ARG_MESSAGES)
                 list(APPEND messages ${msg})
             endforeach()
         endif()
 
-        if(showFrame AND messages)
+        if(ARG_FRAME_UP AND messages)
             log_delimeters()
         endif()
 
@@ -65,7 +60,7 @@ function(log_messages_optional)
             message("${msg}")
         endforeach()
 
-        if(showFrame AND messages)
+        if(ARG_FRAME_DOWN AND messages)
             log_delimeters()
         endif()
     endif()
