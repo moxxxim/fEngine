@@ -36,7 +36,7 @@ set(THIRDPARTY_STATIC_LIBS "")
 if(APPLE)
     file(GLOB_RECURSE THIRDPARTY_STATIC_LIBS REGEX "*.a")
 elseif(WIN32)
-    message(FATAL_ERROR "Not implemented libs collections for Win")
+    file(GLOB_RECURSE THIRDPARTY_STATIC_LIBS REGEX "*.lib")
 endif()
 
 set(THIRDPARTY_STATIC_LIBS_DEBUG ${THIRDPARTY_STATIC_LIBS})
@@ -49,14 +49,14 @@ log_messages_optional(
     MESSAGES 
         "Thirdparty static libraries (DEBUG):"
         ${THIRDPARTY_STATIC_LIBS_DEBUG}
-    DO_LOG
+    DO_LOG ${VERBOSE_BUILD}
     FRAME_UP)
 
 log_messages_optional(
     MESSAGES 
         "Thirdparty static libraries (RELEASE):"
         ${THIRDPARTY_STATIC_LIBS_RELEASE}
-    DO_LOG
+    DO_LOG ${VERBOSE_BUILD}
     FRAME_DOWN)
 
 # ----------------------------------------------------------------------

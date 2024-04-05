@@ -1,9 +1,15 @@
 {
     "version": 1, "configurePresets": [
     {
-    "name": "Xcode_cmake_build",
-    "generator": "Xcode",
-    "displayName": "Xcode _cmake_build",
-    "binaryDir": "_cmake_build"
-    } ]
+        "name": "Xcode_Build",
+        "generator": "Xcode",
+        "displayName": "Xcode build to _cmake",
+        "binaryDir": "_cmake"
+    },
+    {
+        "name": "VS_17_Build",
+        "generator": "Visual Studio 17 2022",
+        "displayName": "Visual Studio 17 build to _cmake",
+        "binaryDir": "_cmake"
+    }]
 }
