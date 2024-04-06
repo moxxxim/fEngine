@@ -9,3 +9,8 @@
 #endif
 
 #include <GLFW/glfw3.h>
+
+namespace Feng
+{
+    bool TryInitOpenGL();
+}

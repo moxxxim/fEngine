@@ -368,7 +368,7 @@ namespace test
         static_assert(Feng::Quaternion::Identity().AxisScaled().coord.x == 0);
         static_assert((Feng::Quaternion::Identity() * Feng::Quaternion::Identity()).AxisScaled().coord.x == 0);
         static_assert((Feng::Vector3{0, 0, 1} * Feng::Quaternion::Identity()).coord.x == 0);
-        
+
         LoadResources();
         return CreateScene();
     }

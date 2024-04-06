@@ -106,9 +106,20 @@ namespace Feng
                 glfwSetCursorPosCallback(outWindow, MouseCallback);
                 glfwSetScrollCallback(outWindow, ScrollCallback);
                 glfwSetInputMode(outWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
+
+                const bool glInitialized = Feng::TryInitOpenGL();
+                if (!glInitialized)
+                {
+                    glfwDestroyWindow(outWindow);
+                    outWindow = nullptr;
+                }
+                else
+                {
+                    glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
+                }
             }
-            else
+
+            if (!outWindow)
             {
                 std::cout << "Failed to create GLFW window" << std::endl;
                 glfwTerminate();
@@ -164,44 +175,47 @@ namespace Feng
     
     Engine::Engine()
     {
-        instance = this;
-        
-        if(SEngine::TryInitGlfw())
+        if (!instance)
         {
-            SEngine::window = SEngine::CreateMainWindow();
-            SEngine::InitRender(showDepth);
+            if (SEngine::TryInitGlfw())
+            {
+                SEngine::window = SEngine::CreateMainWindow();
+                SEngine::InitRender(showDepth);
+            }
         }
+
+        instance = this;
     }
 
     int32_t Engine::Run()
     {
-        if(SEngine::window)
+        if(!SEngine::window)
         {
-            Debug::LogMessage("Start loop.");
-            while(!glfwWindowShouldClose(SEngine::window))
-            {
-                SEngine::FixWindow();
-                UpdateTime();
-                UpdateInputKeys();
-                Update();
-                Render();
-                ResetFrameTemporary();
-                glfwSwapBuffers(SEngine::window);
-                glfwPollEvents();
-
-                Print_Errors_OpengGL();
-                
-                if(Engine::IsKeyPressed(InputKey::Kb_Escape))
-                {
-                    glfwSetWindowShouldClose(SEngine::window, true);
-                }
-            }
-
-            glfwTerminate();
-            return 0;
+            return 1;
         }
-        
-        return 1;
+
+        Debug::LogMessage("Start loop.");
+        while (!glfwWindowShouldClose(SEngine::window))
+        {
+            SEngine::FixWindow();
+            UpdateTime();
+            UpdateInputKeys();
+            Update();
+            Render();
+            ResetFrameTemporary();
+            glfwSwapBuffers(SEngine::window);
+            glfwPollEvents();
+
+            Print_Errors_OpengGL();
+
+            if (Engine::IsKeyPressed(InputKey::Kb_Escape))
+            {
+                glfwSetWindowShouldClose(SEngine::window, true);
+            }
+        }
+
+        glfwTerminate();
+        return 0;
     }
     
     void Engine::SetPostEffect(PostEffectDefinition *postEffect)
