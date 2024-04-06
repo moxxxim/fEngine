@@ -1,9 +1,9 @@
+0. GLFW lib as IMPORTED
 1. Work for win
 1. Nice thirdparty management
 2. Thirdparty management as separate projects with no targets
 3. Feng as separate cmake project building like (lib, dylib, interface lib). - chapter 40
-4. resources into IDE (shaders, cfg, etc) (maybe 43.4)
-5. rewrite helper methods for handling paths new way cmake_path(...) 
+4. resources into IDE (shaders, cfg, etc) (maybe 43.4) 
 
 0. Add compiler option to require return value definition.
 1. File system;

@@ -6,7 +6,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeUtils")
 
 option(VERBOSE_BUILD "Use verbose logging when building project" ON)
 
-set(THIRDPARTY_SRC_DIR_NAME "Thirdparty")
+set(thirdpartySrcDirName "Thirdparty")
 set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum OS X deployment version")
 
 # Do not allow build in source directory
@@ -31,31 +31,31 @@ log_messages_optional(
 # ------------------- Collect thirdparty libraries --------------------
 # ---------------------------------------------------------------------
 
-set(THIRDPARTY_STATIC_LIBS "")
+set(thirdpartyStaticLibs "")
 
 if(APPLE)
-    file(GLOB_RECURSE THIRDPARTY_STATIC_LIBS REGEX "*.a")
+    file(GLOB_RECURSE thirdpartyStaticLibs REGEX "*.a")
 elseif(WIN32)
-    file(GLOB_RECURSE THIRDPARTY_STATIC_LIBS REGEX "*.lib")
+    file(GLOB_RECURSE thirdpartyStaticLibs REGEX "*.lib")
 endif()
 
-set(THIRDPARTY_STATIC_LIBS_DEBUG ${THIRDPARTY_STATIC_LIBS})
-list(FILTER THIRDPARTY_STATIC_LIBS_DEBUG INCLUDE REGEX ".*${THIRDPARTY_SRC_DIR_NAME}.*Libs.*Debug.*")
+set(thirdpartyStaticLibsDebug ${thirdpartyStaticLibs})
+list(FILTER thirdpartyStaticLibsDebug INCLUDE REGEX ".*${thirdpartySrcDirName}.*Libs.*Debug.*")
 
-set(THIRDPARTY_STATIC_LIBS_RELEASE ${THIRDPARTY_STATIC_LIBS})
-list(FILTER THIRDPARTY_STATIC_LIBS_RELEASE INCLUDE REGEX ".*${THIRDPARTY_SRC_DIR_NAME}.*Libs.*Release.*")
+set(thirdpartyStaticLibsRelease ${thirdpartyStaticLibs})
+list(FILTER thirdpartyStaticLibsRelease INCLUDE REGEX ".*${thirdpartySrcDirName}.*Libs.*Release.*")
 
 log_messages_optional(
     MESSAGES 
         "Thirdparty static libraries (DEBUG):"
-        ${THIRDPARTY_STATIC_LIBS_DEBUG}
+        ${thirdpartyStaticLibsDebug}
     DO_LOG ${VERBOSE_BUILD}
     FRAME_UP)
 
 log_messages_optional(
     MESSAGES 
         "Thirdparty static libraries (RELEASE):"
-        ${THIRDPARTY_STATIC_LIBS_RELEASE}
+        ${thirdpartyStaticLibsRelease}
     DO_LOG ${VERBOSE_BUILD}
     FRAME_DOWN)
 
@@ -77,11 +77,6 @@ if(APPLE)
                     ${MAC_OPEN_GL_LIB})
 endif()
 
-if(WIN32)
-    find_package(OpenGL 3.3 REQUIRED)
-    set(platformSpecificLibs OpenGL::GL)
-endif()
-
 log_messages_optional(
     MESSAGES 
         "Platform-specific libraries:"
@@ -90,75 +85,92 @@ log_messages_optional(
     FRAME_UP FRAME_DOWN)
 
 # -----------------------------------------------------------------------
-# ---------------- Collect all source files for project -----------------
+# --------------------- My source files for project ---------------------
 # -----------------------------------------------------------------------
 
-set(SOURCE_FILES_EXTENSIONS "*.cpp" "*.h" "*.hpp" "*.c")
-file(GLOB_RECURSE MY_PROJECT_SOURCES_FILES ${SOURCE_FILES_EXTENSIONS})
-# remove cmake build directory from source files.
-list(FILTER MY_PROJECT_SOURCES_FILES EXCLUDE REGEX ".*${PROJECT_BINARY_DIR}.*")
+set(mySrcDir ${PROJECT_SOURCE_DIR}/Source)
+file(GLOB_RECURSE mySrcFiles LIST_DIRECTORIES false
+    "${mySrcDir}/*.cpp"
+    "${mySrcDir}/*.hpp"
+    "${mySrcDir}/*.c"
+    "${mySrcDir}/*.h"
+)
 
-foreach(src_path IN ITEMS ${MY_PROJECT_SOURCES_FILES})
-    get_filename_component(src_dir ${src_path} DIRECTORY)
-    string(APPEND src_dir "/")
-    list(APPEND MY_PROJECT_SOURCES_FILES_DIRS ${src_dir})
-endforeach()
-list(REMOVE_DUPLICATES MY_PROJECT_SOURCES_FILES_DIRS)
+# -----------------------------------------------------------------------
+# ---------------- Thirdparty source files for project ------------------
+# -----------------------------------------------------------------------
 
-log_messages_optional(
-    MESSAGES 
-        "Source code directories for project '${PROJECT_NAME}':"
-        ${MY_PROJECT_SOURCES_FILES_DIRS}
-    DO_LOG ${VERBOSE_BUILD}
-    FRAME_UP FRAME_DOWN)
+set(thirdpartySrcDir ${PROJECT_SOURCE_DIR}/${thirdpartySrcDirName})
+
+# glad
+if(WIN32)
+    add_subdirectory(${thirdpartySrcDir}/Glad SYSTEM)
+    list(APPEND platformSpecificLibs GladLibInterface)
+    get_target_property(gladSrc GladLibInterface INTERFACE_SOURCES)
+    source_group("Thirdparty/Glad" FILES ${gladSrc})
+endif()
+
+# Glfw
+file(GLOB_RECURSE glfwSrc LIST_DIRECTORIES false
+    "${thirdpartySrcDir}/Glfw/*.cpp"
+    "${thirdpartySrcDir}/Glfw/*.hpp"
+    "${thirdpartySrcDir}/Glfw/*.c"
+    "${thirdpartySrcDir}/Glfw/*.h"
+)
+source_group("Thirdparty/Glfw" FILES ${glfwSrc})
+
+# Stb
+file(GLOB_RECURSE stbSrc LIST_DIRECTORIES false
+    "${thirdpartySrcDir}/Stb/*.cpp"
+    "${thirdpartySrcDir}/Stb/*.hpp"
+    "${thirdpartySrcDir}/Stb/*.c"
+    "${thirdpartySrcDir}/Stb/*.h"
+)
+source_group("Thirdparty/Stb" FILES ${stbSrc})
 
 # ---------------------------------------------------------------------
 # ------------------------- Setup executable --------------------------
 # ---------------------------------------------------------------------
 
-set(FENG_APP_NAME GlSandbox CACHE STRING "Name of the main target")
-set(FENG_TARGET_NAME ${PROJECT_NAME}_${FENG_APP_NAME})
+add_executable(Feng_GlSandbox)
+add_executable(Feng::GlSandbox ALIAS Feng_GlSandbox)
+set_target_properties(Feng_GlSandbox PROPERTIES
+      OUTPUT_NAME GlSandbox
+      EXPORT_NAME GlSandbox)
 
-add_executable(${FENG_TARGET_NAME})
-add_executable(${PROJECT_NAME}::${FENG_APP_NAME} ALIAS ${FENG_TARGET_NAME})
-set_target_properties(${FENG_TARGET_NAME} PROPERTIES
-      OUTPUT_NAME ${FENG_APP_NAME}
-      EXPORT_NAME ${FENG_APP_NAME})
-
-target_sources(${FENG_TARGET_NAME}
+target_sources(Feng_GlSandbox
     PUBLIC 
-        ${MY_PROJECT_SOURCES_FILES})
+        ${mySrcFiles} 
+        ${glfwSrc}
+        ${stbSrc})
 
 if(APPLE)
     # disable warnings aboug OpenGL deprecation of Mac
-    target_compile_definitions(${FENG_TARGET_NAME} 
+    target_compile_definitions(Feng_GlSandbox 
         PRIVATE 
             "GL_SILENCE_DEPRECATION")
-elseif(WIN32)
-
 endif()
 
 if(MSVC)
-    target_compile_options(${FENG_TARGET_NAME} PRIVATE /W4 /WX /MP)
+    target_compile_options(Feng_GlSandbox PRIVATE /W4 /WX /MP)
 else()
-    target_compile_options(${FENG_TARGET_NAME} PRIVATE -Wall -Wextra -pedantic -Werror -Wno-missing-field-initializers)
+    target_compile_options(Feng_GlSandbox PRIVATE -Wall -Wextra -pedantic -Werror -Wno-missing-field-initializers)
 endif()
 
-target_include_directories(${FENG_TARGET_NAME} 
+target_include_directories(Feng_GlSandbox 
     PUBLIC 
-        "${PROJECT_SOURCE_DIR}/Source"
-        "${PROJECT_SOURCE_DIR}/Source/Thirdparty",
-        "${PROJECT_SOURCE_DIR}/Source/Thirdparty/Glad/include")
+        "${mySrcDir}"
+        "${thirdpartySrcDir}")
 
 # Link libraries
-target_link_libraries(${FENG_TARGET_NAME}
+target_link_libraries(Feng_GlSandbox
     PRIVATE
-        $<$<CONFIG:Debug>:${THIRDPARTY_STATIC_LIBS_DEBUG}>
-        $<$<CONFIG:Release>:${THIRDPARTY_STATIC_LIBS_RELEASE}>
+        $<$<CONFIG:Debug>:${thirdpartyStaticLibsDebug}>
+        $<$<CONFIG:Release>:${thirdpartyStaticLibsRelease}>
         ${platformSpecificLibs})
 
-set_target_properties(${FENG_TARGET_NAME} PROPERTIES FOLDER "Apps")
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${FENG_TARGET_NAME})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MY_PROJECT_SOURCES_FILES})
+set_target_properties(Feng_GlSandbox PROPERTIES FOLDER "Apps")
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Feng_GlSandbox)
+source_group(TREE ${mySrcDir} FILES ${mySrcFiles})
 
 # TODO: m.alekseev make resources folder visible in project.
