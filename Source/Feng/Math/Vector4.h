@@ -12,7 +12,7 @@ namespace Feng
             : data {aX, aY, aZ, aW}
         { }
         constexpr Vector4(const Vector3& aXyz, float aW)
-            : data {aXyz.x, aXyz.y, aXyz.z, aW}
+            : data {aXyz.coord.x, aXyz.coord.y, aXyz.coord.z, aW}
         { }
         constexpr Vector4(const Vector3& aXyz)
             : Vector4(aXyz, 0.f)
@@ -23,19 +23,19 @@ namespace Feng
 
         constexpr Vector3 GetXyz() const
         {
-            return Vector3{x, y, z};
+            return Vector3{ coord.x, coord.y, coord.z};
         }
 
         constexpr Vector4& operator = (const Vector4& other) = default;
         constexpr Vector4& operator = (Vector4&& other) = default;
         constexpr Vector4 operator - () const
         {
-            return Vector4{-x, -y, -z, -w};
+            return Vector4{-coord.x, -coord.y, -coord.z, -coord.w};
         }
         
         constexpr friend Vector4 operator * (const Vector4& v, float a)
         {
-            return Vector4 {v.x * a, v.y * a, v.z * a, v.w * a};
+            return Vector4 {v.coord.x * a, v.coord.y * a, v.coord.z * a, v.coord.w * a};
         }
 
         constexpr friend Vector4 operator * (float a, const Vector4& v)
@@ -45,17 +45,17 @@ namespace Feng
 
         constexpr friend Vector4 operator / (const Vector4& v, float a)
         {
-            return Vector4 {v.x / a, v.y / a, v.z / a, v.w / a};
+            return Vector4 {v.coord.x / a, v.coord.y / a, v.coord.z / a, v.coord.w / a};
         }
 
         constexpr friend Vector4 operator * (const Vector4& v1, const Vector4& v2)
         {
-            return Vector3 { v1.x * v2.x, v1.y * v2.y, v1.z * v2.z };
+            return Vector3 { v1.coord.x * v2.coord.x, v1.coord.y * v2.coord.y, v1.coord.z * v2.coord.z };
         }
 
         constexpr friend Vector4 operator + (const Vector4& a, const Vector4& b)
         {
-            return Vector3 {a.x + b.x, a.y + b.y, a.z + b.z};
+            return Vector3 {a.coord.x + b.coord.x, a.coord.y + b.coord.y, a.coord.z + b.coord.z};
         }
 
         constexpr friend Vector4 operator - (const Vector4& a, const Vector4& b)
@@ -66,13 +66,13 @@ namespace Feng
         union
         {
             float data[4];
-            struct
+            struct Coord
             {
                 float x;
                 float y;
                 float z;
                 float w;
-            };
+            } coord;
         };
     };
 }

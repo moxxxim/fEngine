@@ -1,5 +1,6 @@
 #include <Feng/Render/PostEffects/Core/RenderPostProcessing.h>
 
+#include <Feng/Core/FengGL.h>
 #include <Feng/Render/PostEffects/Core/CompositePostEffect.h>
 #include <Feng/Render/PostEffects/Core/MaterialPostEffect.h>
 #include <Feng/Render/PostEffects/Core/PostEffect.h>
@@ -9,9 +10,6 @@
 #include <Feng/Utils/Debug.h>
 #include <Feng/Utils/Render/MeshParams.h>
 #include <Feng/Utils/Render/RenderUtils.h>
-
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
 
 #include <array>
 
@@ -103,7 +101,7 @@ namespace Feng
         else
         {
             const std::vector<std::unique_ptr<PostEffectDefinition>>& subsequence = effectDefinition.GetSubsequence();
-            int effectsCount = subsequence.size();
+            size_t effectsCount = subsequence.size();
             std::vector<std::unique_ptr<PostEffect>> subEffects;
             subEffects.reserve(effectsCount);
 

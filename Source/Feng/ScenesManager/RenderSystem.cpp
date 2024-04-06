@@ -2,6 +2,7 @@
 
 #include <Feng/App/Globals.h>
 #include <Feng/Core/Engine.hpp>
+#include <Feng/Core/FengGL.h>
 #include <Feng/Math/MatrixUtils.h>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
@@ -13,8 +14,8 @@
 #include <Feng/Utils/Render/RenderUtils.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
+#include <algorithm>
+#include <functional>
 
 namespace Feng
 {
@@ -110,12 +111,12 @@ namespace Feng
                 for(const Vector4& corner : camFrustum)
                 {
                     const Vector4 cornerInLightSpace = corner * lightViewMatrix;
-                    minX = std::min(minX, cornerInLightSpace.x);
-                    maxX = std::max(maxX, cornerInLightSpace.x);
-                    minY = std::min(minY, cornerInLightSpace.y);
-                    maxY = std::max(maxY, cornerInLightSpace.y);
-                    minZ = std::min(minZ, cornerInLightSpace.z);
-                    maxZ = std::max(maxZ, cornerInLightSpace.z);
+                    minX = std::min(minX, cornerInLightSpace.coord.x);
+                    maxX = std::max(maxX, cornerInLightSpace.coord.x);
+                    minY = std::min(minY, cornerInLightSpace.coord.y);
+                    maxY = std::max(maxY, cornerInLightSpace.coord.y);
+                    minZ = std::min(minZ, cornerInLightSpace.coord.z);
+                    maxZ = std::max(maxZ, cornerInLightSpace.coord.z);
                 }
 
                 minZ -= 10.f;
@@ -154,13 +155,13 @@ namespace Feng
                 std::vector<Matrix4> cascadeMatrices;
 
                 Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
-                float near = renderProperties.cam->GetNearClipPlane();
+                float nearPlane = renderProperties.cam->GetNearClipPlane();
                 for(int i = 0; i < farDistances.size(); ++i)
                 {
-                    std::pair<float, float> nearFar = std::make_pair(near, farDistances[i]);
+                    std::pair<float, float> nearFar = std::make_pair(nearPlane, farDistances[i]);
                     Matrix4 lightProjection = GetShadowCastLightProjectionMatrix(renderProperties, lightViewMatrix, nearFar);
                     cascadeMatrices.push_back(lightViewMatrix * lightProjection);
-                    near = nearFar.second;
+                    nearPlane = nearFar.second;
                 }
                 
                 return cascadeMatrices;
@@ -555,9 +556,9 @@ namespace Feng
 
         const Transform *pointLightTransform = renderProperties.pointLight->GetEntity()->GetComponent<Transform>();
         Vector4 pointLightPositionAndRange = pointLightTransform->GetPosition();
-        pointLightPositionAndRange.w = renderProperties.pointLight->GetRange();
+        pointLightPositionAndRange.coord.w = renderProperties.pointLight->GetRange();
         Vector4 pointLightColor = renderProperties.pointLight->GetColor();
-        pointLightColor.w = renderProperties.pointLight->GetIntesity();
+        pointLightColor.coord.w = renderProperties.pointLight->GetIntesity();
 
         renderProperties.globalBindings.SetVector4(ShaderParams::PointLightColor.data(), pointLightColor);
         renderProperties.globalBindings.SetVector4(ShaderParams::PointLightPositionAndRange.data(), pointLightPositionAndRange);
@@ -565,18 +566,18 @@ namespace Feng
         const Transform *directLightTransform = renderProperties.directLight->GetEntity()->GetComponent<Transform>();
         Vector3 directLightDirection = directLightTransform->GetForward();
         Vector4 directLightColor = renderProperties.directLight->GetColor();
-        directLightColor.w = renderProperties.directLight->GetIntesity();
+        directLightColor.coord.w = renderProperties.directLight->GetIntesity();
 
         renderProperties.globalBindings.SetVector4(ShaderParams::DirectLightColor.data(), directLightColor);
         renderProperties.globalBindings.SetVector3(ShaderParams::DirectLightDir.data(), directLightDirection);
 
         const Transform *spotLightTransform = renderProperties.spotLight->GetEntity()->GetComponent<Transform>();
         Vector4 spotLightDirAndAngle = spotLightTransform->GetForward();
-        spotLightDirAndAngle.w = renderProperties.spotLight->GetSpotAngle();
+        spotLightDirAndAngle.coord.w = renderProperties.spotLight->GetSpotAngle();
         Vector4 spotLightColor = renderProperties.spotLight->GetColor();
-        spotLightColor.w = renderProperties.spotLight->GetIntesity();
+        spotLightColor.coord.w = renderProperties.spotLight->GetIntesity();
         Vector4 spotLightPosAndRange = spotLightTransform->GetPosition();
-        spotLightPosAndRange.w = renderProperties.spotLight->GetRange();
+        spotLightPosAndRange.coord.w = renderProperties.spotLight->GetRange();
 
         renderProperties.globalBindings.SetVector4(ShaderParams::SpotLightColor.data(), spotLightColor);
         renderProperties.globalBindings.SetVector4(ShaderParams::SpotLightPositionAndRange.data(), spotLightPosAndRange);
@@ -727,7 +728,7 @@ namespace Feng
         bufferSettings.stencil = FrameBuffer::eAttachement::None;
         bufferSettings.multisample = false;
         bufferSettings.combinedDepthStencil = false;
-        bufferSettings.depth2dArraySize = renderProperties.cascadeBorders.size() + 1;
+        bufferSettings.depth2dArraySize = static_cast<uint32_t>(renderProperties.cascadeBorders.size()) + 1u;
 
         return fboPool.Pop(bufferSettings);
     }

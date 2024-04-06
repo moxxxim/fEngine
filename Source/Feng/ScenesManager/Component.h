@@ -31,7 +31,7 @@ namespace Feng
         return owner;
     }
     
-    inline void Component::Update(float deltaTime)
+    inline void Component::Update(float)
     {}
     
     inline void Component::SetOwner(Entity *aOwner)

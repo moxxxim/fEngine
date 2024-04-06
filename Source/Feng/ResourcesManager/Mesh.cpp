@@ -84,7 +84,7 @@ namespace Feng
 
     uint32_t Mesh::GetDataSize() const
     {
-        return vertices.size() * sizeof(float);
+        return static_cast<uint32_t>(vertices.size() * sizeof(float));
     }
 
     const uint8_t* Mesh::GetData() const

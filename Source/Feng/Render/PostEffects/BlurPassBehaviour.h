@@ -19,5 +19,6 @@ namespace Feng
         void SetupMaterial(int passIndex, Material *material);
 
         float *m_blurStrength = nullptr;
+        int32_t m_passesCount = 1;
     };
 }

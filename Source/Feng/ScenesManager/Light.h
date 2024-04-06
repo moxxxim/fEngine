@@ -36,7 +36,7 @@ namespace Feng
         void SetSpotAngle(float aSpotAngle);
         
         bool IsShadowCaster() const;
-        bool SetShadowCaster(bool aCastShadows);
+        void SetShadowCaster(bool aCastShadows);
 
     private:
         Vector4 color;
@@ -105,7 +105,7 @@ namespace Feng
         return shadowCaster;
     }
 
-    inline bool Light::SetShadowCaster(bool aCastShadows)
+    inline void Light::SetShadowCaster(bool aCastShadows)
     {
         shadowCaster = aCastShadows;
     }

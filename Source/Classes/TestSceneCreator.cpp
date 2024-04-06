@@ -29,7 +29,7 @@ namespace test
         std::map<Feng::Light *, std::unique_ptr<Feng::Material>> lightMaterials;
         
         constexpr Feng::Vector3 planePos{0.f, -1.f, 0.f};
-        constexpr Feng::Vector3 reflectiveCubePos{6.f, planePos.y + 0.6f, 0.f};
+        constexpr Feng::Vector3 reflectiveCubePos{6.f, planePos.coord.y + 0.6f, 0.f};
         constexpr uint32_t vertexFormatPNU = Feng::eVertexAtributes::Position
                                            | Feng::eVertexAtributes::Normal
                                            | Feng::eVertexAtributes::Uv0;
@@ -78,7 +78,7 @@ namespace test
         std::vector<CubeDesc> cubes =
         {
             { Feng::Vector3(-4.0f, 0.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
-            { Feng::Vector3( 0.0f,  planePos.y + 0.6f,  -5.5f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
+            { Feng::Vector3( 0.0f,  planePos.coord.y + 0.6f,  -5.5f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
             { Feng::Vector3( 2.0f,  0.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
             { Feng::Vector3(-2.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", true },
             { Feng::Vector3(0.0f, 2.0f, 0.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", false },
@@ -88,29 +88,29 @@ namespace test
             { Feng::Vector3( -2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
             { Feng::Vector3( 0.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
             { Feng::Vector3( 2.0f, 1.0f, -4.0f), Feng::Quaternion{}, vertexFormatPNU, "DiffTex1SpecTex2Material", true },
-            { Feng::Vector3( -2.f, planePos.y + 0.6f, 0.f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
+            { Feng::Vector3( -2.f, planePos.coord.y + 0.6f, 0.f), Feng::Quaternion{}, vertexFormatPNU, "TileWallMaterial", false },
         };
 
         std::array<Feng::Vector3, 10> vegetationPositions
         {
-            Feng::Vector3(10.0f, planePos.y + 0.6f, 10.0f),
-            Feng::Vector3(10.0f, planePos.y + 0.6f, -10.0f),
-            Feng::Vector3(-10.0f, planePos.y + 0.6f, -10.0f),
-            Feng::Vector3(-10.0f, planePos.y + 0.6f, 10.0f),
-            Feng::Vector3(10.0f, planePos.y + 0.6f, 5.0f),
-            Feng::Vector3(5.0f, planePos.y + 0.6f, 10.0f),
-            Feng::Vector3(5.0f, planePos.y + 0.6f, 5.0f),
-            Feng::Vector3(10.0f, planePos.y + 0.6f, 1.0f),
-            Feng::Vector3(5.0f, planePos.y + 0.6f, 1.0f),
-            Feng::Vector3(1.0f, planePos.y + 0.6f, 10.0f),
+            Feng::Vector3(10.0f, planePos.coord.y + 0.6f, 10.0f),
+            Feng::Vector3(10.0f, planePos.coord.y + 0.6f, -10.0f),
+            Feng::Vector3(-10.0f, planePos.coord.y + 0.6f, -10.0f),
+            Feng::Vector3(-10.0f, planePos.coord.y + 0.6f, 10.0f),
+            Feng::Vector3(10.0f, planePos.coord.y + 0.6f, 5.0f),
+            Feng::Vector3(5.0f, planePos.coord.y + 0.6f, 10.0f),
+            Feng::Vector3(5.0f, planePos.coord.y + 0.6f, 5.0f),
+            Feng::Vector3(10.0f, planePos.coord.y + 0.6f, 1.0f),
+            Feng::Vector3(5.0f, planePos.coord.y + 0.6f, 1.0f),
+            Feng::Vector3(1.0f, planePos.coord.y + 0.6f, 10.0f),
         };
 
         std::array<Feng::Vector3, 8> windowPositions
         {
-            Feng::Vector3(10.0f, planePos.y + 0.6f, 20.0f),
-            Feng::Vector3(20.0f, planePos.y + 0.6f, -10.0f),
-            Feng::Vector3(-10.0f, planePos.y + 0.6f, -20.0f),
-            Feng::Vector3(-20.0f, planePos.y + 0.6f, 10.0f),
+            Feng::Vector3(10.0f, planePos.coord.y + 0.6f, 20.0f),
+            Feng::Vector3(20.0f, planePos.coord.y + 0.6f, -10.0f),
+            Feng::Vector3(-10.0f, planePos.coord.y + 0.6f, -20.0f),
+            Feng::Vector3(-20.0f, planePos.coord.y + 0.6f, 10.0f),
             Feng::Vector3(0.0f, 0.0f, 2.0f),
             Feng::Vector3(1.0f, 2.0f, 2.0f),
             Feng::Vector3(-1.0f, -0.2f, 2.0f),
@@ -262,7 +262,7 @@ namespace test
             using namespace Feng;
             
             std::ignore = scene.CreateSkybox(test::res.SkyboxMaterial.get());
-            Entity* camEntity = CreateCamera(scene);
+            std::ignore = CreateCamera(scene);
             CreateDirectLight(scene, true);
             CreatePointLight(scene);
             CreateSpotLight(scene);
@@ -333,7 +333,7 @@ namespace test
                                            false);
             }
 
-            Feng::Entity *reflectiveeObject = CreateObject(
+            std::ignore = CreateObject(
                                                           scene,
                                                           reflectiveCubePos,
                                                           "Reflective",
@@ -341,7 +341,6 @@ namespace test
                                                           *test::res.CubemapReflectiveMaterial,
                                                           test::res.CubeMesh->GetAttributes(),
                                                           true);
-            Feng::Transform *reflectiveObjectTransform = reflectiveeObject->GetComponent<Feng::Transform>();
 
             // Game manager.
             Entity &gameManger = scene.CreateEntity("Game Manger");
@@ -366,9 +365,9 @@ namespace test
     
     std::unique_ptr<Feng::Scene> CreateTestScene()
     {
-        static_assert(Feng::Quaternion::Identity().AxisScaled().x == 0);
-        static_assert((Feng::Quaternion::Identity() * Feng::Quaternion::Identity()).AxisScaled().x == 0);
-        static_assert((Feng::Vector3{0, 0, 1} * Feng::Quaternion::Identity()).x == 0);
+        static_assert(Feng::Quaternion::Identity().AxisScaled().coord.x == 0);
+        static_assert((Feng::Quaternion::Identity() * Feng::Quaternion::Identity()).AxisScaled().coord.x == 0);
+        static_assert((Feng::Vector3{0, 0, 1} * Feng::Quaternion::Identity()).coord.x == 0);
         
         LoadResources();
         return CreateScene();

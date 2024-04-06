@@ -46,11 +46,11 @@ namespace Feng
         union
         {
             float data[2];
-            struct
+            struct Coord
             {
                 float x;
                 float y;
-            };
+            } coord;
         };
     };
 }
@@ -87,13 +87,13 @@ namespace Feng
     inline void Vector2::Normalize()
     {
         float norm = Length();
-        x /= norm;
-        y /= norm;
+        coord.x /= norm;
+        coord.y /= norm;
     }
 
     inline float Vector2::Dot(const Vector2& a, const Vector2& b)
     {
-        return (a.x * b.x) + (a.y * b.y);
+        return (a.coord.x * b.coord.x) + (a.coord.y * b.coord.y);
     }
 
     inline float Vector2::Distance(const Vector2& a, const Vector2& b)
@@ -108,29 +108,29 @@ namespace Feng
 
     inline Vector2 Vector2::operator - () const
     {
-        return Vector2{-x, -y};
+        return Vector2{-coord.x, -coord.y};
     }
 
     inline Vector2& Vector2::operator += (const Vector2& other)
     {
-        x += other.x;
-        y += other.y;
+        coord.x += other.coord.x;
+        coord.y += other.coord.y;
 
         return *this;
     }
 
     inline Vector2& Vector2::operator -= (const Vector2& other)
     {
-        x -= other.x;
-        y -= other.y;
+        coord.x -= other.coord.x;
+        coord.y -= other.coord.y;
 
         return *this;
     }
 
     inline Vector2& Vector2::operator *= (float value)
     {
-        x *= value;
-        y *= value;
+        coord.x *= value;
+        coord.y *= value;
 
         return *this;
     }
@@ -147,7 +147,7 @@ namespace Feng
 
     inline Vector2 operator * (const Vector2& v, float a)
     {
-        return Vector2 {v.x * a, v.y * a};
+        return Vector2 {v.coord.x * a, v.coord.y * a};
     }
 
     inline Vector2 operator * (float a, const Vector2& v)
@@ -157,12 +157,12 @@ namespace Feng
 
     inline Vector2 operator / (const Vector2& v, float a)
     {
-        return Vector2 {v.x / a, v.y / a};
+        return Vector2 {v.coord.x / a, v.coord.y / a};
     }
 
     inline Vector2 operator + (const Vector2& a, const Vector2& b)
     {
-        return Vector2 {a.x + b.x, a.y + b.y};
+        return Vector2 {a.coord.x + b.coord.x, a.coord.y + b.coord.y};
     }
 
     inline Vector2 operator - (const Vector2& a, const Vector2& b)

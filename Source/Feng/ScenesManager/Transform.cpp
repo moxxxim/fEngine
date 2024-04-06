@@ -15,7 +15,7 @@ namespace Feng
         rotation = (space == eSpace::World) ? aRotation : aRotation * rotation;
     }
 
-    Vector3 Transform::GetEuler(eSpace space /*= eSpace::World*/) const
+    Vector3 Transform::GetEuler(eSpace) const
     {
         throw "'Transform::GetRotationEuler()' not implemented yet.";
     }
@@ -27,7 +27,7 @@ namespace Feng
 
     void Transform::SetEuler(const Vector3& euler, eSpace space /*= eSpace::World*/)
     {
-        SetEuler(euler.x, euler.y, euler.z, space);
+        SetEuler(euler.coord.x, euler.coord.y, euler.coord.z, space);
     }
 
     Vector3 Transform::GetForward() const
@@ -56,9 +56,9 @@ namespace Feng
         rotation = (space == eSpace::World) ? rotation * change : change * rotation;
     }
     
-    void Transform::Rotate(const Vector3& euler, eSpace space /*= eSpace::World*/)
+    void Transform::Rotate(const Vector3& euler, eSpace)
     {
-        Rotate(euler.x, euler.y, euler.z);
+        Rotate(euler.coord.x, euler.coord.y, euler.coord.z);
     }
     
     void Transform::Rotate(const Vector3& axisNormalized, float dAngle, eSpace space /*= eSpace::World*/)

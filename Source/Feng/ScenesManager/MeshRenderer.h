@@ -17,8 +17,8 @@ namespace Feng
     class Camera;
     class Material;
     class Mesh;
-    class RenderProperties;
     class Texture;
+    struct RenderProperties;
 
     class MeshRenderer final : public Component
     {

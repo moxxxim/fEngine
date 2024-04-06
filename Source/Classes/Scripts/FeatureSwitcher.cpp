@@ -2,12 +2,12 @@
 
 #include <Classes/TempResouces.h>
 #include <Feng/Core/Engine.hpp>
+#include <Feng/Core/FengGL.h>
 #include <Feng/ScenesManager/RenderSystem.h>
 #include <Feng/Utils/Debug.h>
 #include <Feng/Utils/Render/ShaderParams.h>
-#include <GLFW/glfw3.h>
 
-void FeatureSwitcher::Update(float deltaTime)
+void FeatureSwitcher::Update(float)
 {
     Feng::Engine *engine = Feng::Engine::Instance();
     if(appliedEffectIndex >= 0)

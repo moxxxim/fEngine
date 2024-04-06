@@ -46,7 +46,7 @@ void InstancedObjectTransformController::SetCount(size_t count)
     instances = InitializeInstances(count);
 }
 
-void InstancedObjectTransformController::Update(float deltaTime)
+void InstancedObjectTransformController::Update(float)
 {
     if(!renderer)
     {
@@ -58,7 +58,7 @@ void InstancedObjectTransformController::Update(float deltaTime)
     constexpr float speedFactor = 0.1f;
     for(size_t i = 0; i < instances.size(); i+=2)
     {
-        instances[i].rows[3].z += offsetFactor * std::sin(speedFactor * Feng::Engine::Time());
+        instances[i].rows[3].coord.z += offsetFactor * std::sin(speedFactor * Feng::Engine::Time());
     }
 
     renderer->SetInstanceTransforms(instances);

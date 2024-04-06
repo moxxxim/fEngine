@@ -1,19 +1,17 @@
 #include <Feng/Utils/Render/RenderUtils.h>
 
+#include <Feng/Core/FengGL.h>
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/ResourcesManager/Texture.h>
 #include <Feng/Utils/Render/TextureParams.h>
 #include <Feng/Utils/Debug.h>
 
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
-
 namespace Feng::Render
 {
     namespace SRenderUtils
     {
-        uint32_t LoadTextureData2d(const Texture& texture)
+        void LoadTextureData2d(const Texture& texture)
         {
             GLenum format = GetTextureFormat(texture);
             GLsizei width = static_cast<GLsizei>(texture.GetWidth());
@@ -61,7 +59,7 @@ namespace Feng::Render
                                     type,
                                     isNormalized,
                                     static_cast<GLsizei>(stride),
-                                    reinterpret_cast<const GLvoid *>(offset));
+                                    reinterpret_cast<const GLvoid *>(static_cast<uintptr_t>(offset)));
                 Print_Errors_OpengGL();
                 
                 glEnableVertexAttribArray(attributeIndex);
@@ -153,7 +151,6 @@ namespace Feng::Render
 
             if(const Texture *texture = bindings.GetTexture(name))
             {
-                GLenum target = ToOpenGLValue(texture->GetType());
                 if(auto it = textureBuffers.find(name); it != textureBuffers.end())
                 {
                     BindTexture(shader, texture->GetType(), textureUnit, name, it->second);
@@ -255,6 +252,9 @@ namespace Feng::Render
             case eShaderType::Fragment:
                 return GL_FRAGMENT_SHADER;
         }
+
+        Debug::LogError("Invalid shader type specified.");
+        return 0;
     }
     
     VertexBuffer CreateQuadBuffer()
@@ -309,7 +309,7 @@ namespace Feng::Render
                         2.f * z - 1.f,
                         1.f};
                     Vector4 cornerWorld = cornerNdc * camViewProjInverse;
-                    corners[i] = cornerWorld / cornerWorld.w;
+                    corners[i] = cornerWorld / cornerWorld.coord.w;
                     ++i;
                 }
             }

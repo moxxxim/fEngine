@@ -1,13 +1,11 @@
 #include <Feng/Render/PostEffects/Core/PostEffectRenderer.h>
 
+#include <Feng/Core/FengGL.h>
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/Utils/Debug.h>
 #include <Feng/Utils/Render/TextureParams.h>
 #include <Feng/Utils/Render/RenderUtils.h>
-
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
 
 namespace Feng
 {
@@ -24,7 +22,7 @@ namespace Feng
         shader->StartUse();
 
         SetupBufferedTextures();
-        Render::ResolveBindings(*shader, material->Bindings(), materialTextures, frameBufferTextures->size());
+        Render::ResolveBindings(*shader, material->Bindings(), materialTextures, static_cast<uint32_t>(frameBufferTextures->size()));
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         shader->StopUse();

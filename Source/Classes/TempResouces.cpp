@@ -6,6 +6,7 @@
 #include <Feng/ResourcesManager/TextureData.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <string>

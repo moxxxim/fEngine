@@ -41,8 +41,8 @@ namespace Feng
 
         float aspectRatio = DefaultAspectRatio;;
         float fovY = DefaultFovY;
-        float near = DefaultNear;
-        float far = DefaultFar;
+        float nearPlane = DefaultNear;
+        float farPlane = DefaultFar;
     };
 
     inline float Camera::GetFovY() const
@@ -57,11 +57,11 @@ namespace Feng
 
     inline float Camera::GetNearClipPlane() const
     {
-        return near;
+        return nearPlane;
     }
 
     inline float Camera::GetFarClipPlane() const
     {
-        return far;
+        return farPlane;
     }
 }

@@ -63,24 +63,29 @@ log_messages_optional(
 # ---------------- Collect platform-specific libraries -----------------
 # ----------------------------------------------------------------------
 
-set(PLATFORM_SPECIFIC_LIBS)
+set(platformSpecificLibs)
 if(APPLE)
     find_library(MAC_COCOA_LIB Cocoa REQUIRED)
     find_library(MAC_IO_KIT_LIB IOKit REQUIRED)
     find_library(MAC_CORE_VIDEO_LIB CoreVideo REQUIRED)
     find_library(MAC_OPEN_GL_LIB OpenGL REQUIRED)
 
-    set(PLATFORM_SPECIFIC_LIBS 
+    set(platformSpecificLibs 
                     ${MAC_COCOA_LIB}
                     ${MAC_IO_KIT_LIB}
                     ${MAC_CORE_VIDEO_LIB}
                     ${MAC_OPEN_GL_LIB})
 endif()
 
+if(WIN32)
+    find_package(OpenGL 3.3 REQUIRED)
+    set(platformSpecificLibs OpenGL::GL)
+endif()
+
 log_messages_optional(
     MESSAGES 
         "Platform-specific libraries:"
-        ${PLATFORM_SPECIFIC_LIBS}
+        ${platformSpecificLibs}
     DO_LOG ${VERBOSE_BUILD}
     FRAME_UP FRAME_DOWN)
 
@@ -88,7 +93,7 @@ log_messages_optional(
 # ---------------- Collect all source files for project -----------------
 # -----------------------------------------------------------------------
 
-set(SOURCE_FILES_EXTENSIONS "*.cpp" "*.h" "*.hpp")
+set(SOURCE_FILES_EXTENSIONS "*.cpp" "*.h" "*.hpp" "*.c")
 file(GLOB_RECURSE MY_PROJECT_SOURCES_FILES ${SOURCE_FILES_EXTENSIONS})
 # remove cmake build directory from source files.
 list(FILTER MY_PROJECT_SOURCES_FILES EXCLUDE REGEX ".*${PROJECT_BINARY_DIR}.*")
@@ -129,21 +134,31 @@ if(APPLE)
     target_compile_definitions(${FENG_TARGET_NAME} 
         PRIVATE 
             "GL_SILENCE_DEPRECATION")
+elseif(WIN32)
+
+endif()
+
+if(MSVC)
+    target_compile_options(${FENG_TARGET_NAME} PRIVATE /W4 /WX /MP)
+else()
+    target_compile_options(${FENG_TARGET_NAME} PRIVATE -Wall -Wextra -pedantic -Werror -Wno-missing-field-initializers)
 endif()
 
 target_include_directories(${FENG_TARGET_NAME} 
     PUBLIC 
         "${PROJECT_SOURCE_DIR}/Source"
-        "${PROJECT_SOURCE_DIR}/Source/Thirdparty")
+        "${PROJECT_SOURCE_DIR}/Source/Thirdparty",
+        "${PROJECT_SOURCE_DIR}/Source/Thirdparty/Glad/include")
 
 # Link libraries
 target_link_libraries(${FENG_TARGET_NAME}
     PRIVATE
         $<$<CONFIG:Debug>:${THIRDPARTY_STATIC_LIBS_DEBUG}>
         $<$<CONFIG:Release>:${THIRDPARTY_STATIC_LIBS_RELEASE}>
-        ${PLATFORM_SPECIFIC_LIBS})
+        ${platformSpecificLibs})
 
 set_target_properties(${FENG_TARGET_NAME} PROPERTIES FOLDER "Apps")
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${FENG_TARGET_NAME})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MY_PROJECT_SOURCES_FILES})
 
 # TODO: m.alekseev make resources folder visible in project.

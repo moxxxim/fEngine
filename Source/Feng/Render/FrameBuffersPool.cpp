@@ -1,11 +1,9 @@
 #include <Feng/Render/FrameBuffersPool.h>
 
 #include <Feng/App/Globals.h>
+#include <Feng/Core/FengGL.h>
 #include <Feng/Utils/Debug.h>
-
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
-
+#include <algorithm>
 
 namespace Feng
 {
@@ -24,7 +22,7 @@ namespace Feng
             
             std::vector<GLuint> colorBuffers;
             colorBuffers.resize(settings.colorBuffersCount);
-            glGenTextures(colorBuffers.size(), colorBuffers.data());
+            glGenTextures(static_cast<GLsizei>(colorBuffers.size()), colorBuffers.data());
             
             GLenum target = settings.multisample
                 ? GL_TEXTURE_2D_MULTISAMPLE
@@ -73,7 +71,7 @@ namespace Feng
                                 {
                                     return attachement++;
                                 });
-                glDrawBuffers(attachements.size(), attachements.data());
+                glDrawBuffers(static_cast<GLsizei>(attachements.size()), attachements.data());
             }
             else if (settings.color == FrameBuffer::eAttachement::Buffer)
             {
@@ -306,7 +304,7 @@ namespace Feng
     void FrameBuffersPool::DeleteBuffer(const FrameBuffer& buffer)
     {
         glDeleteFramebuffers(1, &buffer.frame);
-        glDeleteTextures(buffer.color.size(), buffer.color.data());
+        glDeleteTextures(static_cast<GLsizei>(buffer.color.size()), buffer.color.data());
         glDeleteRenderbuffers(1, &buffer.depth);
         glDeleteRenderbuffers(1, &buffer.stencil);
     }

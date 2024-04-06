@@ -1,7 +1,6 @@
 #include <Feng/Utils/Debug.h>
 
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
+#include <Feng/Core/FengGL.h>
 #include <iostream>
 #include <vector>
 
@@ -61,8 +60,6 @@ namespace Feng
 
             std::cout << error << " | " << file << " (" << line << ")" << "\n";
         }
-
-        return errorCode;
     }
 
     void Debug::LogRenderInfoOpenGL()

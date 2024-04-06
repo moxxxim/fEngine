@@ -8,8 +8,9 @@
 
 namespace Feng
 {
-    BlurPassBehaviour::BlurPassBehaviour(float *blurStrength, int passesCount) :
-        m_blurStrength(blurStrength)
+    BlurPassBehaviour::BlurPassBehaviour(float *blurStrength, int passesCount) 
+        : m_blurStrength(blurStrength)
+        , m_passesCount(passesCount)
     { }
 
     void BlurPassBehaviour::Initialize(PostEffectPrePass& prePass)

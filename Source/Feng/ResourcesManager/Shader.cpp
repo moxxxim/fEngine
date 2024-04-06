@@ -1,12 +1,10 @@
 #include <Feng/ResourcesManager/Shader.h>
 
+#include <Feng/Core/FengGL.h>
 #include <Feng/ResourcesManager/ResourcesManager.h>
 #include <Feng/Utils/Render/RenderUtils.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/Utils/Debug.h>
-
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
 
 #include <fstream>
 #include <sstream>
@@ -85,7 +83,7 @@ namespace Feng
     {
     }
 
-    bool Shader::TryGetAttributeLocation(const char *name, uint32_t& location) const
+    bool Shader::TryGetAttributeLocation(const char *name, int32_t& location) const
     {
         if(auto it = attributes.find(name); it != attributes.end())
         {
@@ -96,7 +94,7 @@ namespace Feng
         return false;
     }
 
-    bool Shader::TryGetUniformLocation(const char *name, uint32_t& location) const
+    bool Shader::TryGetUniformLocation(const char *name, int32_t& location) const
     {
         if(auto it = uniforms.find(name); it != uniforms.end())
         {
@@ -115,7 +113,7 @@ namespace Feng
 
     bool Shader::SetUniformBool(const char *name, bool value) const
     {
-        SetUniformInt(name, static_cast<int32_t>(value));
+        return SetUniformInt(name, static_cast<int32_t>(value));
     }
 
     bool Shader::SetUniformInt(const char *name, int32_t value) const
@@ -131,7 +129,7 @@ namespace Feng
 
     bool Shader::SetUniformFloat(const char *name, float value) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniform1f(location, value);
@@ -143,7 +141,7 @@ namespace Feng
     
     bool Shader::SetUniformFloats(const char *name, const std::vector<float>& value) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniform1fv(location, static_cast<int32_t>(value.size()), value.data());
@@ -155,10 +153,10 @@ namespace Feng
 
     bool Shader::SetUniformVector2(const char *name, const Vector2& value) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
-            glUniform2f(location, value.x, value.y);
+            glUniform2f(location, value.coord.x, value.coord.y);
             return true;
         }
 
@@ -167,10 +165,10 @@ namespace Feng
 
     bool Shader::SetUniformVector3(const char *name, const Vector3& value) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
-            glUniform3f(location, value.x, value.y, value.z);
+            glUniform3f(location, value.coord.x, value.coord.y, value.coord.z);
             return true;
         }
 
@@ -179,10 +177,10 @@ namespace Feng
 
     bool Shader::SetUniformVector4(const char *name, const Vector4& value) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
-            glUniform4f(location, value.x, value.y, value.z, value.w);
+            glUniform4f(location, value.coord.x, value.coord.y, value.coord.z, value.coord.w);
             return true;
         }
 
@@ -191,7 +189,7 @@ namespace Feng
 
     bool Shader::SetUniformMatrix3(const char *name, const Matrix3& matrix) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniformMatrix3fv(location, 1, GL_FALSE, matrix.data);
@@ -203,7 +201,7 @@ namespace Feng
 
     bool Shader::SetUniformMatrix4(const char *name, const Matrix4& matrix) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data);
@@ -215,7 +213,7 @@ namespace Feng
     
     bool Shader::SetUniformMatrices4(const char *name, const std::vector<Matrix4>& matrices) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniformMatrix4fv(
@@ -231,7 +229,7 @@ namespace Feng
 
     bool Shader::SetUniformBuffer(const char *name, uint32_t index) const
     {
-        uint32_t location = glGetUniformBlockIndex(program, name);
+        int32_t location = glGetUniformBlockIndex(program, name);
         if(location != UndefinedParamLocation)
         {
             glUniformBlockBinding(program, location, index);
@@ -243,7 +241,7 @@ namespace Feng
 
     bool Shader::SetUniformFloatArray(const char *name, const float *value, int size) const
     {
-        uint32_t location = UndefinedParamLocation;
+        int32_t location = UndefinedParamLocation;
         if(TryGetUniformLocation(name, location))
         {
             glUniform1fv(location, size, value);

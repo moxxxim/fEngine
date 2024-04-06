@@ -1,9 +1,8 @@
 #include <Feng/Utils/Render/TextureParams.h>
 
+#include <Feng/Core/FengGL.h>
 #include <Feng/ResourcesManager/Texture.h>
-#include <Feng/Utils/Debug.h>>
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
+#include <Feng/Utils/Debug.h>
 
 namespace Feng
 {

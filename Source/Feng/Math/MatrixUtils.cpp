@@ -7,9 +7,9 @@ namespace Feng::Mat4
     Matrix4 MakeScale(const Vector3& scale)
     {
         Matrix4 matrix = Matrix4::Identity;
-        matrix.m00 = scale.x;
-        matrix.m11 = scale.y;
-        matrix.m22 = scale.z;
+        matrix.m._00 = scale.coord.x;
+        matrix.m._11 = scale.coord.y;
+        matrix.m._22 = scale.coord.z;
 
         return matrix;
     }
@@ -17,17 +17,15 @@ namespace Feng::Mat4
     Matrix4 MakeRotation(const Matrix3& rotation)
     {
         Matrix4 matrix = Matrix4::Identity;
-        matrix.m00 = rotation.m00;
-        matrix.m01 = rotation.m01;
-        matrix.m02 = rotation.m02;
-
-        matrix.m10 = rotation.m10;
-        matrix.m11 = rotation.m11;
-        matrix.m12 = rotation.m12;
-
-        matrix.m20 = rotation.m20;
-        matrix.m21 = rotation.m21;
-        matrix.m22 = rotation.m22;
+        matrix.m._00 = rotation.m._00;
+        matrix.m._01 = rotation.m._01;
+        matrix.m._02 = rotation.m._02;
+        matrix.m._10 = rotation.m._10;
+        matrix.m._11 = rotation.m._11;
+        matrix.m._12 = rotation.m._12;
+        matrix.m._20 = rotation.m._20;
+        matrix.m._21 = rotation.m._21;
+        matrix.m._22 = rotation.m._22;
 
         return matrix;
     }
@@ -40,9 +38,9 @@ namespace Feng::Mat4
     Matrix4 MakeTranslation(const Vector3& translation)
     {
         Matrix4 matrix = Matrix4::Identity;
-        matrix.m30 = translation.x;
-        matrix.m31 = translation.y;
-        matrix.m32 = translation.z;
+        matrix.m._30 = translation.coord.x;
+        matrix.m._31 = translation.coord.y;
+        matrix.m._32 = translation.coord.z;
 
         return matrix;
     }
@@ -71,11 +69,11 @@ namespace Feng::Mat4
         float fovYRad = Math::DegToRad(fovYDeg);
         float fovHalfTan = std::tan(fovYRad / 2.f);
 
-        projection.m00 = 1.f / (aspect * fovHalfTan);
-        projection.m11 = 1.f / fovHalfTan;
-        projection.m22 = - (far + near) / (far - near);
-        projection.m23 = -1.f;
-        projection.m32 = -2.f * far * near / (far - near);
+        projection.m._00 = 1.f / (aspect * fovHalfTan);
+        projection.m._11 = 1.f / fovHalfTan;
+        projection.m._22 = - (far + near) / (far - near);
+        projection.m._23 = -1.f;
+        projection.m._32 = -2.f * far * near / (far - near);
 
         return projection;
     }
@@ -85,13 +83,13 @@ namespace Feng::Mat4
         // http://www.songho.ca/opengl/gl_projectionmatrix.html
         Matrix4 projection = Matrix4::Zero;
 
-        projection.m00 = (2 * n) / (r - l);
-        projection.m02 = (r + l) / (r - l);
-        projection.m11 = 2 * n / (t - b);
-        projection.m12 = (t + b) / (t - b);
-        projection.m22 = - (f + n) / (f - n);
-        projection.m23 = -1.f;
-        projection.m32 = -2.f * f * n / (f - n);
+        projection.m._00 = (2 * n) / (r - l);
+        projection.m._02 = (r + l) / (r - l);
+        projection.m._11 = 2 * n / (t - b);
+        projection.m._12 = (t + b) / (t - b);
+        projection.m._22 = - (f + n) / (f - n);
+        projection.m._23 = -1.f;
+        projection.m._32 = -2.f * f * n / (f - n);
 
         return projection;
     }
@@ -100,11 +98,11 @@ namespace Feng::Mat4
     {
         Matrix4 projection = Matrix4::Zero;
 
-        projection.m00 = 2 / static_cast<float>(width);
-        projection.m11 = 2 / static_cast<float>(height);
-        projection.m22 = -2 / (far - near);
-        projection.m32 = - (far + near) / (far - near);
-        projection.m33 = 1;
+        projection.m._00 = 2 / static_cast<float>(width);
+        projection.m._11 = 2 / static_cast<float>(height);
+        projection.m._22 = -2 / (far - near);
+        projection.m._32 = - (far + near) / (far - near);
+        projection.m._33 = 1;
 
         return projection;
     }
@@ -114,13 +112,13 @@ namespace Feng::Mat4
         // http://www.songho.ca/opengl/gl_projectionmatrix.html
         Matrix4 projection = Matrix4::Zero;
 
-        projection.m00 = 2 / (r - l);
-        projection.m11 = 2 / (t - b);
-        projection.m22 = -2 / (f - n);
-        projection.m30 = - (r + l) / (r - l);
-        projection.m31 = - (t + b) / (t - b);
-        projection.m32 = - (f + n) / (f - n);
-        projection.m33 = 1;
+        projection.m._00 = 2 / (r - l);
+        projection.m._11 = 2 / (t - b);
+        projection.m._22 = -2 / (f - n);
+        projection.m._30 = - (r + l) / (r - l);
+        projection.m._31 = - (t + b) / (t - b);
+        projection.m._32 = - (f + n) / (f - n);
+        projection.m._33 = 1;
 
         return projection;
     }
@@ -141,10 +139,10 @@ namespace Feng::Mat3
         float rotationCos = std::cos(rad);
         float rotationSin = std::sin(rad);
 
-        rotation.m11 = rotationCos;
-        rotation.m12 = rotationSin;
-        rotation.m21 = -rotationSin;
-        rotation.m22 = rotationCos;
+        rotation.m._11 = rotationCos;
+        rotation.m._12 = rotationSin;
+        rotation.m._21 = -rotationSin;
+        rotation.m._22 = rotationCos;
 
         return rotation;
     }
@@ -157,10 +155,10 @@ namespace Feng::Mat3
         float rotationCos = std::cos(rad);
         float rotationSin = std::sin(rad);
 
-        rotation.m00 = rotationCos;
-        rotation.m02 = -rotationSin;
-        rotation.m20 = rotationSin;
-        rotation.m22 = rotationCos;
+        rotation.m._00 = rotationCos;
+        rotation.m._02 = -rotationSin;
+        rotation.m._20 = rotationSin;
+        rotation.m._22 = rotationCos;
 
         return rotation;
     }
@@ -173,17 +171,17 @@ namespace Feng::Mat3
         float rotationCos = std::cos(rad);
         float rotationSin = std::sin(rad);
 
-        rotation.m00 = rotationCos;
-        rotation.m01 = rotationSin;
-        rotation.m10 = -rotationSin;
-        rotation.m11 = rotationCos;
+        rotation.m._00 = rotationCos;
+        rotation.m._01 = rotationSin;
+        rotation.m._10 = -rotationSin;
+        rotation.m._11 = rotationCos;
 
         return rotation;
     }
 
     Matrix3 MakeRotation(const Vector3 &dAngles)
     {
-        return MakeRotation(dAngles.x, dAngles.y, dAngles.z);
+        return MakeRotation(dAngles.coord.x, dAngles.coord.y, dAngles.coord.z);
     }
 
     Matrix3 MakeRotation(float dAngleX, float dAngleY, float dAngleZ)
@@ -197,7 +195,7 @@ namespace Feng::Quat
 {
     Quaternion MakeRotation(const Vector3 &dAngles)
     {
-        return MakeRotation(dAngles.x, dAngles.y, dAngles.z);
+        return MakeRotation(dAngles.coord.x, dAngles.coord.y, dAngles.coord.z);
     }
     
     Quaternion MakeRotation(float dAngleX, float dAngleY, float dAngleZ)

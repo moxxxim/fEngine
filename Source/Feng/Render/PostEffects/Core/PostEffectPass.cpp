@@ -1,11 +1,9 @@
 #include <Feng/Render/PostEffects/Core/PostEffectPass.h>
 
+#include <Feng/Core/FengGL.h>
 #include <Feng/ResourcesManager/Material.h>
 #include <Feng/ResourcesManager/Shader.h>
 #include <Feng/Render/FrameBuffersPool.h>
-
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
 
 namespace Feng
 {

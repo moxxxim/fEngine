@@ -27,9 +27,9 @@ namespace Feng
         
         static constexpr Matrix3 Rows(const Vector3& ex, const Vector3& ey, const Vector3& ez)
         {
-            return Matrix3 {ex.x, ex.y, ex.z,
-                            ey.x, ey.y, ey.z,
-                            ez.x, ez.y, ez.z };
+            return Matrix3 {ex.coord.x, ex.coord.y, ex.coord.z,
+                            ey.coord.x, ey.coord.y, ey.coord.z,
+                            ez.coord.x, ez.coord.y, ez.coord.z };
         }
         
         static constexpr Matrix3 Diag(float a00, float a11, float a22)
@@ -41,7 +41,7 @@ namespace Feng
         
         static constexpr Matrix3 Diag(const Vector3& diag)
         {
-            return Matrix3::Diag(diag.x, diag.y, diag.z);
+            return Matrix3::Diag(diag.coord.x, diag.coord.y, diag.coord.z);
         }
         
         static constexpr Matrix3 Diag(float value)
@@ -54,9 +54,9 @@ namespace Feng
             float a00, float a01, float a02,
             float a10, float a11, float a12,
             float a20, float a21, float a22)
-            : m00{ a00 }, m01{ a01 }, m02{ a02 }
-            , m10{ a10 }, m11{ a11 }, m12{ a12 }
-            , m20{ a20 }, m21{ a21 }, m22{ a22 }
+            : m{ a00, a01, a02
+            , a10, a11, a12
+            , a20, a21, a22 }
         {}
         constexpr Matrix3(const Matrix3&) = default;
         constexpr Matrix3(Matrix3&&) = default;
@@ -64,12 +64,12 @@ namespace Feng
         bool HasInverse() const;
         constexpr float Determinant() const
         {
-            return m00 * (m11 * m22 - m21 * m12) - m01 * (m10 * m22 - m20 * m12) + m02 * (m10 * m21 - m20 * m11);
+            return m._00 * (m._11 * m._22 - m._21 * m._12) - m._01 * (m._10 * m._22 - m._20 * m._12) + m._02 * (m._10 * m._21 - m._20 * m._11);
         }
         
         constexpr float Trace() const
         {
-            return m00 + m11 + m22;
+            return m._00 + m._11 + m._22;
         }
 
         bool TryInvert(Matrix3& inverted) const;
@@ -77,9 +77,9 @@ namespace Feng
         constexpr Matrix3 Transposed() const
         {
             return Matrix3 {
-                m00, m10, m20,
-                m01, m11, m21,
-                m02, m12, m22
+                m._00, m._10, m._20,
+                m._01, m._11, m._21,
+                m._02, m._12, m._22
             };
         }
 
@@ -102,18 +102,18 @@ namespace Feng
             float data[9];
             float mat[3][3];
             Vector3 rows[3];
-            struct
+            struct Component
             {
-                float m00;
-                float m01;
-                float m02;
-                float m10;
-                float m11;
-                float m12;
-                float m20;
-                float m21;
-                float m22;
-            };
+                float _00;
+                float _01;
+                float _02;
+                float _10;
+                float _11;
+                float _12;
+                float _20;
+                float _21;
+                float _22;
+            } m;
         };
     };
 }
@@ -129,6 +129,10 @@ namespace Feng
 
     inline bool Matrix3::TryInvert(Matrix3& inverted) const
     {
+        throw "Not Implemented";
+
+        inverted = Matrix3::Identity();
+
         constexpr float epsilon = std::numeric_limits<float>::epsilon();
         float det = Determinant();
         if((epsilon < det) && (det < epsilon))
@@ -141,9 +145,9 @@ namespace Feng
 
     inline void Matrix3::Transpose()
     {
-        std::swap(m01, m10);
-        std::swap(m02, m20);
-        std::swap(m12, m21);
+        std::swap(m._01, m._10);
+        std::swap(m._02, m._20);
+        std::swap(m._12, m._21);
     }
 
     inline Matrix3& Matrix3::operator *= (const Matrix3& other)
@@ -154,29 +158,27 @@ namespace Feng
 
     inline float Matrix3::operator()(uint8_t i, uint8_t j) const
     {
-        return mat[j][j];
+        return mat[i][j];
     }
 
     inline float& Matrix3::operator()(uint8_t i, uint8_t j)
     {
-        return mat[j][j];
+        return mat[i][j];
     }
 
     inline Matrix3 operator * (const Matrix3& a, const Matrix3& b)
     {
         Matrix3 result;
 
-        result.m00 = (a.m00 * b.m00) + (a.m01 * b.m10) + (a.m02 * b.m20);
-        result.m01 = (a.m00 * b.m01) + (a.m01 * b.m11) + (a.m02 * b.m21);
-        result.m02 = (a.m00 * b.m02) + (a.m01 * b.m12) + (a.m02 * b.m22);
-
-        result.m10 = (a.m10 * b.m00) + (a.m11 * b.m10) + (a.m12 * b.m20);
-        result.m11 = (a.m10 * b.m01) + (a.m11 * b.m11) + (a.m12 * b.m21);
-        result.m12 = (a.m10 * b.m02) + (a.m11 * b.m12) + (a.m12 * b.m22);
-
-        result.m20 = (a.m20 * b.m00) + (a.m21 * b.m10) + (a.m22 * b.m20);
-        result.m21 = (a.m20 * b.m01) + (a.m21 * b.m11) + (a.m22 * b.m21);
-        result.m22 = (a.m20 * b.m02) + (a.m21 * b.m12) + (a.m22 * b.m22);
+        result.m._00 = (a.m._00 * b.m._00) + (a.m._01 * b.m._10) + (a.m._02 * b.m._20);
+        result.m._01 = (a.m._00 * b.m._01) + (a.m._01 * b.m._11) + (a.m._02 * b.m._21);
+        result.m._02 = (a.m._00 * b.m._02) + (a.m._01 * b.m._12) + (a.m._02 * b.m._22);
+        result.m._10 = (a.m._10 * b.m._00) + (a.m._11 * b.m._10) + (a.m._12 * b.m._20);
+        result.m._11 = (a.m._10 * b.m._01) + (a.m._11 * b.m._11) + (a.m._12 * b.m._21);
+        result.m._12 = (a.m._10 * b.m._02) + (a.m._11 * b.m._12) + (a.m._12 * b.m._22);
+        result.m._20 = (a.m._20 * b.m._00) + (a.m._21 * b.m._10) + (a.m._22 * b.m._20);
+        result.m._21 = (a.m._20 * b.m._01) + (a.m._21 * b.m._11) + (a.m._22 * b.m._21);
+        result.m._22 = (a.m._20 * b.m._02) + (a.m._21 * b.m._12) + (a.m._22 * b.m._22);
 
         return result;
 
@@ -186,9 +188,9 @@ namespace Feng
     {
         Vector3 result;
 
-        result.x = (a.x * b.m00) + (a.y * b.m10) + (a.z * b.m20);
-        result.y = (a.x * b.m01) + (a.y * b.m11) + (a.z * b.m21);
-        result.z = (a.x * b.m02) + (a.y * b.m12) + (a.z * b.m22);
+        result.coord.x = (a.coord.x * b.m._00) + (a.coord.y * b.m._10) + (a.coord.z * b.m._20);
+        result.coord.y = (a.coord.x * b.m._01) + (a.coord.y * b.m._11) + (a.coord.z * b.m._21);
+        result.coord.z = (a.coord.x * b.m._02) + (a.coord.y * b.m._12) + (a.coord.z * b.m._22);
 
         return result;
     }

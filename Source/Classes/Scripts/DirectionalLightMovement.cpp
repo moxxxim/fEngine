@@ -12,9 +12,9 @@ void DirectionalLightMovement::Update(float deltaTime)
         myTransform = GetEntity()->GetComponent<Feng::Transform>();
         start = myTransform->GetPosition();
 
-        Feng::Vector3 startXz = start - Feng::Vector3{0.f, start.y, 0.f};
+        Feng::Vector3 startXz = start - Feng::Vector3{0.f, start.coord.y, 0.f};
         radius = startXz.Length();
-        height = start.y;
+        height = start.coord.y;
         yStartAngleRad = acos(Feng::Vector3::Dot(myTransform->GetForward(), startXz.ToNormalized()));
         float acosX = acos(Feng::Vector3::Dot(Feng::Vector3::OneX, startXz.ToNormalized()));
         if(acosX > Feng::Math::Pi / 2)

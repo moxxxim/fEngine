@@ -21,7 +21,6 @@ private:
 
 	Feng::Transform *myTransform = nullptr;
     float speed = 3.f;
-    float speedMultiplier = 1;
     float camSensitivity = 0.1f;
     float pitch = 0.f;
     float yaw = 0.f;

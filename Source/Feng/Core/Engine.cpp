@@ -1,10 +1,7 @@
 #include <Feng/Core/Engine.hpp>
 
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
-#include <GLFW/glfw3.h>
-
 #include <Feng/App/Globals.h>
+#include <Feng/Core/FengGL.h>
 #include <Feng/Math/Size.h>
 #include <Feng/ScenesManager/RenderSystem.h>
 #include <Feng/Utils/Debug.h>
@@ -22,19 +19,19 @@ namespace Feng
         static Vector2 mousePos;
         static Vector2 mouseScroll;
         
-        static void MouseCallback(GLFWwindow* window, double x, double y)
+        static void MouseCallback(GLFWwindow*, double x, double y)
         {
-            mousePos.x = static_cast<float>(x);
-            mousePos.y = static_cast<float>(y);
+            mousePos.coord.x = static_cast<float>(x);
+            mousePos.coord.y = static_cast<float>(y);
         }
 
-        static void ScrollCallback(GLFWwindow* window, double x, double y)
+        static void ScrollCallback(GLFWwindow*, double x, double y)
         {
-            mouseScroll.x = static_cast<float>(x);
-            mouseScroll.y = static_cast<float>(y);
+            mouseScroll.coord.x = static_cast<float>(x);
+            mouseScroll.coord.y = static_cast<float>(y);
         }
         
-        static void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+        static void FramebufferSizeCallback(GLFWwindow* aWindow, int width, int height)
         {
             Screen::ScreenSize = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
             
@@ -42,7 +39,7 @@ namespace Feng
             sstream << WindowName << " ";
             sstream << width << " x " << height;
             
-            glfwSetWindowTitle(window, sstream.str().c_str());
+            glfwSetWindowTitle(aWindow, sstream.str().c_str());
             glViewport(0, 0, width, height);
         }
         
@@ -97,18 +94,18 @@ namespace Feng
             Print_Errors_OpengGL();
         }
         
-        static GLFWwindow* CreateWindow()
+        static GLFWwindow* CreateMainWindow()
         {
             Screen::ScreenSize = InitiaScreenSize;
             glfwWindowHint(GLFW_SAMPLES, 4);
-            GLFWwindow* window = glfwCreateWindow(Screen::ScreenSize.width, Screen::ScreenSize.height, WindowName, nullptr, nullptr);
-            if (window)
+            GLFWwindow* outWindow = glfwCreateWindow(Screen::ScreenSize.width, Screen::ScreenSize.height, WindowName, nullptr, nullptr);
+            if (outWindow)
             {
-                glfwMakeContextCurrent(window);
-                glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-                glfwSetCursorPosCallback(window, MouseCallback);
-                glfwSetScrollCallback(window, ScrollCallback);
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                glfwMakeContextCurrent(outWindow);
+                glfwSetFramebufferSizeCallback(outWindow, FramebufferSizeCallback);
+                glfwSetCursorPosCallback(outWindow, MouseCallback);
+                glfwSetScrollCallback(outWindow, ScrollCallback);
+                glfwSetInputMode(outWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                 glViewport(0, 0, Screen::ScreenSize.width, Screen::ScreenSize.height);
             }
             else
@@ -117,52 +114,7 @@ namespace Feng
                 glfwTerminate();
             }
 
-            return window;
-        }
-        
-        static void RenderWithOutline(const std::vector<Entity*>& outlined)
-        {
-            /*
-            // Put 1s (ones) into stencil buffer for all drawn fragments.
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glStencilFunc(GL_ALWAYS, 1, 0xFF);
-            glStencilMask(0xFF);
-
-            for(feng::Entity *entity : outlined)
-            {
-                if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
-                {
-                    //renderer->Draw(<render properties>);
-                }
-            }
-
-            // Make the stencil test fail for all 1s in stencil buffer (for all previously rendered fragments).
-            glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-            glStencilMask(0x00);
-
-            std::unique_ptr<feng::Material> outlineMaterial = test::CreateFlatColorMaterial();
-            outlineMaterial->SetVector3(feng::ShaderParams::MainColor.data(), feng::Vector3::OneY);
-
-            for(feng::Entity *entity : outlined)
-            {
-                if(feng::MeshRenderer *renderer = entity->GetComponent<feng::MeshRenderer>())
-                {
-                    feng::Transform *transform = entity->GetComponent<feng::Transform>();
-                    feng::Material *material = renderer->GetMaterial();
-                    feng::Vector3 scale = transform->GetScale();
-
-                    renderer->SetMaterial(outlineMaterial.get());
-                    transform->SetScale(1.05 * scale);
-                    //renderer->Draw(<render properties>);
-
-                    transform->SetScale(scale);
-                    renderer->SetMaterial(material);
-                }
-            }
-
-            glStencilFunc(GL_ALWAYS, 1, 0xFF);
-            glStencilMask(0xFF);
-            */
+            return outWindow;
         }
         
         void FixWindow()
@@ -216,7 +168,7 @@ namespace Feng
         
         if(SEngine::TryInitGlfw())
         {
-            SEngine::window = SEngine::CreateWindow();
+            SEngine::window = SEngine::CreateMainWindow();
             SEngine::InitRender(showDepth);
         }
     }
@@ -274,7 +226,7 @@ namespace Feng
     
     void Engine::UpdateTime()
     {
-        float currentFrame = glfwGetTime();
+        float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - time;
         time = currentFrame;
     }

@@ -1,5 +1,6 @@
 #include <Feng/ScenesManager/MeshRenderer.h>
 
+#include <Feng/Core/FengGL.h>
 #include <Feng/Math/MatrixUtils.h>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
@@ -13,9 +14,6 @@
 #include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/Utils/Render/RenderUtils.h>
 #include <Feng/Utils/Debug.h>
-
-#include <OpenGL/gl.h>
-#include <OpenGL/gl3.h>
 
 namespace Feng
 {
@@ -107,7 +105,7 @@ namespace Feng
         activeAttributes = static_cast<eVertexAtributes>((attributes | aAttributes) & attributes);
     }
 
-    void MeshRenderer::Draw(const RenderProperties &renderProperties, bool isShadowPass, Material *externalMaterial)
+    void MeshRenderer::Draw(const RenderProperties &renderProperties, bool, Material *externalMaterial)
     {
         Material* workingMaterial = externalMaterial ? externalMaterial : material;
 
@@ -181,7 +179,7 @@ namespace Feng
             {
                 glDrawElementsInstanced(
                                ToOpenGLValue(primitiveType),
-                               indices.size(),
+                               static_cast<GLsizei>(indices.size()),
                                GL_UNSIGNED_INT,
                                reinterpret_cast<void*>(0),
                                instancesCount);
@@ -190,7 +188,7 @@ namespace Feng
             {
                 glDrawElements(
                                ToOpenGLValue(primitiveType),
-                               indices.size(),
+                               static_cast<GLsizei>(indices.size()),
                                GL_UNSIGNED_INT,
                                reinterpret_cast<void*>(0));
             }

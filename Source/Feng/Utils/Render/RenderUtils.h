@@ -1,11 +1,11 @@
 #pragma once
 
+#include <Feng/Core/FengGL.h>
 #include <Feng/Math/Vector4.h>
 #include <Feng/Math/Matrix4.h>
 #include <Feng/Render/VertexBuffer.h>
 #include <Feng/Utils/Render/MeshParams.h>
 #include <Feng/Utils/Render/TextureParams.h>
-#include <OpenGL/gl.h>
 
 #include <cstdint>
 #include <map>

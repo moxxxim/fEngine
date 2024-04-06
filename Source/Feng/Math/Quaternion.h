@@ -46,14 +46,14 @@ namespace Feng
     {
         float radHalfAngle = Math::DegToRad(dAngle / 2);
         float sine = std::sin(radHalfAngle);
-        xyzw[0] = sine * normAxis.x;
-        xyzw[1] = sine * normAxis.y;
-        xyzw[2] = sine * normAxis.z;
+        xyzw[0] = sine * normAxis.coord.x;
+        xyzw[1] = sine * normAxis.coord.y;
+        xyzw[2] = sine * normAxis.coord.z;
         xyzw[3] = std::cos(radHalfAngle);
     }
     
     constexpr Quaternion::Quaternion(const Vector4& aXyzw)
-        : Quaternion {aXyzw.x, aXyzw.y, aXyzw.z, aXyzw.w}
+        : Quaternion {aXyzw.coord.x, aXyzw.coord.y, aXyzw.coord.z, aXyzw.coord.w}
     {}
     
     constexpr Quaternion::Quaternion(float x, float y, float z, float w)
@@ -126,7 +126,7 @@ namespace Feng
         const Vector3 outAxisScaled = Vector3::Cross(vRhs, vLhs) + wLhs * vRhs + wRhs * vLhs;
         const float outW = wLhs * wRhs - Vector3::Dot(vRhs, vLhs);
 
-        return Quaternion{outAxisScaled.x, outAxisScaled.y, outAxisScaled.z, outW};
+        return Quaternion{outAxisScaled.coord.x, outAxisScaled.coord.y, outAxisScaled.coord.z, outW};
     }
     
     constexpr Vector3 operator * (const Vector3& point, const Quaternion& rotation)

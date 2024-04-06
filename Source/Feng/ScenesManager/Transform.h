@@ -50,24 +50,24 @@ namespace Feng
 
 namespace Feng
 {
-    inline const Vector3& Transform::GetPosition(eSpace space /*= eSpace::World*/) const
+    inline const Vector3& Transform::GetPosition(eSpace) const
     {
         return position;
     }
 
-    inline void Transform::SetPosition(const Vector3& aPosition, eSpace space /*= eSpace::World*/)
+    inline void Transform::SetPosition(const Vector3& aPosition, eSpace)
     {
         position = aPosition;
     }
 
-    inline void Transform::SetPosition(float x, float y, float z, eSpace space /*= eSpace::World*/)
+    inline void Transform::SetPosition(float x, float y, float z, eSpace)
     {
-        position.x = x;
-        position.y = y;
-        position.z = z;
+        position.coord.x = x;
+        position.coord.y = y;
+        position.coord.z = z;
     }
 
-    inline const Quaternion& Transform::GetRotation(eSpace space /*= eSpace::World*/) const
+    inline const Quaternion& Transform::GetRotation(eSpace) const
     {
         return rotation;
     }
@@ -79,9 +79,9 @@ namespace Feng
 
     inline void Transform::SetScale(float x, float y, float z)
     {
-        scale.x = x;
-        scale.y = y;
-        scale.z = z;
+        scale.coord.x = x;
+        scale.coord.y = y;
+        scale.coord.z = z;
     }
     
     inline void Transform::SetScale(const Vector3& aScale)
@@ -91,9 +91,9 @@ namespace Feng
 
     inline void Transform::SetScale(float uniformScale)
     {
-        scale.x = uniformScale;
-        scale.y = uniformScale;
-        scale.z = uniformScale;
+        scale.coord.x = uniformScale;
+        scale.coord.y = uniformScale;
+        scale.coord.z = uniformScale;
     }
 
     inline void Transform::Move(const Vector3& translation)
@@ -103,8 +103,8 @@ namespace Feng
 
     inline void Transform::Move(float x, float y, float z)
     {
-        position.x += x;
-        position.y += y;
-        position.z += z;
+        position.coord.x += x;
+        position.coord.y += y;
+        position.coord.z += z;
     }
 }

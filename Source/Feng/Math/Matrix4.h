@@ -17,10 +17,10 @@ namespace Feng
             float a10, float a11, float a12, float a13,
             float a20, float a21, float a22, float a23,
             float a30, float a31, float a32, float a33)
-            : m00{ a00 }, m01{ a01 }, m02{ a02 }, m03{ a03 }
-            , m10{ a10 }, m11{ a11 }, m12{ a12 }, m13{ a13 }
-            , m20{ a20 }, m21{ a21 }, m22{ a22 }, m23{ a23 }
-            , m30{ a30 }, m31{ a31 }, m32{ a32 }, m33{ a33 }
+            : m{ a00, a01, a02, a03
+            , a10, a11, a12, a13
+            , a20, a21, a22, a23
+            , a30, a31, a32, a33 }
         {}
         Matrix4(const Matrix4&) = default;
         Matrix4(Matrix4&&) = default;
@@ -50,28 +50,28 @@ namespace Feng
             float data[16];
             float mat[4][4];
             Vector4 rows[4];
-            struct
+            struct Component
             {
-                float m00;
-                float m01;
-                float m02;
-                float m03;
+                float _00;
+                float _01;
+                float _02;
+                float _03;
 
-                float m10;
-                float m11;
-                float m12;
-                float m13;
+                float _10;
+                float _11;
+                float _12;
+                float _13;
 
-                float m20;
-                float m21;
-                float m22;
-                float m23;
+                float _20;
+                float _21;
+                float _22;
+                float _23;
 
-                float m30;
-                float m31;
-                float m32;
-                float m33;
-            };
+                float _30;
+                float _31;
+                float _32;
+                float _33;
+            } m;
         };
     };
 }
@@ -87,17 +87,17 @@ namespace Feng
 
     inline float Matrix4::Determinant() const
     {
-        return (m00 * m11 - m10 * m01) * (m22 * m33 - m32 * m23)
-        - (m00 * m21 - m20 * m01) * (m12 * m33 - m32 * m13)
-        + (m00 * m31 - m30 * m01) * (m12 * m23 - m22 * m13)
-        + (m10 * m21 - m20 * m11) * (m02 * m33 - m32 * m03)
-        - (m10 * m31 - m30 * m11) * (m02 * m23 - m22 * m03)
-        + (m20 * m31 - m30 * m21) * (m02 * m13 - m12 * m03);
+        return (m._00 * m._11 - m._10 * m._01) * (m._22 * m._33 - m._32 * m._23)
+        - (m._00 * m._21 - m._20 * m._01) * (m._12 * m._33 - m._32 * m._13)
+        + (m._00 * m._31 - m._30 * m._01) * (m._12 * m._23 - m._22 * m._13)
+        + (m._10 * m._21 - m._20 * m._11) * (m._02 * m._33 - m._32 * m._03)
+        - (m._10 * m._31 - m._30 * m._11) * (m._02 * m._23 - m._22 * m._03)
+        + (m._20 * m._31 - m._30 * m._21) * (m._02 * m._13 - m._12 * m._03);
     }
 
     inline float Matrix4::Trace() const
     {
-        return m00 + m11 + m22 + m33;
+        return m._00 + m._11 + m._22 + m._33;
     }
 
     inline bool Matrix4::TryInvert(Matrix4& inv) const
@@ -111,27 +111,27 @@ namespace Feng
 
         d = 1.f / d;
 
-        const Matrix4& m = *this;
+        const Matrix4& meCopy = *this;
 
-        inv.m00 = d * (m11 * (m22 * m33 - m32 * m23) + m21 * (m32 * m13 - m12 * m33) + m31 * (m12 * m23 - m22 * m13));
-        inv.m10 = d * (m12 * (m20 * m33 - m30 * m23) + m22 * (m30 * m13 - m10 * m33) + m32 * (m10 * m23 - m20 * m13));
-        inv.m20 = d * (m13 * (m20 * m31 - m30 * m21) + m23 * (m30 * m11 - m10 * m31) + m33 * (m10 * m21 - m20 * m11));
-        inv.m30 = d * (m10 * (m31 * m22 - m21 * m32) + m20 * (m11 * m32 - m31 * m12) + m30 * (m21 * m12 - m11 * m22));
+        inv.m._00 = d * (meCopy.m._11 * (meCopy.m._22 * meCopy.m._33 - meCopy.m._32 * meCopy.m._23) + meCopy.m._21 * (meCopy.m._32 * meCopy.m._13 - meCopy.m._12 * meCopy.m._33) + meCopy.m._31 * (meCopy.m._12 * meCopy.m._23 - meCopy.m._22 * meCopy.m._13));
+        inv.m._10 = d * (meCopy.m._12 * (meCopy.m._20 * meCopy.m._33 - meCopy.m._30 * meCopy.m._23) + meCopy.m._22 * (meCopy.m._30 * meCopy.m._13 - meCopy.m._10 * meCopy.m._33) + meCopy.m._32 * (meCopy.m._10 * meCopy.m._23 - meCopy.m._20 * meCopy.m._13));
+        inv.m._20 = d * (meCopy.m._13 * (meCopy.m._20 * meCopy.m._31 - meCopy.m._30 * meCopy.m._21) + meCopy.m._23 * (meCopy.m._30 * meCopy.m._11 - meCopy.m._10 * meCopy.m._31) + meCopy.m._33 * (meCopy.m._10 * meCopy.m._21 - meCopy.m._20 * meCopy.m._11));
+        inv.m._30 = d * (meCopy.m._10 * (meCopy.m._31 * meCopy.m._22 - meCopy.m._21 * meCopy.m._32) + meCopy.m._20 * (meCopy.m._11 * meCopy.m._32 - meCopy.m._31 * meCopy.m._12) + meCopy.m._30 * (meCopy.m._21 * meCopy.m._12 - meCopy.m._11 * meCopy.m._22));
 
-        inv.m01 = d * (m21 * (m02 * m33 - m32 * m03) + m31 * (m22 * m03 - m02 * m23) + m01 * (m32 * m23 - m22 * m33));
-        inv.m11 = d * (m22 * (m00 * m33 - m30 * m03) + m32 * (m20 * m03 - m00 * m23) + m02 * (m30 * m23 - m20 * m33));
-        inv.m21 = d * (m23 * (m00 * m31 - m30 * m01) + m33 * (m20 * m01 - m00 * m21) + m03 * (m30 * m21 - m20 * m31));
-        inv.m31 = d * (m20 * (m31 * m02 - m01 * m32) + m30 * (m01 * m22 - m21 * m02) + m00 * (m21 * m32 - m31 * m22));
+        inv.m._01 = d * (meCopy.m._21 * (meCopy.m._02 * meCopy.m._33 - meCopy.m._32 * meCopy.m._03) + meCopy.m._31 * (meCopy.m._22 * meCopy.m._03 - meCopy.m._02 * meCopy.m._23) + meCopy.m._01 * (meCopy.m._32 * meCopy.m._23 - meCopy.m._22 * meCopy.m._33));
+        inv.m._11 = d * (meCopy.m._22 * (meCopy.m._00 * meCopy.m._33 - meCopy.m._30 * meCopy.m._03) + meCopy.m._32 * (meCopy.m._20 * meCopy.m._03 - meCopy.m._00 * meCopy.m._23) + meCopy.m._02 * (meCopy.m._30 * meCopy.m._23 - meCopy.m._20 * meCopy.m._33));
+        inv.m._21 = d * (meCopy.m._23 * (meCopy.m._00 * meCopy.m._31 - meCopy.m._30 * meCopy.m._01) + meCopy.m._33 * (meCopy.m._20 * meCopy.m._01 - meCopy.m._00 * meCopy.m._21) + meCopy.m._03 * (meCopy.m._30 * meCopy.m._21 - meCopy.m._20 * meCopy.m._31));
+        inv.m._31 = d * (meCopy.m._20 * (meCopy.m._31 * meCopy.m._02 - meCopy.m._01 * meCopy.m._32) + meCopy.m._30 * (meCopy.m._01 * meCopy.m._22 - meCopy.m._21 * meCopy.m._02) + meCopy.m._00 * (meCopy.m._21 * meCopy.m._32 - meCopy.m._31 * meCopy.m._22));
 
-        inv.m02 = d * (m31 * (m02 * m13 - m12 * m03) + m01 * (m12 * m33 - m32 * m13) + m11 * (m32 * m03 - m02 * m33));
-        inv.m12 = d * (m32 * (m00 * m13 - m10 * m03) + m02 * (m10 * m33 - m30 * m13) + m12 * (m30 * m03 - m00 * m33));
-        inv.m22 = d * (m33 * (m00 * m11 - m10 * m01) + m03 * (m10 * m31 - m30 * m11) + m13 * (m30 * m01 - m00 * m31));
-        inv.m32 = d * (m30 * (m11 * m02 - m01 * m12) + m00 * (m31 * m12 - m11 * m32) + m10 * (m01 * m32 - m31 * m02));
+        inv.m._02 = d * (meCopy.m._31 * (meCopy.m._02 * meCopy.m._13 - meCopy.m._12 * meCopy.m._03) + meCopy.m._01 * (meCopy.m._12 * meCopy.m._33 - meCopy.m._32 * meCopy.m._13) + meCopy.m._11 * (meCopy.m._32 * meCopy.m._03 - meCopy.m._02 * meCopy.m._33));
+        inv.m._12 = d * (meCopy.m._32 * (meCopy.m._00 * meCopy.m._13 - meCopy.m._10 * meCopy.m._03) + meCopy.m._02 * (meCopy.m._10 * meCopy.m._33 - meCopy.m._30 * meCopy.m._13) + meCopy.m._12 * (meCopy.m._30 * meCopy.m._03 - meCopy.m._00 * meCopy.m._33));
+        inv.m._22 = d * (meCopy.m._33 * (meCopy.m._00 * meCopy.m._11 - meCopy.m._10 * meCopy.m._01) + meCopy.m._03 * (meCopy.m._10 * meCopy.m._31 - meCopy.m._30 * meCopy.m._11) + meCopy.m._13 * (meCopy.m._30 * meCopy.m._01 - meCopy.m._00 * meCopy.m._31));
+        inv.m._32 = d * (meCopy.m._30 * (meCopy.m._11 * meCopy.m._02 - meCopy.m._01 * meCopy.m._12) + meCopy.m._00 * (meCopy.m._31 * meCopy.m._12 - meCopy.m._11 * meCopy.m._32) + meCopy.m._10 * (meCopy.m._01 * meCopy.m._32 - meCopy.m._31 * meCopy.m._02));
 
-        inv.m03 = d * (m01 * (m22 * m13 - m12 * m23) + m11 * (m02 * m23 - m22 * m03) + m21 * (m12 * m03 - m02 * m13));
-        inv.m13 = d * (m02 * (m20 * m13 - m10 * m23) + m12 * (m00 * m23 - m20 * m03) + m22 * (m10 * m03 - m00 * m13));
-        inv.m23 = d * (m03 * (m20 * m11 - m10 * m21) + m13 * (m00 * m21 - m20 * m01) + m23 * (m10 * m01 - m00 * m11));
-        inv.m33 = d * (m00 * (m11 * m22 - m21 * m12) + m10 * (m21 * m02 - m01 * m22) + m20 * (m01 * m12 - m11 * m02));
+        inv.m._03 = d * (meCopy.m._01 * (meCopy.m._22 * meCopy.m._13 - meCopy.m._12 * meCopy.m._23) + meCopy.m._11 * (meCopy.m._02 * meCopy.m._23 - meCopy.m._22 * meCopy.m._03) + meCopy.m._21 * (meCopy.m._12 * meCopy.m._03 - meCopy.m._02 * meCopy.m._13));
+        inv.m._13 = d * (meCopy.m._02 * (meCopy.m._20 * meCopy.m._13 - meCopy.m._10 * meCopy.m._23) + meCopy.m._12 * (meCopy.m._00 * meCopy.m._23 - meCopy.m._20 * meCopy.m._03) + meCopy.m._22 * (meCopy.m._10 * meCopy.m._03 - meCopy.m._00 * meCopy.m._13));
+        inv.m._23 = d * (meCopy.m._03 * (meCopy.m._20 * meCopy.m._11 - meCopy.m._10 * meCopy.m._21) + meCopy.m._13 * (meCopy.m._00 * meCopy.m._21 - meCopy.m._20 * meCopy.m._01) + meCopy.m._23 * (meCopy.m._10 * meCopy.m._01 - meCopy.m._00 * meCopy.m._11));
+        inv.m._33 = d * (meCopy.m._00 * (meCopy.m._11 * meCopy.m._22 - meCopy.m._21 * meCopy.m._12) + meCopy.m._10 * (meCopy.m._21 * meCopy.m._02 - meCopy.m._01 * meCopy.m._22) + meCopy.m._20 * (meCopy.m._01 * meCopy.m._12 - meCopy.m._11 * meCopy.m._02));
 
         return true;
     }
@@ -146,12 +146,12 @@ namespace Feng
 
     inline void Matrix4::Transpose()
     {
-        std::swap(m01, m10);
-        std::swap(m02, m20);
-        std::swap(m03, m30);
-        std::swap(m12, m21);
-        std::swap(m13, m31);
-        std::swap(m23, m32);
+        std::swap(m._01, m._10);
+        std::swap(m._02, m._20);
+        std::swap(m._03, m._30);
+        std::swap(m._12, m._21);
+        std::swap(m._13, m._31);
+        std::swap(m._23, m._32);
     }
 
     inline Matrix4& Matrix4::operator *= (const Matrix4& other)
@@ -174,25 +174,22 @@ namespace Feng
     {
         Matrix4 result;
 
-        result.m00 = (a.m00 * b.m00) + (a.m01 * b.m10) + (a.m02 * b.m20) + (a.m03 * b.m30);
-        result.m01 = (a.m00 * b.m01) + (a.m01 * b.m11) + (a.m02 * b.m21) + (a.m03 * b.m31);
-        result.m02 = (a.m00 * b.m02) + (a.m01 * b.m12) + (a.m02 * b.m22) + (a.m03 * b.m32);
-        result.m03 = (a.m00 * b.m03) + (a.m01 * b.m13) + (a.m02 * b.m23) + (a.m03 * b.m33);
-
-        result.m10 = (a.m10 * b.m00) + (a.m11 * b.m10) + (a.m12 * b.m20) + (a.m13 * b.m30);
-        result.m11 = (a.m10 * b.m01) + (a.m11 * b.m11) + (a.m12 * b.m21) + (a.m13 * b.m31);
-        result.m12 = (a.m10 * b.m02) + (a.m11 * b.m12) + (a.m12 * b.m22) + (a.m13 * b.m32);
-        result.m13 = (a.m10 * b.m03) + (a.m11 * b.m13) + (a.m12 * b.m23) + (a.m13 * b.m33);
-
-        result.m20 = (a.m20 * b.m00) + (a.m21 * b.m10) + (a.m22 * b.m20) + (a.m23 * b.m30);
-        result.m21 = (a.m20 * b.m01) + (a.m21 * b.m11) + (a.m22 * b.m21) + (a.m23 * b.m31);
-        result.m22 = (a.m20 * b.m02) + (a.m21 * b.m12) + (a.m22 * b.m22) + (a.m23 * b.m32);
-        result.m23 = (a.m20 * b.m03) + (a.m21 * b.m13) + (a.m22 * b.m23) + (a.m23 * b.m33);
-
-        result.m30 = (a.m30 * b.m00) + (a.m31 * b.m10) + (a.m32 * b.m20) + (a.m33 * b.m30);
-        result.m31 = (a.m30 * b.m01) + (a.m31 * b.m11) + (a.m32 * b.m21) + (a.m33 * b.m31);
-        result.m32 = (a.m30 * b.m02) + (a.m31 * b.m12) + (a.m32 * b.m22) + (a.m33 * b.m32);
-        result.m33 = (a.m30 * b.m03) + (a.m31 * b.m13) + (a.m32 * b.m23) + (a.m33 * b.m33);
+        result.m._00 = (a.m._00 * b.m._00) + (a.m._01 * b.m._10) + (a.m._02 * b.m._20) + (a.m._03 * b.m._30);
+        result.m._01 = (a.m._00 * b.m._01) + (a.m._01 * b.m._11) + (a.m._02 * b.m._21) + (a.m._03 * b.m._31);
+        result.m._02 = (a.m._00 * b.m._02) + (a.m._01 * b.m._12) + (a.m._02 * b.m._22) + (a.m._03 * b.m._32);
+        result.m._03 = (a.m._00 * b.m._03) + (a.m._01 * b.m._13) + (a.m._02 * b.m._23) + (a.m._03 * b.m._33);
+        result.m._10 = (a.m._10 * b.m._00) + (a.m._11 * b.m._10) + (a.m._12 * b.m._20) + (a.m._13 * b.m._30);
+        result.m._11 = (a.m._10 * b.m._01) + (a.m._11 * b.m._11) + (a.m._12 * b.m._21) + (a.m._13 * b.m._31);
+        result.m._12 = (a.m._10 * b.m._02) + (a.m._11 * b.m._12) + (a.m._12 * b.m._22) + (a.m._13 * b.m._32);
+        result.m._13 = (a.m._10 * b.m._03) + (a.m._11 * b.m._13) + (a.m._12 * b.m._23) + (a.m._13 * b.m._33);
+        result.m._20 = (a.m._20 * b.m._00) + (a.m._21 * b.m._10) + (a.m._22 * b.m._20) + (a.m._23 * b.m._30);
+        result.m._21 = (a.m._20 * b.m._01) + (a.m._21 * b.m._11) + (a.m._22 * b.m._21) + (a.m._23 * b.m._31);
+        result.m._22 = (a.m._20 * b.m._02) + (a.m._21 * b.m._12) + (a.m._22 * b.m._22) + (a.m._23 * b.m._32);
+        result.m._23 = (a.m._20 * b.m._03) + (a.m._21 * b.m._13) + (a.m._22 * b.m._23) + (a.m._23 * b.m._33);
+        result.m._30 = (a.m._30 * b.m._00) + (a.m._31 * b.m._10) + (a.m._32 * b.m._20) + (a.m._33 * b.m._30);
+        result.m._31 = (a.m._30 * b.m._01) + (a.m._31 * b.m._11) + (a.m._32 * b.m._21) + (a.m._33 * b.m._31);
+        result.m._32 = (a.m._30 * b.m._02) + (a.m._31 * b.m._12) + (a.m._32 * b.m._22) + (a.m._33 * b.m._32);
+        result.m._33 = (a.m._30 * b.m._03) + (a.m._31 * b.m._13) + (a.m._32 * b.m._23) + (a.m._33 * b.m._33);
 
         return result;
     }
@@ -201,10 +198,10 @@ namespace Feng
     {
         Vector4 result;
 
-        result.x = (a.x * b.m00) + (a.y * b.m10) + (a.z * b.m20) + (a.w * b.m30);
-        result.y = (a.x * b.m01) + (a.y * b.m11) + (a.z * b.m21) + (a.w * b.m31);
-        result.z = (a.x * b.m02) + (a.y * b.m12) + (a.z * b.m22) + (a.w * b.m32);
-        result.w = (a.x * b.m03) + (a.y * b.m13) + (a.z * b.m23) + (a.w * b.m33);
+        result.coord.x = (a.coord.x * b.m._00) + (a.coord.y * b.m._10) + (a.coord.z * b.m._20) + (a.coord.w * b.m._30);
+        result.coord.y = (a.coord.x * b.m._01) + (a.coord.y * b.m._11) + (a.coord.z * b.m._21) + (a.coord.w * b.m._31);
+        result.coord.z = (a.coord.x * b.m._02) + (a.coord.y * b.m._12) + (a.coord.z * b.m._22) + (a.coord.w * b.m._32);
+        result.coord.w = (a.coord.x * b.m._03) + (a.coord.y * b.m._13) + (a.coord.z * b.m._23) + (a.coord.w * b.m._33);
 
         return result;
     }

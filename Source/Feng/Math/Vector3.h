@@ -10,14 +10,14 @@ namespace Feng
     public:
         constexpr static float Dot(const Vector3& a, const Vector3& b)
         {
-            return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+            return (a.coord.x * b.coord.x) + (a.coord.y * b.coord.y) + (a.coord.z * b.coord.z);
         }
 
         constexpr static Vector3 Cross(const Vector3& a, const Vector3& b)
         {
-            const float x = (a.y * b.z) - (a.z * b.y);
-            const float y = (a.z * b.x) - (a.x * b.z);
-            const float z = (a.x * b.y) - (a.y * b.x);
+            const float x = (a.coord.y * b.coord.z) - (a.coord.z * b.coord.y);
+            const float y = (a.coord.z * b.coord.x) - (a.coord.x * b.coord.z);
+            const float z = (a.coord.x * b.coord.y) - (a.coord.y * b.coord.x);
 
             return Vector3 {x, y, z};
         }
@@ -39,7 +39,7 @@ namespace Feng
 
         Vector3() = default;
         constexpr Vector3(float aX, float aY, float aZ)
-        : x {aX} , y {aY} , z {aZ}
+        : coord {aX, aY, aZ}
         { }
         constexpr Vector3(const Vector3&) = default;
         constexpr Vector3(Vector3&&) = default;
@@ -67,7 +67,7 @@ namespace Feng
         constexpr Vector3& operator = (Vector3&& other) = default;
         constexpr Vector3 operator - () const
         {
-            return Vector3{-x, -y, -z};
+            return Vector3{-coord.x, -coord.y, -coord.z};
         }
 
         Vector3& operator += (const Vector3& other);
@@ -77,7 +77,7 @@ namespace Feng
         friend bool operator != (const Vector3& a, const Vector3& b);
         constexpr friend Vector3 operator * (const Vector3& v, float a)
         {
-            return Vector3 {v.x * a, v.y * a, v.z * a};
+            return Vector3 {v.coord.x * a, v.coord.y * a, v.coord.z * a};
         }
 
         constexpr friend Vector3 operator * (float a, const Vector3& v)
@@ -87,17 +87,17 @@ namespace Feng
 
         constexpr friend Vector3 operator / (const Vector3& v, float a)
         {
-            return Vector3 {v.x / a, v.y / a, v.z / a};
+            return Vector3 {v.coord.x / a, v.coord.y / a, v.coord.z / a};
         }
 
         constexpr friend Vector3 operator * (const Vector3& v1, const Vector3& v2)
         {
-            return Vector3 { v1.x * v2.x, v1.y * v2.y, v1.z * v2.z };
+            return Vector3 { v1.coord.x * v2.coord.x, v1.coord.y * v2.coord.y, v1.coord.z * v2.coord.z };
         }
 
         constexpr friend Vector3 operator + (const Vector3& a, const Vector3& b)
         {
-            return Vector3 {a.x + b.x, a.y + b.y, a.z + b.z};
+            return Vector3 {a.coord.x + b.coord.x, a.coord.y + b.coord.y, a.coord.z + b.coord.z};
         }
 
         constexpr friend Vector3 operator - (const Vector3& a, const Vector3& b)
@@ -114,12 +114,12 @@ namespace Feng
         union
         {
             float data[3];
-            struct
+            struct Coord
             {
                 float x;
                 float y;
                 float z;
-            };
+            } coord;
         };
     };
 }
@@ -142,9 +142,9 @@ namespace Feng
     inline void Vector3::Normalize()
     {
         float norm = Length();
-        x /= norm;
-        y /= norm;
-        z /= norm;
+        coord.x /= norm;
+        coord.y /= norm;
+        coord.z /= norm;
     }
 
     inline bool operator == (const Vector3& a, const Vector3& b)
@@ -159,27 +159,27 @@ namespace Feng
 
     inline Vector3& Vector3::operator += (const Vector3& other)
     {
-        x += other.x;
-        y += other.y;
-        z += other.z;
+        coord.x += other.coord.x;
+        coord.y += other.coord.y;
+        coord.z += other.coord.z;
 
         return *this;
     }
 
     inline Vector3& Vector3::operator -= (const Vector3& other)
     {
-        x -= other.x;
-        y -= other.y;
-        z -= other.z;
+        coord.x -= other.coord.x;
+        coord.y -= other.coord.y;
+        coord.z -= other.coord.z;
 
         return *this;
     }
 
     inline Vector3& Vector3::operator *= (float value)
     {
-        x *= value;
-        y *= value;
-        z *= value;
+        coord.x *= value;
+        coord.y *= value;
+        coord.z *= value;
 
         return *this;
     }

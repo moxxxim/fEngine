@@ -34,8 +34,8 @@ namespace Feng
         const std::map<std::string, int32_t>& GetAttributes() const;
         const std::map<std::string, int32_t>& GetUniforms() const;
 
-        bool TryGetAttributeLocation(const char *name, uint32_t& location) const;
-        bool TryGetUniformLocation(const char *name, uint32_t& location) const;
+        bool TryGetAttributeLocation(const char *name, int32_t& location) const;
+        bool TryGetUniformLocation(const char *name, int32_t& location) const;
         bool HasUniform(const char *name) const;
 
         bool SetUniformBool(const char *name, bool value) const;

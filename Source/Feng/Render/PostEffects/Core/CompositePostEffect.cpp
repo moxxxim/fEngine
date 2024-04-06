@@ -6,8 +6,8 @@
 namespace Feng
 {
     CompositePostEffect::CompositePostEffect(std::vector<std::unique_ptr<PostEffect>> &&aEffects, FrameBuffersPool *aBuffersPool)
-        : effects {std::move(aEffects)}
-        , buffersPool {buffersPool}
+        : effects { std::move(aEffects) }
+        , buffersPool { aBuffersPool }
     { }
 
     CompositePostEffect::~CompositePostEffect() = default;

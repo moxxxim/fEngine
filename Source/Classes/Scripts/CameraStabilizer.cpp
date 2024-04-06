@@ -4,6 +4,7 @@
 #include <Feng/Core/Engine.hpp>
 #include <Feng/ScenesManager/Camera.h>
 #include <Feng/ScenesManager/Entity.h>
+#include <algorithm>
 
 void CameraStabilizer::SetMinMaxFov(float min, float max)
 {
@@ -11,7 +12,7 @@ void CameraStabilizer::SetMinMaxFov(float min, float max)
     maxFovY = max;
 }
 
-void CameraStabilizer::Update(float deltaTime)
+void CameraStabilizer::Update(float)
 {
     if(!myCam)
     {
@@ -20,7 +21,7 @@ void CameraStabilizer::Update(float deltaTime)
         fovY = myCam->GetFovY();
     }
 
-    fovY -= static_cast<float>(Feng::Engine::GetMouseScroll().y);
+    fovY -= static_cast<float>(Feng::Engine::GetMouseScroll().coord.y);
     fovY = std::max(fovY, minFovY);
     fovY = std::min(fovY, maxFovY);
     fovY = std::clamp(fovY, minFovY, maxFovY);

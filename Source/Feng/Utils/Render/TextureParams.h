@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OpenGL/gl.h>
+#include <Feng/Core/FengGL.h>
 #include <cstdint>
 
 namespace Feng

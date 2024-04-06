@@ -1,6 +1,6 @@
 #include <Feng/Render/RenderBase.h>
 
-#include <OpenGL/gl.h>
+#include <Feng/Core/FengGL.h>
 
 namespace Feng::Render
 {

@@ -119,15 +119,15 @@ void CameraWasdController::UpdateRotationMouse()
     
     if (firstMouse)
     {
-        lastMouseX = mousePos.x;
-        lastMouseY = mousePos.y;
+        lastMouseX = mousePos.coord.x;
+        lastMouseY = mousePos.coord.y;
         firstMouse = false;
     }
 
-    float xoffset = -(mousePos.x - lastMouseX);
-    float yoffset = lastMouseY - mousePos.y;
-    lastMouseX = mousePos.x;
-    lastMouseY = mousePos.y;
+    float xoffset = -(mousePos.coord.x - lastMouseX);
+    float yoffset = lastMouseY - mousePos.coord.y;
+    lastMouseX = mousePos.coord.x;
+    lastMouseY = mousePos.coord.y;
 
     xoffset *= camSensitivity;
     yoffset *= camSensitivity;

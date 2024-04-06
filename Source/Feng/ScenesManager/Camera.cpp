@@ -21,13 +21,13 @@ namespace Feng
     void Camera::SetNearClipPlane(float aNear)
     {
         // TODO: m.alekseev Validate.
-        near = aNear;
+        nearPlane = aNear;
     }
 
     void Camera::SetFarClipPlane(float aFar)
     {
         // TODO: m.alekseev Validate.
-        far = aFar;
+        farPlane = aFar;
     }
 
     Matrix4 Camera::GetViewMatrix() const
@@ -44,7 +44,7 @@ namespace Feng
     Matrix4 Camera::GetProjectionMatrix() const
     {
         //return Mat4::MakeOrthogonalProjection(-5, 5, -5, 5, -50, 50);
-        return Mat4::MakePerspectiveProjection(fovY, aspectRatio, near, far);
+        return Mat4::MakePerspectiveProjection(fovY, aspectRatio, nearPlane, farPlane);
     }
 
     Matrix4 Camera::GetViewProjectionMatrix() const

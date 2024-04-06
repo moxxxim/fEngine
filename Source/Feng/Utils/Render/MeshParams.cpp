@@ -66,5 +66,7 @@ namespace Feng
             case ePrimitiveType::Triangles:
                 return GL_TRIANGLES;
         }
+
+        return 0;
     }
 }
