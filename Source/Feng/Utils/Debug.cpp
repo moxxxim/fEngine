@@ -4,10 +4,20 @@
 #include <iostream>
 #include <vector>
 
+#ifdef WIN32
+    #include <Windows.h>
+#endif
+
+static_assert(sizeof(const char) == sizeof(const GLubyte));
+
 namespace Feng
 {
     void Debug::LogMessage(const std::string &message)
     {
+#ifdef WIN32
+        OutputDebugString(message.c_str());
+        OutputDebugString("\n");
+#endif
         std::cout << message << "\n";
     }
 
@@ -58,7 +68,7 @@ namespace Feng
                 break;
             }
 
-            std::cout << error << " | " << file << " (" << line << ")" << "\n";
+            LogMessage(error + " | " + file + " (" + std::to_string(line) + ") ");
         }
     }
 
@@ -67,11 +77,11 @@ namespace Feng
         GLint extensionsCount = 0;
         glGetIntegerv(GL_NUM_EXTENSIONS, &extensionsCount);
 
-        std::vector<const GLubyte*> extensions;
+        std::vector<std::string> extensions;
         for(GLint i = 0; i < extensionsCount; ++i)
         {
             const GLubyte* extension = glGetStringi(GL_EXTENSIONS, i);
-            extensions.push_back(extension);
+            extensions.push_back(std::string{ reinterpret_cast<const char*>(extension) });
         }
 
         int maxAttributes;
@@ -82,19 +92,18 @@ namespace Feng
         const GLubyte *renderer = glGetString(GL_RENDERER);
         const GLubyte *languageVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
 
-        std::cout << "------------------ Open GL Info ----------------------\n";
-        std::cout << "OpenGL Version: " << version << "\n";
-        std::cout << "OpenGL Vendor: " << vendor << "\n";
-        std::cout << "OpenGL Renderer: " << renderer << "\n";
-        std::cout << "OpenGL Language Version: " << languageVersion << "\n";
-        std::cout << "OpenGL Maximum vertex attributes number: " << maxAttributes << "\n";
-        std::cout << "OpenGL Supported Extensions:\n";
-        for(const GLubyte* extension : extensions)
+        LogMessage("------------------ Open GL Info ----------------------");
+        LogMessage("OpenGL Version: " + std::string{ reinterpret_cast<const char*>(version) });
+        LogMessage("OpenGL Vendor: " + std::string{ reinterpret_cast<const char*>(vendor) });
+        LogMessage("OpenGL Renderer: " + std::string{ reinterpret_cast<const char*>(renderer) });
+        LogMessage("OpenGL Language Version: " + std::string{ reinterpret_cast<const char*>(languageVersion) });
+        LogMessage("OpenGL Maximum vertex attributes number: " + std::to_string(maxAttributes));
+        LogMessage("OpenGL Supported Extensions:\n");
+        for(const std::string& extension : extensions)
         {
-            std::cout << " -- " << extension << "\n";
+            LogMessage(" -- " + extension);
         }
 
-        std::cout << "------------------------------------------------------";
-        std::cout << "\n";
+        LogMessage("------------------------------------------------------");
     }
 }

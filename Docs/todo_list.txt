@@ -1,11 +1,10 @@
-0. GLFW lib as IMPORTED
-1. Work for win
-1. Nice thirdparty management
-2. Thirdparty management as separate projects with no targets
-3. Feng as separate cmake project building like (lib, dylib, interface lib). - chapter 40
-4. resources into IDE (shaders, cfg, etc) (maybe 43.4) 
+0. Work for win
+1. GLFW lib as IMPORTED
+2. No warnings for external projects (AppleClang)
+3. Nice thirdparty management (as separate projects with no targets)
+4. Feng as separate cmake project building like (lib, dylib, interface lib). - chapter 40
+5. resources into IDE (shaders, cfg, etc) (maybe 43.4) 
 
-0. Add compiler option to require return value definition.
 1. File system;
 2. GUID generation;
 3. Math lib: Vector2, Vector3, Vector4, Matrix3, Matrix4, Quaternion; Radians <-> Degrees. Left-handed <-> Right-handed
@@ -23,17 +22,11 @@
 15. Implement Color class.
 16. Tempaltes for material/type erasure.
 17. Camera frustum culling.
-18. How linera filtering is calculated?
 19. Performance impact with mip-maps.
 21. Checkered white-black texture on plane for testing mip-maps filtering.
-22. glTexImage2D - formats parameters?
 23. Visualize light sources: point - cube/sphere, directional - gram, spot - pyramid/cone.
 24. Gizmos for light sources.
-25. Do local intermediate variables have impact on shader performance?
-26. How to combine multiple light sources in shader.
-27. all degrees to rad by default.
 28. Copy material.
-29. Implementations of spot and point light sources.
 31. Texture compression.
 32. Implement texture data sharing.
 33. Implement mesh data sharing.
@@ -42,12 +35,10 @@
 36. Implement effect like in Death Stranding scaning.
 37. "discard" instruction. Only fragment? performance?
 39. "order independent transparency". depth/transparency conflict.
-40. <OpenGL/gl.h> vs./and <OpenGL/gl3.h>
 41. glVertexAttribPointer/glEnableVertexAttribArray why every call without VAO.
 42. glViewport and renderbuffer different sizes: what result?
 43. PostEffects: under water; bag on head; draw depth as posteffect; monochromacity (white-blue);
 44. Shader: glass, bottle, surface curvature.
-46. Is frustum culling made automatically by OpenGL?
 48. Buffer texture what for?
 49. Use "shared" uniform block: fetch offsets and total size. 
 50. Extra vaiables in uniform block for several shaders. Is it bad?

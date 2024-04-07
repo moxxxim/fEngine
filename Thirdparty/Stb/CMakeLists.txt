@@ -1,5 +1,3 @@
-set(CMAKE_COMPILE_WARNING_AS_ERROR NO)
-
 add_library(StbLibInterface INTERFACE)
 
 target_sources(StbLibInterface 
