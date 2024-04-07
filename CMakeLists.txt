@@ -100,12 +100,13 @@ source_group_from_target("Thirdparty/Stb" StbLibInterface)
 # ---------------------------------------------------------------------
 
 set_target_properties(Feng_GlSandbox PROPERTIES
-      OUTPUT_NAME GlSandbox
-      EXPORT_NAME GlSandbox
-      FOLDER "Apps"
-      VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      XCODE_GENERATE_SCHEME TRUE
-      XCODE_SCHEME_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+        OUTPUT_NAME GlSandbox
+        EXPORT_NAME GlSandbox
+        FOLDER "Apps"
+        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        XCODE_GENERATE_SCHEME TRUE
+        XCODE_SCHEME_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
 
 target_sources(Feng_GlSandbox
     PRIVATE 
