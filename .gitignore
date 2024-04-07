@@ -96,20 +96,9 @@ Temporary Items
 *.gch
 *.pch
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
 # Fortran module files
 *.mod
 *.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-# *.a  Allow static libraries
-*.lib
 
 # Executables
 *.exe
