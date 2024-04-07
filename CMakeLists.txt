@@ -9,6 +9,7 @@ option(VERBOSE_BUILD "Use verbose logging when building project" ON)
 set(mySrcDir ${PROJECT_SOURCE_DIR}/Source)
 set(thirdpartySrcDir ${PROJECT_SOURCE_DIR}/Thirdparty)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum OS X deployment version")
+set(CMAKE_XCODE_GENERATE_SCHEME TRUE)
 
 # Do not allow build in source directory
 if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
@@ -104,13 +105,10 @@ set_target_properties(Feng_GlSandbox PROPERTIES
         EXPORT_NAME GlSandbox
         FOLDER "Apps"
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        XCODE_GENERATE_SCHEME TRUE
         XCODE_SCHEME_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
-target_sources(Feng_GlSandbox
-    PRIVATE 
-        ${mySrcFiles})
+target_sources(Feng_GlSandbox PRIVATE ${mySrcFiles})
 
 if(APPLE)
     # disable warnings aboug OpenGL deprecation of Mac
