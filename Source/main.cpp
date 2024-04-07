@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-int main(int, const char *)
+int main(int, const char **)
 {
     Feng::Engine engine;
     std::unique_ptr<Feng::Scene> scene = test::CreateTestScene();

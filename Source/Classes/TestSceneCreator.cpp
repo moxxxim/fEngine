@@ -33,12 +33,6 @@ namespace test
         constexpr uint32_t vertexFormatPNU = Feng::eVertexAtributes::Position
                                            | Feng::eVertexAtributes::Normal
                                            | Feng::eVertexAtributes::Uv0;
-        constexpr uint32_t vertexFormatPU = Feng::eVertexAtributes::Position | Feng::eVertexAtributes::Uv0;
-        constexpr uint32_t vertexFormatPNTBU = Feng::eVertexAtributes::Position
-                                             | Feng::eVertexAtributes::Normal
-                                             | Feng::eVertexAtributes::Tangent
-                                             | Feng::eVertexAtributes::Bitangent
-                                             | Feng::eVertexAtributes::Uv0;
         
         struct CubeDesc final
         {
@@ -269,7 +263,7 @@ namespace test
             CreateInstancedObject(scene, *test::res.CubeMesh);
 
             // Cubes.
-            for(int32_t i = 0; i < cubes.size(); ++i)
+            for(int32_t i = 0; i < static_cast<int32_t>(cubes.size()); ++i)
             {
                 const CubeDesc& cube = cubes[i];
                 std::string name = "cube " + std::to_string(i);
@@ -304,7 +298,7 @@ namespace test
             planeTransform->SetScale(40.f, 0.2f, 40.f);
 
             // Grass.
-            for(int32_t i = 0; i < vegetationPositions.size(); ++i)
+            for(int32_t i = 0; i < static_cast<int32_t>(vegetationPositions.size()); ++i)
             {
                 const Vector3& position = vegetationPositions[i];
                 std::string name = "grass " + std::to_string(i);
@@ -319,7 +313,7 @@ namespace test
             }
 
             // Windows.
-            for(int32_t i = 0; i < windowPositions.size(); ++i)
+            for(int32_t i = 0; i < static_cast<int32_t>(windowPositions.size()); ++i)
             {
                 const Vector3& position = windowPositions[i];
                 std::string name = "window " + std::to_string(i);

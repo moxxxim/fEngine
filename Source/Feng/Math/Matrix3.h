@@ -97,23 +97,25 @@ namespace Feng
         friend Matrix3 operator * (const Matrix3& m, float a);
         friend Matrix3 operator / (const Matrix3& m, float a);
 
+        struct Component
+        {
+            float _00;
+            float _01;
+            float _02;
+            float _10;
+            float _11;
+            float _12;
+            float _20;
+            float _21;
+            float _22;
+        };
+        
         union
         {
             float data[9];
             float mat[3][3];
             Vector3 rows[3];
-            struct Component
-            {
-                float _00;
-                float _01;
-                float _02;
-                float _10;
-                float _11;
-                float _12;
-                float _20;
-                float _21;
-                float _22;
-            } m;
+            Component m;
         };
     };
 }

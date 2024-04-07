@@ -62,17 +62,19 @@ namespace Feng
         {
             return a + (-b);
         }
+        
+        struct Coord
+        {
+            float x;
+            float y;
+            float z;
+            float w;
+        };
 
         union
         {
             float data[4];
-            struct Coord
-            {
-                float x;
-                float y;
-                float z;
-                float w;
-            } coord;
+            Coord coord;
         };
     };
 }

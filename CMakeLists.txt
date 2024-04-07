@@ -16,6 +16,7 @@ endif()
 
 include(FengCMakeUtils)
 set_property(GLOBAL PROPERTY USE_FOLDERS YES)
+set(CMAKE_COMPILE_WARNING_AS_ERROR YES)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/_build/")
@@ -26,6 +27,13 @@ log_messages_optional(
         "Build project to directory: ${PROJECT_BINARY_DIR}"
     DO_LOG ${VERBOSE_BUILD}
     FRAME_UP FRAME_DOWN)
+
+# ---------------------------------------------------------------------
+# ------------------------ Defind executables -------------------------
+# ---------------------------------------------------------------------
+
+add_executable(Feng_GlSandbox)
+add_executable(Feng::GlSandbox ALIAS Feng_GlSandbox)
 
 # ---------------------------------------------------------------------
 # ------------------- Collect thirdparty libraries --------------------
@@ -120,20 +128,14 @@ file(GLOB_RECURSE glfwSrc LIST_DIRECTORIES false
 source_group("Thirdparty/Glfw" FILES ${glfwSrc})
 
 # Stb
-file(GLOB_RECURSE stbSrc LIST_DIRECTORIES false
-    "${thirdpartySrcDir}/Stb/*.cpp"
-    "${thirdpartySrcDir}/Stb/*.hpp"
-    "${thirdpartySrcDir}/Stb/*.c"
-    "${thirdpartySrcDir}/Stb/*.h"
-)
+add_subdirectory(${thirdpartySrcDir}/Stb SYSTEM)
+get_target_property(stbSrc StbLibInterface INTERFACE_SOURCES)
 source_group("Thirdparty/Stb" FILES ${stbSrc})
 
 # ---------------------------------------------------------------------
 # ------------------------- Setup executable --------------------------
 # ---------------------------------------------------------------------
 
-add_executable(Feng_GlSandbox)
-add_executable(Feng::GlSandbox ALIAS Feng_GlSandbox)
 set_target_properties(Feng_GlSandbox PROPERTIES
       OUTPUT_NAME GlSandbox
       EXPORT_NAME GlSandbox)
@@ -141,24 +143,24 @@ set_target_properties(Feng_GlSandbox PROPERTIES
 target_sources(Feng_GlSandbox
     PUBLIC 
         ${mySrcFiles} 
-        ${glfwSrc}
-        ${stbSrc})
+        ${glfwSrc})
 
 if(APPLE)
     # disable warnings aboug OpenGL deprecation of Mac
     target_compile_definitions(Feng_GlSandbox 
         PRIVATE 
-            "GL_SILENCE_DEPRECATION")
+            GL_SILENCE_DEPRECATION GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED)
 endif()
+target_compile_definitions(Feng_GlSandbox PRIVATE NOMINMAX)
 
 if(MSVC)
-    target_compile_options(Feng_GlSandbox PRIVATE /W4 /WX /MP)
+    target_compile_options(Feng_GlSandbox PRIVATE /W4 /MP)
 else()
-    target_compile_options(Feng_GlSandbox PRIVATE -Wall -Wextra -pedantic -Werror -Wno-missing-field-initializers)
+    target_compile_options(Feng_GlSandbox PRIVATE -Wall -Wextra -pedantic -Wno-missing-field-initializers)
 endif()
 
 target_include_directories(Feng_GlSandbox 
-    PUBLIC 
+    PRIVATE
         "${mySrcDir}"
         "${thirdpartySrcDir}")
 
@@ -167,7 +169,8 @@ target_link_libraries(Feng_GlSandbox
     PRIVATE
         $<$<CONFIG:Debug>:${thirdpartyStaticLibsDebug}>
         $<$<CONFIG:Release>:${thirdpartyStaticLibsRelease}>
-        ${platformSpecificLibs})
+        ${platformSpecificLibs}
+        StbLibInterface)
 
 set_target_properties(Feng_GlSandbox PROPERTIES FOLDER "Apps")
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Feng_GlSandbox)

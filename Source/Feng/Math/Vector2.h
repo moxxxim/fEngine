@@ -43,14 +43,16 @@ namespace Feng
         static const Vector2 OneX;
         static const Vector2 OneY;
 
+        struct Coord
+        {
+            float x;
+            float y;
+        };
+        
         union
         {
             float data[2];
-            struct Coord
-            {
-                float x;
-                float y;
-            } coord;
+            Coord coord;
         };
     };
 }

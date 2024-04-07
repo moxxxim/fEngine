@@ -47,7 +47,7 @@ namespace Feng
     {
         uint32_t stride = 0;
 
-        for(int i = 0; i < Order.size(); ++i)
+        for(int32_t i = 0; i < static_cast<int32_t>(Order.size()); ++i)
         {
             eVertexAtributes attribute = Order[i];
             if((attribute & aAttributes) != 0)

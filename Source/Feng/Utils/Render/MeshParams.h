@@ -55,7 +55,7 @@ namespace Feng
 
     inline bool AttributesParser::HasCurrent() const
     {
-        return index < Order.size();
+        return index < static_cast<int32_t>(Order.size());
     }
 
     inline bool AttributesParser::IsCurrentSet() const

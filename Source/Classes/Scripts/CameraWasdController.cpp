@@ -69,8 +69,6 @@ void CameraWasdController::UpdatePosition(float deltaTime)
 
 void CameraWasdController::UpdateRotationArrows(float deltaTime)
 {
-    static bool firstMouse = true;
-    
     float xoffset = 0;
     float yoffset = 0;
     

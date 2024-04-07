@@ -39,7 +39,7 @@ namespace Feng
 
         Matrix4 GetGlobalTransformMatrix() const;
 
-        float aspectRatio = DefaultAspectRatio;;
+        float aspectRatio = DefaultAspectRatio;
         float fovY = DefaultFovY;
         float nearPlane = DefaultNear;
         float farPlane = DefaultFar;

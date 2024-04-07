@@ -111,15 +111,17 @@ namespace Feng
         static const Vector3 OneY;
         static const Vector3 OneZ;
 
+        struct Coord
+        {
+            float x;
+            float y;
+            float z;
+        };
+        
         union
         {
             float data[3];
-            struct Coord
-            {
-                float x;
-                float y;
-                float z;
-            } coord;
+            Coord coord;
         };
     };
 }

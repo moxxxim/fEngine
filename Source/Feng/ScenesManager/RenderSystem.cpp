@@ -137,7 +137,7 @@ namespace Feng
                 
                 float minNear = renderProperties.cam->GetNearClipPlane();
                 float maxFar = renderProperties.cam->GetFarClipPlane();
-                for(int i = 0; i < renderProperties.cascadeBorders.size(); ++i)
+                for(int32_t i = 0; i < static_cast<int32_t>(renderProperties.cascadeBorders.size()); ++i)
                 {
                     float cascadeBorder = renderProperties.cascadeBorders[i];
                     float far = minNear + (maxFar - minNear) * cascadeBorder;
@@ -156,7 +156,7 @@ namespace Feng
 
                 Matrix4 lightViewMatrix = GetShadowCastLightViewMatrix(renderProperties.directShadowLight);
                 float nearPlane = renderProperties.cam->GetNearClipPlane();
-                for(int i = 0; i < farDistances.size(); ++i)
+                for(int32_t i = 0; i < static_cast<int32_t>(farDistances.size()); ++i)
                 {
                     std::pair<float, float> nearFar = std::make_pair(nearPlane, farDistances[i]);
                     Matrix4 lightProjection = GetShadowCastLightProjectionMatrix(renderProperties, lightViewMatrix, nearFar);
