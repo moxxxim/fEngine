@@ -13,7 +13,7 @@
 
 namespace
 {
-    std::string BaseResourcesDir = "../../../Resources/";
+    std::string BaseResourcesDir = "Resources/";
     std::string BaseTexturesDir = BaseResourcesDir + "Textures/";
     std::string BaseShadersDir = BaseResourcesDir + "Shaders/";
 

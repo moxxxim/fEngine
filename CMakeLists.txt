@@ -21,6 +21,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/_build/")
 
+message("CMAKE_VS_DEBUGGER_WORKING_DIRECTORY = ${CMAKE_VS_DEBUGGER_WORKING_DIRECTORY}")
 log_messages_optional(
     MESSAGES
         "Build project '${PROJECT_NAME}' from source: ${PROJECT_SOURCE_DIR}"
@@ -138,7 +139,9 @@ source_group("Thirdparty/Stb" FILES ${stbSrc})
 
 set_target_properties(Feng_GlSandbox PROPERTIES
       OUTPUT_NAME GlSandbox
-      EXPORT_NAME GlSandbox)
+      EXPORT_NAME GlSandbox
+      FOLDER "Apps"
+      VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_sources(Feng_GlSandbox
     PUBLIC 
@@ -172,7 +175,6 @@ target_link_libraries(Feng_GlSandbox
         ${platformSpecificLibs}
         StbLibInterface)
 
-set_target_properties(Feng_GlSandbox PROPERTIES FOLDER "Apps")
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Feng_GlSandbox)
 source_group(TREE ${mySrcDir} FILES ${mySrcFiles})
 

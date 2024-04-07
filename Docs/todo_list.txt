@@ -1,4 +1,3 @@
-0. Work for win
 1. GLFW lib as IMPORTED
 2. No warnings for external projects (AppleClang)
 3. Nice thirdparty management (as separate projects with no targets)
