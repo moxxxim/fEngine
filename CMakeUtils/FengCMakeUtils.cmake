@@ -65,3 +65,17 @@ function(log_messages_optional)
         endif()
     endif()
 endfunction()
+
+function(source_group_from_target group target)
+    get_target_property(srcFiles ${target} INTERFACE_SOURCES)
+    source_group(${group} FILES ${srcFiles})
+endfunction()
+
+function(source_group_from_dir group dir)
+    file(GLOB_RECURSE srcFiles LIST_DIRECTORIES false
+        "${dir}}/*.cpp"
+        "${dir}/*.hpp"
+        "${dir}/*.c"
+        "${dir}/*.h")
+    source_group(${group} FILES ${srcFiles})
+endfunction()

@@ -6,7 +6,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeUtils")
 
 option(VERBOSE_BUILD "Use verbose logging when building project" ON)
 
-set(thirdpartySrcDirName "Thirdparty")
+set(mySrcDir ${PROJECT_SOURCE_DIR}/Source)
+set(thirdpartySrcDir ${PROJECT_SOURCE_DIR}/Thirdparty)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum OS X deployment version")
 
 # Do not allow build in source directory
@@ -25,7 +26,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/_build/")
 
-message("CMAKE_VS_DEBUGGER_WORKING_DIRECTORY = ${CMAKE_VS_DEBUGGER_WORKING_DIRECTORY}")
 log_messages_optional(
     MESSAGES
         "Build project '${PROJECT_NAME}' from source: ${PROJECT_SOURCE_DIR}"
@@ -40,37 +40,16 @@ log_messages_optional(
 add_executable(Feng_GlSandbox)
 add_executable(Feng::GlSandbox ALIAS Feng_GlSandbox)
 
-# ---------------------------------------------------------------------
-# ------------------- Collect thirdparty libraries --------------------
-# ---------------------------------------------------------------------
+# -----------------------------------------------------------------------
+# --------------------- My source files for project ---------------------
+# -----------------------------------------------------------------------
 
-set(thirdpartyStaticLibs "")
-
-if(APPLE)
-    file(GLOB_RECURSE thirdpartyStaticLibs REGEX "*.a")
-elseif(WIN32)
-    file(GLOB_RECURSE thirdpartyStaticLibs REGEX "*.lib")
-endif()
-
-set(thirdpartyStaticLibsDebug ${thirdpartyStaticLibs})
-list(FILTER thirdpartyStaticLibsDebug INCLUDE REGEX ".*${thirdpartySrcDirName}.*Libs.*Debug.*")
-
-set(thirdpartyStaticLibsRelease ${thirdpartyStaticLibs})
-list(FILTER thirdpartyStaticLibsRelease INCLUDE REGEX ".*${thirdpartySrcDirName}.*Libs.*Release.*")
-
-log_messages_optional(
-    MESSAGES 
-        "Thirdparty static libraries (DEBUG):"
-        ${thirdpartyStaticLibsDebug}
-    DO_LOG ${VERBOSE_BUILD}
-    FRAME_UP)
-
-log_messages_optional(
-    MESSAGES 
-        "Thirdparty static libraries (RELEASE):"
-        ${thirdpartyStaticLibsRelease}
-    DO_LOG ${VERBOSE_BUILD}
-    FRAME_DOWN)
+file(GLOB_RECURSE mySrcFiles LIST_DIRECTORIES false
+    "${mySrcDir}/*.cpp"
+    "${mySrcDir}/*.hpp"
+    "${mySrcDir}/*.c"
+    "${mySrcDir}/*.h"
+)
 
 # ----------------------------------------------------------------------
 # ---------------- Collect platform-specific libraries -----------------
@@ -90,6 +69,13 @@ if(APPLE)
                     ${MAC_OPEN_GL_LIB})
 endif()
 
+# glad
+if(WIN32)
+    add_subdirectory(${thirdpartySrcDir}/Glad SYSTEM)
+    list(APPEND platformSpecificLibs GladLibInterface)
+    source_group_from_target("Thirdparty/Glad" GladLibInterface)
+endif()
+
 log_messages_optional(
     MESSAGES 
         "Platform-specific libraries:"
@@ -98,44 +84,16 @@ log_messages_optional(
     FRAME_UP FRAME_DOWN)
 
 # -----------------------------------------------------------------------
-# --------------------- My source files for project ---------------------
-# -----------------------------------------------------------------------
-
-set(mySrcDir ${PROJECT_SOURCE_DIR}/Source)
-file(GLOB_RECURSE mySrcFiles LIST_DIRECTORIES false
-    "${mySrcDir}/*.cpp"
-    "${mySrcDir}/*.hpp"
-    "${mySrcDir}/*.c"
-    "${mySrcDir}/*.h"
-)
-
-# -----------------------------------------------------------------------
 # ---------------- Thirdparty source files for project ------------------
 # -----------------------------------------------------------------------
 
-set(thirdpartySrcDir ${PROJECT_SOURCE_DIR}/${thirdpartySrcDirName})
-
-# glad
-if(WIN32)
-    add_subdirectory(${thirdpartySrcDir}/Glad SYSTEM)
-    list(APPEND platformSpecificLibs GladLibInterface)
-    get_target_property(gladSrc GladLibInterface INTERFACE_SOURCES)
-    source_group("Thirdparty/Glad" FILES ${gladSrc})
-endif()
-
 # Glfw
-file(GLOB_RECURSE glfwSrc LIST_DIRECTORIES false
-    "${thirdpartySrcDir}/Glfw/*.cpp"
-    "${thirdpartySrcDir}/Glfw/*.hpp"
-    "${thirdpartySrcDir}/Glfw/*.c"
-    "${thirdpartySrcDir}/Glfw/*.h"
-)
-source_group("Thirdparty/Glfw" FILES ${glfwSrc})
+add_subdirectory(${thirdpartySrcDir}/Glfw SYSTEM)
+source_group_from_dir("Thirdparty/Glfw" ${thirdpartySrcDir}/Glfw)
 
 # Stb
 add_subdirectory(${thirdpartySrcDir}/Stb SYSTEM)
-get_target_property(stbSrc StbLibInterface INTERFACE_SOURCES)
-source_group("Thirdparty/Stb" FILES ${stbSrc})
+source_group_from_target("Thirdparty/Stb" StbLibInterface)
 
 # ---------------------------------------------------------------------
 # ------------------------- Setup executable --------------------------
@@ -150,9 +108,8 @@ set_target_properties(Feng_GlSandbox PROPERTIES
       XCODE_SCHEME_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_sources(Feng_GlSandbox
-    PUBLIC 
-        ${mySrcFiles} 
-        ${glfwSrc})
+    PRIVATE 
+        ${mySrcFiles})
 
 if(APPLE)
     # disable warnings aboug OpenGL deprecation of Mac
@@ -176,8 +133,6 @@ target_include_directories(Feng_GlSandbox
 # Link libraries
 target_link_libraries(Feng_GlSandbox
     PRIVATE
-        $<$<CONFIG:Debug>:${thirdpartyStaticLibsDebug}>
-        $<$<CONFIG:Release>:${thirdpartyStaticLibsRelease}>
         ${platformSpecificLibs}
         StbLibInterface)
 
