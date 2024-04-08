@@ -71,6 +71,7 @@ function(source_group_from_dir group dir)
         "${dir}}/*.cpp"
         "${dir}/*.hpp"
         "${dir}/*.c"
-        "${dir}/*.h")
+        "${dir}/*.h"
+        "${dir}/*CMakeLists.txt")
     source_group(${group} FILES ${srcFiles})
 endfunction()

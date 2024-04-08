@@ -1,8 +1,9 @@
 add_library(StbLibInterface INTERFACE)
 
-target_sources(StbLibInterface 
+target_sources(StbLibInterface
     INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}/stb_image.h)
+        CMakeLists.txt
+        stb_image.h)
 
 target_include_directories(StbLibInterface
     INTERFACE

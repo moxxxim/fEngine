@@ -1,5 +1,6 @@
 target_sources(Feng_GlSandbox
     PRIVATE
+        CMakeLists.txt
         glfw3.h
         glfw3native.h)
 
@@ -19,7 +20,7 @@ log_messages_optional(
         ${glfwLibsDebug}
     DO_LOG ${VERBOSE_BUILD}
     FRAME_UP)
-    
+
 log_messages_optional(
     MESSAGES 
         "Glf libs (RELEASE):"
