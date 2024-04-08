@@ -40,11 +40,11 @@ namespace Feng
 
     private:
         PostEffectContext context;
+        std::vector<FrameBuffer> buffers;
         Material *material = nullptr;
         FrameBuffersPool *buffersPool = nullptr;
         std::map<std::string, uint32_t> *shaderInputTextures = nullptr;
         int customBuffersCount = 0;
-        std::vector<FrameBuffer> buffers;
     };
 }
 

@@ -13,9 +13,9 @@ namespace Feng
         int32_t aCustomBuffersCount,
         FrameBuffersPool *aBuffersPool)
         : material(aMaterial)
+        , buffersPool(aBuffersPool)
         , shaderInputTextures(aShaderInputTextures)
         , customBuffersCount(aCustomBuffersCount)
-        , buffersPool(aBuffersPool)
     {
         if(customBuffersCount > 0)
         {

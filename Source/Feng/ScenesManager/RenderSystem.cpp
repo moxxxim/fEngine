@@ -64,8 +64,6 @@ namespace Feng
         
         bool ValidateCascadeBorders(const std::vector<float> cascadeBorders)
         {
-            static constexpr uint32_t cascadesCount = 3;
-            
             if(!std::is_sorted(cascadeBorders.cbegin(), cascadeBorders.cend()))
             {
                 return false;

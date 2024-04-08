@@ -21,7 +21,7 @@ endif()
 include(FengCMakeUtils)
 set_property(GLOBAL PROPERTY USE_FOLDERS YES)
 if(APPLE)
-    set(CMAKE_COMPILE_WARNING_AS_ERROR NO)
+    set(CMAKE_COMPILE_WARNING_AS_ERROR YES)
 elseif(WIN32)
     set(CMAKE_COMPILE_WARNING_AS_ERROR YES)
 endif()
@@ -75,8 +75,8 @@ endif()
 # glad
 if(WIN32)
     add_subdirectory(${thirdpartySrcDir}/Glad SYSTEM)
-    list(APPEND platformSpecificLibs GladLibInterface)
     source_group_from_target("Thirdparty/Glad" GladLibInterface)
+    list(APPEND platformSpecificLibs GladLibInterface)
 endif()
 
 log_messages_optional(
@@ -99,7 +99,7 @@ add_subdirectory(${thirdpartySrcDir}/Stb SYSTEM)
 source_group_from_target("Thirdparty/Stb" StbLibInterface)
 
 # ---------------------------------------------------------------------
-# ------------------------- Setup executable --------------------------
+# ------------------- Setup executable properties ---------------------
 # ---------------------------------------------------------------------
 
 set_target_properties(Feng_GlSandbox PROPERTIES
@@ -129,15 +129,19 @@ endif()
 target_include_directories(Feng_GlSandbox 
     PRIVATE
         "${mySrcDir}"
-        "${thirdpartySrcDir}")
+)
+
+target_include_directories(Feng_GlSandbox SYSTEM
+    PRIVATE
+        "${thirdpartySrcDir}"
+)
 
 # Link libraries
 target_link_libraries(Feng_GlSandbox
     PRIVATE
         ${platformSpecificLibs}
-        StbLibInterface)
+        StbLibInterface
+)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Feng_GlSandbox)
+set_directory_properties(PROPERTY VS_STARTUP_PROJECT Feng_GlSandbox)
 source_group(TREE ${mySrcDir} FILES ${mySrcFiles})
-
-# TODO: m.alekseev make resources folder visible in project.
