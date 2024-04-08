@@ -5,11 +5,13 @@ project(Feng)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeUtils")
 
 option(VERBOSE_BUILD "Use verbose logging when building project" ON)
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "" FORCE) 
 
 set(mySrcDir ${PROJECT_SOURCE_DIR}/Source)
 set(thirdpartySrcDir ${PROJECT_SOURCE_DIR}/Thirdparty)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum OS X deployment version")
 set(CMAKE_XCODE_GENERATE_SCHEME TRUE)
+
 
 # Do not allow build in source directory
 if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
@@ -58,16 +60,16 @@ file(GLOB_RECURSE mySrcFiles LIST_DIRECTORIES false
 
 set(platformSpecificLibs)
 if(APPLE)
-    find_library(MAC_COCOA_LIB Cocoa REQUIRED)
-    find_library(MAC_IO_KIT_LIB IOKit REQUIRED)
-    find_library(MAC_CORE_VIDEO_LIB CoreVideo REQUIRED)
-    find_library(MAC_OPEN_GL_LIB OpenGL REQUIRED)
+    find_library(macCocoaLib Cocoa REQUIRED NO_CACHE)
+    find_library(macIoKitLib IOKit REQUIRED NO_CACHE)
+    find_library(macCoreVideLib CoreVideo REQUIRED NO_CACHE)
+    find_library(macOpenGlLib OpenGL REQUIRED NO_CACHE)
 
     set(platformSpecificLibs 
-                    ${MAC_COCOA_LIB}
-                    ${MAC_IO_KIT_LIB}
-                    ${MAC_CORE_VIDEO_LIB}
-                    ${MAC_OPEN_GL_LIB})
+                    ${macCocoaLib}
+                    ${macIoKitLib}
+                    ${macCoreVideLib}
+                    ${macOpenGlLib})
 endif()
 
 # glad
