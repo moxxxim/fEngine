@@ -11,7 +11,16 @@ function(log_message_framed)
     log_delimeters()
 endfunction()
 
-# log list of messages each on a new line
+#[[ 
+    Log list of messages each on a new line
+    Example: 
+        log_messages_optional(
+            MESSAGES 
+                "Message:"
+                ${variableName}
+            DO_LOG ON
+            FRAME_UP FRAME_DOWN)
+]]
 function(log_messages_optional)
     set(prefix ARG)
     set(options
