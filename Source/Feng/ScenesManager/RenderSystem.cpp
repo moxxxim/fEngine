@@ -428,7 +428,7 @@ namespace Feng
         glBindVertexArray(quadBuffer.vao);
 
         Shader *shader = shadowSetup.directLightShadowDebugMaterial->GetShader();
-        shader->StartUse();
+        shader->Use();
         Render::ResolveBindings(*shader, renderProperties.globalBindings, { });
         Render::SetDrawFace(eDrawFace::Cw);
         Print_Errors_OpengGL();
@@ -439,9 +439,8 @@ namespace Feng
         Print_Errors_OpengGL();
         shader->SetUniformInt(ShaderParams::DirectShadowMap.data(), 0);
         Print_Errors_OpengGL();
-        
+
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        shader->StopUse();
         Print_Errors_OpengGL();
 
         glBindVertexArray(Render::UndefinedBuffer);
@@ -652,7 +651,7 @@ namespace Feng
         glBindVertexArray(quadBuffer.vao);
         
         Shader *shader = toneMappingMaterial->GetShader();
-        shader->StartUse();
+        shader->Use();
         Render::ResolveBindings(*shader, renderProperties.globalBindings, { });
         Render::SetDrawFace(eDrawFace::Cw);
         Print_Errors_OpengGL();
@@ -666,7 +665,6 @@ namespace Feng
         Print_Errors_OpengGL();
         
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        shader->StopUse();
         Print_Errors_OpengGL();
         glBindVertexArray(Render::UndefinedBuffer);
         fboPool.Push(screenProcessed);

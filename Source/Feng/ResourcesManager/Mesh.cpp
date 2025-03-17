@@ -1,7 +1,5 @@
 #include <Feng/ResourcesManager/Mesh.h>
 
-#include <Feng/ResourcesManager/ResourceManager.h>
-
 namespace Feng
 {
     Mesh::Mesh(

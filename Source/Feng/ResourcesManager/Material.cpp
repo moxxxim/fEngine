@@ -1,6 +1,5 @@
 #include <Feng/ResourcesManager/Material.h>
 
-#include <Feng/ResourcesManager/ResourceManager.h>
 #include <Feng/ResourcesManager/Shader.h>
 
 namespace Feng
@@ -40,7 +39,7 @@ namespace Feng
     {
         if(shader)
         {
-            shader->StartUse();
+            shader->Use();
             ApplyStates();
         }
     }

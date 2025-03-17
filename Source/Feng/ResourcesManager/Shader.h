@@ -28,8 +28,7 @@ namespace Feng
         ~Shader();
 
         bool IsLoaded() const;
-        void StartUse() const;
-        void StopUse() const;
+        void Use() const;
 
         const std::map<std::string, int32_t>& GetAttributes() const;
         const std::map<std::string, int32_t>& GetUniforms() const;

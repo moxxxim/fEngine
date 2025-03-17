@@ -1,7 +1,6 @@
 #include <Feng/ResourcesManager/Shader.h>
 
 #include <Feng/Core/FengGL.h>
-#include <Feng/ResourcesManager/ResourcesManager.h>
 #include <Feng/Utils/Render/RenderUtils.h>
 #include <Feng/Utils/Render/ShaderParams.h>
 #include <Feng/Utils/Debug.h>
@@ -74,13 +73,9 @@ namespace Feng
         Unload();
     }
 
-    void Shader::StartUse() const
+    void Shader::Use() const
     {
         glUseProgram(program);
-    }
-
-    void Shader::StopUse() const
-    {
     }
 
     bool Shader::TryGetAttributeLocation(const char *name, int32_t& location) const

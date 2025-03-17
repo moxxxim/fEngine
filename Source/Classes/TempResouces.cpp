@@ -359,7 +359,7 @@ namespace
     void CreatePostEffectDefinitions()
     {
         using namespace Feng;
-        
+
         std::unique_ptr<Shader> grayscaleShader = LoadShader(ShaderSrc::PostEffectVs, ShaderSrc::GrayscalePostEffectFs);
         std::unique_ptr<Material> grayscaleFxMaterial = std::make_unique<Material>(std::move(grayscaleShader));
         grayscaleFx = std::make_unique<PostEffectDefinition>(std::move(grayscaleFxMaterial));
@@ -402,7 +402,7 @@ namespace
 
         uint32_t quadAttributesValue = eVertexAtributes::Position | eVertexAtributes::Uv0;
         eVertexAtributes quadAttributes = static_cast<eVertexAtributes>(quadAttributesValue);
-        test::res.QuadMesh = std::make_unique<Mesh>(quadVertices, quadIndices, quadAttributes,  ePrimitiveType::Triangles);
+        test::res.QuadMesh = std::make_unique<Mesh>(quadVertices, quadIndices, quadAttributes, ePrimitiveType::Triangles);
     }
 }
 

@@ -15,7 +15,6 @@ namespace Feng
         static uint32_t GetBindTarget(FrameBuffer::eAttachement attachement);
         FrameBuffer Pop(const FrameBuffer::Settings& settings);
         void Push(const FrameBuffer& buffer);
-        void Clear();
         
     private:
         FrameBuffer CreateBuffer(const FrameBuffer::Settings& settings);
